@@ -1,5 +1,6 @@
 import React from 'react';
-import { MainStructure } from '../components/Structure';
+import DashboardAppBar from '../components/DashboardAppBar';
+import { OIDCSecure } from '../components/OIDCUtils';
 
 
 export default function DashboardLayout({
@@ -9,9 +10,11 @@ export default function DashboardLayout({
 }) {
   return (
   <div>
-    <MainStructure>
+    <OIDCSecure>
+      <DashboardAppBar>
         {children}
-    </MainStructure>
+      </DashboardAppBar>
+    </OIDCSecure>
   </div>
   );
 }

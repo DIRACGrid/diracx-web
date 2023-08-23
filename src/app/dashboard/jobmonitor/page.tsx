@@ -1,4 +1,4 @@
-import { DiracDataGrid } from "@/app/components/DiracDataGrid";
+import { JobDataGrid } from "@/app/components/JobDataGrid";
 
 const columns = [
   { field: 'id', headerName: 'Job ID', width: 70 },
@@ -36,7 +36,7 @@ export default async function Page() {
     return (
       <div>
         <h2>Job Monitor</h2>
-        <DiracDataGrid rows={rows} columns={columns} />
+        <JobDataGrid rows={rows} columns={columns} />
       </div>
     );
   };

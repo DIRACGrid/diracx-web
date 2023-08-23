@@ -1,12 +1,11 @@
 'use client'
 import * as React from 'react';
-import NextLink from 'next/link'
+import NextLink from 'next/link';
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import CssBaseline from '@mui/material/CssBaseline';
 import Drawer from '@mui/material/Drawer';
 import IconButton from '@mui/material/IconButton';
-import TuneIcon from '@mui/icons-material/Tune';
 import MenuIcon from '@mui/icons-material/Menu';
 import MonitorIcon from '@mui/icons-material/Monitor';
 import MenuBookIcon from '@mui/icons-material/MenuBook';
@@ -17,16 +16,16 @@ import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import Toolbar from '@mui/material/Toolbar';
-import Image from 'next/image';
 import Stack from '@mui/material/Stack';
 import Avatar from '@mui/material/Avatar';
-import { deepOrange, grey } from '@mui/material/colors';
+import { deepOrange } from '@mui/material/colors';
 import Button from '@mui/material/Button';
+import { DiracLogo } from './DiracLogo';
 
 
 const userSections = {'Job Monitor': MonitorIcon};
 
-export function MainStructure(props: Props) {
+export default function DashboardAppBar(props: Props) {
   const { window } = props;
   const [mobileOpen, setMobileOpen] = React.useState(false);
 
@@ -39,14 +38,7 @@ export function MainStructure(props: Props) {
   const drawer = (
     <div>
       <Toolbar>
-        <NextLink href="/dashboard">
-          <Image
-            src='/DIRAC-logo.png'
-            alt="DIRAC logo"
-            width={200}
-            height={70}
-          />
-        </NextLink>
+        <DiracLogo/>
       </Toolbar>
       <List>
         {Object.keys(userSections).map((title, index) => (
@@ -75,20 +67,9 @@ export function MainStructure(props: Props) {
   );
 
   const settings = (
-    <Stack
-      direction='row'
-      sx={{
-        bgcolor: grey[200],
-        borderRadius: '5%',
-        boxShadow: 3}}
-      >
       <Button>
         <Avatar sx={{ bgcolor: deepOrange[500]}}>U</Avatar>
       </Button>
-      <IconButton>
-        <TuneIcon/>
-      </IconButton>
-    </Stack>
   )
 
   const container = window !== undefined ? () => window().document.body : undefined;

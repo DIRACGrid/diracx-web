@@ -1,7 +1,7 @@
 'use client'
-import { DataGrid, GridColDef } from '@mui/x-data-grid';
+import { DataGrid } from '@mui/x-data-grid';
 
-export function DiracDataGrid(props) {
+export function JobDataGrid(props) {
   return (
     <DataGrid
       rows={props.rows}
