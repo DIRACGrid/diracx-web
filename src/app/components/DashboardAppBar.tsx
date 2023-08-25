@@ -21,20 +21,30 @@ import { DiracLogo } from "./DiracLogo";
 import { Dashboard, FolderCopy } from "@mui/icons-material";
 import { LoginButton } from "./LoginButton";
 
+// Sections accessible to the users
 const userSections = {
   Dashboard: { icon: Dashboard, path: "/dashboard" },
   "Job Monitor": { icon: MonitorIcon, path: "/dashboard/jobmonitor" },
   "File Catalog": { icon: FolderCopy, path: "/dashboard/filecatalog" },
 };
 
+/**
+ * Build a side bar on the left containing the available sections as well as a top bar.
+ * The side bar is expected to collapse if displayed on a small screen
+ *
+ * @param props - children
+ * @return an dashboard layout
+ */
 export default function DashboardAppBar(props: Props) {
   const { window } = props;
 
+  /** State management for mobile drawer */
   const [mobileOpen, setMobileOpen] = React.useState(false);
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
   };
 
+  /** State management for selected section in the drawer */
   const [selectedIndex, setSelectedIndex] = React.useState(true);
   const handleListItemClick = (
     event: React.MouseEvent<HTMLDivElement, MouseEvent>,
@@ -43,8 +53,10 @@ export default function DashboardAppBar(props: Props) {
     setSelectedIndex(index);
   };
 
+  /** Drawer width */
   const drawerWidth = 240;
 
+  /** Drawer component: a logo, a list of sections and a link to the documentation */
   const drawer = (
     <div>
       <Toolbar>
@@ -56,7 +68,7 @@ export default function DashboardAppBar(props: Props) {
             <ListItemButton
               component={NextLink}
               href={userSections[title]["path"]}
-              selected={selectedIndex == index}
+              selected={selectedIndex === index}
               onClick={(event) => handleListItemClick(event, index)}
             >
               <ListItemIcon>
@@ -87,6 +99,7 @@ export default function DashboardAppBar(props: Props) {
   const container =
     window !== undefined ? () => window().document.body : undefined;
 
+  /** Return an App bar embedding the drawer */
   return (
     <Box sx={{ display: "flex" }}>
       <CssBaseline />

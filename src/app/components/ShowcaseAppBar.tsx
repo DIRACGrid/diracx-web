@@ -11,6 +11,11 @@ import { DiracLogo } from "./DiracLogo";
 import { LoginButton } from "./LoginButton";
 import { Stack } from "@mui/material";
 
+/**
+ * Controls the response due to a scrolling
+ * @param props - children
+ * @returns an elevation of the children component
+ */
 function ElevationScroll(props: Props) {
   const { children } = props;
 
@@ -24,6 +29,11 @@ function ElevationScroll(props: Props) {
   });
 }
 
+/**
+ * Build the showcase content with an AppBar
+ * @param props - children
+ * @returns showcase content
+ */
 export default function ShowcaseAppBar(props: Props) {
   const Item = styled(Paper)(({ theme }) => ({
     backgroundColor: theme.palette.mode === "dark" ? "#1A2027" : "#fff",

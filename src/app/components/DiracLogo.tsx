@@ -1,6 +1,10 @@
 import NextLink from "next/link";
 import Image from "next/image";
 
+/**
+ * Logo of the DIRAC interware redirecting to the root page
+ * @returns a NextLink embedding an Image
+ */
 export function DiracLogo() {
   return (
     <>

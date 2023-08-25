@@ -1,32 +1,24 @@
 "use client";
-import { useRouter } from "next/navigation";
-import {
-  OidcProvider,
-  OidcSecure,
-  useOidcAccessToken,
-} from "@axa-fr/react-oidc";
+import { OidcProvider, OidcSecure } from "@axa-fr/react-oidc";
 
+/**
+ * Wrapper around the react-oidc OidcProvider component
+ * Needed because OidcProvider cannot be directly called from a server file
+ * @param props - configuration of the OIDC provider
+ * @returns the wrapper around OidcProvider
+ */
 export function OIDCProvider(props: Props) {
   const onEvent = (configurationName: string, eventName: string, data: any) => {
     console.log(`oidc:${configurationName}:${eventName}`, data);
   };
 
-  // const withCustomHistory = () => {
-
-  //  const router = useRouter();
-
-  //  return {
-  //    replaceState: (url: string) => {
-  //      router.replace({
-  //        pathname: url,
-  //      }).then(() => {
-  //        window.dispatchEvent(new Event('popstate'));
-  //      });
-  //    },
-  //  };
-  // };
   const withCustomHistory = () => {
-    return { replaceState: (url: string) => (window.location.href = url) };
+    return {
+      replaceState: (url: string) => {
+        // Cannot use router.replace() because the code is not adapted to NextJS 13 yet
+        window.location.href = url;
+      },
+    };
   };
 
   return (
@@ -42,40 +34,16 @@ export function OIDCProvider(props: Props) {
   );
 }
 
+/**
+ * Wrapper around the react-oidc OidcSecure component
+ * Needed because OidcProvider cannot be directly called from a server file
+ * @param props - configuration of the OIDC provider
+ * @returns the wrapper around OidcProvider
+ */
 export function OIDCSecure({ children }) {
   return (
     <>
       <OidcSecure>{children}</OidcSecure>
     </>
-  );
-}
-
-export function OIDCAccessToken() {
-  const { accessToken, accessTokenPayload } = useOidcAccessToken();
-
-  if (!accessToken) {
-    return <p>You are not authenticated</p>;
-  }
-
-  return (
-    <div className="card text-white bg-info mb-3">
-      <div className="card-body">
-        <h5 className="card-title">Access Token</h5>
-        <p className="card-text">Access Token: {JSON.stringify(accessToken)}</p>
-        {accessTokenPayload != null && (
-          <p className="card-text">
-            Access Token Payload: {JSON.stringify(accessTokenPayload)}
-          </p>
-        )}
-      </div>
-    </div>
-  );
-}
-
-export function OIDCProfile() {
-  return (
-    <div className="container mt-3">
-      <OIDCAccessToken />
-    </div>
   );
 }

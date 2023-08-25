@@ -3,6 +3,10 @@ import { Avatar, Button } from "@mui/material";
 import { deepOrange } from "@mui/material/colors";
 import NextLink from "next/link";
 
+/**
+ * Login/Logout button, expected to vary whether the user is connected
+ * @returns a Button
+ */
 export function LoginButton() {
   const { accessToken, accessTokenPayload } = useOidcAccessToken();
 
