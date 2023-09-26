@@ -8,10 +8,6 @@ import { OidcProvider, OidcSecure } from "@axa-fr/react-oidc";
  * @returns the wrapper around OidcProvider
  */
 export function OIDCProvider(props: Props) {
-  const onEvent = (configurationName: string, eventName: string, data: any) => {
-    console.log(`oidc:${configurationName}:${eventName}`, data);
-  };
-
   const withCustomHistory = () => {
     return {
       replaceState: (url: string) => {
@@ -25,7 +21,6 @@ export function OIDCProvider(props: Props) {
     <>
       <OidcProvider
         configuration={props.configuration}
-        onEvent={onEvent}
         withCustomHistory={withCustomHistory}
       >
         <main>{props.children}</main>

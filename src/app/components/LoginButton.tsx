@@ -21,7 +21,7 @@ export function LoginButton() {
   return (
     <Button>
       <Avatar sx={{ bgcolor: deepOrange[500] }}>
-        {accessTokenPayload["name"][0]}
+        {accessTokenPayload["preferred_username"][0]}
       </Avatar>
     </Button>
   );
