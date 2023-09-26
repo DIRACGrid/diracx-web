@@ -11,6 +11,7 @@ import { DiracLogo } from "./DiracLogo";
 import { LoginButton } from "./LoginButton";
 import { Stack } from "@mui/material";
 import { DashboardButton } from "./DashboardButton";
+import Image from "next/image";
 
 /**
  * Controls the response due to a scrolling
@@ -37,10 +38,8 @@ function ElevationScroll(props: Props) {
  */
 export default function ShowcaseAppBar(props: Props) {
   const Item = styled(Paper)(({ theme }) => ({
-    backgroundColor: theme.palette.mode === "dark" ? "#1A2027" : "#fff",
-    ...theme.typography.body2,
-    padding: theme.spacing(1),
-    color: theme.palette.text.secondary,
+    padding: theme.spacing(6),
+    elevation: 0,
   }));
 
   return (
@@ -69,40 +68,35 @@ export default function ShowcaseAppBar(props: Props) {
       </ElevationScroll>
       <Toolbar />
       <Grid container spacing={2} sx={{ my: 2 }}>
-        <Grid item xs={6} md={8}>
+        <Grid item xs={6} md={4}>
           <Item>
-            Cras mattis consectetur purus sit amet fermentum. Cras justo odio,
-            dapibus ac facilisis in, egestas eget quam. Morbi leo risus, porta
-            ac consectetur ac, vestibulum at eros. Praesent commodo cursus
-            magna, vel scelerisque nisl consectetur et. Cras mattis consectetur
-            purus sit amet fermentum. Cras justo odio, dapibus ac facilisis in,
-            egestas eget quam. Morbi leo risus, porta ac consectetur ac,
-            vestibulum at eros. Praesent commodo cursus magna, vel scelerisque
-            nisl consectetur et. Cras mattis consectetur purus sit amet
-            fermentum. Cras justo odio, dapibus ac facilisis in, egestas eget
-            quam. Morbi leo risus, porta ac consectetur ac, vestibulum at eros.
-            Praesent commodo cursus magna, vel scelerisque nisl consectetur et.
+            The DIRAC interware is a software framework that enables communities
+            to interact with distributed computing resources. DIRAC forms a
+            layer between users and resources, hiding diversities across
+            computing and storage resources.
           </Item>
         </Grid>
-        <Grid item xs={6} md={4}>
-          <Item>Image</Item>
+        <Grid item xs={6} md={6}>
+          <Image
+            src="/showcase1.png"
+            alt="DIRAC logo"
+            width={400}
+            height={400}
+          />
+        </Grid>
+        <Grid item xs={6} md={6}>
+          <Image
+            src="/showcase2.png"
+            alt="DIRAC logo"
+            width={400}
+            height={400}
+          />
         </Grid>
         <Grid item xs={6} md={4}>
-          <Item>Image</Item>
-        </Grid>
-        <Grid item xs={6} md={8}>
           <Item>
-            Cras mattis consectetur purus sit amet fermentum. Cras justo odio,
-            dapibus ac facilisis in, egestas eget quam. Morbi leo risus, porta
-            ac consectetur ac, vestibulum at eros. Praesent commodo cursus
-            magna, vel scelerisque nisl consectetur et. Cras mattis consectetur
-            purus sit amet fermentum. Cras justo odio, dapibus ac facilisis in,
-            egestas eget quam. Morbi leo risus, porta ac consectetur ac,
-            vestibulum at eros. Praesent commodo cursus magna, vel scelerisque
-            nisl consectetur et. Cras mattis consectetur purus sit amet
-            fermentum. Cras justo odio, dapibus ac facilisis in, egestas eget
-            quam. Morbi leo risus, porta ac consectetur ac, vestibulum at eros.
-            Praesent commodo cursus magna, vel scelerisque nisl consectetur et.
+            DIRAC has been adopted by several HEP and non-HEP experiments
+            communities, with different goals, intents, resources and workflows:
+            it is experiment agnostic, extensible, and flexible.
           </Item>
         </Grid>
       </Grid>
