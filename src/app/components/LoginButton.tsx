@@ -1,6 +1,6 @@
 import { useOidcAccessToken } from "@axa-fr/react-oidc";
 import { Avatar, Button } from "@mui/material";
-import { deepOrange } from "@mui/material/colors";
+import { deepOrange, lightGreen } from "@mui/material/colors";
 import NextLink from "next/link";
 
 /**
@@ -12,7 +12,15 @@ export function LoginButton() {
 
   if (!accessToken) {
     return (
-      <Button component={NextLink} href="/dashboard">
+      <Button
+        sx={{
+          bgcolor: lightGreen[700],
+          "&:hover": { bgcolor: deepOrange[500] },
+        }}
+        variant="contained"
+        component={NextLink}
+        href="/dashboard"
+      >
         Login
       </Button>
     );

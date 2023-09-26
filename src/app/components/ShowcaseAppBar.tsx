@@ -10,6 +10,7 @@ import { styled } from "@mui/material/styles";
 import { DiracLogo } from "./DiracLogo";
 import { LoginButton } from "./LoginButton";
 import { Stack } from "@mui/material";
+import { DashboardButton } from "./DashboardButton";
 
 /**
  * Controls the response due to a scrolling
@@ -58,7 +59,10 @@ export default function ShowcaseAppBar(props: Props) {
               }}
             >
               <div />
-              <LoginButton />
+              <Stack direction="row">
+                <DashboardButton />
+                <LoginButton />
+              </Stack>
             </Toolbar>
           </Stack>
         </AppBar>
