@@ -31,8 +31,7 @@ export function JobDataGrid() {
   if (error) {
     return <div>An error occurred while fetching jobs.</div>;
   }
-
-  if (!data) {
+  if (!data || data.length == 0) {
     return <div>No job submitted.</div>;
   }
 
