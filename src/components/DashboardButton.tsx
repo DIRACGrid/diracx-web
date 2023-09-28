@@ -8,7 +8,7 @@ import Link from "next/link";
  * @returns a Button
  */
 export function DashboardButton() {
-  const { accessToken, accessTokenPayload } = useOidcAccessToken();
+  const { accessToken } = useOidcAccessToken();
 
   if (!accessToken) {
     return null;

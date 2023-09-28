@@ -1,6 +1,7 @@
 import "./globals.css";
 import { Inter } from "next/font/google";
-import { OIDCProvider } from "./components/OIDCUtils";
+import { OIDCProvider } from "@/components/OIDCUtils";
+import { OidcConfiguration } from "@axa-fr/react-oidc";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -9,11 +10,11 @@ export const metadata = {
   description: "Distributed Infrastructure with Remote Agent Controller",
 };
 
-const configuration = {
-  client_id: process.env.DIRACX_CLIENT_ID,
-  redirect_uri: process.env.REDIRECT_URI,
-  scope: process.env.DEFAULT_SCOPE,
-  authority: process.env.NEXT_PUBLIC_DIRACX_URL,
+const configuration: OidcConfiguration = {
+  client_id: process.env.DIRACX_CLIENT_ID || "",
+  redirect_uri: process.env.REDIRECT_URI || "",
+  scope: process.env.DEFAULT_SCOPE || "",
+  authority: process.env.NEXT_PUBLIC_DIRACX_URL || "",
 };
 
 export default function RootLayout({

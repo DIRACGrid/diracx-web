@@ -7,6 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
+    "ts-lint": "tsc -noEmit -incremental",
     "postinstall": "node ./node_modules/@axa-fr/react-oidc/bin/copy-service-worker-files.mjs public",
     "prepare": "husky install"
   },
@@ -39,6 +40,7 @@
   },
   "lint-staged": {
     "*.{js,ts,jsx,tsx}": "eslint --cache --fix",
-    "*.{js,ts,jsx,tsx,css,md}": "prettier --write"
+    "*.{js,ts,jsx,tsx,css,md}": "prettier --write",
+    "*.{ts, tsx}": "tsc-files --noEmit"
   }
 }

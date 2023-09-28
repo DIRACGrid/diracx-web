@@ -14,29 +14,11 @@ import { DashboardButton } from "./DashboardButton";
 import Image from "next/image";
 
 /**
- * Controls the response due to a scrolling
- * @param props - children
- * @returns an elevation of the children component
- */
-function ElevationScroll(props: Props) {
-  const { children } = props;
-
-  const trigger = useScrollTrigger({
-    disableHysteresis: true,
-    threshold: 0,
-  });
-
-  return React.cloneElement(children, {
-    elevation: trigger ? 4 : 0,
-  });
-}
-
-/**
  * Build the showcase content with an AppBar
  * @param props - children
  * @returns showcase content
  */
-export default function ShowcaseAppBar(props: Props) {
+export default function ShowcaseAppBar() {
   const Item = styled(Paper)(({ theme }) => ({
     padding: theme.spacing(6),
     elevation: 0,
@@ -45,27 +27,25 @@ export default function ShowcaseAppBar(props: Props) {
   return (
     <React.Fragment>
       <CssBaseline />
-      <ElevationScroll {...props}>
-        <AppBar sx={{ bgcolor: "white" }}>
-          <Stack direction="row">
-            <Toolbar>
-              <DiracLogo />
-            </Toolbar>
-            <Toolbar
-              sx={{
-                justifyContent: "space-between",
-                flexGrow: 1,
-              }}
-            >
-              <div />
-              <Stack direction="row">
-                <DashboardButton />
-                <LoginButton />
-              </Stack>
-            </Toolbar>
-          </Stack>
-        </AppBar>
-      </ElevationScroll>
+      <AppBar sx={{ bgcolor: "white" }}>
+        <Stack direction="row">
+          <Toolbar>
+            <DiracLogo />
+          </Toolbar>
+          <Toolbar
+            sx={{
+              justifyContent: "space-between",
+              flexGrow: 1,
+            }}
+          >
+            <div />
+            <Stack direction="row">
+              <DashboardButton />
+              <LoginButton />
+            </Stack>
+          </Toolbar>
+        </Stack>
+      </AppBar>
       <Toolbar />
       <Grid container spacing={2} sx={{ my: 2 }}>
         <Grid item xs={6} md={4}>

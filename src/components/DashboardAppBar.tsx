@@ -21,8 +21,15 @@ import { DiracLogo } from "./DiracLogo";
 import { Dashboard, FolderCopy } from "@mui/icons-material";
 import { LoginButton } from "./LoginButton";
 
+interface DashboardAppBarProps {
+  children: React.ReactNode;
+}
+
 // Sections accessible to the users
-const userSections = {
+const userSections: Record<
+  string,
+  { icon: React.ComponentType; path: string }
+> = {
   Dashboard: { icon: Dashboard, path: "/dashboard" },
   "Job Monitor": { icon: MonitorIcon, path: "/dashboard/jobmonitor" },
   "File Catalog": { icon: FolderCopy, path: "/dashboard/filecatalog" },
@@ -35,9 +42,7 @@ const userSections = {
  * @param props - children
  * @return an dashboard layout
  */
-export default function DashboardAppBar(props: Props) {
-  const { window } = props;
-
+export default function DashboardAppBar(props: DashboardAppBarProps) {
   /** State management for mobile drawer */
   const [mobileOpen, setMobileOpen] = React.useState(false);
   const handleDrawerToggle = () => {
@@ -45,11 +50,8 @@ export default function DashboardAppBar(props: Props) {
   };
 
   /** State management for selected section in the drawer */
-  const [selectedIndex, setSelectedIndex] = React.useState(true);
-  const handleListItemClick = (
-    event: React.MouseEvent<HTMLDivElement, MouseEvent>,
-    index: number,
-  ) => {
+  const [selectedIndex, setSelectedIndex] = React.useState<number>(0);
+  const handleListItemClick = (index: number) => {
     setSelectedIndex(index);
   };
 
@@ -63,13 +65,13 @@ export default function DashboardAppBar(props: Props) {
         <DiracLogo />
       </Toolbar>
       <List>
-        {Object.keys(userSections).map((title, index) => (
+        {Object.keys(userSections).map((title: string, index: number) => (
           <ListItem key={title} disablePadding>
             <ListItemButton
               component={NextLink}
               href={userSections[title]["path"]}
               selected={selectedIndex === index}
-              onClick={(event) => handleListItemClick(event, index)}
+              onClick={() => handleListItemClick(index)}
             >
               <ListItemIcon>
                 <Icon component={userSections[title]["icon"]} />
@@ -97,7 +99,7 @@ export default function DashboardAppBar(props: Props) {
   );
 
   const container =
-    window !== undefined ? () => window().document.body : undefined;
+    window !== undefined ? () => window.document.body : undefined;
 
   /** Return an App bar embedding the drawer */
   return (

@@ -12,15 +12,18 @@ jobs:
         runs-on: ubuntu-latest
         steps:
             - uses: actions/checkout@v3
-              
-            - name: Format
-              run: npm run prettier
 
-            - name: lint
+            - name: Install dependencies
+              run: npm install
+              
+            - name: Check formatting rules
+              run: npx prettier . --check
+
+            - name: Check code-quality rules
               run: npm run lint
 
-            - name: typescript
-              run: npm run typescript
+            - name: Check typescript type validity
+              run: npm run ts-lint
 
-            - name: build
+            - name: Build the web client
               run: npm run build --if-present

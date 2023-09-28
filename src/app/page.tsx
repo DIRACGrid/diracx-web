@@ -1,4 +1,4 @@
-import ShowcaseAppBar from "./components/ShowcaseAppBar";
+import ShowcaseAppBar from "@/components/ShowcaseAppBar";
 
 const containerStyles = {
   marginLeft: "30%",

@@ -19,7 +19,7 @@ export function JobDataGrid() {
   const { accessToken } = useOidcAccessToken();
 
   // TODO: move fetcher to make it usable from other places
-  const fetcher = (params) => {
+  const fetcher = (params: string[]) => {
     const [path] = params;
     return fetch(process.env.NEXT_PUBLIC_DIRACX_URL + path, {
       method: "POST",

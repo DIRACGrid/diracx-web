@@ -1,9 +1,7 @@
 export default function Page() {
-    return (
-      <div>
-        <span>
-          Hello User
-        </span>
-      </div>
-    );
+  return (
+    <div>
+      <span>Hello User</span>
+    </div>
+  );
 }

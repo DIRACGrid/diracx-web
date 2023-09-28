@@ -1,5 +1,19 @@
 "use client";
-import { OidcProvider, OidcSecure } from "@axa-fr/react-oidc";
+import {
+  OidcConfiguration,
+  OidcProvider,
+  OidcSecure,
+} from "@axa-fr/react-oidc";
+import React from "react";
+
+interface OIDCProviderProps {
+  configuration: OidcConfiguration;
+  children: React.ReactNode;
+}
+
+interface OIDCProps {
+  children: React.ReactNode;
+}
 
 /**
  * Wrapper around the react-oidc OidcProvider component
@@ -7,7 +21,7 @@ import { OidcProvider, OidcSecure } from "@axa-fr/react-oidc";
  * @param props - configuration of the OIDC provider
  * @returns the wrapper around OidcProvider
  */
-export function OIDCProvider(props: Props) {
+export function OIDCProvider(props: OIDCProviderProps) {
   const withCustomHistory = () => {
     return {
       replaceState: (url: string) => {
@@ -35,7 +49,7 @@ export function OIDCProvider(props: Props) {
  * @param props - configuration of the OIDC provider
  * @returns the wrapper around OidcProvider
  */
-export function OIDCSecure({ children }) {
+export function OIDCSecure({ children }: OIDCProps) {
   return (
     <>
       <OidcSecure>{children}</OidcSecure>
