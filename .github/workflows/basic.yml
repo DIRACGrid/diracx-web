@@ -1,4 +1,4 @@
-name: React App CI
+name: Basic checks
 
 on:
     # Triggers the workflow on push or pull request events but only for the master branch
@@ -25,5 +25,3 @@ jobs:
             - name: Check typescript type validity
               run: npm run ts-lint
 
-            - name: Build the web client
-              run: npm run build --if-present
