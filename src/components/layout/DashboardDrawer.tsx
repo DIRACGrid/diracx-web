@@ -24,7 +24,7 @@ const userSections: Record<
   "File Catalog": { icon: FolderCopy, path: "/dashboard/filecatalog" },
 };
 
-export default function DashboardDrawerContents() {
+export default function DashboardDrawer() {
   const pathname = usePathname();
 
   return (

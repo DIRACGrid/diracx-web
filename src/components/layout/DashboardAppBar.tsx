@@ -38,7 +38,6 @@ export default function DashboardAppBar(props: DashboardAppBarProps) {
 
   const renderDrawer = (variant: "permanent" | "temporary") => {
     const isTemporary = variant === "temporary";
-
     return (
       <Drawer
         container={isTemporary ? container : undefined}
@@ -55,6 +54,7 @@ export default function DashboardAppBar(props: DashboardAppBarProps) {
             width: drawerWidth,
           },
         }}
+        data-testid={`drawer-${variant}`}
       >
         <DashboardDrawer />
       </Drawer>
@@ -80,6 +80,7 @@ export default function DashboardAppBar(props: DashboardAppBarProps) {
               edge="start"
               onClick={handleDrawerToggle}
               sx={{ mr: 2, display: { sm: "none" } }}
+              data-testid="drawer-toggle-button"
             >
               <MenuIcon />
             </IconButton>
@@ -100,6 +101,10 @@ export default function DashboardAppBar(props: DashboardAppBarProps) {
         sx={{ width: { sm: drawerWidth }, flexShrink: { sm: 0 } }}
         aria-label="side bar"
       >
+        {/* Here two types of drawers are rendered:
+           1. Temporary drawer: Visible on small screens (xs) and is collapsible.
+           2. Permanent drawer: Visible on larger screens (sm) and stays fixed.
+          Depending on the screen size, only one will be visible at a time. */}
         {renderDrawer("temporary")}
         {renderDrawer("permanent")}
       </Box>

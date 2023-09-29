@@ -12,7 +12,7 @@ const TokenRenewMode = {
   id_token_invalid: "id_token_invalid"
 };
 const openidWellknownUrlEndWith = "/.well-known/openid-configuration";
-const version = "7.3.3";
+const version = "7.6.0";
 function checkDomain(domains, endpoint) {
   if (!endpoint) {
     return;
@@ -155,6 +155,21 @@ const isTokensOidcValid = (tokens, nonce, oidcServerConfiguration) => {
   }
   return { isValid: true, reason: "" };
 };
+function extractedIssueAt(tokens, accessTokenPayload, _idTokenPayload) {
+  if (!tokens.issued_at) {
+    if (accessTokenPayload && accessTokenPayload.iat) {
+      return accessTokenPayload.iat;
+    } else if (_idTokenPayload && _idTokenPayload.iat) {
+      return _idTokenPayload.iat;
+    } else {
+      const currentTimeUnixSecond = (/* @__PURE__ */ new Date()).getTime() / 1e3;
+      return currentTimeUnixSecond;
+    }
+  } else if (typeof tokens.issued_at == "string") {
+    return parseInt(tokens.issued_at, 10);
+  }
+  return tokens.issued_at;
+}
 function _hideTokens(tokens, currentDatabaseElement, configurationName) {
   if (!tokens.issued_at) {
     const currentTimeUnixSecond = (/* @__PURE__ */ new Date()).getTime() / 1e3;
@@ -184,6 +199,7 @@ function _hideTokens(tokens, currentDatabaseElement, configurationName) {
   if (tokens.refresh_token) {
     secureTokens.refresh_token = TOKEN.REFRESH_TOKEN + "_" + configurationName;
   }
+  tokens.issued_at = extractedIssueAt(tokens, accessTokenPayload, _idTokenPayload);
   const expireIn = typeof tokens.expires_in == "string" ? parseInt(tokens.expires_in, 10) : tokens.expires_in;
   const idTokenExpiresAt = _idTokenPayload && _idTokenPayload.exp ? _idTokenPayload.exp : Number.MAX_VALUE;
   const accessTokenExpiresAt = accessTokenPayload && accessTokenPayload.exp ? accessTokenPayload.exp : tokens.issued_at + expireIn;
@@ -235,6 +251,17 @@ function hideTokens(currentDatabaseElement) {
 function replaceCodeVerifier(codeVerifier, newCodeVerifier) {
   const regex = /code_verifier=[A-Za-z0-9_-]+/i;
   return codeVerifier.replace(regex, `code_verifier=${newCodeVerifier}`);
+}
+if (typeof trustedTypes !== "undefined" && typeof trustedTypes.createPolicy == "function") {
+  trustedTypes.createPolicy("default", {
+    createScriptURL: function(url) {
+      if (url == scriptFilename) {
+        return url;
+      } else {
+        throw new Error("Untrusted script URL blocked: " + url);
+      }
+    }
+  });
 }
 const _self = self;
 _self.importScripts(scriptFilename);
@@ -320,7 +347,7 @@ const handleFetch = async (event) => {
       };
     }
     const newRequest = new Request(originalRequest, init);
-    event.waitUntil(event.respondWith(fetch(newRequest)));
+    event.respondWith(fetch(newRequest));
     return;
   }
   if (event.request.method !== "POST") {
@@ -424,7 +451,7 @@ const handleFetch = async (event) => {
         reject(err);
       });
     });
-    event.waitUntil(event.respondWith(maPromesse));
+    event.respondWith(maPromesse);
   }
 };
 const handleMessage = (event) => {
@@ -450,8 +477,10 @@ const handleMessage = (event) => {
       status: null,
       configurationName,
       hideAccessToken: !showAccessToken,
-      setAccessTokenToNavigateRequests: doNotSetAccessTokenToNavigateRequests || true,
-      convertAllRequestsToCorsExceptNavigate: convertAllRequestsToCorsExceptNavigate || false
+      setAccessTokenToNavigateRequests: doNotSetAccessTokenToNavigateRequests ?? true,
+      convertAllRequestsToCorsExceptNavigate: convertAllRequestsToCorsExceptNavigate ?? false,
+      demonstratingProofOfPossessionNonce: null,
+      demonstratingProofOfPossessionJwkJson: null
     };
     currentDatabase = database[configurationName];
     if (!trustedDomains[configurationName]) {
@@ -517,6 +546,22 @@ const handleMessage = (event) => {
       }
       return;
     }
+    case "setDemonstratingProofOfPossessionNonce":
+      currentDatabase.demonstratingProofOfPossessionNonce = data.data.demonstratingProofOfPossessionNonce;
+      port.postMessage({ configurationName });
+      return;
+    case "getDemonstratingProofOfPossessionNonce":
+      const demonstratingProofOfPossessionNonce = currentDatabase.demonstratingProofOfPossessionNonce;
+      port.postMessage({ configurationName, demonstratingProofOfPossessionNonce });
+      return;
+    case "setDemonstratingProofOfPossessionJwk":
+      currentDatabase.demonstratingProofOfPossessionJwkJson = data.data.demonstratingProofOfPossessionJwkJson;
+      port.postMessage({ configurationName });
+      return;
+    case "getDemonstratingProofOfPossessionJwk":
+      const demonstratingProofOfPossessionJwkJson = currentDatabase.demonstratingProofOfPossessionJwkJson;
+      port.postMessage({ configurationName, demonstratingProofOfPossessionJwkJson });
+      return;
     case "setState":
       currentDatabase.state = data.data.state;
       port.postMessage({ configurationName });

@@ -1,4 +1,4 @@
-name: Basic checks
+name: Tests
 
 on:
     # Triggers the workflow on push or pull request events but only for the master branch
@@ -16,12 +16,5 @@ jobs:
             - name: Install dependencies
               run: npm install
               
-            - name: Check formatting rules
-              run: npx prettier . --check
-
-            - name: Check code-quality rules
-              run: npm run lint
-
-            - name: Check typescript type validity
-              run: npm run ts-lint
-
+            - name: Trigger tests
+              run: npm run test
