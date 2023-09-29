@@ -1,6 +1,5 @@
 import { useOidcAccessToken } from "@axa-fr/react-oidc";
 import { Button } from "@mui/material";
-import { deepOrange, lightGreen } from "@mui/material/colors";
 import Link from "next/link";
 
 /**

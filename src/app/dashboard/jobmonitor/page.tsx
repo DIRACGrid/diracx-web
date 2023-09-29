@@ -1,4 +1,4 @@
-import { JobDataGrid } from "@/components/JobDataGrid";
+import { JobDataGrid } from "@/components/data/JobDataGrid";
 
 export default async function Page() {
   return (

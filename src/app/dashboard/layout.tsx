@@ -1,6 +1,6 @@
 import React from "react";
-import DashboardAppBar from "@/components/DashboardAppBar";
-import { OIDCSecure } from "@/components/OIDCUtils";
+import DashboardAppBar from "@/components/layout/DashboardAppBar";
+import { OIDCSecure } from "@/components/auth/OIDCUtils";
 
 export default function DashboardLayout({
   children,

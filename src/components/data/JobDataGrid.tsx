@@ -11,7 +11,8 @@ const columns = [
 ];
 
 /**
- * Table of jobs
+ * It gets rows from diracx and build the data grid
+ *
  * @returns a DataGrid displaying details about jobs
  */
 export function JobDataGrid() {

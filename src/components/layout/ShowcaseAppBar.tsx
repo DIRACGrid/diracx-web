@@ -3,14 +3,13 @@ import * as React from "react";
 import AppBar from "@mui/material/AppBar";
 import Toolbar from "@mui/material/Toolbar";
 import CssBaseline from "@mui/material/CssBaseline";
-import useScrollTrigger from "@mui/material/useScrollTrigger";
 import Grid from "@mui/material/Grid";
 import Paper from "@mui/material/Paper";
 import { styled } from "@mui/material/styles";
-import { DiracLogo } from "./DiracLogo";
-import { LoginButton } from "./LoginButton";
+import { DiracLogo } from "../ui/DiracLogo";
+import { LoginButton } from "../ui/LoginButton";
 import { Stack } from "@mui/material";
-import { DashboardButton } from "./DashboardButton";
+import { DashboardButton } from "../ui/DashboardButton";
 import Image from "next/image";
 
 /**

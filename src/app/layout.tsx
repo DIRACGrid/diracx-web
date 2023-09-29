@@ -1,6 +1,6 @@
 import "./globals.css";
 import { Inter } from "next/font/google";
-import { OIDCProvider } from "@/components/OIDCUtils";
+import { OIDCProvider } from "@/components/auth/OIDCUtils";
 import { OidcConfiguration } from "@axa-fr/react-oidc";
 
 const inter = Inter({ subsets: ["latin"] });
