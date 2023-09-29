@@ -1,7 +1,6 @@
 "use client";
 import { DataGrid } from "@mui/x-data-grid";
-import { useOidcAccessToken } from "@axa-fr/react-oidc";
-import useSWR from "swr";
+import { useJobs } from "@/hooks/jobs";
 
 const columns = [
   { field: "JobID", headerName: "Job ID", width: 70 },
@@ -16,22 +15,17 @@ const columns = [
  * @returns a DataGrid displaying details about jobs
  */
 export function JobDataGrid() {
-  const { accessToken } = useOidcAccessToken();
+  const { data, error, isLoading } = useJobs();
 
-  // TODO: move fetcher to make it usable from other places
-  const fetcher = (params: string[]) => {
-    const [path] = params;
-    return fetch(process.env.NEXT_PUBLIC_DIRACX_URL + path, {
-      method: "POST",
-      headers: { Authorization: "Bearer " + accessToken },
-    }).then((res) => res.json());
-  };
-  const { data, error } = useSWR(["/jobs/search?page=0&per_page=100"], fetcher);
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
 
   if (error) {
     return <div>An error occurred while fetching jobs.</div>;
   }
-  if (!data || data.length == 0) {
+
+  if (!data || data.length === 0) {
     return <div>No job submitted.</div>;
   }
 
