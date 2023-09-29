@@ -3,11 +3,11 @@ import { DataGrid } from "@mui/x-data-grid";
 import { useJobs } from "@/hooks/jobs";
 
 const columns = [
-  { field: "JobID", headerName: "Job ID", width: 70 },
-  { field: "JobName", headerName: "Job Name", width: 130 },
-  { field: "Status", headerName: "Status", width: 130 },
-  { field: "MinorStatus", headerName: "Minor Status", width: 130 },
-  { field: "SubmissionTime", headerName: "Submission Time", width: 130 },
+  { field: "JobID", headerName: "Job ID", width: 90 },
+  { field: "JobName", headerName: "Job Name", flex: 1 },
+  { field: "Status", headerName: "Status", flex: 1 },
+  { field: "MinorStatus", headerName: "Minor Status", flex: 1 },
+  { field: "SubmissionTime", headerName: "Submission Time", flex: 1 },
 ];
 
 /**
@@ -40,6 +40,7 @@ export function JobDataGrid() {
           paginationModel: { page: 0, pageSize: 5 },
         },
       }}
+      autoHeight
       pageSizeOptions={[5, 10, 50, 100, 500, 1000]}
       checkboxSelection
     />

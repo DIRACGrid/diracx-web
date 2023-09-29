@@ -8,7 +8,7 @@ import Paper from "@mui/material/Paper";
 import { styled } from "@mui/material/styles";
 import { DiracLogo } from "../ui/DiracLogo";
 import { LoginButton } from "../ui/LoginButton";
-import { Stack } from "@mui/material";
+import { Box, Stack } from "@mui/material";
 import { DashboardButton } from "../ui/DashboardButton";
 import Image from "next/image";
 
@@ -46,39 +46,52 @@ export default function ShowcaseAppBar() {
         </Stack>
       </AppBar>
       <Toolbar />
-      <Grid container spacing={2} sx={{ my: 2 }}>
-        <Grid item xs={6} md={4}>
-          <Item>
-            The DIRAC interware is a software framework that enables communities
-            to interact with distributed computing resources. DIRAC forms a
-            layer between users and resources, hiding diversities across
-            computing and storage resources.
-          </Item>
+      <Box
+        sx={{
+          ml: { xs: "5%", md: "30%" },
+          mr: { xs: "5%", md: "30%" },
+        }}
+      >
+        <Grid container spacing={2} sx={{ my: 2 }}>
+          <Grid item xs={12} md={6} lg={4}>
+            <Item>
+              The DIRAC interware is a software framework that enables
+              communities to interact with distributed computing resources.
+              DIRAC forms a layer between users and resources, hiding
+              diversities across computing and storage resources.
+            </Item>
+          </Grid>
+          <Grid item xs={12} md={6}>
+            <div style={{ width: "100%", position: "relative" }}>
+              <Image
+                src="/showcase1.png"
+                alt="DIRAC showcase1"
+                layout="responsive"
+                width={400}
+                height={400}
+              />
+            </div>
+          </Grid>
+          <Grid item xs={12} md={6}>
+            <div style={{ width: "100%", position: "relative" }}>
+              <Image
+                src="/showcase2.png"
+                alt="DIRAC showcase 2"
+                layout="responsive"
+                width={400}
+                height={400}
+              />
+            </div>
+          </Grid>
+          <Grid item xs={12} md={6} lg={4}>
+            <Item>
+              DIRAC has been adopted by several HEP and non-HEP experiments
+              communities, with different goals, intents, resources and
+              workflows: it is experiment agnostic, extensible, and flexible.
+            </Item>
+          </Grid>
         </Grid>
-        <Grid item xs={6} md={6}>
-          <Image
-            src="/showcase1.png"
-            alt="DIRAC logo"
-            width={400}
-            height={400}
-          />
-        </Grid>
-        <Grid item xs={6} md={6}>
-          <Image
-            src="/showcase2.png"
-            alt="DIRAC logo"
-            width={400}
-            height={400}
-          />
-        </Grid>
-        <Grid item xs={6} md={4}>
-          <Item>
-            DIRAC has been adopted by several HEP and non-HEP experiments
-            communities, with different goals, intents, resources and workflows:
-            it is experiment agnostic, extensible, and flexible.
-          </Item>
-        </Grid>
-      </Grid>
+      </Box>
     </React.Fragment>
   );
 }
