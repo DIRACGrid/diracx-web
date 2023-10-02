@@ -1,6 +1,6 @@
 import React from "react";
 import { render, fireEvent } from "@testing-library/react";
-import DashboardAppBar from "@/components/layout/DashboardAppBar";
+import Dashboard from "@/components/layout/Dashboard";
 import { useOidc, useOidcAccessToken } from "@axa-fr/react-oidc";
 
 // Mock the module
@@ -9,7 +9,7 @@ jest.mock("@axa-fr/react-oidc", () => ({
   useOidc: jest.fn(),
 }));
 
-describe("<DashboardAppBar>", () => {
+describe("<Dashboard>", () => {
   beforeEach(() => {
     // Mock the return value for each test
     (useOidcAccessToken as jest.Mock).mockReturnValue({
@@ -29,9 +29,9 @@ describe("<DashboardAppBar>", () => {
   // Normal case
   it("renders on desktop screen", () => {
     const { getByTestId } = render(
-      <DashboardAppBar>
+      <Dashboard>
         <h1>Test</h1>
-      </DashboardAppBar>,
+      </Dashboard>,
     );
 
     // `drawer-temporary` should not even be in the DOM for desktop screen sizes
@@ -46,9 +46,9 @@ describe("<DashboardAppBar>", () => {
     global.dispatchEvent(new Event("resize"));
 
     const { getByTestId } = render(
-      <DashboardAppBar>
+      <Dashboard>
         <h1>Test</h1>
-      </DashboardAppBar>,
+      </Dashboard>,
     );
     const toggleButton = getByTestId("drawer-toggle-button");
 

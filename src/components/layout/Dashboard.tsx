@@ -3,15 +3,14 @@ import * as React from "react";
 import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
 import CssBaseline from "@mui/material/CssBaseline";
-import Drawer from "@mui/material/Drawer";
 import IconButton from "@mui/material/IconButton";
 import MenuIcon from "@mui/icons-material/Menu";
 import Toolbar from "@mui/material/Toolbar";
 import Stack from "@mui/material/Stack";
 import { LoginButton } from "../ui/LoginButton";
-import DashboardDrawer from "./DashboardDrawer";
+import DashboardDrawer from "../ui/DashboardDrawer";
 
-interface DashboardAppBarProps {
+interface DashboardProps {
   children: React.ReactNode;
 }
 
@@ -22,7 +21,7 @@ interface DashboardAppBarProps {
  * @param props - children
  * @return an dashboard layout
  */
-export default function DashboardAppBar(props: DashboardAppBarProps) {
+export default function Dashboard(props: DashboardProps) {
   /** State management for mobile drawer */
   const [mobileOpen, setMobileOpen] = React.useState(false);
   const handleDrawerToggle = () => {
@@ -31,35 +30,6 @@ export default function DashboardAppBar(props: DashboardAppBarProps) {
 
   /** Drawer width */
   const drawerWidth = 240;
-
-  /** Drawer component: a logo, a list of sections and a link to the documentation */
-  const container =
-    window !== undefined ? () => window.document.body : undefined;
-
-  const renderDrawer = (variant: "permanent" | "temporary") => {
-    const isTemporary = variant === "temporary";
-    return (
-      <Drawer
-        container={isTemporary ? container : undefined}
-        variant={variant}
-        open={isTemporary ? mobileOpen : true}
-        onClose={handleDrawerToggle}
-        sx={{
-          display: {
-            xs: isTemporary ? "block" : "none",
-            sm: isTemporary ? "none" : "block",
-          },
-          "& .MuiDrawer-paper": {
-            boxSizing: "border-box",
-            width: drawerWidth,
-          },
-        }}
-        data-testid={`drawer-${variant}`}
-      >
-        <DashboardDrawer />
-      </Drawer>
-    );
-  };
 
   return (
     <Box sx={{ display: "flex" }}>
@@ -105,8 +75,18 @@ export default function DashboardAppBar(props: DashboardAppBarProps) {
            1. Temporary drawer: Visible on small screens (xs) and is collapsible.
            2. Permanent drawer: Visible on larger screens (sm) and stays fixed.
           Depending on the screen size, only one will be visible at a time. */}
-        {renderDrawer("temporary")}
-        {renderDrawer("permanent")}
+        <DashboardDrawer
+          variant="temporary"
+          mobileOpen={mobileOpen}
+          width={drawerWidth}
+          handleDrawerToggle={handleDrawerToggle}
+        />
+        <DashboardDrawer
+          variant="permanent"
+          mobileOpen={mobileOpen}
+          width={drawerWidth}
+          handleDrawerToggle={handleDrawerToggle}
+        />
       </Box>
       <Box
         component="main"

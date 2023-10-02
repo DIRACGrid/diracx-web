@@ -1,5 +1,5 @@
-import ShowcaseAppBar from "@/components/layout/ShowcaseAppBar";
+import Showcase from "@/components/layout/Showcase";
 
 export default function Page() {
-  return <ShowcaseAppBar />;
+  return <Showcase />;
 }

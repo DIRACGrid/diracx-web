@@ -17,7 +17,7 @@ import Image from "next/image";
  * @param props - children
  * @returns showcase content
  */
-export default function ShowcaseAppBar() {
+export default function Showcase() {
   const Item = styled(Paper)(({ theme }) => ({
     padding: theme.spacing(6),
     elevation: 0,
@@ -48,8 +48,8 @@ export default function ShowcaseAppBar() {
       <Toolbar />
       <Box
         sx={{
-          ml: { xs: "5%", md: "30%" },
-          mr: { xs: "5%", md: "30%" },
+          ml: { xs: "5%", md: "20%" },
+          mr: { xs: "5%", md: "20%" },
         }}
       >
         <Grid container spacing={2} sx={{ my: 2 }}>

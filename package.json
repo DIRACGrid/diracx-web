@@ -49,6 +49,6 @@
   "lint-staged": {
     "*.{js,ts,jsx,tsx}": "eslint --cache --fix",
     "*.{js,ts,jsx,tsx,css,md}": "prettier --write",
-    "*.{ts,tsx}": "tsc-files --noEmit"
+    "src/**/*.{ts,tsx}": "tsc-files --noEmit"
   }
 }
