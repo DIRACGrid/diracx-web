@@ -21,7 +21,7 @@ import React from "react";
  */
 export function LoginButton() {
   const { accessTokenPayload } = useOidcAccessToken();
-  const { logout, isAuthenticated } = useOidc();
+  const { login, logout, isAuthenticated } = useOidc();
 
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
@@ -43,8 +43,7 @@ export function LoginButton() {
           "&:hover": { bgcolor: deepOrange[500] },
         }}
         variant="contained"
-        component={NextLink}
-        href="/dashboard"
+        onClick={() => login()}
       >
         Login
       </Button>
