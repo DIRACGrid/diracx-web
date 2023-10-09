@@ -1,23 +1,16 @@
-FROM node:16-alpine
-EXPOSE 3000
-
-# Set the working directory in the container
+# Minimize the size and complexity of the final Docker image by separating the
+# build stage and the runtime stage into two different steps
+FROM node:16-alpine AS build
 WORKDIR /app
-
-# Copy package.json and package-lock.json to the working directory
+# Install the project dependencies
 COPY package*.json ./
-
-# Install project dependencies
-RUN npm install
-
+RUN npm ci
 # Copy the rest of the application to the working directory
 COPY . .
+# Build the static export with telemetry disabled (https://nextjs.org/telemetry)
+RUN NEXT_TELEMETRY_DISABLED=1 npm run build
 
-# Disable telemetry. Further details: https://nextjs.org/telemetry
-ENV NEXT_TELEMETRY_DISABLED 1
-
-# Build the Next.js app for production
-RUN npm run build
-
-# Define the command to run the app
-CMD [ "npm", "start" ]
+# Copy the website from the previous container to a Nginx container
+FROM nginxinc/nginx-unprivileged:alpine
+EXPOSE 8080
+COPY --from=build /app/out /usr/share/nginx/html

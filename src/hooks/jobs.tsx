@@ -1,5 +1,6 @@
 import { useOidcAccessToken } from "@axa-fr/react-oidc";
 import useSWR from "swr";
+import { useDiracxUrl } from "./utils";
 
 const fetcher = (args: any[]) => {
   const [url, accessToken] = args;
@@ -14,9 +15,14 @@ const fetcher = (args: any[]) => {
 };
 
 export function useJobs() {
+  const diracxUrl = useDiracxUrl();
   const { accessToken } = useOidcAccessToken();
-  const url = `${process.env.NEXT_PUBLIC_DIRACX_URL}/api/jobs/search?page=0&per_page=100`;
+  const url = `${diracxUrl}/api/jobs/search?page=0&per_page=100`;
   const { data, error } = useSWR([url, accessToken], fetcher);
+
+  if (diracxUrl === null) {
+    return { data: null, error: "diracxUrl is null", isLoading: false };
+  }
 
   return {
     data,
