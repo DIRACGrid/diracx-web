@@ -1,0 +1,54 @@
+title: "[<Community Name>] <Feature Request>"
+body:
+  - type: markdown
+    attributes:
+      value: >
+        Develop a user persona and a story to capture the goals and tasks your users want to accomplish with diracx-web.
+        We are interested in understanding your needs and goals. Please focus on what you want to achieve rather than how you think it should be achieved.
+        All ideas are welcome, and there are no wrong answers. We appreciate your honest feedback as it helps us improve the system to better meet your needs.
+
+  - type: textarea
+    id: user-persona
+    attributes:
+      label: User Persona
+      description: |
+        Who is the user? Here is an example:
+        - Name: John Doe
+        - Age: 32
+        - Occupation: Dirac Developer
+        - Goals: 
+          1. Ease eye strain during long working hours by utilizing a dark mode feature.
+          2. Improve focus and productivity by reducing glare and distraction from a bright screen.
+          3. Maintain a sleek and modern user interface.
+        - Pain points:
+          1. Current bright/light theme of the web app causes eye fatigue, especially when working late into the night.
+          2. The lack of a dark mode feature feels outdated and not in alignment with contemporary design standards.
+          3. Concerned that continued use of the app in its current state may adversely affect my vision over time.
+      value: |
+        - Name:
+        - Age:
+        - Occupation:
+        - Goals:
+        - Pain points:
+    validations:
+      required: true
+
+  - type: textarea
+    id: user-story
+    attributes:
+      label: User Story
+      description: |
+        What does the user want to achieve in this scenario? Here is an example:
+        As a developer, John wants a dark mode feature in the web app so that he can work comfortably during late hours and reduce eye strain, while also enjoying a modern and sleek user interface.
+      placeholder: |
+        As a [type of user], [User] wants [an action] so that [a benefit/a goal].
+    validations:
+      required: true
+
+  - type: textarea
+    id: additional-comments
+    attributes:
+      label: Additional Comments or Suggestions
+      description: "Share any other feedback, ideas, or suggestions that can help us understand your needs better."
+    validations:
+      required: false
