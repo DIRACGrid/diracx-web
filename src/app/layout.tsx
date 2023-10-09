@@ -1,21 +1,17 @@
 import "./globals.css";
 import { Inter } from "next/font/google";
 import { OIDCProvider } from "@/components/auth/OIDCUtils";
-import { OidcConfiguration } from "@axa-fr/react-oidc";
 
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata = {
-  title: "diracX",
+  title: "DiracX",
   description: "Distributed Infrastructure with Remote Agent Controller",
 };
 
-const configuration: OidcConfiguration = {
-  client_id: process.env.DIRACX_CLIENT_ID || "",
-  redirect_uri: process.env.REDIRECT_URI || "",
-  scope: process.env.DEFAULT_SCOPE || "",
-  authority: process.env.NEXT_PUBLIC_DIRACX_URL || "",
-};
+// Force an error if any components use dynamic functions or uncached data
+// as these won't work in the static export.
+export const dynamic = "error";
 
 export default function RootLayout({
   children,
@@ -25,7 +21,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        <OIDCProvider configuration={configuration}>{children}</OIDCProvider>
+        <OIDCProvider>{children}</OIDCProvider>
       </body>
     </html>
   );

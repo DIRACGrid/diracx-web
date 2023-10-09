@@ -27,5 +27,5 @@ jobs:
               with:
                 context: .
                 push: ${{ github.event_name == 'push' && github.repository == 'DIRACGrid/diracx-web' && github.ref_name == 'main' }}
-                tags: ghcr.io/diracgrid/diracx-web/client:latest
+                tags: ghcr.io/diracgrid/diracx-web/static:latest
                 platforms: linux/amd64,linux/arm64
