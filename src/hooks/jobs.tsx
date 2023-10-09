@@ -15,7 +15,7 @@ const fetcher = (args: any[]) => {
 
 export function useJobs() {
   const { accessToken } = useOidcAccessToken();
-  const url = `${process.env.NEXT_PUBLIC_DIRACX_URL}/jobs/search?page=0&per_page=100`;
+  const url = `${process.env.NEXT_PUBLIC_DIRACX_URL}/api/jobs/search?page=0&per_page=100`;
   const { data, error } = useSWR([url, accessToken], fetcher);
 
   return {
