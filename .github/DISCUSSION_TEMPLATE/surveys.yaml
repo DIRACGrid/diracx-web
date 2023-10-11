@@ -1,0 +1,153 @@
+title: "[<Community Name>] User Feedback Survey"
+body:
+  - type: markdown
+    attributes:
+      value: >
+        We value your feedback and would love to hear about your experience with our current web application.
+        Your insights will be instrumental in shaping the new diracx-web client we are building.
+        Please take a moment to answer the questions below.
+
+  - type: markdown
+    attributes:
+      value: "## General"
+
+  - type: textarea
+    id: overall-experience
+    attributes:
+      label: "Describe your overall experience with the current DIRAC web application."
+      description: >
+        Focus on aspects like ease of use, reliability, and speed
+    validations:
+      required: true
+
+  - type: textarea
+    id: tasks
+    attributes:
+      label: "What tasks do you primarily use our web application for?"
+      description: >
+        Example: I monitor my jobs.
+    validations:
+      required: true
+
+  - type: markdown
+    attributes:
+      value: |
+        ## Features
+        ### For all users
+
+  - type: textarea
+    id: features-used
+    attributes:
+      label: "What features do you find most useful and why?"
+      description: >
+        Example: The possibility of monitoring my jobs in real-time.
+    validations:
+      required: true
+
+  - type: textarea
+    id: frustrating-features
+    attributes:
+      label: "Are there any features or functionalities you find frustrating or difficult to use?"
+      description: >
+        Example: I am lost with all these pages.
+    validations:
+      required: true
+
+  - type: textarea
+    id: bugs
+    attributes:
+      label: "Have you encountered any bugs or issues while using the application? If so, describe them."
+      description: >
+        Example: Sometimes I see some messages I do not understand popping up in the interface.
+    validations:
+      required: true
+
+  - type: textarea
+    id: santa-claus-might-be-on-his-way
+    attributes:
+      label: "Are there any features or functionalities you wish were included in the current web application?"
+      description: >
+        Example: Yes, I would like to group my job by CE type!
+    validations:
+      required: true
+
+  - type: markdown
+    attributes:
+      value: "## For Admins only"
+
+  - type: textarea
+    id: admin-features-used
+    attributes:
+      label: "As an admin, what features do you find most useful and why?"
+    validations:
+      required: false
+
+  - type: textarea
+    id: admin-frustrating-features
+    attributes:
+      label: "Are there any admin-specific features or functionalities you find frustrating or difficult to use?"
+    validations:
+      required: false
+
+  - type: textarea
+    id: admin-bugs
+    attributes:
+      label: "Have you encountered any bugs or issues while using the application? If so, describe them."
+    validations:
+      required: false
+
+  - type: textarea
+    id: admin-wishlist
+    attributes:
+      label: "Are there any admin-specific features or functionalities you wish were included in the current web application?"
+    validations:
+      required: false
+
+  - type: markdown
+    attributes:
+      value: "## Design and responsiveness"
+
+  - type: textarea
+    id: design-feeling
+    attributes:
+      label: "How do you feel about the current user interface and design? What changes, if any, would you suggest?"
+    validations:
+      required: true
+
+  - type: textarea
+    id: mobile-experience
+    attributes:
+      label: "Have you ever used the DIRAC web application on mobile devices? Would a mobile-friendly version be beneficial for you?"
+      description: "The adoption of OIDC tokens will open up such possibilities"
+    validations:
+      required: true
+
+  - type: markdown
+    attributes:
+      value: "## Extensions"
+
+  - type: textarea
+    id: extension
+    attributes:
+      label: "Are you using a DIRAC web application extension? What do you have in it?"
+    validations:
+      required: false
+
+  - type: markdown
+    attributes:
+      value: "## Any other suggestion"
+
+  - type: textarea
+    id: suggestions
+    attributes:
+      label: "Is there anything else you would like to share or suggest as we work on the diracx-web application?"
+    validations:
+      required: false
+
+  - type: markdown
+    attributes:
+      value: >
+        Thank you for taking the time to provide your feedback.
+        Your insights are valuable to us as we work on improving the application.
+        We will keep you updated on our progress and look forward to sharing the new version with you.
+
