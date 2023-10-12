@@ -42,7 +42,7 @@ export function OIDCProvider(props: OIDCProviderProps) {
         // TODO: Figure out how to get this. Hardcode? Get from a /.well-known/diracx-configuration endpoint?
         client_id: "myDIRACClientID",
         // TODO: Get this from the /.well-known/openid-configuration endpoint
-        scope: "vo:diracAdmin",
+        scope: "vo:gridpp",
         redirect_uri: `${diracxUrl}/#authentication-callback`,
       }));
     }

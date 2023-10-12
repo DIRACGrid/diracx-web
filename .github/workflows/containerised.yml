@@ -2,9 +2,9 @@ name: Containerise the project
 
 on:
     push:
-        branches: [main]
+        branches: [drw23_demo]
     pull_request:
-        branches: [main]
+        branches: [drw23_demo]
 
 jobs:
     docker:
@@ -26,6 +26,6 @@ jobs:
               uses: docker/build-push-action@v5
               with:
                 context: .
-                push: ${{ github.event_name == 'push' && github.repository == 'DIRACGrid/diracx-web' && github.ref_name == 'main' }}
-                tags: ghcr.io/diracgrid/diracx-web/static:latest
+                push: ${{ github.event_name == 'push' && github.repository == 'DIRACGrid/diracx-web' && github.ref_name == 'drw23_demo' }}
+                tags: ghcr.io/diracgrid/diracx-web/static:drw23_demo
                 platforms: linux/amd64,linux/arm64
