@@ -4,7 +4,7 @@ import { ThemeToggleButton } from "@/components/ui/ThemeToggleButton";
 import { useTheme } from "@/hooks/theme";
 
 // Mocking the useTheme hook
-jest.mock("../src/hooks/theme", () => ({
+jest.mock("../../src/hooks/theme", () => ({
   useTheme: jest.fn(),
 }));
 
