@@ -1,7 +1,5 @@
+import UserDashboard from "@/components/applications/UserDashboard";
+
 export default function Page() {
-  return (
-    <div>
-      <span>Hello User</span>
-    </div>
-  );
+  return <UserDashboard />;
 }

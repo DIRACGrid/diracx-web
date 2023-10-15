@@ -1,6 +1,6 @@
-import "./globals.css";
 import { Inter } from "next/font/google";
 import { OIDCProvider } from "@/components/auth/OIDCUtils";
+import { ThemeProvider } from "@/contexts/ThemeProvider";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -21,7 +21,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        <OIDCProvider>{children}</OIDCProvider>
+        <OIDCProvider>
+          <ThemeProvider>{children}</ThemeProvider>
+        </OIDCProvider>
       </body>
     </html>
   );
