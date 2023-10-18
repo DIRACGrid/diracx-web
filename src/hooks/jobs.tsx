@@ -17,8 +17,11 @@ const fetcher = (args: any[]) => {
 export function useJobs() {
   const diracxUrl = useDiracxUrl();
   const { accessToken } = useOidcAccessToken();
-  const url = `${diracxUrl}/api/jobs/search?page=0&per_page=100`;
-  const { data, error } = useSWR([url, accessToken], fetcher);
+  const url = diracxUrl
+    ? `${diracxUrl}/api/jobs/search?page=0&per_page=100`
+    : null;
+
+  const { data, error } = useSWR(url ? [url, accessToken] : null, fetcher);
 
   if (diracxUrl === null) {
     return { data: null, error: "diracxUrl is null", isLoading: false };

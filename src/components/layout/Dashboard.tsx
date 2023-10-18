@@ -9,6 +9,9 @@ import Toolbar from "@mui/material/Toolbar";
 import Stack from "@mui/material/Stack";
 import { LoginButton } from "../ui/LoginButton";
 import DashboardDrawer from "../ui/DashboardDrawer";
+import { useMUITheme } from "@/hooks/theme";
+import { ThemeProvider as MUIThemeProvider } from "@mui/material/styles";
+import { ThemeToggleButton } from "../ui/ThemeToggleButton";
 
 interface DashboardProps {
   children: React.ReactNode;
@@ -22,6 +25,7 @@ interface DashboardProps {
  * @return an dashboard layout
  */
 export default function Dashboard(props: DashboardProps) {
+  const theme = useMUITheme();
   /** State management for mobile drawer */
   const [mobileOpen, setMobileOpen] = React.useState(false);
   const handleDrawerToggle = () => {
@@ -34,66 +38,70 @@ export default function Dashboard(props: DashboardProps) {
   return (
     <Box sx={{ display: "flex" }}>
       <CssBaseline />
-      <AppBar
-        position="fixed"
-        elevation={0}
-        sx={{
-          width: { sm: `calc(100% - ${drawerWidth}px)` },
-          ml: { sm: `${drawerWidth}px` },
-          bgcolor: "white",
-        }}
-      >
-        <Stack direction="row">
-          <Toolbar>
-            <IconButton
-              aria-label="open drawer"
-              edge="start"
-              onClick={handleDrawerToggle}
-              sx={{ mr: 2, display: { sm: "none" } }}
-              data-testid="drawer-toggle-button"
+      <MUIThemeProvider theme={theme}>
+        <AppBar
+          position="fixed"
+          elevation={0}
+          sx={{
+            width: { sm: `calc(100% - ${drawerWidth}px)` },
+            ml: { sm: `${drawerWidth}px` },
+          }}
+        >
+          <Stack direction="row">
+            <Toolbar>
+              <IconButton
+                aria-label="open drawer"
+                edge="start"
+                onClick={handleDrawerToggle}
+                sx={{ mr: 2, display: { sm: "none" } }}
+                data-testid="drawer-toggle-button"
+              >
+                <MenuIcon />
+              </IconButton>
+            </Toolbar>
+            <Toolbar
+              sx={{
+                justifyContent: "space-between",
+                flexGrow: 1,
+              }}
             >
-              <MenuIcon />
-            </IconButton>
-          </Toolbar>
-          <Toolbar
-            sx={{
-              justifyContent: "space-between",
-              flexGrow: 1,
-            }}
-          >
-            <div />
-            <LoginButton />
-          </Toolbar>
-        </Stack>
-      </AppBar>
-      <Box
-        component="nav"
-        sx={{ width: { sm: drawerWidth }, flexShrink: { sm: 0 } }}
-        aria-label="side bar"
-      >
-        {/* Here two types of drawers are rendered:
+              <div />
+              <Stack direction="row">
+                <ThemeToggleButton />
+                <LoginButton />
+              </Stack>
+            </Toolbar>
+          </Stack>
+        </AppBar>
+        <Box
+          component="nav"
+          sx={{ width: { sm: drawerWidth }, flexShrink: { sm: 0 } }}
+          aria-label="side bar"
+        >
+          {/* Here two types of drawers are rendered:
            1. Temporary drawer: Visible on small screens (xs) and is collapsible.
            2. Permanent drawer: Visible on larger screens (sm) and stays fixed.
           Depending on the screen size, only one will be visible at a time. */}
-        <DashboardDrawer
-          variant="temporary"
-          mobileOpen={mobileOpen}
-          width={drawerWidth}
-          handleDrawerToggle={handleDrawerToggle}
-        />
-        <DashboardDrawer
-          variant="permanent"
-          mobileOpen={mobileOpen}
-          width={drawerWidth}
-          handleDrawerToggle={handleDrawerToggle}
-        />
-      </Box>
-      <Box
-        component="main"
-        sx={{ pt: 10, px: 3, width: { sm: `calc(100% - ${drawerWidth}px)` } }}
-      >
-        {props.children}
-      </Box>
+          <DashboardDrawer
+            variant="temporary"
+            mobileOpen={mobileOpen}
+            width={drawerWidth}
+            handleDrawerToggle={handleDrawerToggle}
+          />
+          <DashboardDrawer
+            variant="permanent"
+            mobileOpen={mobileOpen}
+            width={drawerWidth}
+            handleDrawerToggle={handleDrawerToggle}
+          />
+        </Box>
+        <Box
+          component="main"
+          sx={{ pt: 10, px: 3, width: { sm: `calc(100% - ${drawerWidth}px)` } }}
+        >
+          {props.children}
+        </Box>
+      </MUIThemeProvider>
     </Box>
   );
 }

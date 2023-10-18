@@ -1,5 +1,6 @@
 import { useOidcAccessToken } from "@axa-fr/react-oidc";
 import { Button } from "@mui/material";
+import { deepOrange, lightGreen } from "@mui/material/colors";
 import Link from "next/link";
 
 /**
@@ -14,7 +15,14 @@ export function DashboardButton() {
   }
 
   return (
-    <Button variant="outlined" component={Link} href="/dashboard">
+    <Button
+      sx={{
+        bgcolor: lightGreen[700],
+        "&:hover": { bgcolor: deepOrange[500] },
+      }}
+      component={Link}
+      href="/dashboard"
+    >
       Dashboard
     </Button>
   );

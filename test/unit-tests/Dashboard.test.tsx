@@ -1,6 +1,7 @@
 import React from "react";
 import { render, fireEvent } from "@testing-library/react";
 import Dashboard from "@/components/layout/Dashboard";
+import { ThemeProvider } from "@/contexts/ThemeProvider";
 import { useOidc, useOidcAccessToken } from "@axa-fr/react-oidc";
 
 // Mock the module
@@ -29,9 +30,11 @@ describe("<Dashboard>", () => {
   // Normal case
   it("renders on desktop screen", () => {
     const { getByTestId } = render(
-      <Dashboard>
-        <h1>Test</h1>
-      </Dashboard>,
+      <ThemeProvider>
+        <Dashboard>
+          <h1>Test</h1>
+        </Dashboard>
+      </ThemeProvider>,
     );
 
     // `drawer-temporary` should not even be in the DOM for desktop screen sizes
@@ -46,9 +49,11 @@ describe("<Dashboard>", () => {
     global.dispatchEvent(new Event("resize"));
 
     const { getByTestId } = render(
-      <Dashboard>
-        <h1>Test</h1>
-      </Dashboard>,
+      <ThemeProvider>
+        <Dashboard>
+          <h1>Test</h1>
+        </Dashboard>
+      </ThemeProvider>,
     );
     const toggleButton = getByTestId("drawer-toggle-button");
 
