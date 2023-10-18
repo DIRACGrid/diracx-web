@@ -13,8 +13,7 @@ body:
       label: User Persona
       description: |
         Who is the user? Here is an example:
-        - Name: John Doe
-        - Age: 32
+        - Technical proficiency: Novice | Intermediate | Advanced | Expert
         - Occupation: Dirac Developer
         - Goals: 
           1. Ease eye strain during long working hours by utilizing a dark mode feature.
@@ -25,8 +24,7 @@ body:
           2. The lack of a dark mode feature feels outdated and not in alignment with contemporary design standards.
           3. Concerned that continued use of the app in its current state may adversely affect my vision over time.
       value: |
-        - Name:
-        - Age:
+        - Technical proficiency:
         - Occupation:
         - Goals:
         - Pain points:
