@@ -9,7 +9,7 @@ export function DiracLogo() {
   return (
     <>
       <NextLink href="/">
-        <Image src="/DIRAC-logo.png" alt="DIRAC logo" width={150} height={55} />
+        <Image src="/DIRAC-logo.png" alt="DIRAC logo" width={150} height={45} />
       </NextLink>
     </>
   );

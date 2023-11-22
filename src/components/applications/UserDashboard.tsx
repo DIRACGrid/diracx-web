@@ -24,7 +24,9 @@ export default function UserDashboard() {
             mr: "5%",
           }}
         >
-          <span>Hello {accessTokenPayload["preferred_username"]}</span>
+          <h2>Hello {accessTokenPayload["preferred_username"]}</h2>
+
+          <p>To start with, select an application in the side bar</p>
         </Box>
       </MUIThemeProvider>
     </React.Fragment>

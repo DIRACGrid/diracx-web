@@ -1,11 +1,8 @@
 "use client";
-import {
-  OidcConfiguration,
-  OidcProvider,
-  OidcSecure,
-} from "@axa-fr/react-oidc";
+import { OidcConfiguration, OidcProvider, useOidc } from "@axa-fr/react-oidc";
 import React, { useState, useEffect } from "react";
 import { useDiracxUrl } from "@/hooks/utils";
+import { useRouter } from "next/navigation";
 
 interface OIDCProviderProps {
   children: React.ReactNode;
@@ -65,15 +62,19 @@ export function OIDCProvider(props: OIDCProviderProps) {
 }
 
 /**
- * Wrapper around the react-oidc OidcSecure component
- * Needed because OidcProvider cannot be directly called from a server file
+ * Check whether the user is authenticated, and redirect to the login page if not
  * @param props - configuration of the OIDC provider
- * @returns the wrapper around OidcProvider
+ * @returns The children if the user is authenticated, null otherwise
  */
 export function OIDCSecure({ children }: OIDCProps) {
-  return (
-    <>
-      <OidcSecure>{children}</OidcSecure>
-    </>
-  );
+  const { isAuthenticated } = useOidc();
+  const router = useRouter();
+
+  // Redirect to login page if not authenticated
+  if (!isAuthenticated) {
+    router.push("/auth");
+    return null;
+  }
+
+  return <>{children}</>;
 }
