@@ -7,7 +7,7 @@ import IconButton from "@mui/material/IconButton";
 import MenuIcon from "@mui/icons-material/Menu";
 import Toolbar from "@mui/material/Toolbar";
 import Stack from "@mui/material/Stack";
-import { LoginButton } from "../ui/LoginButton";
+import { ProfileButton } from "../ui/ProfileButton";
 import DashboardDrawer from "../ui/DashboardDrawer";
 import { useMUITheme } from "@/hooks/theme";
 import { ThemeProvider as MUIThemeProvider } from "@mui/material/styles";
@@ -68,7 +68,7 @@ export default function Dashboard(props: DashboardProps) {
               <div />
               <Stack direction="row">
                 <ThemeToggleButton />
-                <LoginButton />
+                <ProfileButton />
               </Stack>
             </Toolbar>
           </Stack>

@@ -7,7 +7,7 @@ import Grid from "@mui/material/Grid";
 import Paper from "@mui/material/Paper";
 import { styled } from "@mui/material/styles";
 import { DiracLogo } from "../ui/DiracLogo";
-import { LoginButton } from "../ui/LoginButton";
+import { ProfileButton } from "../ui/ProfileButton";
 import { Box, Stack } from "@mui/material";
 import { DashboardButton } from "../ui/DashboardButton";
 import Image from "next/image";
@@ -47,7 +47,7 @@ export default function Showcase() {
               <Stack direction="row">
                 <DashboardButton />
                 <ThemeToggleButton />
-                <LoginButton />
+                <ProfileButton />
               </Stack>
             </Toolbar>
           </Stack>

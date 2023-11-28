@@ -5,6 +5,7 @@ import { Box } from "@mui/material";
 import { useMUITheme } from "@/hooks/theme";
 import { ThemeProvider as MUIThemeProvider } from "@mui/material/styles";
 import { useOidcAccessToken } from "@axa-fr/react-oidc";
+import { useOIDCContext } from "@/hooks/oidcConfiguration";
 
 /**
  * Build the User Dashboard page
@@ -12,7 +13,8 @@ import { useOidcAccessToken } from "@axa-fr/react-oidc";
  */
 export default function UserDashboard() {
   const theme = useMUITheme();
-  const { accessTokenPayload } = useOidcAccessToken();
+  const { configurationName } = useOIDCContext();
+  const { accessTokenPayload } = useOidcAccessToken(configurationName);
 
   return (
     <React.Fragment>

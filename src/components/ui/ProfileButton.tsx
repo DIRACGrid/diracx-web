@@ -1,4 +1,5 @@
 "use client";
+import { useOIDCContext } from "@/hooks/oidcConfiguration";
 import { useOidc, useOidcAccessToken } from "@axa-fr/react-oidc";
 import { Logout } from "@mui/icons-material";
 import {
@@ -16,12 +17,13 @@ import { deepOrange, lightGreen } from "@mui/material/colors";
 import React from "react";
 
 /**
- * Login/Logout button, expected to vary whether the user is connected
+ * Profile button, expected to vary whether the user is connected
  * @returns a Button
  */
-export function LoginButton() {
-  const { accessTokenPayload } = useOidcAccessToken();
-  const { logout, isAuthenticated } = useOidc();
+export function ProfileButton() {
+  const { configurationName, setConfigurationName } = useOIDCContext();
+  const { accessTokenPayload } = useOidcAccessToken(configurationName);
+  const { logout, isAuthenticated } = useOidc(configurationName);
 
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
@@ -33,6 +35,9 @@ export function LoginButton() {
     setAnchorEl(null);
   };
   const handleLogout = () => {
+    // Remove the OIDC configuration name from the session storage
+    setConfigurationName(undefined);
+    sessionStorage.removeItem("oidcConfigName");
     logout();
   };
 

@@ -1,10 +1,10 @@
-import useSWR, { SWRResponse } from "swr";
+import useSWRImmutable, { SWRResponse } from "swr";
 import { useDiracxUrl, fetcher } from "./utils";
 
 /**
  * Metadata returned by the /.well-known/dirac-metadata endpoint
  */
-interface Metadata {
+export interface Metadata {
   virtual_organizations: {
     [key: string]: {
       groups: {
@@ -30,7 +30,10 @@ export function useMetadata() {
   const diracxUrl = useDiracxUrl();
 
   const url = `${diracxUrl}/.well-known/dirac-metadata`;
-  const { data, error }: SWRResponse<Metadata, any> = useSWR([url], fetcher);
+  const { data, error }: SWRResponse<Metadata, any> = useSWRImmutable(
+    [url],
+    fetcher,
+  );
 
   return {
     data,

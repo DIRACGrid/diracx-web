@@ -1,5 +1,5 @@
 import { render, fireEvent, screen, within } from "@testing-library/react";
-import { LoginForm } from "@/components/ui/LoginForm";
+import { LoginForm } from "@/components/applications/LoginForm";
 import { ThemeProvider } from "@/contexts/ThemeProvider";
 import { useMetadata } from "@/hooks/metadata";
 
