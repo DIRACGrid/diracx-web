@@ -1,6 +1,6 @@
 import React from "react";
 import { render, fireEvent } from "@testing-library/react";
-import { LoginButton } from "@/components/ui/LoginButton";
+import { ProfileButton } from "@/components/ui/ProfileButton";
 import { useOidcAccessToken, useOidc } from "@axa-fr/react-oidc";
 
 // Mocking the hooks
@@ -10,12 +10,12 @@ beforeEach(() => {
   jest.resetAllMocks();
 });
 
-describe("<LoginButton />", () => {
+describe("<ProfileButton />", () => {
   it('displays the "Login" button when not authenticated', () => {
     (useOidc as jest.Mock).mockReturnValue({ isAuthenticated: false });
     (useOidcAccessToken as jest.Mock).mockReturnValue({});
 
-    const { getByText } = render(<LoginButton />);
+    const { getByText } = render(<ProfileButton />);
     expect(getByText("Login")).toBeInTheDocument();
   });
 
@@ -26,7 +26,7 @@ describe("<LoginButton />", () => {
       accessTokenPayload: { preferred_username: "John" },
     });
 
-    const { getByText } = render(<LoginButton />);
+    const { getByText } = render(<ProfileButton />);
     expect(getByText("J")).toBeInTheDocument(); // Assuming 'John' is the preferred username and 'J' is the first letter.
   });
 
@@ -37,7 +37,7 @@ describe("<LoginButton />", () => {
       accessTokenPayload: { preferred_username: "John" },
     });
 
-    const { getByText, queryByText } = render(<LoginButton />);
+    const { getByText, queryByText } = render(<ProfileButton />);
     fireEvent.click(getByText("J"));
     expect(queryByText("Profile")).toBeInTheDocument();
     expect(queryByText("Logout")).toBeInTheDocument();
@@ -55,7 +55,7 @@ describe("<LoginButton />", () => {
       accessTokenPayload: { preferred_username: "John" },
     });
 
-    const { getByText } = render(<LoginButton />);
+    const { getByText } = render(<ProfileButton />);
 
     // Open the menu by clicking the avatar
     fireEvent.click(getByText("J"));

@@ -1,4 +1,5 @@
-import { useOidcAccessToken } from "@axa-fr/react-oidc";
+import { useOIDCContext } from "@/hooks/oidcConfiguration";
+import { useOidc } from "@axa-fr/react-oidc";
 import { Button } from "@mui/material";
 import { deepOrange, lightGreen } from "@mui/material/colors";
 import Link from "next/link";
@@ -8,9 +9,11 @@ import Link from "next/link";
  * @returns a Button
  */
 export function DashboardButton() {
-  const { accessToken } = useOidcAccessToken();
+  const { configurationName } = useOIDCContext();
+  const { isAuthenticated } = useOidc(configurationName);
 
-  if (!accessToken) {
+  // Render null if the OIDC configuration is not ready or no access token is available
+  if (!isAuthenticated) {
     return null;
   }
 

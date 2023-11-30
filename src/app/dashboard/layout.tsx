@@ -1,6 +1,6 @@
 import React from "react";
 import Dashboard from "@/components/layout/Dashboard";
-import { OIDCSecure } from "@/components/auth/OIDCUtils";
+import { OIDCSecure } from "@/components/layout/OIDCSecure";
 
 export default function DashboardLayout({
   children,

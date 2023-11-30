@@ -1,4 +1,5 @@
 "use client";
+import { useOIDCContext } from "@/hooks/oidcConfiguration";
 import { useOidc, useOidcAccessToken } from "@axa-fr/react-oidc";
 import { Logout } from "@mui/icons-material";
 import {
@@ -6,6 +7,7 @@ import {
   Button,
   Divider,
   IconButton,
+  Link,
   ListItemIcon,
   Menu,
   MenuItem,
@@ -15,15 +17,17 @@ import { deepOrange, lightGreen } from "@mui/material/colors";
 import React from "react";
 
 /**
- * Login/Logout button, expected to vary whether the user is connected
+ * Profile button, expected to vary whether the user is connected
  * @returns a Button
  */
-export function LoginButton() {
-  const { accessTokenPayload } = useOidcAccessToken();
-  const { login, logout, isAuthenticated } = useOidc();
+export function ProfileButton() {
+  const { configurationName, setConfigurationName } = useOIDCContext();
+  const { accessTokenPayload } = useOidcAccessToken(configurationName);
+  const { logout, isAuthenticated } = useOidc(configurationName);
 
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
+
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
   };
@@ -31,6 +35,9 @@ export function LoginButton() {
     setAnchorEl(null);
   };
   const handleLogout = () => {
+    // Remove the OIDC configuration name from the session storage
+    setConfigurationName(undefined);
+    sessionStorage.removeItem("oidcConfigName");
     logout();
   };
 
@@ -42,7 +49,8 @@ export function LoginButton() {
           "&:hover": { bgcolor: deepOrange[500] },
         }}
         variant="contained"
-        onClick={() => login()}
+        component={Link}
+        href="/auth"
       >
         Login
       </Button>
@@ -69,29 +77,31 @@ export function LoginButton() {
         open={open}
         onClose={handleClose}
         onClick={handleClose}
-        PaperProps={{
-          elevation: 0,
-          sx: {
-            overflow: "visible",
-            filter: "drop-shadow(0px 2px 8px rgba(0,0,0,0.32))",
-            mt: 1.5,
-            "& .MuiAvatar-root": {
-              width: 32,
-              height: 32,
-              ml: -0.5,
-              mr: 1,
-            },
-            "&:before": {
-              content: '""',
-              display: "block",
-              position: "absolute",
-              top: 0,
-              right: 14,
-              width: 10,
-              height: 10,
-              bgcolor: "background.paper",
-              transform: "translateY(-50%) rotate(45deg)",
-              zIndex: 0,
+        slotProps={{
+          paper: {
+            elevation: 0,
+            sx: {
+              overflow: "visible",
+              filter: "drop-shadow(0px 2px 8px rgba(0,0,0,0.32))",
+              mt: 1.5,
+              "& .MuiAvatar-root": {
+                width: 32,
+                height: 32,
+                ml: -0.5,
+                mr: 1,
+              },
+              "&:before": {
+                content: '""',
+                display: "block",
+                position: "absolute",
+                top: 0,
+                right: 14,
+                width: 10,
+                height: 10,
+                bgcolor: "background.paper",
+                transform: "translateY(-50%) rotate(45deg)",
+                zIndex: 0,
+              },
             },
           },
         }}

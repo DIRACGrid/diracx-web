@@ -1,11 +1,11 @@
 import React from "react";
 import { render } from "@testing-library/react";
 import { DashboardButton } from "@/components/ui/DashboardButton";
-import { useOidcAccessToken } from "@axa-fr/react-oidc";
+import { useOidc } from "@axa-fr/react-oidc";
 
 // Mocking the useOidcAccessToken hook
 jest.mock("@axa-fr/react-oidc", () => ({
-  useOidcAccessToken: jest.fn(),
+  useOidc: jest.fn(),
 }));
 
 describe("<DashboardButton />", () => {
@@ -13,10 +13,10 @@ describe("<DashboardButton />", () => {
     jest.clearAllMocks();
   });
 
-  it("renders the button when user is connected (has accessToken)", () => {
-    // Mocking the return value of useOidcAccessToken to simulate a user with an accessToken
-    (useOidcAccessToken as jest.Mock).mockReturnValue({
-      accessToken: "mocked_token",
+  it("renders the button when user is connected (isAuthenticated = true)", () => {
+    // Mocking the return value of useOidcAccessToken to simulate a non-connected user
+    (useOidc as jest.Mock).mockReturnValue({
+      isAuthenticated: true,
     });
 
     const { getByText } = render(<DashboardButton />);
@@ -26,8 +26,8 @@ describe("<DashboardButton />", () => {
   });
 
   it("does not render the button when user is not connected (no accessToken)", () => {
-    // Mocking the return value of useOidcAccessToken to simulate a user without an accessToken
-    (useOidcAccessToken as jest.Mock).mockReturnValue({ accessToken: null });
+    // Mocking the return value of useOidc to simulate a connected user
+    (useOidc as jest.Mock).mockReturnValue({ isAuthenticated: false });
 
     const { queryByText } = render(<DashboardButton />);
     const button = queryByText("Dashboard");
