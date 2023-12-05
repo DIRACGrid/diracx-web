@@ -13,8 +13,8 @@ import { useOIDCContext } from "@/hooks/oidcConfiguration";
  */
 export default function UserDashboard() {
   const theme = useMUITheme();
-  const { configurationName } = useOIDCContext();
-  const { accessTokenPayload } = useOidcAccessToken(configurationName);
+  const { configuration } = useOIDCContext();
+  const { accessTokenPayload } = useOidcAccessToken(configuration?.scope);
 
   return (
     <React.Fragment>

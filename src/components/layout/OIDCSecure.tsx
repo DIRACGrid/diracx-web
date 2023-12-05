@@ -14,8 +14,8 @@ interface OIDCProps {
  * @returns The children if the user is authenticated, null otherwise
  */
 export function OIDCSecure({ children }: OIDCProps) {
-  const { configurationName } = useOIDCContext();
-  const { isAuthenticated } = useOidc(configurationName);
+  const { configuration } = useOIDCContext();
+  const { isAuthenticated } = useOidc(configuration?.scope);
   const router = useRouter();
 
   // Redirect to login page if not authenticated

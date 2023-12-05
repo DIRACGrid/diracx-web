@@ -8,9 +8,9 @@ import { useOIDCContext } from "./oidcConfiguration";
  * @returns the jobs
  */
 export function useJobs() {
-  const { configurationName } = useOIDCContext();
+  const { configuration } = useOIDCContext();
   const diracxUrl = useDiracxUrl();
-  const { accessToken } = useOidcAccessToken(configurationName);
+  const { accessToken } = useOidcAccessToken(configuration?.scope);
 
   const url = `${diracxUrl}/api/jobs/search?page=0&per_page=100`;
   const { data, error } = useSWR([url, accessToken, "POST"], fetcher);
