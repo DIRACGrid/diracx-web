@@ -1,6 +1,6 @@
 "use client";
 import { useMediaQuery } from "@mui/material";
-import { createContext, useState } from "react";
+import { createContext, useEffect, useState } from "react";
 
 /**
  * Theme context type
@@ -8,7 +8,7 @@ import { createContext, useState } from "react";
  * @property toggleTheme - function to toggle the theme mode
  */
 type ThemeContextType = {
-  theme: "light" | "dark";
+  theme: string;
   toggleTheme: () => void;
 };
 
@@ -30,12 +30,22 @@ export const ThemeContext = createContext<ThemeContextType | undefined>(
  * ThemeProvider component to provide the theme context to its children
  */
 export const ThemeProvider = ({ children }: ThemeProviderProps) => {
-  // State to manage the current theme mode
-  const [theme, setTheme] = useState<"light" | "dark">(
-    useMediaQuery("(prefers-color-scheme: dark)") ? "dark" : "light",
-  );
+  // Read the initial theme from localStorage
+  const prefersDarkMode = useMediaQuery("(prefers-color-scheme: dark)");
+  const storedTheme = localStorage.getItem("theme");
+  const defaultTheme = storedTheme
+    ? storedTheme
+    : prefersDarkMode
+      ? "dark"
+      : "light";
 
-  // Function to toggle the theme mode
+  const [theme, setTheme] = useState<string>(defaultTheme);
+
+  // Update localStorage when the theme changes
+  useEffect(() => {
+    localStorage.setItem("theme", theme);
+  }, [theme]);
+
   const toggleTheme = () => {
     setTheme((prevTheme) => (prevTheme === "light" ? "dark" : "light"));
   };

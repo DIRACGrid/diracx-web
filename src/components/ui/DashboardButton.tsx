@@ -9,8 +9,8 @@ import Link from "next/link";
  * @returns a Button
  */
 export function DashboardButton() {
-  const { configurationName } = useOIDCContext();
-  const { isAuthenticated } = useOidc(configurationName);
+  const { configuration } = useOIDCContext();
+  const { isAuthenticated } = useOidc(configuration?.scope);
 
   // Render null if the OIDC configuration is not ready or no access token is available
   if (!isAuthenticated) {

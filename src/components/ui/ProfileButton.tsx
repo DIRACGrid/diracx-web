@@ -21,9 +21,9 @@ import React from "react";
  * @returns a Button
  */
 export function ProfileButton() {
-  const { configurationName, setConfigurationName } = useOIDCContext();
-  const { accessTokenPayload } = useOidcAccessToken(configurationName);
-  const { logout, isAuthenticated } = useOidc(configurationName);
+  const { configuration, setConfiguration } = useOIDCContext();
+  const { accessTokenPayload } = useOidcAccessToken(configuration?.scope);
+  const { logout, isAuthenticated } = useOidc(configuration?.scope);
 
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
@@ -35,9 +35,13 @@ export function ProfileButton() {
     setAnchorEl(null);
   };
   const handleLogout = () => {
+    if (!configuration) {
+      return;
+    }
+
     // Remove the OIDC configuration name from the session storage
-    setConfigurationName(undefined);
-    sessionStorage.removeItem("oidcConfigName");
+    setConfiguration({ ...configuration, scope: `` });
+    sessionStorage.removeItem("oidcScope");
     logout();
   };
 

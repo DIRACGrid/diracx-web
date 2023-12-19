@@ -1,4 +1,5 @@
 import { ThemeContext } from "@/contexts/ThemeProvider";
+import { PaletteMode } from "@mui/material";
 import { createTheme } from "@mui/material/styles";
 import { useContext } from "react";
 
@@ -20,13 +21,14 @@ export const useTheme = () => {
  * @returns the Material-UI theme
  * @throws an error if the hook is not used within a ThemeProvider
  */
+
 export const useMUITheme = () => {
   const { theme } = useTheme();
 
   // Create a Material-UI theme based on the current mode
   const muiTheme = createTheme({
     palette: {
-      mode: theme,
+      mode: theme as PaletteMode,
       primary: {
         main: "#ffffff",
       },

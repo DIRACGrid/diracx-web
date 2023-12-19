@@ -13,13 +13,9 @@ import { OIDCProvider } from "@/components/layout/OIDCProvider";
 export const OIDCConfigurationContext = createContext<{
   configuration: OidcConfiguration | null;
   setConfiguration: (config: OidcConfiguration | null) => void;
-  configurationName: string | undefined;
-  setConfigurationName: (name: string | undefined) => void;
 }>({
   configuration: null,
   setConfiguration: () => {},
-  configurationName: undefined,
-  setConfigurationName: () => {},
 });
 
 /**
@@ -35,17 +31,12 @@ export const OIDCConfigurationProvider = ({
   const [configuration, setConfiguration] = useState<OidcConfiguration | null>(
     null,
   );
-  const [configurationName, setConfigurationName] = useState<
-    string | undefined
-  >(undefined);
 
   return (
     <OIDCConfigurationContext.Provider
       value={{
         configuration,
         setConfiguration,
-        configurationName,
-        setConfigurationName,
       }}
     >
       <OIDCProvider>{children}</OIDCProvider>
