@@ -32,20 +32,16 @@ export function LoginForm() {
   const { data, error, isLoading } = useMetadata();
   const [selectedVO, setSelectedVO] = useState<string | null>(null);
   const [selectedGroup, setSelectedGroup] = useState<string | null>(null);
-  const {
-    configuration,
-    setConfiguration,
-    configurationName,
-    setConfigurationName,
-  } = useOIDCContext();
-  const { isAuthenticated, login } = useOidc(configurationName);
+  const { configuration, setConfiguration } = useOIDCContext();
+  const { isAuthenticated, login } = useOidc(configuration?.scope);
 
   // Login if not authenticated
   useEffect(() => {
-    if (configurationName && isAuthenticated === false) {
+    if (configuration && configuration.scope && isAuthenticated === false) {
+      sessionStorage.setItem("oidcScope", JSON.stringify(configuration.scope));
       login();
     }
-  }, [configurationName, isAuthenticated, login]);
+  }, [configuration, isAuthenticated, login]);
 
   // Get default group
   const getDefaultGroup = (data: Metadata | undefined, vo: string): string => {
@@ -87,10 +83,6 @@ export function LoginForm() {
         ...configuration,
         scope: newScope,
       });
-      setConfigurationName(newScope);
-
-      sessionStorage.setItem("oidcConfigName", JSON.stringify(newScope));
-      login();
     }
   };
   // Redirect to dashboard if already authenticated

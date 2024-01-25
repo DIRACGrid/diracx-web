@@ -15,22 +15,16 @@ interface OIDCProviderProps {
  * @returns the wrapper around OidcProvider
  */
 export function OIDCProvider(props: OIDCProviderProps) {
-  const {
-    configuration,
-    setConfiguration,
-    configurationName,
-    setConfigurationName,
-  } = useOIDCContext();
+  const { configuration, setConfiguration } = useOIDCContext();
   const diracxUrl = useDiracxUrl();
 
   useEffect(() => {
-    if (!configuration && !configurationName && diracxUrl) {
+    if (!configuration && diracxUrl) {
       // Get the OIDC configuration name from the session storage if it exists
-      let scope = sessionStorage.getItem("oidcConfigName") || ``;
+      let scope = sessionStorage.getItem("oidcScope") || ``;
 
       if (scope) {
         scope = scope.replace(/^"|"$/g, "");
-        setConfigurationName(scope);
       }
 
       // Set the OIDC configuration
@@ -41,7 +35,7 @@ export function OIDCProvider(props: OIDCProviderProps) {
         redirect_uri: `${diracxUrl}/#authentication-callback`,
       });
     }
-  }, [diracxUrl, configuration, setConfiguration]);
+  }, [diracxUrl, configuration]);
 
   const withCustomHistory = () => {
     return {
@@ -61,7 +55,7 @@ export function OIDCProvider(props: OIDCProviderProps) {
     <>
       <OidcProvider
         configuration={configuration}
-        configurationName={configurationName}
+        configurationName={configuration.scope}
         withCustomHistory={withCustomHistory}
       >
         <main>{props.children}</main>

@@ -2,6 +2,7 @@ import React from "react";
 import { render, fireEvent } from "@testing-library/react";
 import { ProfileButton } from "@/components/ui/ProfileButton";
 import { useOidcAccessToken, useOidc } from "@axa-fr/react-oidc";
+import { OIDCConfigurationContext } from "@/contexts/OIDCConfigurationProvider";
 
 // Mocking the hooks
 jest.mock("@axa-fr/react-oidc");
@@ -51,11 +52,20 @@ describe("<ProfileButton />", () => {
       logout: mockLogout,
     });
     (useOidcAccessToken as jest.Mock).mockReturnValue({
-      accessToken: "mockAccessToken",
       accessTokenPayload: { preferred_username: "John" },
     });
 
-    const { getByText } = render(<ProfileButton />);
+    // Mock context value
+    const mockContextValue = {
+      configuration: { scope: "mockScope" },
+      setConfiguration: jest.fn(),
+    };
+
+    const { getByText } = render(
+      <OIDCConfigurationContext.Provider value={mockContextValue}>
+        <ProfileButton />
+      </OIDCConfigurationContext.Provider>,
+    );
 
     // Open the menu by clicking the avatar
     fireEvent.click(getByText("J"));
