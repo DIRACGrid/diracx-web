@@ -1,5 +1,7 @@
 import { ThemeContext } from "@/contexts/ThemeProvider";
 import { PaletteMode } from "@mui/material";
+import deepOrange from "@mui/material/colors/deepOrange";
+import lightGreen from "@mui/material/colors/lightGreen";
 import { createTheme } from "@mui/material/styles";
 import { useContext } from "react";
 
@@ -31,6 +33,31 @@ export const useMUITheme = () => {
       mode: theme as PaletteMode,
       primary: {
         main: "#ffffff",
+      },
+    },
+    components: {
+      MuiButton: {
+        styleOverrides: {
+          contained: {
+            // Target the 'contained' variant
+            color: "white",
+            backgroundColor: lightGreen[700],
+            "&:hover": {
+              color: "white",
+              backgroundColor: deepOrange[500],
+            },
+          },
+          outlined: {
+            // Target the 'outlined' variant
+            color: lightGreen[700],
+            borderColor: lightGreen[700],
+            "&:hover": {
+              color: deepOrange[500],
+              borderColor: deepOrange[500],
+              backgroundColor: "transparent",
+            },
+          },
+        },
       },
     },
   });

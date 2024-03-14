@@ -20,7 +20,6 @@ import { useRouter } from "next/navigation";
 import { useOIDCContext } from "@/hooks/oidcConfiguration";
 import * as React from "react";
 import { useOidc } from "@axa-fr/react-oidc";
-import { deepOrange, lightGreen } from "@mui/material/colors";
 
 /**
  * Login form
@@ -201,8 +200,6 @@ export function LoginForm() {
                 <Button
                   variant="contained"
                   sx={{
-                    bgcolor: lightGreen[700],
-                    "&:hover": { bgcolor: deepOrange[500] },
                     flexGrow: 1,
                   }}
                   onClick={handleConfigurationChanges}
