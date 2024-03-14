@@ -1,8 +1,7 @@
 import { ThemeContext } from "@/contexts/ThemeProvider";
 import { PaletteMode } from "@mui/material";
-import deepOrange from "@mui/material/colors/deepOrange";
-import lightGreen from "@mui/material/colors/lightGreen";
-import { createTheme } from "@mui/material/styles";
+import { deepOrange, grey, lightGreen } from "@mui/material/colors";
+import { createTheme, darken, lighten } from "@mui/material/styles";
 import { useContext } from "react";
 
 /**
@@ -35,32 +34,73 @@ export const useMUITheme = () => {
         main: "#ffffff",
       },
     },
-    components: {
-      MuiButton: {
-        styleOverrides: {
-          contained: {
-            // Target the 'contained' variant
+  });
+
+  muiTheme.components = {
+    MuiButton: {
+      styleOverrides: {
+        contained: {
+          // Target the 'contained' variant
+          color: "white",
+          backgroundColor: lightGreen[700],
+          "&:hover": {
             color: "white",
-            backgroundColor: lightGreen[700],
-            "&:hover": {
-              color: "white",
-              backgroundColor: deepOrange[500],
-            },
+            backgroundColor: deepOrange[500],
           },
-          outlined: {
-            // Target the 'outlined' variant
-            color: lightGreen[700],
-            borderColor: lightGreen[700],
-            "&:hover": {
-              color: deepOrange[500],
-              borderColor: deepOrange[500],
-              backgroundColor: "transparent",
-            },
+        },
+        outlined: {
+          // Target the 'outlined' variant
+          color: lightGreen[700],
+          borderColor: lightGreen[700],
+          "&:hover": {
+            color: deepOrange[500],
+            borderColor: deepOrange[500],
+            backgroundColor: "transparent",
           },
         },
       },
     },
-  });
+    MuiTableRow: {
+      styleOverrides: {
+        root: {
+          "&.Mui-selected, &.Mui-selected:hover": {
+            backgroundColor:
+              muiTheme.palette.mode === "light"
+                ? lighten(grey[200], 0.2)
+                : darken(grey[800], 0.2),
+          },
+        },
+      },
+    },
+    MuiTableCell: {
+      styleOverrides: {
+        head: {
+          borderRight: `1px solid ${muiTheme.palette.divider}`,
+          borderColor: "divider",
+          // Remove the border for the last cell
+          "&:last-child": {
+            borderRight: 0,
+          },
+          textAlign: "left",
+        },
+        body: {
+          textAlign: "left",
+        },
+      },
+    },
+    MuiCheckbox: {
+      styleOverrides: {
+        root: {
+          "&.Mui-checked": {
+            color: lightGreen[700],
+          },
+          "&.MuiCheckbox-indeterminate": {
+            color: deepOrange[500],
+          },
+        },
+      },
+    },
+  };
 
   return muiTheme;
 };
