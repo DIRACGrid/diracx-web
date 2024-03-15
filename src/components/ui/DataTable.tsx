@@ -1,4 +1,5 @@
 import * as React from "react";
+import { alpha } from "@mui/material/styles";
 import Box from "@mui/material/Box";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
@@ -11,6 +12,14 @@ import TableSortLabel from "@mui/material/TableSortLabel";
 import Paper from "@mui/material/Paper";
 import Checkbox from "@mui/material/Checkbox";
 import { visuallyHidden } from "@mui/utils";
+import Toolbar from "@mui/material/Toolbar";
+import Typography from "@mui/material/Typography";
+import Tooltip from "@mui/material/Tooltip";
+import IconButton from "@mui/material/IconButton";
+import FilterListIcon from "@mui/icons-material/FilterList";
+import FormatListBulletedIcon from "@mui/icons-material/FormatListBulleted";
+import { Snackbar, Stack } from "@mui/material";
+import { deepOrange } from "@mui/material/colors";
 
 /**
  * Descending comparator function
@@ -165,15 +174,106 @@ function DataTableHead(props: EnhancedTableProps) {
 }
 
 /**
+ * Data table toolbar props
+ * @property {string} title - the title of the table
+ * @property {number} numSelected - the number of selected rows
+ * @property {number[]} selectedIds - the ids of the selected rows
+ * @property {function} clearSelected - the function to call when the selected rows are cleared
+ */
+interface DataTableToolbarProps {
+  title: string;
+  numSelected: number;
+  selectedIds: readonly number[];
+  toolbarComponents: JSX.Element;
+}
+
+/**
+ * Data table toolbar component
+ * @param {DataTableToolbarProps} props - the props for the component
+ */
+function DataTableToolbar(props: DataTableToolbarProps) {
+  const { title, numSelected, selectedIds, toolbarComponents } = props;
+  const [snackbarOpen, setSnackbarOpen] = React.useState(false);
+
+  const handleCopyIDs = () => {
+    navigator.clipboard.writeText(JSON.stringify(selectedIds)).then(
+      () => {
+        setSnackbarOpen(true); // Open the snackbar on successful copy
+      },
+      (err) => {
+        console.error("Could not copy text: ", err);
+      },
+    );
+  };
+
+  return (
+    <Toolbar
+      sx={{
+        ...(numSelected > 0 && {
+          bgcolor: (theme) =>
+            alpha(deepOrange[500], theme.palette.action.activatedOpacity),
+        }),
+      }}
+    >
+      {numSelected > 0 ? (
+        <Typography
+          sx={{ flex: "1 1 100%" }}
+          color="inherit"
+          variant="subtitle1"
+          component="div"
+        >
+          {numSelected} selected
+        </Typography>
+      ) : (
+        <Typography
+          sx={{ flex: "1 1 100%" }}
+          variant="h6"
+          id="tableTitle"
+          component="div"
+        >
+          {title}
+        </Typography>
+      )}
+      {numSelected > 0 ? (
+        <Stack direction="row">
+          <Tooltip title="Get IDs">
+            <IconButton onClick={handleCopyIDs}>
+              <FormatListBulletedIcon />
+            </IconButton>
+          </Tooltip>
+          <Snackbar
+            open={snackbarOpen}
+            autoHideDuration={6000}
+            onClose={() => setSnackbarOpen(false)}
+            message="Job IDs copied to clipboard"
+          />
+          {toolbarComponents}
+        </Stack>
+      ) : (
+        <Tooltip title="Filter list">
+          <IconButton>
+            <FilterListIcon />
+          </IconButton>
+        </Tooltip>
+      )}
+    </Toolbar>
+  );
+}
+
+/**
  * Data table props
  * @property {HeadCell[]} columns - the columns for the table
  * @property {any[]} rows - the rows for the table
  */
 interface DataTableProps {
+  title: string;
+  selected: readonly number[];
+  setSelected: React.Dispatch<React.SetStateAction<readonly number[]>>;
   columns: HeadCell[];
   rows: any[];
   rowIdentifier: string;
   isMobile: boolean;
+  toolbarComponents: JSX.Element;
 }
 
 /**
@@ -182,10 +282,18 @@ interface DataTableProps {
  * @returns a DataTable component
  */
 export function DataTable(props: DataTableProps) {
-  const { columns, rows, rowIdentifier, isMobile } = props;
+  const {
+    title,
+    selected,
+    setSelected,
+    columns,
+    rows,
+    rowIdentifier,
+    isMobile,
+    toolbarComponents,
+  } = props;
   const [order, setOrder] = React.useState<Order>("asc");
   const [orderBy, setOrderBy] = React.useState<string | number>(rowIdentifier);
-  const [selected, setSelected] = React.useState<readonly number[]>([]);
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(25);
 
@@ -247,10 +355,16 @@ export function DataTable(props: DataTableProps) {
   return (
     <Box sx={{ width: "100%" }}>
       <Paper sx={{ width: "100%", mb: 2 }}>
-        <TableContainer sx={{ maxHeight: "75vh" }}>
+        <DataTableToolbar
+          title={title}
+          numSelected={selected.length}
+          selectedIds={selected}
+          toolbarComponents={toolbarComponents}
+        />
+        <TableContainer sx={{ maxHeight: "65vh" }}>
           <Table
             stickyHeader
-            sx={{ minWidth: isMobile ? "undefined" : "90vw" }}
+            sx={{ minWidth: isMobile ? "undefined" : "50vw" }}
             aria-labelledby="tableTitle"
             size={"medium"}
           >

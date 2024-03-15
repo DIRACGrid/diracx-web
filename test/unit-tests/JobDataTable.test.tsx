@@ -1,21 +1,27 @@
 import React from "react";
 import { render } from "@testing-library/react";
 import { JobDataTable } from "@/components/ui/JobDataTable";
-import { useJobs } from "@/hooks/jobs";
+import useSWR from "swr";
+import { useOidcAccessToken } from "@axa-fr/react-oidc";
 
-// Mocking the useJobs hook
-jest.mock("../../src/hooks/jobs");
+// Mock the module
+jest.mock("@axa-fr/react-oidc", () => ({
+  useOidcAccessToken: jest.fn(),
+}));
+
+jest.mock("swr", () => jest.fn());
 
 describe("<JobDataTable />", () => {
   it("displays loading state", () => {
-    (useJobs as jest.Mock).mockReturnValue({ isLoading: true });
+    (useSWR as jest.Mock).mockReturnValue({ data: null, error: null });
+    (useOidcAccessToken as jest.Mock).mockReturnValue("1234");
 
     const { getByText } = render(<JobDataTable />);
     expect(getByText("Loading...")).toBeInTheDocument();
   });
 
   it("displays error state", () => {
-    (useJobs as jest.Mock).mockReturnValue({ error: true });
+    (useSWR as jest.Mock).mockReturnValue({ error: true });
 
     const { getByText } = render(<JobDataTable />);
     expect(
@@ -24,7 +30,7 @@ describe("<JobDataTable />", () => {
   });
 
   it("displays no jobs data state", () => {
-    (useJobs as jest.Mock).mockReturnValue({ data: [] });
+    (useSWR as jest.Mock).mockReturnValue({ data: [] });
 
     const { getByText } = render(<JobDataTable />);
     expect(getByText("No job submitted.")).toBeInTheDocument();
@@ -40,7 +46,7 @@ describe("<JobDataTable />", () => {
         SubmissionTime: "2023-10-13",
       },
     ];
-    (useJobs as jest.Mock).mockReturnValue({ data: mockData });
+    (useSWR as jest.Mock).mockReturnValue({ data: mockData });
 
     const { getByText } = render(<JobDataTable />);
     expect(getByText("TestJob1")).toBeInTheDocument();

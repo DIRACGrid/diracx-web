@@ -1,5 +1,4 @@
 import * as React from "react";
-import { useJobs } from "@/hooks/jobs";
 import { DataTable, HeadCell } from "./DataTable";
 import Box from "@mui/material/Box";
 import {
@@ -15,25 +14,41 @@ import {
   lime,
   amber,
 } from "@mui/material/colors";
-import { useMediaQuery, useTheme } from "@mui/material";
+import {
+  Alert,
+  AlertColor,
+  IconButton,
+  Tooltip,
+  useMediaQuery,
+  useTheme,
+} from "@mui/material";
+import { useOidcAccessToken } from "@axa-fr/react-oidc";
+import { useOIDCContext } from "../../hooks/oidcConfiguration";
+import DeleteIcon from "@mui/icons-material/Delete";
+import ClearIcon from "@mui/icons-material/Clear";
+import ReplayIcon from "@mui/icons-material/Replay";
+import { Backdrop, CircularProgress, Snackbar, Stack } from "@mui/material";
+import { mutate } from "swr";
+import useSWR from "swr";
+import { fetcher } from "../../hooks/utils";
 
 const renderStatusCell = (status: string) => {
   const statusColors: { [key: string]: string } = {
-    Submitting: purple[500], // Starting process - Purple suggests something 'in progress'
-    Received: blueGrey[500], // Neutral informative color
-    Checking: teal[500], // Indicates a process in action, teal is less 'active' than blue but still indicates movement
-    Staging: lightBlue[500], // Light blue is calm, implying readiness and preparation
-    Waiting: amber[600], // Amber signals a pause or that something is on hold
-    Matched: blue[300], // A lighter blue indicating a successful match but still in an intermediate stage
-    Running: blue[900], // Dark blue suggests a deeper level of operation
-    Rescheduled: lime[700], // Lime is bright and eye-catching, good for something that has been reset
-    Completing: orange[500], // Orange is often associated with the transition, appropriate for a state leading to completion
-    Completed: green[300], // Light green signifies near success
-    Done: green[500], // Green represents success and completion
-    Failed: red[500], // Red is commonly associated with failure
-    Stalled: amber[900], // Darker amber implies a more critical waiting or hold state
-    Killed: red[900], // A darker red to indicate an intentional stop with a more critical connotation than 'Failed'
-    Deleted: grey[500], // Grey denotes deactivation or removal, neutral and final
+    Submitting: purple[500],
+    Received: blueGrey[500],
+    Checking: teal[500],
+    Staging: lightBlue[500],
+    Waiting: amber[600],
+    Matched: blue[300],
+    Running: blue[900],
+    Rescheduled: lime[700],
+    Completing: orange[500],
+    Completed: green[300],
+    Done: green[500],
+    Failed: red[500],
+    Stalled: amber[900],
+    Killed: red[900],
+    Deleted: grey[500],
   };
 
   return (
@@ -76,22 +91,203 @@ const mobileHeadCells: HeadCell[] = [
  * The data grid for the jobs
  */
 export function JobDataTable() {
-  const { data: rows, isLoading, error } = useJobs();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+  const [selected, setSelected] = React.useState<readonly number[]>([]);
+
+  const { configuration } = useOIDCContext();
+  const { accessToken } = useOidcAccessToken(configuration?.scope);
+  const [backdropOpen, setBackdropOpen] = React.useState(false);
+  const [snackbarInfo, setSnackbarInfo] = React.useState({
+    open: false,
+    message: "",
+    severity: "success",
+  });
+
+  /**
+   * Fetches the jobs from the /api/jobs/search endpoint
+   */
+  const urlGetJobs = `/api/jobs/search?page=0&per_page=100`;
+  const { data, error } = useSWR([urlGetJobs, accessToken, "POST"], fetcher);
+
+  if (!data && !error) return <div>Loading...</div>;
+  if (error) return <div>An error occurred while fetching jobs</div>;
+  if (!data || data.length === 0) return <div>No job submitted.</div>;
 
   const columns = isMobile ? mobileHeadCells : headCells;
+  const clearSelected = () => setSelected([]);
 
-  if (isLoading) return <div>Loading...</div>;
-  if (error) return <div>An error occurred while fetching jobs</div>;
-  if (!rows || rows.length === 0) return <div>No job submitted.</div>;
+  /**
+   * Handle the deletion of the selected jobs
+   */
+  const handleDelete = async (selectedIds: readonly number[]) => {
+    const queryString = selectedIds.map((id) => `job_ids=${id}`).join("&");
+    const deleteUrl = `/api/jobs/?${queryString}`;
+    const requestOptions = {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${accessToken}`, // Use the access token for authorization
+      },
+    };
+
+    setBackdropOpen(true);
+    try {
+      const response = await fetch(deleteUrl, requestOptions);
+      if (!response.ok)
+        throw new Error("An error occurred while deleting jobs.");
+      const data = await response.json();
+      setBackdropOpen(false);
+      mutate([urlGetJobs, accessToken, "POST"]);
+      clearSelected();
+      setSnackbarInfo({
+        open: true,
+        message: "Deleted successfully",
+        severity: "success",
+      });
+    } catch (error: any) {
+      setSnackbarInfo({
+        open: true,
+        message: "Delete failed: " + error.message,
+        severity: "error",
+      });
+    } finally {
+      setBackdropOpen(false);
+    }
+  };
+
+  /**
+   * Handle the killing of the selected jobs
+   */
+  const handleKill = async (selectedIds: readonly number[]) => {
+    const queryString = selectedIds.map((id) => `job_ids=${id}`).join("&");
+    const killUrl = `/api/jobs/kill?${queryString}`;
+    const requestOptions = {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${accessToken}`, // Use the access token for authorization
+      },
+    };
+
+    setBackdropOpen(true);
+    try {
+      const response = await fetch(killUrl, requestOptions);
+      if (!response.ok)
+        throw new Error("An error occurred while deleting jobs.");
+      const data = await response.json();
+      setBackdropOpen(false);
+      mutate([urlGetJobs, accessToken, "POST"]);
+      clearSelected();
+      setSnackbarInfo({
+        open: true,
+        message: "Killed successfully",
+        severity: "success",
+      });
+    } catch (error: any) {
+      setSnackbarInfo({
+        open: true,
+        message: "Kill failed: " + error.message,
+        severity: "error",
+      });
+    } finally {
+      setBackdropOpen(false);
+    }
+  };
+
+  /**
+   * Handle the rescheduling of the selected jobs
+   */
+  const handleReschedule = async (selectedIds: readonly number[]) => {
+    const queryString = selectedIds.map((id) => `job_ids=${id}`).join("&");
+    const rescheduleUrl = `/api/jobs/reschedule?${queryString}`;
+    const requestOptions = {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${accessToken}`, // Use the access token for authorization
+      },
+    };
+
+    setBackdropOpen(true);
+    try {
+      const response = await fetch(rescheduleUrl, requestOptions);
+      if (!response.ok)
+        throw new Error("An error occurred while deleting jobs.");
+      const data = await response.json();
+      setBackdropOpen(false);
+      mutate([urlGetJobs, accessToken, "POST"]);
+      clearSelected();
+      setSnackbarInfo({
+        open: true,
+        message: "Rescheduled successfully",
+        severity: "success",
+      });
+    } catch (error: any) {
+      setSnackbarInfo({
+        open: true,
+        message: "Reschedule failed: " + error.message,
+        severity: "error",
+      });
+    } finally {
+      setBackdropOpen(false);
+    }
+  };
+
+  /**
+   * The toolbar components for the data grid
+   */
+  const toolbarComponents = (
+    <>
+      <Tooltip title="Reschedule">
+        <IconButton onClick={() => handleReschedule(selected)}>
+          <ReplayIcon />
+        </IconButton>
+      </Tooltip>
+      <Tooltip title="Kill">
+        <IconButton onClick={() => handleKill(selected)}>
+          <ClearIcon />
+        </IconButton>
+      </Tooltip>
+      <Tooltip title="Delete">
+        <IconButton onClick={() => handleDelete(selected)}>
+          <DeleteIcon />
+        </IconButton>
+      </Tooltip>
+    </>
+  );
 
   return (
-    <DataTable
-      columns={columns}
-      rows={rows}
-      rowIdentifier="JobID"
-      isMobile={isMobile}
-    />
+    <>
+      <DataTable
+        title="List of Jobs"
+        selected={selected}
+        setSelected={setSelected}
+        columns={columns}
+        rows={data}
+        rowIdentifier="JobID"
+        isMobile={isMobile}
+        toolbarComponents={toolbarComponents}
+      />
+      <Snackbar
+        open={snackbarInfo.open}
+        autoHideDuration={6000}
+        onClose={() => setSnackbarInfo((old) => ({ ...old, open: false }))}
+      >
+        <Alert
+          onClose={() => setSnackbarInfo((old) => ({ ...old, open: false }))}
+          severity={snackbarInfo.severity as AlertColor}
+          sx={{ width: "100%" }}
+        >
+          {snackbarInfo.message}
+        </Alert>
+      </Snackbar>
+      <Backdrop
+        sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
+        open={backdropOpen}
+      >
+        <CircularProgress color="inherit" />
+      </Backdrop>
+    </>
   );
 }
