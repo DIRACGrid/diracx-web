@@ -18,8 +18,22 @@ import Tooltip from "@mui/material/Tooltip";
 import IconButton from "@mui/material/IconButton";
 import FilterListIcon from "@mui/icons-material/FilterList";
 import FormatListBulletedIcon from "@mui/icons-material/FormatListBulleted";
-import { Snackbar, Stack } from "@mui/material";
+import {
+  FormControl,
+  Grid,
+  InputLabel,
+  MenuItem,
+  OutlinedInput,
+  Popover,
+  Select,
+  Snackbar,
+  Stack,
+  TextField,
+} from "@mui/material";
 import { deepOrange } from "@mui/material/colors";
+import DeleteIcon from "@mui/icons-material/Delete";
+import AddCircleIcon from "@mui/icons-material/AddCircle";
+import Chip from "@mui/material/Chip";
 
 /**
  * Descending comparator function
@@ -173,6 +187,134 @@ function DataTableHead(props: EnhancedTableProps) {
   );
 }
 
+/** Filter form */
+interface Filter {
+  column: string;
+  operator: string;
+  value: string;
+}
+
+interface FilterFormProps {
+  columns: any[];
+  filters: Filter[];
+  setFilters: React.Dispatch<React.SetStateAction<Filter[]>>;
+}
+
+const initialFilter = { column: "", operator: "eq", value: "" };
+
+function FilterForm(props: FilterFormProps) {
+  const { columns, filters, setFilters } = props;
+
+  const handleAddFilter = () => {
+    setFilters([...filters, initialFilter]);
+  };
+
+  const handleRemoveFilter = (index: number) => {
+    setFilters(filters.filter((_, i) => i !== index));
+  };
+
+  const handleFilterChange = (index: number, field: string, value: string) => {
+    const updatedFilters = filters.map((filter, i) =>
+      i === index ? { ...filter, [field]: value } : filter,
+    );
+    setFilters(updatedFilters);
+  };
+
+  return (
+    <Box sx={{ p: 2 }}>
+      <Stack spacing={2} alignItems="flex-start">
+        <Typography variant="h6" padding={1}>
+          Filters
+        </Typography>
+        <Grid container spacing={2}>
+          {filters.length === 0 && <Typography>No active filter</Typography>}
+          {filters.map((filter, index) => (
+            <React.Fragment key={`filter-${index}`}>
+              <Grid item xs={4} sm={3}>
+                <FormControl variant="outlined" fullWidth>
+                  <InputLabel id={`filter-column-label-${index}`}>
+                    Column
+                  </InputLabel>
+                  <Select
+                    labelId={`filter-column-label-${index}`}
+                    id={`filter-column-select-${index}`}
+                    value={filter.column}
+                    onChange={(e) =>
+                      handleFilterChange(index, "column", e.target.value)
+                    }
+                    label="Column"
+                    sx={{ minWidth: 120 }}
+                  >
+                    {columns.map((column) => (
+                      <MenuItem key={column.id} value={column.id}>
+                        {column.label}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </Grid>
+
+              <Grid item xs={4} sm={3}>
+                <FormControl variant="outlined" fullWidth>
+                  <InputLabel id={`filter-operator-label-${index}`}>
+                    Operator
+                  </InputLabel>
+                  <Select
+                    labelId={`filter-operator-label-${index}`}
+                    id={`filter-operator-select-${index}`}
+                    value={filter.operator}
+                    onChange={(e) =>
+                      handleFilterChange(index, "operator", e.target.value)
+                    }
+                    label="Operator"
+                    sx={{ minWidth: 120 }}
+                  >
+                    <MenuItem value="eq">equals to</MenuItem>
+                    <MenuItem value="neq">not equals to</MenuItem>
+                    <MenuItem value="gt">is greater than</MenuItem>
+                    <MenuItem value="lt">is lower than</MenuItem>
+                    <MenuItem value="like">like</MenuItem>
+                  </Select>
+                </FormControl>
+              </Grid>
+              <Grid item xs={4} sm={4}>
+                <FormControl variant="outlined" fullWidth>
+                  <TextField
+                    id={`filter-value-input-${index}`}
+                    variant="outlined"
+                    label="Value"
+                    value={filter.value}
+                    onChange={(e) =>
+                      handleFilterChange(index, "value", e.target.value)
+                    }
+                    sx={{ flexGrow: 1 }}
+                  />
+                </FormControl>
+              </Grid>
+              <Grid item xs={12} sm={2}>
+                <Tooltip title="Remove filter">
+                  <IconButton
+                    onClick={() => handleRemoveFilter(index)}
+                    color="error"
+                  >
+                    <DeleteIcon />
+                  </IconButton>
+                </Tooltip>
+              </Grid>
+            </React.Fragment>
+          ))}
+        </Grid>
+
+        <Tooltip title="Add filter">
+          <IconButton onClick={handleAddFilter}>
+            <AddCircleIcon />
+          </IconButton>
+        </Tooltip>
+      </Stack>
+    </Box>
+  );
+}
+
 /**
  * Data table toolbar props
  * @property {string} title - the title of the table
@@ -182,8 +324,11 @@ function DataTableHead(props: EnhancedTableProps) {
  */
 interface DataTableToolbarProps {
   title: string;
+  columns: HeadCell[];
   numSelected: number;
   selectedIds: readonly number[];
+  filters: Filter[];
+  setFilters: React.Dispatch<React.SetStateAction<Filter[]>>;
   toolbarComponents: JSX.Element;
 }
 
@@ -192,9 +337,24 @@ interface DataTableToolbarProps {
  * @param {DataTableToolbarProps} props - the props for the component
  */
 function DataTableToolbar(props: DataTableToolbarProps) {
-  const { title, numSelected, selectedIds, toolbarComponents } = props;
+  const {
+    title,
+    columns,
+    numSelected,
+    selectedIds,
+    filters,
+    setFilters,
+    toolbarComponents,
+  } = props;
   const [snackbarOpen, setSnackbarOpen] = React.useState(false);
+  const [open, setOpen] = React.useState(false);
+  const [anchorEl, setAnchorEl] = React.useState<HTMLButtonElement | null>(
+    null,
+  );
 
+  /**
+   * Handle the copy of the selected IDs
+   */
   const handleCopyIDs = () => {
     navigator.clipboard.writeText(JSON.stringify(selectedIds)).then(
       () => {
@@ -204,6 +364,19 @@ function DataTableToolbar(props: DataTableToolbarProps) {
         console.error("Could not copy text: ", err);
       },
     );
+  };
+
+  /**
+   * Handle the filter menu
+   */
+  const handleFilterMenuOpen = (event: React.MouseEvent<HTMLButtonElement>) => {
+    setOpen(true);
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleFilterMenuClose = () => {
+    setOpen(false);
+    setAnchorEl(null);
   };
 
   return (
@@ -250,11 +423,29 @@ function DataTableToolbar(props: DataTableToolbarProps) {
           {toolbarComponents}
         </Stack>
       ) : (
-        <Tooltip title="Filter list">
-          <IconButton>
-            <FilterListIcon />
-          </IconButton>
-        </Tooltip>
+        <>
+          <Tooltip title="Filter list">
+            <IconButton onClick={handleFilterMenuOpen}>
+              <FilterListIcon />
+            </IconButton>
+          </Tooltip>
+          <Popover
+            key={`popover-${filters.length > 0 ? "items" : "no-item"}`}
+            open={open}
+            onClose={handleFilterMenuClose}
+            anchorEl={anchorEl}
+            anchorOrigin={{
+              vertical: "bottom",
+              horizontal: "right",
+            }}
+          >
+            <FilterForm
+              columns={columns}
+              filters={filters}
+              setFilters={setFilters}
+            />
+          </Popover>
+        </>
       )}
     </Toolbar>
   );
@@ -267,6 +458,10 @@ function DataTableToolbar(props: DataTableToolbarProps) {
  */
 interface DataTableProps {
   title: string;
+  page: number;
+  setPage: React.Dispatch<React.SetStateAction<number>>;
+  rowsPerPage: number;
+  setRowsPerPage: React.Dispatch<React.SetStateAction<number>>;
   selected: readonly number[];
   setSelected: React.Dispatch<React.SetStateAction<readonly number[]>>;
   columns: HeadCell[];
@@ -284,6 +479,10 @@ interface DataTableProps {
 export function DataTable(props: DataTableProps) {
   const {
     title,
+    page,
+    setPage,
+    rowsPerPage,
+    setRowsPerPage,
     selected,
     setSelected,
     columns,
@@ -294,8 +493,7 @@ export function DataTable(props: DataTableProps) {
   } = props;
   const [order, setOrder] = React.useState<Order>("asc");
   const [orderBy, setOrderBy] = React.useState<string | number>(rowIdentifier);
-  const [page, setPage] = React.useState(0);
-  const [rowsPerPage, setRowsPerPage] = React.useState(25);
+  const [filters, setFilters] = React.useState([]);
 
   const handleRequestSort = (
     event: React.MouseEvent<unknown>,
@@ -354,11 +552,25 @@ export function DataTable(props: DataTableProps) {
 
   return (
     <Box sx={{ width: "100%" }}>
+      {filters.map((filter: Filter, index: number) => (
+        <Chip
+          key={index}
+          label={`${filter.column} ${filter.operator} ${filter.value}`}
+          onDelete={() => setFilters(filters.filter((_, i) => i !== index))}
+          color="primary"
+          sx={{ m: 0.5 }}
+        />
+      ))}
       <Paper sx={{ width: "100%", mb: 2 }}>
         <DataTableToolbar
           title={title}
+          columns={columns}
           numSelected={selected.length}
           selectedIds={selected}
+          filters={filters}
+          setFilters={
+            setFilters as React.Dispatch<React.SetStateAction<Filter[]>>
+          }
           toolbarComponents={toolbarComponents}
         />
         <TableContainer sx={{ maxHeight: "65vh" }}>

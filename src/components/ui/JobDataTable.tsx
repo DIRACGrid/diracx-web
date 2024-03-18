@@ -32,6 +32,9 @@ import { mutate } from "swr";
 import useSWR from "swr";
 import { fetcher } from "../../hooks/utils";
 
+/**
+ * Renders the status cell with colors
+ */
 const renderStatusCell = (status: string) => {
   const statusColors: { [key: string]: string } = {
     Submitting: purple[500],
@@ -67,6 +70,9 @@ const renderStatusCell = (status: string) => {
   );
 };
 
+/**
+ * The head cells for the data grid (desktop version)
+ */
 const headCells: HeadCell[] = [
   { id: "JobID", label: "Job ID" },
   { id: "JobName", label: "Job Name" },
@@ -81,6 +87,9 @@ const headCells: HeadCell[] = [
   },
 ];
 
+/**
+ * The head cells for the data grid (mobile version)
+ */
 const mobileHeadCells: HeadCell[] = [
   { id: "JobID", label: "Job ID" },
   { id: "JobName", label: "Job Name" },
@@ -103,10 +112,14 @@ export function JobDataTable() {
     message: "",
     severity: "success",
   });
+  const [page, setPage] = React.useState(0);
+  const [rowsPerPage, setRowsPerPage] = React.useState(25);
 
   /**
    * Fetches the jobs from the /api/jobs/search endpoint
    */
+  //TODO: uncomment the following line once page and per_page are used in the backend
+  //const urlGetJobs = `/api/jobs/search?page=${page}&per_page=${rowsPerPage}`;
   const urlGetJobs = `/api/jobs/search?page=0&per_page=100`;
   const { data, error } = useSWR([urlGetJobs, accessToken, "POST"], fetcher);
 
@@ -261,6 +274,10 @@ export function JobDataTable() {
     <>
       <DataTable
         title="List of Jobs"
+        page={page}
+        setPage={setPage}
+        rowsPerPage={rowsPerPage}
+        setRowsPerPage={setRowsPerPage}
         selected={selected}
         setSelected={setSelected}
         columns={columns}
