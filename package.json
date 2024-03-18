@@ -46,7 +46,7 @@
     "prettier": "^3.1.0",
     "ts-jest": "^29.1.1",
     "tsc-files": "^1.1.4",
-    "typescript": "5.2.2"
+    "typescript": "5.4.2"
   },
   "lint-staged": {
     "*.{js,ts,jsx,tsx}": "eslint --cache --fix",
