@@ -2,7 +2,7 @@
 # build stage and the runtime stage into two different steps
 
 # Stage 1: Build the Next.js application
-FROM node:16-alpine AS build
+FROM node:alpine AS build
 WORKDIR /app
 # Install the project dependencies
 COPY package*.json ./
