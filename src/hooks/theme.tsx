@@ -58,12 +58,47 @@ export const useMUITheme = () => {
             backgroundColor: "transparent",
           },
         },
+        text: {
+          // Target the 'text' variant
+          color: lightGreen[700],
+          "&:hover": {
+            color: deepOrange[500],
+            backgroundColor: "transparent",
+            //underline in deep orange
+            textDecoration: "underline",
+          },
+        },
       },
     },
     MuiChip: {
       styleOverrides: {
         root: {
           backgroundColor: lightGreen[100],
+        },
+      },
+    },
+    MuiInputLabel: {
+      styleOverrides: {
+        root: {
+          "&.Mui-focused": {
+            color: darken(grey[200], 0.4),
+          },
+        },
+      },
+    },
+    MuiOutlinedInput: {
+      styleOverrides: {
+        root: {
+          "& .MuiOutlinedInput-notchedOutline": {
+            borderColor: grey[200],
+          },
+          "&:hover .MuiOutlinedInput-notchedOutline": {
+            borderColor: darken(grey[200], 0.2),
+          },
+          "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+            borderColor: darken(grey[200], 0.4),
+            color: "black",
+          },
         },
       },
     },

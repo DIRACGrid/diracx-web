@@ -1,5 +1,5 @@
 import * as React from "react";
-import { DataTable, HeadCell } from "./DataTable";
+import { DataTable, HeadCell, Filter } from "./DataTable";
 import Box from "@mui/material/Box";
 import {
   blue,
@@ -27,7 +27,7 @@ import { useOIDCContext } from "../../hooks/oidcConfiguration";
 import DeleteIcon from "@mui/icons-material/Delete";
 import ClearIcon from "@mui/icons-material/Clear";
 import ReplayIcon from "@mui/icons-material/Replay";
-import { Backdrop, CircularProgress, Snackbar, Stack } from "@mui/material";
+import { Backdrop, CircularProgress, Snackbar } from "@mui/material";
 import { mutate } from "swr";
 import useSWR from "swr";
 import { fetcher } from "../../hooks/utils";
@@ -114,6 +114,8 @@ export function JobDataTable() {
   });
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(25);
+  const [filters, setFilters] = React.useState<Filter[]>([]);
+  const [searchBody, setSearchBody] = React.useState({});
 
   /**
    * Fetches the jobs from the /api/jobs/search endpoint
@@ -121,7 +123,10 @@ export function JobDataTable() {
   //TODO: uncomment the following line once page and per_page are used in the backend
   //const urlGetJobs = `/api/jobs/search?page=${page}&per_page=${rowsPerPage}`;
   const urlGetJobs = `/api/jobs/search?page=0&per_page=100`;
-  const { data, error } = useSWR([urlGetJobs, accessToken, "POST"], fetcher);
+  const { data, error } = useSWR(
+    [urlGetJobs, accessToken, "POST", searchBody],
+    fetcher,
+  );
 
   if (!data && !error) return <div>Loading...</div>;
   if (error) return <div>An error occurred while fetching jobs</div>;
@@ -129,6 +134,19 @@ export function JobDataTable() {
 
   const columns = isMobile ? mobileHeadCells : headCells;
   const clearSelected = () => setSelected([]);
+
+  /**
+   * Handle the application of filters
+   */
+  const handleApplyFilters = () => {
+    // Transform list of filters into a json objects
+    const jsonFilters = filters.map((filter) => ({
+      parameter: filter.column,
+      operator: filter.operator,
+      value: filter.value,
+    }));
+    setSearchBody({ search: jsonFilters });
+  };
 
   /**
    * Handle the deletion of the selected jobs
@@ -151,7 +169,7 @@ export function JobDataTable() {
         throw new Error("An error occurred while deleting jobs.");
       const data = await response.json();
       setBackdropOpen(false);
-      mutate([urlGetJobs, accessToken, "POST"]);
+      mutate([urlGetJobs, accessToken, "POST", searchBody]);
       clearSelected();
       setSnackbarInfo({
         open: true,
@@ -190,7 +208,7 @@ export function JobDataTable() {
         throw new Error("An error occurred while deleting jobs.");
       const data = await response.json();
       setBackdropOpen(false);
-      mutate([urlGetJobs, accessToken, "POST"]);
+      mutate([urlGetJobs, accessToken, "POST", searchBody]);
       clearSelected();
       setSnackbarInfo({
         open: true,
@@ -229,7 +247,7 @@ export function JobDataTable() {
         throw new Error("An error occurred while deleting jobs.");
       const data = await response.json();
       setBackdropOpen(false);
-      mutate([urlGetJobs, accessToken, "POST"]);
+      mutate([urlGetJobs, accessToken, "POST", searchBody]);
       clearSelected();
       setSnackbarInfo({
         open: true,
@@ -280,6 +298,9 @@ export function JobDataTable() {
         setRowsPerPage={setRowsPerPage}
         selected={selected}
         setSelected={setSelected}
+        filters={filters}
+        setFilters={setFilters}
+        handleApplyFilters={handleApplyFilters}
         columns={columns}
         rows={data}
         rowIdentifier="JobID"
