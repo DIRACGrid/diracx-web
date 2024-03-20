@@ -200,23 +200,39 @@ function DataTableHead(props: EnhancedTableProps) {
   );
 }
 
+/**
+ * Filter form props
+ * @property {HeadCell[]} columns - the columns for the table
+ * @property {function} handleFilterChange - the function to call when a filter is changed
+ * @property {function} handleFilterMenuClose - the function to call when the filter menu is closed
+ * @property {Filter[]} filters - the filters for the table
+ * @property {number} selectedFilterId - the id of the selected filter
+ */
 interface FilterFormProps {
   columns: any[];
   handleFilterChange: (index: number, tempFilter: Filter) => void;
   handleFilterMenuClose: () => void;
   filters: Filter[];
+  setFilters: React.Dispatch<React.SetStateAction<Filter[]>>;
   selectedFilterId: number | undefined;
 }
 
+/**
+ * Filter form component
+ * @param {FilterFormProps} props - the props for the component
+ * @returns a FilterForm component
+ */
 function FilterForm(props: FilterFormProps) {
   const {
     columns,
     filters,
+    setFilters,
     handleFilterChange,
     handleFilterMenuClose,
     selectedFilterId,
   } = props;
   const [tempFilter, setTempFilter] = React.useState<Filter | null>(null);
+  console.log("selectedFilterId", selectedFilterId);
 
   // Find the index using the filter ID
   const filterIndex = filters.findIndex((f) => f.id === selectedFilterId);
@@ -226,11 +242,11 @@ function FilterForm(props: FilterFormProps) {
     if (filterIndex !== -1) {
       setTempFilter(filters[filterIndex]);
     } else {
-      setTempFilter(null);
+      setTempFilter({ id: Date.now(), column: "", operator: "eq", value: "" });
     }
   }, [filters, filterIndex]);
 
-  if (filterIndex === -1 || !tempFilter) return null;
+  if (!tempFilter) return null;
 
   const onChange = (field: string, value: string) => {
     setTempFilter((prevFilter: Filter | null) => {
@@ -247,7 +263,11 @@ function FilterForm(props: FilterFormProps) {
   };
 
   const applyChanges = () => {
-    handleFilterChange(filterIndex, tempFilter);
+    if (filterIndex === -1) {
+      setFilters([...filters, tempFilter]);
+    } else {
+      handleFilterChange(filterIndex, tempFilter);
+    }
     handleFilterMenuClose();
   };
 
@@ -318,11 +338,8 @@ function FilterForm(props: FilterFormProps) {
 interface FilterToolbarProps {
   columns: HeadCell[];
   filters: Filter[];
-  handleAddFilter: () => void;
-  handleRemoveFilter: (index: number) => void;
-  handleRemoveAllFilters: () => void;
+  setFilters: React.Dispatch<React.SetStateAction<Filter[]>>;
   handleApplyFilters: () => void;
-  handleFilterChange: (index: number, tempFilter: Filter) => void;
 }
 
 /**
@@ -331,54 +348,151 @@ interface FilterToolbarProps {
  * @returns a FilterToolbar component
  */
 function FilterToolbar(props: FilterToolbarProps) {
-  const {
-    columns,
-    filters,
-    handleAddFilter,
-    handleRemoveFilter,
-    handleRemoveAllFilters,
-    handleApplyFilters,
-    handleFilterChange,
-  } = props;
+  const { columns, filters, setFilters, handleApplyFilters } = props;
   const [anchorEl, setAnchorEl] = React.useState<HTMLElement | null>(null);
   const [selectedFilter, setSelectedFilter] = React.useState<Filter | null>(
     null,
   );
+  const addFilterButtonRef = React.useRef<HTMLButtonElement>(null);
 
   const open = Boolean(anchorEl);
 
+  // Filter menu
+  /**
+   * Handle the filter menu open
+   * @param {React.MouseEvent<HTMLElement>} event - the event that triggered the menu open
+   */
   const handleFilterMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
   };
 
+  /**
+   * Handle the filter menu close
+   */
   const handleFilterMenuClose = () => {
     setAnchorEl(null);
   };
 
+  // Filter actions
+  const handleAddFilter = () => {
+    // Create a new filter: it will not be used
+    // It is just a placeholder to open the filter form
+    const newFilter = {
+      id: Date.now(),
+      column: "",
+      operator: "eq",
+      value: "",
+    };
+    setSelectedFilter(newFilter);
+    setAnchorEl(addFilterButtonRef.current);
+  };
+
+  const handleRemoveFilter = (index: number) => {
+    setFilters(filters.filter((_, i) => i !== index));
+  };
+
+  const handleRemoveAllFilters = () => {
+    setFilters([]);
+  };
+
+  const handleFilterChange = (index: number, newFilter: Filter) => {
+    const updatedFilters = filters.map((filter, i) =>
+      i === index ? newFilter : filter,
+    );
+    setFilters(updatedFilters);
+  };
+
+  // Keyboard shortcuts
+  React.useEffect(() => {
+    function debounce(func: (...args: any[]) => void, wait: number) {
+      let timeout: ReturnType<typeof setTimeout> | undefined;
+
+      return function executedFunction(...args: any[]) {
+        const later = () => {
+          clearTimeout(timeout);
+          func(...args);
+        };
+
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+      };
+    }
+
+    const handleKeyPress = (event: {
+      altKey: any;
+      shiftKey: any;
+      key: string;
+      preventDefault: () => void;
+      stopPropagation: () => void;
+    }) => {
+      if (event.altKey && event.shiftKey) {
+        switch (
+          event.key.toLowerCase() // Handle case sensitivity
+        ) {
+          case "a":
+            event.preventDefault();
+            event.stopPropagation();
+            handleAddFilter();
+            break;
+          case "p":
+            event.preventDefault();
+            event.stopPropagation();
+            handleApplyFilters();
+            break;
+          case "c":
+            event.preventDefault();
+            event.stopPropagation();
+            handleRemoveAllFilters();
+            break;
+          default:
+            break;
+        }
+      }
+    };
+
+    // Debounce the keypress handler to avoid rapid successive invocations
+    const debouncedHandleKeyPress = debounce(handleKeyPress, 300);
+
+    // Add event listener
+    window.addEventListener("keydown", debouncedHandleKeyPress);
+
+    // Remove event listener on cleanup
+    return () => {
+      window.removeEventListener("keydown", debouncedHandleKeyPress);
+    };
+  }, [handleAddFilter, handleApplyFilters, handleRemoveAllFilters]);
+
   return (
     <>
       <Stack direction="row" spacing={1} sx={{ m: 1 }}>
-        <Button
-          variant="text"
-          startIcon={<FilterListIcon />}
-          onClick={handleAddFilter}
-        >
-          <span>Add filter</span>
-        </Button>
-        <Button
-          variant="text"
-          startIcon={<SendIcon />}
-          onClick={handleApplyFilters}
-        >
-          <span>Apply filters</span>
-        </Button>
-        <Button
-          variant="text"
-          startIcon={<DeleteIcon />}
-          onClick={handleRemoveAllFilters}
-        >
-          <span>Clear all filters</span>
-        </Button>
+        <Tooltip title="Alt+Shift+a" placement="top">
+          <Button
+            variant="text"
+            startIcon={<FilterListIcon />}
+            onClick={handleAddFilter}
+            ref={addFilterButtonRef}
+          >
+            <span>Add filter</span>
+          </Button>
+        </Tooltip>
+        <Tooltip title="Alt+Shift+p" placement="top">
+          <Button
+            variant="text"
+            startIcon={<SendIcon />}
+            onClick={handleApplyFilters}
+          >
+            <span>Apply filters</span>
+          </Button>
+        </Tooltip>
+        <Tooltip title="Alt+Shift+c" placement="top">
+          <Button
+            variant="text"
+            startIcon={<DeleteIcon />}
+            onClick={handleRemoveAllFilters}
+          >
+            <span>Clear all filters</span>
+          </Button>
+        </Tooltip>
       </Stack>
       <Stack direction="row" spacing={1} sx={{ m: 1, flexWrap: "wrap" }}>
         {filters.map((filter: Filter, index: number) => (
@@ -410,6 +524,7 @@ function FilterToolbar(props: FilterToolbarProps) {
             handleFilterChange={handleFilterChange}
             handleFilterMenuClose={handleFilterMenuClose}
             filters={filters}
+            setFilters={setFilters}
             selectedFilterId={selectedFilter?.id}
           />
         </Popover>
@@ -620,42 +735,13 @@ export function DataTable(props: DataTableProps) {
   const emptyRows =
     rowsPerPage - Math.min(rowsPerPage, rows.length - page * rowsPerPage);
 
-  // Manage filters
-  const handleAddFilter = () => {
-    const initialFilter = {
-      id: Date.now(),
-      column: "",
-      operator: "eq",
-      value: "",
-    };
-    setFilters([...filters, initialFilter]);
-  };
-
-  const handleRemoveFilter = (index: number) => {
-    setFilters(filters.filter((_, i) => i !== index));
-  };
-
-  const handleRemoveAllFilters = () => {
-    setFilters([]);
-  };
-
-  const handleFilterChange = (index: number, newFilter: Filter) => {
-    const updatedFilters = filters.map((filter, i) =>
-      i === index ? newFilter : filter,
-    );
-    setFilters(updatedFilters);
-  };
-
   return (
     <Box sx={{ width: "100%" }}>
       <FilterToolbar
         columns={columns}
         filters={filters}
-        handleAddFilter={handleAddFilter}
-        handleRemoveFilter={handleRemoveFilter}
-        handleRemoveAllFilters={handleRemoveAllFilters}
+        setFilters={setFilters}
         handleApplyFilters={handleApplyFilters}
-        handleFilterChange={handleFilterChange}
       />
 
       <Paper sx={{ width: "100%", mb: 2 }}>
