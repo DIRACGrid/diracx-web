@@ -366,6 +366,31 @@ function FilterToolbar(props: FilterToolbarProps) {
   );
   const addFilterButtonRef = React.useRef<HTMLButtonElement>(null);
 
+  // Filter actions
+  const handleAddFilter = React.useCallback(() => {
+    // Create a new filter: it will not be used
+    // It is just a placeholder to open the filter form
+    const newFilter = {
+      id: Date.now(),
+      column: "",
+      operator: "eq",
+      value: "",
+    };
+    setSelectedFilter(newFilter);
+    setAnchorEl(addFilterButtonRef.current);
+  }, [setSelectedFilter, setAnchorEl]);
+
+  const handleRemoveAllFilters = React.useCallback(() => {
+    setFilters([]);
+  }, [setFilters]);
+
+  const handleFilterChange = (index: number, newFilter: Filter) => {
+    const updatedFilters = filters.map((filter, i) =>
+      i === index ? newFilter : filter,
+    );
+    setFilters(updatedFilters);
+  };
+
   const open = Boolean(anchorEl);
 
   // Filter menu
@@ -384,33 +409,8 @@ function FilterToolbar(props: FilterToolbarProps) {
     setAnchorEl(null);
   };
 
-  // Filter actions
-  const handleAddFilter = () => {
-    // Create a new filter: it will not be used
-    // It is just a placeholder to open the filter form
-    const newFilter = {
-      id: Date.now(),
-      column: "",
-      operator: "eq",
-      value: "",
-    };
-    setSelectedFilter(newFilter);
-    setAnchorEl(addFilterButtonRef.current);
-  };
-
   const handleRemoveFilter = (index: number) => {
     setFilters(filters.filter((_, i) => i !== index));
-  };
-
-  const handleRemoveAllFilters = () => {
-    setFilters([]);
-  };
-
-  const handleFilterChange = (index: number, newFilter: Filter) => {
-    const updatedFilters = filters.map((filter, i) =>
-      i === index ? newFilter : filter,
-    );
-    setFilters(updatedFilters);
   };
 
   // Keyboard shortcuts

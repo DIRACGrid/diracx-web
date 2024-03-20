@@ -10,7 +10,7 @@
     "ts-lint": "tsc -noEmit -incremental",
     "test": "jest --ci",
     "postinstall": "node ./node_modules/@axa-fr/react-oidc/bin/copy-service-worker-files.mjs public",
-    "prepare": "husky install"
+    "prepare": "husky"
   },
   "dependencies": {
     "@axa-fr/react-oidc": "^7.7.3",
