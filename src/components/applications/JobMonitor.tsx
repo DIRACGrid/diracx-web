@@ -4,7 +4,7 @@ import CssBaseline from "@mui/material/CssBaseline";
 import { Box } from "@mui/material";
 import { useMUITheme } from "@/hooks/theme";
 import { ThemeProvider as MUIThemeProvider } from "@mui/material/styles";
-import { JobDataGrid } from "../ui/JobDataGrid";
+import { JobDataTable } from "../ui/JobDataTable";
 
 /**
  * Build the Job Monitor application
@@ -24,7 +24,7 @@ export default function JobMonitor() {
           }}
         >
           <h2>Job Monitor</h2>
-          <JobDataGrid />
+          <JobDataTable />
         </Box>
       </MUIThemeProvider>
     </React.Fragment>

@@ -3,20 +3,24 @@ import { useEffect, useState } from "react";
 
 /**
  * Fetcher function for useSWR
- * @param args - URL, access token, and method
+ * @param args - URL, access token, body and method
  * @returns a promise
  */
-export const fetcher = (args: [string, string?, string?]): Promise<any> => {
-  const [url, accessToken, method = "GET"] = args;
-  const headers = accessToken
-    ? { Authorization: "Bearer " + accessToken }
-    : undefined;
+export const fetcher = (
+  args: [string, string?, string?, any?],
+): Promise<any> => {
+  const [url, accessToken, method = "GET", body] = args;
+  const headers = {
+    "Content-Type": "application/json", // Always set this when sending JSON body
+    ...(accessToken && { Authorization: "Bearer " + accessToken }),
+  };
 
   return fetch(url, {
-    method,
-    ...(headers && { headers }),
+    method: method,
+    headers: headers,
+    ...(body && { body: JSON.stringify(body) }),
   }).then((res) => {
-    if (!res.ok) throw new Error("Failed to fetch jobs");
+    if (!res.ok) throw new Error("Failed to fetch data");
     return res.json();
   });
 };

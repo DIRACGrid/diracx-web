@@ -13,7 +13,7 @@ import {
   MenuItem,
   Tooltip,
 } from "@mui/material";
-import { deepOrange, lightGreen } from "@mui/material/colors";
+import { deepOrange } from "@mui/material/colors";
 import React from "react";
 
 /**
@@ -47,15 +47,7 @@ export function ProfileButton() {
 
   if (!isAuthenticated) {
     return (
-      <Button
-        sx={{
-          bgcolor: lightGreen[700],
-          "&:hover": { bgcolor: deepOrange[500] },
-        }}
-        variant="contained"
-        component={Link}
-        href="/auth"
-      >
+      <Button variant="contained" component={Link} href="/auth">
         Login
       </Button>
     );

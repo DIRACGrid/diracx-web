@@ -35,7 +35,7 @@ export function OIDCProvider(props: OIDCProviderProps) {
         redirect_uri: `${diracxUrl}/#authentication-callback`,
       });
     }
-  }, [diracxUrl, configuration]);
+  }, [diracxUrl, configuration, setConfiguration]);
 
   const withCustomHistory = () => {
     return {
