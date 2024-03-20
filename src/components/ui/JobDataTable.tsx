@@ -1,5 +1,5 @@
 import * as React from "react";
-import { DataTable, HeadCell, Filter } from "./DataTable";
+import { DataTable, HeadCell, Filter, MenuItem } from "./DataTable";
 import Box from "@mui/material/Box";
 import {
   blue,
@@ -17,7 +17,16 @@ import {
 import {
   Alert,
   AlertColor,
+  Button,
+  Dialog,
+  DialogContent,
+  DialogTitle,
   IconButton,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableRow,
   Tooltip,
   useMediaQuery,
   useTheme,
@@ -31,6 +40,7 @@ import { Backdrop, CircularProgress, Snackbar } from "@mui/material";
 import { mutate } from "swr";
 import useSWR from "swr";
 import { fetcher } from "../../hooks/utils";
+import CloseIcon from "@mui/icons-material/Close";
 
 /**
  * Renders the status cell with colors
@@ -96,6 +106,61 @@ const mobileHeadCells: HeadCell[] = [
   { id: "Status", label: "Status", render: renderStatusCell },
 ];
 
+interface JobHistoryDialogProps {
+  open: boolean;
+  onClose: () => void;
+  historyData: any[];
+}
+
+/**
+ * The data for the job history dialog
+ */
+function JobHistoryDialog(props: JobHistoryDialogProps) {
+  const { open, onClose, historyData } = props;
+  return (
+    <Dialog open={open} onClose={onClose} aria-labelledby="job-history-title">
+      <DialogTitle id="job-history-title">Job History</DialogTitle>
+
+      <IconButton
+        aria-label="close"
+        onClick={onClose}
+        sx={{
+          position: "absolute",
+          right: 8,
+          top: 8,
+          color: (theme) => theme.palette.grey[500],
+        }}
+      >
+        <CloseIcon />
+      </IconButton>
+      <DialogContent sx={{ padding: 0 }}>
+        <Table stickyHeader>
+          <TableHead>
+            <TableRow>
+              <TableCell>Status</TableCell>
+              <TableCell>Minor Status</TableCell>
+              <TableCell>Application Status</TableCell>
+              <TableCell>Status Time</TableCell>
+              <TableCell>Source</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {historyData.map((history, index) => (
+              <TableRow key={index}>
+                <TableCell>{history.Status}</TableCell>
+                <TableCell>{history.MinorStatus}</TableCell>
+                <TableCell>{history.ApplicationStatus}</TableCell>
+                <TableCell>{history.StatusTime}</TableCell>
+                <TableCell>{history.Source}</TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
 /**
  * The data grid for the jobs
  */
@@ -116,6 +181,8 @@ export function JobDataTable() {
   const [rowsPerPage, setRowsPerPage] = React.useState(25);
   const [filters, setFilters] = React.useState<Filter[]>([]);
   const [searchBody, setSearchBody] = React.useState({});
+  const [isHistoryDialogOpen, setIsHistoryDialogOpen] = React.useState(false);
+  const [jobHistoryData, setJobHistoryData] = React.useState([]);
 
   /**
    * Fetches the jobs from the /api/jobs/search endpoint
@@ -266,6 +333,46 @@ export function JobDataTable() {
   };
 
   /**
+   * Handle the history of the selected job
+   */
+  const handleHistory = async (selectedId: number | null) => {
+    if (!selectedId) return;
+
+    const historyUrl = `/api/jobs/${selectedId}/status/history`;
+    const requestOptions = {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${accessToken}`, // Use the access token for authorization
+      },
+    };
+
+    setBackdropOpen(true);
+    try {
+      const response = await fetch(historyUrl, requestOptions);
+      if (!response.ok)
+        throw new Error("An error occurred while fetching job history.");
+      const data = await response.json();
+      setBackdropOpen(false);
+      // Show the history
+      setJobHistoryData(data[selectedId]);
+      setIsHistoryDialogOpen(true);
+    } catch (error: any) {
+      setSnackbarInfo({
+        open: true,
+        message: "Fetching history failed: " + error.message,
+        severity: "error",
+      });
+    } finally {
+      setBackdropOpen(false);
+    }
+  };
+
+  const handleHistoryClose = () => {
+    setIsHistoryDialogOpen(false);
+  };
+
+  /**
    * The toolbar components for the data grid
    */
   const toolbarComponents = (
@@ -288,6 +395,17 @@ export function JobDataTable() {
     </>
   );
 
+  /**
+   * The menu items
+   */
+  const menuItems: MenuItem[] = [
+    { label: "Get history", onClick: (id: number | null) => handleHistory(id) },
+  ];
+
+  /**
+   * The main component
+   */
+
   return (
     <>
       <DataTable
@@ -306,6 +424,7 @@ export function JobDataTable() {
         rowIdentifier="JobID"
         isMobile={isMobile}
         toolbarComponents={toolbarComponents}
+        menuItems={menuItems}
       />
       <Snackbar
         open={snackbarInfo.open}
@@ -326,6 +445,11 @@ export function JobDataTable() {
       >
         <CircularProgress color="inherit" />
       </Backdrop>
+      <JobHistoryDialog
+        open={isHistoryDialogOpen}
+        onClose={handleHistoryClose}
+        historyData={jobHistoryData}
+      />
     </>
   );
 }

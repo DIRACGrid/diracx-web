@@ -21,6 +21,7 @@ import FormatListBulletedIcon from "@mui/icons-material/FormatListBulleted";
 import {
   FormControl,
   InputLabel,
+  Menu,
   MenuItem,
   Popover,
   Select,
@@ -117,6 +118,14 @@ export interface Filter {
   column: string;
   operator: string;
   value: string;
+}
+
+/**
+ * Menu item
+ */
+export interface MenuItem {
+  label: string;
+  onClick: (id: number | null) => void;
 }
 
 /**
@@ -643,6 +652,7 @@ interface DataTableProps {
   rowIdentifier: string;
   isMobile: boolean;
   toolbarComponents: JSX.Element;
+  menuItems: MenuItem[];
 }
 
 /**
@@ -667,15 +677,17 @@ export function DataTable(props: DataTableProps) {
     rowIdentifier,
     isMobile,
     toolbarComponents,
+    menuItems,
   } = props;
+  // State for sorting
   const [order, setOrder] = React.useState<Order>("asc");
   const [orderBy, setOrderBy] = React.useState<string | number>(rowIdentifier);
-
-  const [selectedFilter, setSelectedFilter] = React.useState<Filter | null>(
-    null,
-  );
-  const [open, setOpen] = React.useState(false);
-  const [anchorEl, setAnchorEl] = React.useState<HTMLElement | null>(null);
+  // State for the context menu
+  const [contextMenu, setContextMenu] = React.useState<{
+    mouseX: number | null;
+    mouseY: number | null;
+    id: number | null;
+  }>({ mouseX: null, mouseY: null, id: null });
 
   // Manage sorting
   const handleRequestSort = (
@@ -732,8 +744,24 @@ export function DataTable(props: DataTableProps) {
   const isSelected = (name: number) => selected.indexOf(name) !== -1;
 
   // Calculate the number of empty rows needed to fill the space
-  const emptyRows =
-    rowsPerPage - Math.min(rowsPerPage, rows.length - page * rowsPerPage);
+  const emptyRows = Math.min(
+    25,
+    rowsPerPage - Math.min(rowsPerPage, rows.length - page * rowsPerPage),
+  );
+
+  // Manage context menu
+  const handleContextMenu = (event: React.MouseEvent, id: number) => {
+    event.preventDefault(); // Prevent default context menu
+    setContextMenu({
+      mouseX: event.clientX - 2,
+      mouseY: event.clientY - 4,
+      id,
+    });
+  };
+
+  const handleCloseContextMenu = () => {
+    setContextMenu({ mouseX: null, mouseY: null, id: null });
+  };
 
   return (
     <Box sx={{ width: "100%" }}>
@@ -787,6 +815,10 @@ export function DataTable(props: DataTableProps) {
                       tabIndex={-1}
                       key={row[rowIdentifier]}
                       selected={isItemSelected}
+                      onContextMenu={(event) =>
+                        handleContextMenu(event, row[rowIdentifier] as number)
+                      }
+                      style={{ cursor: "context-menu" }}
                     >
                       <TableCell padding="checkbox">
                         <Checkbox
@@ -827,6 +859,28 @@ export function DataTable(props: DataTableProps) {
           labelRowsPerPage={isMobile ? "" : "Rows per page"}
         />
       </Paper>
+      <Menu
+        open={contextMenu.mouseY !== null}
+        onClose={handleCloseContextMenu}
+        anchorReference="anchorPosition"
+        anchorPosition={
+          contextMenu.mouseY !== null && contextMenu.mouseX !== null
+            ? { top: contextMenu.mouseY, left: contextMenu.mouseX }
+            : undefined
+        }
+      >
+        {menuItems.map((menuItem, index: number) => (
+          <MenuItem
+            key={index}
+            onClick={() => {
+              handleCloseContextMenu();
+              menuItem.onClick(contextMenu.id);
+            }}
+          >
+            {menuItem.label}
+          </MenuItem>
+        ))}
+      </Menu>
     </Box>
   );
 }
