@@ -19,12 +19,14 @@ import IconButton from "@mui/material/IconButton";
 import FilterListIcon from "@mui/icons-material/FilterList";
 import FormatListBulletedIcon from "@mui/icons-material/FormatListBulleted";
 import {
+  Alert,
   FormControl,
   InputLabel,
   Menu,
   MenuItem,
   Popover,
   Select,
+  Skeleton,
   Snackbar,
   Stack,
   TextField,
@@ -649,6 +651,7 @@ interface DataTableProps {
   handleApplyFilters: () => void;
   columns: HeadCell[];
   rows: any[];
+  error: string | null;
   rowIdentifier: string;
   isMobile: boolean;
   toolbarComponents: JSX.Element;
@@ -674,6 +677,7 @@ export function DataTable(props: DataTableProps) {
     handleApplyFilters,
     columns,
     rows,
+    error,
     rowIdentifier,
     isMobile,
     toolbarComponents,
@@ -743,12 +747,6 @@ export function DataTable(props: DataTableProps) {
 
   const isSelected = (name: number) => selected.indexOf(name) !== -1;
 
-  // Calculate the number of empty rows needed to fill the space
-  const emptyRows = Math.min(
-    25,
-    rowsPerPage - Math.min(rowsPerPage, rows.length - page * rowsPerPage),
-  );
-
   // Manage context menu
   const handleContextMenu = (event: React.MouseEvent, id: number) => {
     event.preventDefault(); // Prevent default context menu
@@ -762,6 +760,77 @@ export function DataTable(props: DataTableProps) {
   const handleCloseContextMenu = () => {
     setContextMenu({ mouseX: null, mouseY: null, id: null });
   };
+
+  // Wait for the data to load
+  if (!rows && !error) {
+    const buttonWidth = "calc(20% - 10px)";
+    return (
+      <Box sx={{ width: "100%", p: 1 }} data-testid="skeleton">
+        <Stack direction="row" spacing={1} sx={{ m: 1 }}>
+          <Skeleton
+            variant="rectangular"
+            animation="pulse"
+            height={50}
+            width={buttonWidth}
+          />
+          <Skeleton
+            variant="rectangular"
+            animation="pulse"
+            height={50}
+            width={buttonWidth}
+          />
+          <Skeleton
+            variant="rectangular"
+            animation="pulse"
+            height={50}
+            width={buttonWidth}
+          />
+        </Stack>
+        <Skeleton
+          variant="rectangular"
+          animation="pulse"
+          height={500}
+          width="100%"
+        />
+      </Box>
+    );
+  }
+
+  // Handle errors
+  if (error) {
+    return (
+      <Box sx={{ width: "100%", marginTop: 2 }}>
+        <Alert severity="error">
+          An error occurred while fetching data. Reload the page.
+        </Alert>
+      </Box>
+    );
+  }
+
+  // Handle no data
+  if (!rows || rows.length === 0) {
+    return (
+      <>
+        <FilterToolbar
+          columns={columns}
+          filters={filters}
+          setFilters={setFilters}
+          handleApplyFilters={handleApplyFilters}
+        />
+        <Box sx={{ width: "100%", marginTop: 2 }}>
+          <Alert severity="info">
+            No data or no results match your filters.
+          </Alert>
+        </Box>
+      </>
+    );
+  }
+
+  // Calculate the number of empty rows needed to fill the space
+  const emptyRows = Math.min(
+    25,
+    rowsPerPage - Math.min(rowsPerPage, rows.length - page * rowsPerPage),
+  );
 
   return (
     <Box sx={{ width: "100%" }}>
@@ -779,7 +848,7 @@ export function DataTable(props: DataTableProps) {
           selectedIds={selected}
           toolbarComponents={toolbarComponents}
         />
-        <TableContainer sx={{ maxHeight: "65vh" }}>
+        <TableContainer sx={{ maxHeight: "55vh" }}>
           <Table
             stickyHeader
             sx={{ minWidth: isMobile ? "undefined" : "50vw" }}

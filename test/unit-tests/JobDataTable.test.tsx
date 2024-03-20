@@ -16,8 +16,8 @@ describe("<JobDataTable />", () => {
     (useSWR as jest.Mock).mockReturnValue({ data: null, error: null });
     (useOidcAccessToken as jest.Mock).mockReturnValue("1234");
 
-    const { getByText } = render(<JobDataTable />);
-    expect(getByText("Loading...")).toBeInTheDocument();
+    const { getByTestId } = render(<JobDataTable />);
+    expect(getByTestId("skeleton")).toBeVisible();
   });
 
   it("displays error state", () => {
@@ -25,7 +25,7 @@ describe("<JobDataTable />", () => {
 
     const { getByText } = render(<JobDataTable />);
     expect(
-      getByText("An error occurred while fetching jobs"),
+      getByText("An error occurred while fetching data. Reload the page."),
     ).toBeInTheDocument();
   });
 
@@ -33,7 +33,9 @@ describe("<JobDataTable />", () => {
     (useSWR as jest.Mock).mockReturnValue({ data: [] });
 
     const { getByText } = render(<JobDataTable />);
-    expect(getByText("No job submitted.")).toBeInTheDocument();
+    expect(
+      getByText("No data or no results match your filters."),
+    ).toBeInTheDocument();
   });
 
   it("displays jobs data in the grid", () => {

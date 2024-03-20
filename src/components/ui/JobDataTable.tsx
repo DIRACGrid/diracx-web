@@ -195,10 +195,6 @@ export function JobDataTable() {
     fetcher,
   );
 
-  if (!data && !error) return <div>Loading...</div>;
-  if (error) return <div>An error occurred while fetching jobs</div>;
-  if (!data || data.length === 0) return <div>No job submitted.</div>;
-
   const columns = isMobile ? mobileHeadCells : headCells;
   const clearSelected = () => setSelected([]);
 
@@ -421,6 +417,7 @@ export function JobDataTable() {
         handleApplyFilters={handleApplyFilters}
         columns={columns}
         rows={data}
+        error={error}
         rowIdentifier="JobID"
         isMobile={isMobile}
         toolbarComponents={toolbarComponents}
