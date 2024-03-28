@@ -12,7 +12,7 @@ const TokenRenewMode = {
   id_token_invalid: "id_token_invalid"
 };
 const openidWellknownUrlEndWith = "/.well-known/openid-configuration";
-const version = "7.6.0";
+const version = "7.7.3";
 function checkDomain(domains, endpoint) {
   if (!endpoint) {
     return;
