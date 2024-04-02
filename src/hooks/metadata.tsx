@@ -27,9 +27,7 @@ export interface Metadata {
  * @returns the metadata
  */
 export function useMetadata() {
-  const diracxUrl = useDiracxUrl();
-
-  const url = `${diracxUrl}/.well-known/dirac-metadata`;
+  const url = `/.well-known/dirac-metadata`;
   const { data, error }: SWRResponse<Metadata, any> = useSWRImmutable(
     [url],
     fetcher,
