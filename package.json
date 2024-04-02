@@ -13,7 +13,7 @@
     "prepare": "husky"
   },
   "dependencies": {
-    "@axa-fr/react-oidc": "^7.7.3",
+    "@axa-fr/react-oidc": "^7.21.0",
     "@mui/icons-material": "^5.15.12",
     "@mui/material": "^5.14.17",
     "@types/node": "20.11.30",
