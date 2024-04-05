@@ -37,6 +37,7 @@ import Chip from "@mui/material/Chip";
 import Button from "@mui/material/Button";
 import SendIcon from "@mui/icons-material/Send";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 /**
  * Descending comparator function
@@ -243,7 +244,6 @@ function FilterForm(props: FilterFormProps) {
     selectedFilterId,
   } = props;
   const [tempFilter, setTempFilter] = React.useState<Filter | null>(null);
-  console.log("selectedFilterId", selectedFilterId);
 
   // Find the index using the filter ID
   const filterIndex = filters.findIndex((f) => f.id === selectedFilterId);
@@ -490,7 +490,7 @@ function FilterToolbar(props: FilterToolbarProps) {
           <Button
             variant="text"
             startIcon={<SendIcon />}
-            onClick={handleApplyFilters}
+            onClick={() => handleApplyFilters()}
           >
             <span>Apply filters</span>
           </Button>
@@ -648,7 +648,7 @@ interface DataTableProps {
   setSelected: React.Dispatch<React.SetStateAction<readonly number[]>>;
   filters: Filter[];
   setFilters: React.Dispatch<React.SetStateAction<Filter[]>>;
-  handleApplyFilters: () => void;
+  setSearchBody: (searchBody: any) => void;
   columns: HeadCell[];
   rows: any[];
   error: string | null;
@@ -674,7 +674,7 @@ export function DataTable(props: DataTableProps) {
     setSelected,
     filters,
     setFilters,
-    handleApplyFilters,
+    setSearchBody,
     columns,
     rows,
     error,
@@ -692,6 +692,80 @@ export function DataTable(props: DataTableProps) {
     mouseY: number | null;
     id: number | null;
   }>({ mouseX: null, mouseY: null, id: null });
+  // NextJS router and params
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+
+  // Manage URL search params
+  const createQueryString = React.useCallback(
+    (filters: Filter[]) => {
+      const params = new URLSearchParams(searchParams.toString());
+      // Clear existing filters
+      params.delete("filter");
+
+      // Append new filters
+      filters.forEach((filter) => {
+        params.append(
+          "filter",
+          `${filter.id}_${filter.column}_${filter.operator}_${filter.value}`,
+        );
+      });
+
+      return params.toString();
+    },
+    [searchParams],
+  );
+
+  const updateFiltersAndUrl = React.useCallback(
+    (newFilters: Filter[]) => {
+      // Generate the new query string with all filters
+      const queryString = createQueryString(newFilters);
+
+      // Push new URL to history without reloading the page
+      router.push(pathname + "?" + queryString);
+    },
+    [createQueryString, pathname, router],
+  );
+
+  // Handle the application of filters
+  const handleApplyFilters = () => {
+    // Transform list of filters into a json object
+    const jsonFilters = filters.map((filter) => ({
+      parameter: filter.column,
+      operator: filter.operator,
+      value: filter.value,
+    }));
+    setSearchBody({ search: jsonFilters });
+
+    // Update the filters in the URL
+    updateFiltersAndUrl(filters);
+  };
+
+  React.useEffect(() => {
+    // Function to parse the filters from the URL search params
+    const parseFiltersFromUrl = () => {
+      const filterStrings = searchParams.getAll("filter");
+      return filterStrings.map((filterString: string) => {
+        const [id, column, operator, value] = filterString.split("_");
+        return { id: Number(id), column, operator, value };
+      });
+    };
+
+    if (searchParams.has("filter")) {
+      // Parse the filters when the component mounts or when the searchParams change
+      const initialFilters = parseFiltersFromUrl();
+      // Set the filters (they will be displayed in the UI)
+      setFilters(initialFilters);
+      // Apply the filters to get the filtered data
+      const jsonFilters = initialFilters.map((filter) => ({
+        parameter: filter.column,
+        operator: filter.operator,
+        value: filter.value,
+      }));
+      setSearchBody({ search: jsonFilters });
+    }
+  }, [searchParams, setFilters, setSearchBody]);
 
   // Manage sorting
   const handleRequestSort = (

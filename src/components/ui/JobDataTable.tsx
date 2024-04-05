@@ -198,19 +198,6 @@ export function JobDataTable() {
   const clearSelected = () => setSelected([]);
 
   /**
-   * Handle the application of filters
-   */
-  const handleApplyFilters = () => {
-    // Transform list of filters into a json objects
-    const jsonFilters = filters.map((filter) => ({
-      parameter: filter.column,
-      operator: filter.operator,
-      value: filter.value,
-    }));
-    setSearchBody({ search: jsonFilters });
-  };
-
-  /**
    * Handle the deletion of the selected jobs
    */
   const handleDelete = async (selectedIds: readonly number[]) => {
@@ -413,7 +400,7 @@ export function JobDataTable() {
         setSelected={setSelected}
         filters={filters}
         setFilters={setFilters}
-        handleApplyFilters={handleApplyFilters}
+        setSearchBody={setSearchBody}
         columns={columns}
         rows={data}
         error={error}
