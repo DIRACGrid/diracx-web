@@ -42,6 +42,13 @@ export function LoginForm() {
     }
   }, [configuration, isAuthenticated, login]);
 
+  useEffect(() => {
+    // Redirect to dashboard if already authenticated
+    if (isAuthenticated) {
+      router.push("/dashboard");
+    }
+  }, [isAuthenticated, router]);
+
   // Get default group
   const getDefaultGroup = (data: Metadata | undefined, vo: string): string => {
     if (!data) {
@@ -84,11 +91,6 @@ export function LoginForm() {
       });
     }
   };
-  // Redirect to dashboard if already authenticated
-  if (isAuthenticated) {
-    router.push("/dashboard");
-    return null;
-  }
 
   if (isLoading) {
     return <div>Loading...</div>;

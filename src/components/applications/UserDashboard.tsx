@@ -16,6 +16,10 @@ export default function UserDashboard() {
   const { configuration } = useOIDCContext();
   const { accessTokenPayload } = useOidcAccessToken(configuration?.scope);
 
+  if (!accessTokenPayload) {
+    return <div>Not authenticated</div>;
+  }
+
   return (
     <React.Fragment>
       <MUIThemeProvider theme={theme}>
