@@ -1,5 +1,5 @@
 import * as React from "react";
-import { DataTable, HeadCell, Filter, MenuItem } from "./DataTable";
+import { DataTable, MenuItem } from "./DataTable";
 import Box from "@mui/material/Box";
 import {
   blue,
@@ -17,15 +17,7 @@ import {
 import {
   Alert,
   AlertColor,
-  Dialog,
-  DialogContent,
-  DialogTitle,
   IconButton,
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableRow,
   Tooltip,
   useMediaQuery,
   useTheme,
@@ -38,8 +30,10 @@ import ReplayIcon from "@mui/icons-material/Replay";
 import { Backdrop, CircularProgress, Snackbar } from "@mui/material";
 import { mutate } from "swr";
 import useSWR from "swr";
-import { fetcher } from "../../hooks/utils";
-import CloseIcon from "@mui/icons-material/Close";
+import { fetcher } from "@/hooks/utils";
+import { JobHistoryDialog } from "./JobHistoryDialog";
+import { Filter } from "@/types/Filter";
+import { Column } from "@/types/Column";
 
 /**
  * Renders the status cell with colors
@@ -82,7 +76,7 @@ const renderStatusCell = (status: string) => {
 /**
  * The head cells for the data grid (desktop version)
  */
-const headCells: HeadCell[] = [
+const headCells: Column[] = [
   { id: "JobID", label: "Job ID" },
   { id: "JobName", label: "Job Name" },
   { id: "Status", label: "Status", render: renderStatusCell },
@@ -99,66 +93,11 @@ const headCells: HeadCell[] = [
 /**
  * The head cells for the data grid (mobile version)
  */
-const mobileHeadCells: HeadCell[] = [
+const mobileHeadCells: Column[] = [
   { id: "JobID", label: "Job ID" },
   { id: "JobName", label: "Job Name" },
   { id: "Status", label: "Status", render: renderStatusCell },
 ];
-
-interface JobHistoryDialogProps {
-  open: boolean;
-  onClose: () => void;
-  historyData: any[];
-}
-
-/**
- * The data for the job history dialog
- */
-function JobHistoryDialog(props: JobHistoryDialogProps) {
-  const { open, onClose, historyData } = props;
-  return (
-    <Dialog open={open} onClose={onClose} aria-labelledby="job-history-title">
-      <DialogTitle id="job-history-title">Job History</DialogTitle>
-
-      <IconButton
-        aria-label="close"
-        onClick={onClose}
-        sx={{
-          position: "absolute",
-          right: 8,
-          top: 8,
-          color: (theme) => theme.palette.grey[500],
-        }}
-      >
-        <CloseIcon />
-      </IconButton>
-      <DialogContent sx={{ padding: 0 }}>
-        <Table stickyHeader>
-          <TableHead>
-            <TableRow>
-              <TableCell>Status</TableCell>
-              <TableCell>Minor Status</TableCell>
-              <TableCell>Application Status</TableCell>
-              <TableCell>Status Time</TableCell>
-              <TableCell>Source</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {historyData.map((history, index) => (
-              <TableRow key={index}>
-                <TableCell>{history.Status}</TableCell>
-                <TableCell>{history.MinorStatus}</TableCell>
-                <TableCell>{history.ApplicationStatus}</TableCell>
-                <TableCell>{history.StatusTime}</TableCell>
-                <TableCell>{history.Source}</TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </DialogContent>
-    </Dialog>
-  );
-}
 
 /**
  * The data grid for the jobs

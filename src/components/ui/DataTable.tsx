@@ -16,28 +16,20 @@ import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 import Tooltip from "@mui/material/Tooltip";
 import IconButton from "@mui/material/IconButton";
-import FilterListIcon from "@mui/icons-material/FilterList";
 import FormatListBulletedIcon from "@mui/icons-material/FormatListBulleted";
 import {
   Alert,
-  FormControl,
-  InputLabel,
   Menu,
   MenuItem,
-  Popover,
-  Select,
   Skeleton,
   Snackbar,
   Stack,
-  TextField,
 } from "@mui/material";
 import { deepOrange } from "@mui/material/colors";
-import DeleteIcon from "@mui/icons-material/Delete";
-import Chip from "@mui/material/Chip";
-import Button from "@mui/material/Button";
-import SendIcon from "@mui/icons-material/Send";
-import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { FilterToolbar } from "./FilterToolbar";
+import { Filter } from "@/types/Filter";
+import { Column } from "@/types/Column";
 
 /**
  * Descending comparator function
@@ -99,31 +91,6 @@ function stableSort<T>(
 }
 
 /**
- * The head cells for the table.
- * Components using this table should provide a list of head cells.
- * @property {number | string} id - the id of the cell
- * @property {string} label - the label of the cell
- */
-export interface HeadCell {
-  id: number | string;
-  label: string;
-  render?: ((value: any) => JSX.Element) | null;
-}
-
-/** Filter form
- * @property {number} id - the id of the filter
- * @property {string} column - the column to filter by
- * @property {string} operator - the operator to use for the filter
- * @property {string} value - the value to filter by
- */
-export interface Filter {
-  id: number;
-  column: string;
-  operator: string;
-  value: string;
-}
-
-/**
  * Menu item
  */
 export interface MenuItem {
@@ -132,8 +99,8 @@ export interface MenuItem {
 }
 
 /**
- * Enhanced table props
- * @property {HeadCell[]} headCells - the head cells for the table
+ * DataTable head props
+ * @property {Column[]} headCells - the head cells for the table
  * @property {number} numSelected - the number of selected rows
  * @property {function} onRequestSort - the function to call when sorting is requested
  * @property {function} onSelectAllClick - the function to call when all rows are selected
@@ -141,8 +108,8 @@ export interface MenuItem {
  * @property {string} orderBy - the key to sort by
  * @property {number} rowCount - the number of rows
  */
-interface EnhancedTableProps {
-  headCells: HeadCell[];
+interface DataTableHeadProps {
+  headCells: Column[];
   numSelected: number;
   onRequestSort: (
     event: React.MouseEvent<unknown>,
@@ -159,9 +126,9 @@ interface EnhancedTableProps {
 
 /**
  * Data table head component
- * @param {EnhancedTableProps} props - the props for the component
+ * @param {DataTableHeadProps} props - the props for the component
  */
-function DataTableHead(props: EnhancedTableProps) {
+function DataTableHead(props: DataTableHeadProps) {
   const {
     headCells,
     onSelectAllClick,
@@ -209,338 +176,6 @@ function DataTableHead(props: EnhancedTableProps) {
         ))}
       </TableRow>
     </TableHead>
-  );
-}
-
-/**
- * Filter form props
- * @property {HeadCell[]} columns - the columns for the table
- * @property {function} handleFilterChange - the function to call when a filter is changed
- * @property {function} handleFilterMenuClose - the function to call when the filter menu is closed
- * @property {Filter[]} filters - the filters for the table
- * @property {number} selectedFilterId - the id of the selected filter
- */
-interface FilterFormProps {
-  columns: any[];
-  handleFilterChange: (index: number, tempFilter: Filter) => void;
-  handleFilterMenuClose: () => void;
-  filters: Filter[];
-  setFilters: React.Dispatch<React.SetStateAction<Filter[]>>;
-  selectedFilterId: number | undefined;
-}
-
-/**
- * Filter form component
- * @param {FilterFormProps} props - the props for the component
- * @returns a FilterForm component
- */
-function FilterForm(props: FilterFormProps) {
-  const {
-    columns,
-    filters,
-    setFilters,
-    handleFilterChange,
-    handleFilterMenuClose,
-    selectedFilterId,
-  } = props;
-  const [tempFilter, setTempFilter] = React.useState<Filter | null>(null);
-
-  // Find the index using the filter ID
-  const filterIndex = filters.findIndex((f) => f.id === selectedFilterId);
-
-  // Set the temp filter
-  React.useEffect(() => {
-    if (filterIndex !== -1) {
-      setTempFilter(filters[filterIndex]);
-    } else {
-      setTempFilter({ id: Date.now(), column: "", operator: "eq", value: "" });
-    }
-  }, [filters, filterIndex]);
-
-  if (!tempFilter) return null;
-
-  const onChange = (field: string, value: string) => {
-    setTempFilter((prevFilter: Filter | null) => {
-      if (prevFilter === null) {
-        return null; // or initialize a new Filter object as appropriate
-      }
-      // Ensuring all fields of Filter are always defined
-      const updatedFilter: Filter = {
-        ...prevFilter,
-        [field]: value,
-      };
-      return updatedFilter;
-    });
-  };
-
-  const applyChanges = () => {
-    if (filterIndex === -1) {
-      setFilters([...filters, tempFilter]);
-    } else {
-      handleFilterChange(filterIndex, tempFilter);
-    }
-    handleFilterMenuClose();
-  };
-
-  return (
-    <Box sx={{ p: 2 }}>
-      <Stack spacing={2} alignItems="flex-start">
-        <Typography variant="h6" padding={1}>
-          Edit Filter
-        </Typography>
-        <Stack direction="row" spacing={2}>
-          <FormControl variant="outlined" fullWidth>
-            <InputLabel>Column</InputLabel>
-            <Select
-              value={tempFilter.column}
-              onChange={(e) => onChange("column", e.target.value)}
-              label="Column"
-              sx={{ minWidth: 120 }}
-            >
-              {columns.map((column) => (
-                <MenuItem key={column.id} value={column.id}>
-                  {column.label}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-
-          <FormControl variant="outlined" fullWidth>
-            <InputLabel>Operator</InputLabel>
-            <Select
-              value={tempFilter.operator}
-              onChange={(e) => onChange("operator", e.target.value)}
-              label="Operator"
-              sx={{ minWidth: 120 }}
-            >
-              <MenuItem value="eq">equals to</MenuItem>
-              <MenuItem value="neq">not equals to</MenuItem>
-              <MenuItem value="gt">is greater than</MenuItem>
-              <MenuItem value="lt">is lower than</MenuItem>
-              <MenuItem value="like">like</MenuItem>
-            </Select>
-          </FormControl>
-
-          <FormControl variant="outlined" fullWidth>
-            <TextField
-              variant="outlined"
-              label="Value"
-              value={tempFilter.value}
-              onChange={(e) => onChange("value", e.target.value)}
-              sx={{ flexGrow: 1 }}
-            />
-          </FormControl>
-
-          <Tooltip title="Finish editing filter">
-            <IconButton onClick={() => applyChanges()} color="success">
-              <CheckCircleIcon />
-            </IconButton>
-          </Tooltip>
-        </Stack>
-      </Stack>
-    </Box>
-  );
-}
-
-/**
- * Filter toolbar component
- * @param {FilterToolbarProps} props - the props for the component
- */
-interface FilterToolbarProps {
-  columns: HeadCell[];
-  filters: Filter[];
-  setFilters: React.Dispatch<React.SetStateAction<Filter[]>>;
-  handleApplyFilters: () => void;
-}
-
-/**
- * Filter toolbar component
- * @param {FilterToolbarProps} props - the props for the component
- * @returns a FilterToolbar component
- */
-function FilterToolbar(props: FilterToolbarProps) {
-  const { columns, filters, setFilters, handleApplyFilters } = props;
-  const [anchorEl, setAnchorEl] = React.useState<HTMLElement | null>(null);
-  const [selectedFilter, setSelectedFilter] = React.useState<Filter | null>(
-    null,
-  );
-  const addFilterButtonRef = React.useRef<HTMLButtonElement>(null);
-
-  // Filter actions
-  const handleAddFilter = React.useCallback(() => {
-    // Create a new filter: it will not be used
-    // It is just a placeholder to open the filter form
-    const newFilter = {
-      id: Date.now(),
-      column: "",
-      operator: "eq",
-      value: "",
-    };
-    setSelectedFilter(newFilter);
-    setAnchorEl(addFilterButtonRef.current);
-  }, [setSelectedFilter, setAnchorEl]);
-
-  const handleRemoveAllFilters = React.useCallback(() => {
-    setFilters([]);
-  }, [setFilters]);
-
-  const handleFilterChange = (index: number, newFilter: Filter) => {
-    const updatedFilters = filters.map((filter, i) =>
-      i === index ? newFilter : filter,
-    );
-    setFilters(updatedFilters);
-  };
-
-  const open = Boolean(anchorEl);
-
-  // Filter menu
-  /**
-   * Handle the filter menu open
-   * @param {React.MouseEvent<HTMLElement>} event - the event that triggered the menu open
-   */
-  const handleFilterMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
-    setAnchorEl(event.currentTarget);
-  };
-
-  /**
-   * Handle the filter menu close
-   */
-  const handleFilterMenuClose = () => {
-    setAnchorEl(null);
-  };
-
-  const handleRemoveFilter = (index: number) => {
-    setFilters(filters.filter((_, i) => i !== index));
-  };
-
-  // Keyboard shortcuts
-  React.useEffect(() => {
-    function debounce(func: (...args: any[]) => void, wait: number) {
-      let timeout: ReturnType<typeof setTimeout> | undefined;
-
-      return function executedFunction(...args: any[]) {
-        const later = () => {
-          clearTimeout(timeout);
-          func(...args);
-        };
-
-        clearTimeout(timeout);
-        timeout = setTimeout(later, wait);
-      };
-    }
-
-    const handleKeyPress = (event: {
-      altKey: any;
-      shiftKey: any;
-      key: string;
-      preventDefault: () => void;
-      stopPropagation: () => void;
-    }) => {
-      if (event.altKey && event.shiftKey) {
-        switch (
-          event.key.toLowerCase() // Handle case sensitivity
-        ) {
-          case "a":
-            event.preventDefault();
-            event.stopPropagation();
-            handleAddFilter();
-            break;
-          case "p":
-            event.preventDefault();
-            event.stopPropagation();
-            handleApplyFilters();
-            break;
-          case "c":
-            event.preventDefault();
-            event.stopPropagation();
-            handleRemoveAllFilters();
-            break;
-          default:
-            break;
-        }
-      }
-    };
-
-    // Debounce the keypress handler to avoid rapid successive invocations
-    const debouncedHandleKeyPress = debounce(handleKeyPress, 300);
-
-    // Add event listener
-    window.addEventListener("keydown", debouncedHandleKeyPress);
-
-    // Remove event listener on cleanup
-    return () => {
-      window.removeEventListener("keydown", debouncedHandleKeyPress);
-    };
-  }, [handleAddFilter, handleApplyFilters, handleRemoveAllFilters]);
-
-  return (
-    <>
-      <Stack direction="row" spacing={1} sx={{ m: 1 }}>
-        <Tooltip title="Alt+Shift+a" placement="top">
-          <Button
-            variant="text"
-            startIcon={<FilterListIcon />}
-            onClick={handleAddFilter}
-            ref={addFilterButtonRef}
-          >
-            <span>Add filter</span>
-          </Button>
-        </Tooltip>
-        <Tooltip title="Alt+Shift+p" placement="top">
-          <Button
-            variant="text"
-            startIcon={<SendIcon />}
-            onClick={() => handleApplyFilters()}
-          >
-            <span>Apply filters</span>
-          </Button>
-        </Tooltip>
-        <Tooltip title="Alt+Shift+c" placement="top">
-          <Button
-            variant="text"
-            startIcon={<DeleteIcon />}
-            onClick={handleRemoveAllFilters}
-          >
-            <span>Clear all filters</span>
-          </Button>
-        </Tooltip>
-      </Stack>
-      <Stack direction="row" spacing={1} sx={{ m: 1, flexWrap: "wrap" }}>
-        {filters.map((filter: Filter, index: number) => (
-          <Chip
-            key={index}
-            label={`${filter.column} ${filter.operator} ${filter.value}`}
-            onClick={(event) => {
-              handleFilterMenuOpen(event); // Open the menu
-              setSelectedFilter(filter); // Set the selected filter
-            }}
-            onDelete={() => {
-              handleRemoveFilter(index);
-            }}
-            color="primary"
-            sx={{ m: 0.5 }}
-          />
-        ))}
-        <Popover
-          open={open}
-          onClose={handleFilterMenuClose}
-          anchorEl={anchorEl}
-          anchorOrigin={{
-            vertical: "bottom",
-            horizontal: "left",
-          }}
-        >
-          <FilterForm
-            columns={columns}
-            handleFilterChange={handleFilterChange}
-            handleFilterMenuClose={handleFilterMenuClose}
-            filters={filters}
-            setFilters={setFilters}
-            selectedFilterId={selectedFilter?.id}
-          />
-        </Popover>
-      </Stack>
-    </>
   );
 }
 
@@ -635,8 +270,23 @@ function DataTableToolbar(props: DataTableToolbarProps) {
 
 /**
  * Data table props
- * @property {HeadCell[]} columns - the columns for the table
- * @property {any[]} rows - the rows for the table
+ * @property {string} title - the title of the table
+ * @property {number} page - the current page
+ * @property {function} setPage - the function to call when the page changes
+ * @property {number} rowsPerPage - the number of rows per page
+ * @property {function} setRowsPerPage - the function to call when the rows per page change
+ * @property {number[]} selected - the selected rows
+ * @property {function} setSelected - the function to call when the selected rows change
+ * @property {Filter[]} filters - the filters to apply
+ * @property {function} setFilters - the function to call when the filters change
+ * @property {function} setSearchBody - the function to call when the search body changes
+ * @property {Column[]} columns - the columns of the table
+ * @property {any[]} rows - the rows of the table
+ * @property {string | null} error - the error message
+ * @property {string} rowIdentifier - the identifier for the rows
+ * @property {boolean} isMobile - whether the table is displayed on a mobile device
+ * @property {JSX.Element} toolbarComponents - the components to display in the toolbar
+ * @property {MenuItem[]} menuItems - the menu items
  */
 interface DataTableProps {
   title: string;
@@ -649,7 +299,7 @@ interface DataTableProps {
   filters: Filter[];
   setFilters: React.Dispatch<React.SetStateAction<Filter[]>>;
   setSearchBody: (searchBody: any) => void;
-  columns: HeadCell[];
+  columns: Column[];
   rows: any[];
   error: string | null;
   rowIdentifier: string;
