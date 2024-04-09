@@ -13,9 +13,7 @@ describe("Login and Logout", () => {
   });
 
   it("login", () => {
-    // Find the login button on click on it
-    cy.contains("Login").click();
-
+    // The user is redirected to the /auth page because not authenticated
     // Make sure we are on the /auth page
     cy.url().should("include", "/auth");
 
@@ -49,6 +47,15 @@ describe("Login and Logout", () => {
     cy.contains("Logout").click();
 
     // The user is redirected back to the /auth page
+    cy.url().should("include", "/auth");
+
+    // The user is logged out
+    // The login button should be present
+    cy.contains("Login through your Identity Provider").should("exist");
+
+    // The user tries to access the dashboard page without being connected
+    // The user is redirected to the /auth page
+    cy.visit(`https://${baseUrl}:8000/`);
     cy.url().should("include", "/auth");
   });
 });

@@ -6,6 +6,7 @@ import { useMUITheme } from "@/hooks/theme";
 import { ThemeProvider as MUIThemeProvider } from "@mui/material/styles";
 import { useOidcAccessToken } from "@axa-fr/react-oidc";
 import { useOIDCContext } from "@/hooks/oidcConfiguration";
+import Dashboard from "../layout/Dashboard";
 
 /**
  * Build the User Dashboard page
@@ -21,7 +22,7 @@ export default function UserDashboard() {
   }
 
   return (
-    <React.Fragment>
+    <Dashboard>
       <MUIThemeProvider theme={theme}>
         <CssBaseline />
         <Box
@@ -35,6 +36,6 @@ export default function UserDashboard() {
           <p>To start with, select an application in the side bar</p>
         </Box>
       </MUIThemeProvider>
-    </React.Fragment>
+    </Dashboard>
   );
 }

@@ -11,7 +11,6 @@ import Button from "@mui/material/Button";
 import Autocomplete from "@mui/material/Autocomplete";
 import TextField from "@mui/material/TextField";
 import { useMetadata, Metadata } from "@/hooks/metadata";
-import NextLink from "next/link";
 import Image from "next/image";
 import { CssBaseline, Stack } from "@mui/material";
 import { useMUITheme } from "@/hooks/theme";
@@ -45,7 +44,7 @@ export function LoginForm() {
   useEffect(() => {
     // Redirect to dashboard if already authenticated
     if (isAuthenticated) {
-      router.push("/dashboard");
+      router.push("/");
     }
   }, [isAuthenticated, router]);
 
@@ -131,14 +130,12 @@ export function LoginForm() {
               paddingBottom: "10%",
             }}
           >
-            <NextLink href="/">
-              <Image
-                src="/DIRAC-logo-minimal.png"
-                alt="DIRAC logo"
-                width={150}
-                height={150}
-              />
-            </NextLink>
+            <Image
+              src="/DIRAC-logo-minimal.png"
+              alt="DIRAC logo"
+              width={150}
+              height={150}
+            />
           </Box>
           {singleVO ? (
             <Typography

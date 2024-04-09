@@ -1,5 +1,5 @@
-import Showcase from "@/components/applications/Showcase";
+import UserDashboard from "@/components/applications/UserDashboard";
 
 export default function Page() {
-  return <Showcase />;
+  return <UserDashboard />;
 }

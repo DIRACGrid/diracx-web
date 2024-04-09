@@ -22,9 +22,9 @@ const userSections: Record<
   string,
   { icon: React.ComponentType; path: string }
 > = {
-  Dashboard: { icon: Dashboard, path: "/dashboard" },
-  "Job Monitor": { icon: MonitorIcon, path: "/dashboard/jobmonitor" },
-  "File Catalog": { icon: FolderCopy, path: "/dashboard/filecatalog" },
+  Dashboard: { icon: Dashboard, path: "/" },
+  "Job Monitor": { icon: MonitorIcon, path: "/jobmonitor" },
+  "File Catalog": { icon: FolderCopy, path: "/filecatalog" },
 };
 
 interface DashboardDrawerProps {
