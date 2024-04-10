@@ -4,10 +4,25 @@ import { JobDataTable } from "@/components/ui/JobDataTable";
 import useSWR from "swr";
 import { useOidcAccessToken } from "@axa-fr/react-oidc";
 
-// Mock the module
+// Mock modules
 jest.mock("@axa-fr/react-oidc", () => ({
   useOidcAccessToken: jest.fn(),
 }));
+
+jest.mock("next/navigation", () => {
+  return {
+    usePathname: () => ({
+      pathname: "",
+    }),
+    useRouter: () => ({
+      push: jest.fn(),
+    }),
+    useSearchParams: () => ({
+      has: () => false,
+      getAll: () => [],
+    }),
+  };
+});
 
 jest.mock("swr", () => jest.fn());
 

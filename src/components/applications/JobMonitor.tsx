@@ -5,6 +5,7 @@ import { Box } from "@mui/material";
 import { useMUITheme } from "@/hooks/theme";
 import { ThemeProvider as MUIThemeProvider } from "@mui/material/styles";
 import { JobDataTable } from "../ui/JobDataTable";
+import Dashboard from "../layout/Dashboard";
 
 /**
  * Build the Job Monitor application
@@ -14,7 +15,7 @@ export default function JobMonitor() {
   const theme = useMUITheme();
 
   return (
-    <React.Fragment>
+    <Dashboard>
       <MUIThemeProvider theme={theme}>
         <CssBaseline />
         <Box
@@ -27,6 +28,6 @@ export default function JobMonitor() {
           <JobDataTable />
         </Box>
       </MUIThemeProvider>
-    </React.Fragment>
+    </Dashboard>
   );
 }

@@ -42,6 +42,21 @@ Open [http://localhost:8000](http://localhost:8000) with your browser to see the
 - Want to discuss about UX/UI design?
   Share your [Design idea](https://github.com/DIRACGrid/diracx-web/discussions/categories/design-ideas).
 
+## Testing
+
+Unit tests can be started with:
+
+```
+npm test
+```
+
+End-to-end tests are launched through `cypress` such as:
+
+```
+export CYPRESS_BASE_URL=<ip address used by diracx-charts>
+npx cypress open
+```
+
 ## Learn More
 
 To learn more about Next.js, take a look at the following resources:
