@@ -45,11 +45,11 @@ jobs:
               exit 1
             fi
         
-        - name: Set BASE_URL
-          run: echo "BASE_URL=$(hostname)" >> $GITHUB_ENV
+        - name: Set DIRACX_URL
+          run: echo "DIRACX_URL=https://$(ifconfig | grep 'inet ' | awk '{ print $2 }' | grep -v '^127' | head -n 1 | cut -d '/' -f 1).nip.io:8000" >> $GITHUB_ENV
 
         - name: Start Cypress
           uses: cypress-io/github-action@v6
           with:
             browser: chrome
-            env: BASE_URL=${{ env.BASE_URL }}
+            config: baseUrl=${{ env.DIRACX_URL }}
