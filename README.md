@@ -53,8 +53,7 @@ npm test
 End-to-end tests are launched through `cypress` such as:
 
 ```
-export CYPRESS_BASE_URL=<ip address used by diracx-charts>
-npx cypress open
+npx cypress open --config baseUrl=$DIRACX_URL
 ```
 
 ## Learn More
