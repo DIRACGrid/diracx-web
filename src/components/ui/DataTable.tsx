@@ -550,12 +550,6 @@ export function DataTable(props: DataTableProps) {
     );
   }
 
-  // Calculate the number of empty rows needed to fill the space
-  const emptyRows = Math.min(
-    25,
-    rowsPerPage - Math.min(rowsPerPage, rows.length - page * rowsPerPage),
-  );
-
   return (
     <Box sx={{ width: "100%" }}>
       <FilterToolbar
@@ -572,12 +566,12 @@ export function DataTable(props: DataTableProps) {
           selectedIds={selected}
           toolbarComponents={toolbarComponents}
         />
-        <TableContainer sx={{ maxHeight: "55vh" }}>
+        <TableContainer sx={{ height: "55vh" }}>
           <Table
             stickyHeader
             sx={{ minWidth: isMobile ? "undefined" : "50vw" }}
             aria-labelledby="tableTitle"
-            size={"medium"}
+            size={"small"}
           >
             <DataTableHead
               headCells={columns}
@@ -633,11 +627,6 @@ export function DataTable(props: DataTableProps) {
                     </TableRow>
                   );
                 })}
-              {emptyRows > 0 && (
-                <TableRow style={{ height: 53 * emptyRows }}>
-                  <TableCell colSpan={columns.length + 1} />
-                </TableRow>
-              )}
             </TableBody>
           </Table>
         </TableContainer>
