@@ -1,8 +1,8 @@
 import React from "react";
 import { render, fireEvent } from "@testing-library/react";
+import { useOidc, useOidcAccessToken } from "@axa-fr/react-oidc";
 import Dashboard from "@/components/layout/Dashboard";
 import { ThemeProvider } from "@/contexts/ThemeProvider";
-import { useOidc, useOidcAccessToken } from "@axa-fr/react-oidc";
 
 // Mock the module
 jest.mock("@axa-fr/react-oidc", () => ({

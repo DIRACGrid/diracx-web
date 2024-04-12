@@ -7,11 +7,11 @@ import IconButton from "@mui/material/IconButton";
 import MenuIcon from "@mui/icons-material/Menu";
 import Toolbar from "@mui/material/Toolbar";
 import Stack from "@mui/material/Stack";
+import { ThemeProvider as MUIThemeProvider } from "@mui/material/styles";
 import { ProfileButton } from "../ui/ProfileButton";
 import DashboardDrawer from "../ui/DashboardDrawer";
-import { useMUITheme } from "@/hooks/theme";
-import { ThemeProvider as MUIThemeProvider } from "@mui/material/styles";
 import { ThemeToggleButton } from "../ui/ThemeToggleButton";
+import { useMUITheme } from "@/hooks/theme";
 
 interface DashboardProps {
   children: React.ReactNode;

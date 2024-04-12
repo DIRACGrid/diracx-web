@@ -1,4 +1,3 @@
-import { DiracLogo } from "./DiracLogo";
 import { usePathname } from "next/navigation";
 import NextLink from "next/link";
 import {
@@ -15,6 +14,7 @@ import { Dashboard, FolderCopy } from "@mui/icons-material";
 import MonitorIcon from "@mui/icons-material/Monitor";
 import MenuBookIcon from "@mui/icons-material/MenuBook";
 import { ReactEventHandler } from "react";
+import { DiracLogo } from "./DiracLogo";
 
 // Define the sections that are accessible to users.
 // Each section has an associated icon and path.

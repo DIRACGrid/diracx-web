@@ -10,15 +10,15 @@ import MenuItem from "@mui/material/MenuItem";
 import Button from "@mui/material/Button";
 import Autocomplete from "@mui/material/Autocomplete";
 import TextField from "@mui/material/TextField";
-import { useMetadata, Metadata } from "@/hooks/metadata";
 import Image from "next/image";
 import { CssBaseline, Stack } from "@mui/material";
-import { useMUITheme } from "@/hooks/theme";
 import { ThemeProvider as MUIThemeProvider } from "@mui/material/styles";
 import { useRouter } from "next/navigation";
-import { useOIDCContext } from "@/hooks/oidcConfiguration";
 import * as React from "react";
 import { useOidc } from "@axa-fr/react-oidc";
+import { useOIDCContext } from "@/hooks/oidcConfiguration";
+import { useMUITheme } from "@/hooks/theme";
+import { useMetadata, Metadata } from "@/hooks/metadata";
 
 /**
  * Login form

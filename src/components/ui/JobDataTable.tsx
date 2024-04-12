@@ -1,5 +1,4 @@
 import * as React from "react";
-import { DataTable, MenuItem } from "./DataTable";
 import Box from "@mui/material/Box";
 import {
   blue,
@@ -21,17 +20,19 @@ import {
   Tooltip,
   useMediaQuery,
   useTheme,
+  Backdrop,
+  CircularProgress,
+  Snackbar,
 } from "@mui/material";
 import { useOidcAccessToken } from "@axa-fr/react-oidc";
-import { useOIDCContext } from "../../hooks/oidcConfiguration";
 import DeleteIcon from "@mui/icons-material/Delete";
 import ClearIcon from "@mui/icons-material/Clear";
 import ReplayIcon from "@mui/icons-material/Replay";
-import { Backdrop, CircularProgress, Snackbar } from "@mui/material";
-import { mutate } from "swr";
-import useSWR from "swr";
-import { fetcher } from "@/hooks/utils";
+import useSWR, { mutate } from "swr";
+import { useOIDCContext } from "../../hooks/oidcConfiguration";
+import { DataTable, MenuItem } from "./DataTable";
 import { JobHistoryDialog } from "./JobHistoryDialog";
+import { fetcher } from "@/hooks/utils";
 import { Filter } from "@/types/Filter";
 import { Column } from "@/types/Column";
 

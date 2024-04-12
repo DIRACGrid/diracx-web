@@ -1,12 +1,12 @@
 import React from "react";
 import { render } from "@testing-library/react";
-import UserDashboard from "@/components/applications/UserDashboard";
-import { ThemeProvider } from "@/contexts/ThemeProvider";
 import {
   useOIDCContext,
   useOidcAccessToken,
   useOidc,
 } from "@axa-fr/react-oidc";
+import UserDashboard from "@/components/applications/UserDashboard";
+import { ThemeProvider } from "@/contexts/ThemeProvider";
 
 // Mock the modules
 jest.mock("@axa-fr/react-oidc", () => ({
