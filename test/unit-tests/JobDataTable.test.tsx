@@ -1,8 +1,8 @@
 import React from "react";
 import { render } from "@testing-library/react";
-import { JobDataTable } from "@/components/ui/JobDataTable";
 import useSWR from "swr";
 import { useOidcAccessToken } from "@axa-fr/react-oidc";
+import { JobDataTable } from "@/components/ui/JobDataTable";
 
 // Mock modules
 jest.mock("@axa-fr/react-oidc", () => ({

@@ -10,8 +10,8 @@
   },
   "plugins": ["import"],
   "rules": {
-    "import/order": ["warn"],
-    "import/no-unused-modules": ["warn"],
-    "import/no-useless-path-segments": ["warn"]
+    "import/order": ["error"],
+    "import/no-unused-modules": ["error"],
+    "import/no-useless-path-segments": ["error"]
   }
 }

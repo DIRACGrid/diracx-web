@@ -1,5 +1,4 @@
 "use client";
-import { useOIDCContext } from "@/hooks/oidcConfiguration";
 import { useOidc, useOidcAccessToken } from "@axa-fr/react-oidc";
 import { Logout } from "@mui/icons-material";
 import {
@@ -15,6 +14,7 @@ import {
 } from "@mui/material";
 import { deepOrange } from "@mui/material/colors";
 import React from "react";
+import { useOIDCContext } from "@/hooks/oidcConfiguration";
 
 /**
  * Profile button, expected to vary whether the user is connected

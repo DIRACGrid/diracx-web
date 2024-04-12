@@ -2,10 +2,10 @@
 import * as React from "react";
 import CssBaseline from "@mui/material/CssBaseline";
 import { Box } from "@mui/material";
-import { useMUITheme } from "@/hooks/theme";
 import { ThemeProvider as MUIThemeProvider } from "@mui/material/styles";
 import { JobDataTable } from "../ui/JobDataTable";
 import Dashboard from "../layout/Dashboard";
+import { useMUITheme } from "@/hooks/theme";
 
 /**
  * Build the Job Monitor application

@@ -1,8 +1,8 @@
-import { ThemeContext } from "@/contexts/ThemeProvider";
 import { PaletteMode } from "@mui/material";
 import { deepOrange, grey, lightGreen } from "@mui/material/colors";
 import { createTheme, darken, lighten } from "@mui/material/styles";
 import { useContext } from "react";
+import { ThemeContext } from "@/contexts/ThemeProvider";
 
 /**
  * Custom hook to access the theme context
