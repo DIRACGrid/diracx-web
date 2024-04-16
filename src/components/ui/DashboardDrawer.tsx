@@ -1,5 +1,4 @@
 import { usePathname } from "next/navigation";
-import NextLink from "next/link";
 import {
   Drawer,
   Icon,
@@ -13,25 +12,58 @@ import {
 import { Dashboard, FolderCopy } from "@mui/icons-material";
 import MonitorIcon from "@mui/icons-material/Monitor";
 import MenuBookIcon from "@mui/icons-material/MenuBook";
-import { ReactEventHandler } from "react";
+import React, { ComponentType, ReactEventHandler } from "react";
+import { DragDropContext, Droppable } from "react-beautiful-dnd";
+import DrawerItemGroup from "./DrawerItemGroup";
 import { DiracLogo } from "./DiracLogo";
 
 // Define the sections that are accessible to users.
 // Each section has an associated icon and path.
-const userSections: Record<
-  string,
-  { icon: React.ComponentType; path: string }
-> = {
-  Dashboard: { icon: Dashboard, path: "/" },
-  "Job Monitor": { icon: MonitorIcon, path: "/jobmonitor" },
-  "File Catalog": { icon: FolderCopy, path: "/filecatalog" },
-};
+let userSections: {
+  title: string;
+  items: { title: string; id: number; icon: ComponentType; path: string }[];
+}[] = [
+  {
+    title: "Dashboard",
+    items: [
+      { title: "Dashboard", id: 0, icon: Dashboard, path: "/" },
+      { title: "Job Monitor", id: 1, icon: MonitorIcon, path: "/jobmonitor" },
+    ],
+  },
+  {
+    title: "Other",
+    items: [
+      { title: "File Catalog", id: 2, icon: FolderCopy, path: "/filecatalog" },
+    ],
+  },
+];
 
 interface DashboardDrawerProps {
   variant: "permanent" | "temporary";
   mobileOpen: boolean;
   width: number;
   handleDrawerToggle: ReactEventHandler;
+}
+
+function onDragEnd(result: any) {
+  // Reorder the list of items in the group.
+  if (!result.destination) {
+    return;
+  }
+  const source = result.source;
+  const destination = result.destination;
+
+  const sourceGroup = userSections.find(
+    (group) => group.title == source.droppableId,
+  );
+  const destinationGroup = userSections.find(
+    (group) => group.title == destination.droppableId,
+  );
+
+  if (sourceGroup && destinationGroup) {
+    const [removed] = sourceGroup.items.splice(source.index, 1);
+    destinationGroup.items.splice(destination.index, 0, removed);
+  }
 }
 
 export default function DashboardDrawer(props: DashboardDrawerProps) {
@@ -67,22 +99,15 @@ export default function DashboardDrawer(props: DashboardDrawerProps) {
           <DiracLogo />
         </Toolbar>
         {/* Map over user sections and render them as list items in the drawer. */}
-        <List>
-          {Object.keys(userSections).map((title: string) => (
-            <ListItem key={title} disablePadding>
-              <ListItemButton
-                component={NextLink}
-                href={userSections[title]["path"]}
-                selected={pathname === userSections[title]["path"]}
-              >
-                <ListItemIcon>
-                  <Icon component={userSections[title]["icon"]} />
-                </ListItemIcon>
-                <ListItemText primary={title} />
-              </ListItemButton>
-            </ListItem>
-          ))}
-        </List>
+        <DragDropContext onDragEnd={onDragEnd}>
+          <List>
+            {userSections.map(({ title, items }, index: number) => (
+              <ListItem key={title} disablePadding>
+                <DrawerItemGroup title={title} items={items} />
+              </ListItem>
+            ))}
+          </List>
+        </DragDropContext>
         {/* Render a link to documentation, positioned at the bottom of the drawer. */}
         <List style={{ position: "absolute", bottom: "0" }}>
           <ListItem key={"Documentation"}>
