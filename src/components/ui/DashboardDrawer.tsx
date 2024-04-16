@@ -12,58 +12,16 @@ import {
 import { Dashboard, FolderCopy } from "@mui/icons-material";
 import MonitorIcon from "@mui/icons-material/Monitor";
 import MenuBookIcon from "@mui/icons-material/MenuBook";
-import React, { ComponentType, ReactEventHandler } from "react";
+import React, { ComponentType, ReactEventHandler, useState } from "react";
 import { DragDropContext, Droppable } from "react-beautiful-dnd";
 import DrawerItemGroup from "./DrawerItemGroup";
 import { DiracLogo } from "./DiracLogo";
-
-// Define the sections that are accessible to users.
-// Each section has an associated icon and path.
-let userSections: {
-  title: string;
-  items: { title: string; id: number; icon: ComponentType; path: string }[];
-}[] = [
-  {
-    title: "Dashboard",
-    items: [
-      { title: "Dashboard", id: 0, icon: Dashboard, path: "/" },
-      { title: "Job Monitor", id: 1, icon: MonitorIcon, path: "/jobmonitor" },
-    ],
-  },
-  {
-    title: "Other",
-    items: [
-      { title: "File Catalog", id: 2, icon: FolderCopy, path: "/filecatalog" },
-    ],
-  },
-];
 
 interface DashboardDrawerProps {
   variant: "permanent" | "temporary";
   mobileOpen: boolean;
   width: number;
   handleDrawerToggle: ReactEventHandler;
-}
-
-function onDragEnd(result: any) {
-  // Reorder the list of items in the group.
-  if (!result.destination) {
-    return;
-  }
-  const source = result.source;
-  const destination = result.destination;
-
-  const sourceGroup = userSections.find(
-    (group) => group.title == source.droppableId,
-  );
-  const destinationGroup = userSections.find(
-    (group) => group.title == destination.droppableId,
-  );
-
-  if (sourceGroup && destinationGroup) {
-    const [removed] = sourceGroup.items.splice(source.index, 1);
-    destinationGroup.items.splice(destination.index, 0, removed);
-  }
 }
 
 export default function DashboardDrawer(props: DashboardDrawerProps) {
@@ -74,6 +32,79 @@ export default function DashboardDrawer(props: DashboardDrawerProps) {
     window !== undefined ? () => window.document.body : undefined;
   // Check if the drawer is in "temporary" mode.
   const isTemporary = props.variant === "temporary";
+
+  // Define the sections that are accessible to users.
+  // Each section has an associated icon and path.
+  const [userSections, setSections] = useState([
+    {
+      title: "Dashboard",
+      extended: true,
+      items: [
+        { title: "Dashboard", id: 0, icon: Dashboard, path: "/" },
+        { title: "Job Monitor", id: 1, icon: MonitorIcon, path: "/jobmonitor" },
+      ],
+    },
+    {
+      title: "Other",
+      extended: false,
+      items: [
+        {
+          title: "File Catalog",
+          id: 2,
+          icon: FolderCopy,
+          path: "/filecatalog",
+        },
+      ],
+    },
+    {
+      title: "Other2",
+      extended: false,
+      items: [],
+    },
+  ] as {
+    title: string;
+    extended: boolean;
+    items: { title: string; id: number; icon: ComponentType; path: string }[];
+  }[]);
+
+  /**
+   * Handles the drag end event for reordering items in the group.
+   *
+   * @param result - The result object containing information about the drag event.
+   */
+  function onDragEnd(result: any) {
+    // Reorder the list of items in the group.
+    if (!result.destination) {
+      return;
+    }
+    const source = result.source;
+    const destination = result.destination;
+
+    const sourceGroup = userSections.find(
+      (group) => group.title == source.droppableId,
+    );
+    const destinationGroup = userSections.find(
+      (group) => group.title == destination.droppableId,
+    );
+
+    if (sourceGroup && destinationGroup) {
+      const sourceItems = [...sourceGroup.items];
+      const destinationItems = [...destinationGroup.items];
+
+      const [removed] = sourceItems.splice(source.index, 1);
+      destinationItems.splice(destination.index, 0, removed);
+
+      setSections((sections) =>
+        sections.map((section) =>
+          section.title === sourceGroup.title
+            ? { ...section, items: sourceItems }
+            : section.title === destinationGroup.title
+              ? { ...section, items: destinationItems }
+              : section,
+        ),
+      );
+    }
+  }
 
   return (
     <Drawer
@@ -101,9 +132,9 @@ export default function DashboardDrawer(props: DashboardDrawerProps) {
         {/* Map over user sections and render them as list items in the drawer. */}
         <DragDropContext onDragEnd={onDragEnd}>
           <List>
-            {userSections.map(({ title, items }, index: number) => (
-              <ListItem key={title} disablePadding>
-                <DrawerItemGroup title={title} items={items} />
+            {userSections.map((group) => (
+              <ListItem key={group.title} disablePadding>
+                <DrawerItemGroup group={group} setSections={setSections} />
               </ListItem>
             ))}
           </List>

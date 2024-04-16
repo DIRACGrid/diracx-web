@@ -15,19 +15,56 @@ import DragIndicatorIcon from "@mui/icons-material/DragIndicator";
 import { StrictModeDroppable } from "./StrictModeDroppable";
 
 export default function DrawerItemGroup({
-  title,
-  items,
+  group: { title, extended: expanded, items },
+  setSections,
 }: {
-  title: string;
-  items: {
+  group: {
     title: string;
-    id: number;
-    icon: React.ComponentType;
-    path: string;
-  }[];
+    extended: boolean;
+    items: {
+      title: string;
+      id: number;
+      icon: React.ComponentType;
+      path: string;
+    }[];
+  };
+  setSections: React.Dispatch<
+    React.SetStateAction<
+      {
+        title: string;
+        extended: boolean;
+        items: {
+          title: string;
+          id: number;
+          icon: React.ComponentType;
+          path: string;
+        }[];
+      }[]
+    >
+  >;
 }) {
+  const handleChange = (title: string) => (event: any, isExpanded: any) => {
+    // Set the extended state of the accordion group.
+    setSections((sections) =>
+      sections.map((section) =>
+        section.title === title
+          ? { ...section, extended: isExpanded }
+          : section,
+      ),
+    );
+  };
+
   return (
-    <Accordion sx={{ width: "100%" }} disableGutters>
+    <Accordion
+      sx={{
+        width: "100%",
+        "& .MuiAccordion-region": { height: expanded ? "auto" : 0 },
+        "& .MuiAccordionDetails-root": { display: expanded ? "block" : "none" },
+      }}
+      expanded={expanded}
+      onChange={handleChange(title)}
+      disableGutters
+    >
       {/* Accordion summary */}
       <AccordionSummary expandIcon={<ExpandMoreIcon />}>
         {title}
