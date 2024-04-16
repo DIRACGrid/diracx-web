@@ -13,7 +13,6 @@ import { useMUITheme } from "@/hooks/theme";
  * @returns User Dashboard content
  */
 export default function UserDashboard() {
-  const theme = useMUITheme();
   const { configuration } = useOIDCContext();
   const { accessTokenPayload } = useOidcAccessToken(configuration?.scope);
 
@@ -22,20 +21,10 @@ export default function UserDashboard() {
   }
 
   return (
-    <Dashboard>
-      <MUIThemeProvider theme={theme}>
-        <CssBaseline />
-        <Box
-          sx={{
-            ml: "5%",
-            mr: "5%",
-          }}
-        >
-          <h2>Hello {accessTokenPayload["preferred_username"]}</h2>
+    <div>
+      <h2>Hello {accessTokenPayload["preferred_username"]}</h2>
 
-          <p>To start with, select an application in the side bar</p>
-        </Box>
-      </MUIThemeProvider>
-    </Dashboard>
+      <p>To start with, select an application in the side bar</p>
+    </div>
   );
 }
