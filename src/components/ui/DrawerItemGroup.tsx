@@ -8,11 +8,9 @@ import {
   ListItemText,
 } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import { Draggable, Droppable } from "react-beautiful-dnd";
 import React from "react";
 import Link from "next/link";
 import DragIndicatorIcon from "@mui/icons-material/DragIndicator";
-import { StrictModeDroppable } from "./StrictModeDroppable";
 
 export default function DrawerItemGroup({
   group: { title, extended: expanded, items },
@@ -70,41 +68,25 @@ export default function DrawerItemGroup({
         {title}
       </AccordionSummary>
       {/* Accordion details */}
-      <StrictModeDroppable droppableId={title}>
-        {(provided, snapshot) => (
-          <AccordionDetails
-            {...provided.droppableProps}
-            ref={provided.innerRef}
+      <AccordionDetails>
+        {items.map(({ title, id, icon, path }, index) => (
+          <ListItemButton
+            disableGutters
+            key={title}
+            component={Link}
+            href={path}
+            sx={{ pl: 2, borderRadius: 2, pr: 1 }}
           >
-            {items.map(({ title, id, icon, path }, index) => (
-              <Draggable key={id} draggableId={title} index={index}>
-                {(provided) => (
-                  <div>
-                    <ListItemButton
-                      disableGutters
-                      ref={provided.innerRef}
-                      key={title}
-                      component={Link}
-                      href={path}
-                      sx={{ pl: 2, borderRadius: 2, pr: 1 }}
-                      {...provided.draggableProps}
-                    >
-                      <ListItemIcon>
-                        <Icon component={icon} />
-                      </ListItemIcon>
-                      <ListItemText primary={title} />
-                      <div {...provided.dragHandleProps}>
-                        <Icon component={DragIndicatorIcon} />
-                      </div>
-                    </ListItemButton>
-                  </div>
-                )}
-              </Draggable>
-            ))}
-            {provided.placeholder}
-          </AccordionDetails>
-        )}
-      </StrictModeDroppable>
+            <ListItemIcon>
+              <Icon component={icon} />
+            </ListItemIcon>
+            <ListItemText primary={title} />
+            <div>
+              <Icon component={DragIndicatorIcon} />
+            </div>
+          </ListItemButton>
+        ))}
+      </AccordionDetails>
     </Accordion>
   );
 }

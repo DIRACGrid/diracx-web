@@ -13,7 +13,6 @@ import { Dashboard, FolderCopy } from "@mui/icons-material";
 import MonitorIcon from "@mui/icons-material/Monitor";
 import MenuBookIcon from "@mui/icons-material/MenuBook";
 import React, { ComponentType, ReactEventHandler, useState } from "react";
-import { DragDropContext, Droppable } from "react-beautiful-dnd";
 import DrawerItemGroup from "./DrawerItemGroup";
 import { DiracLogo } from "./DiracLogo";
 
@@ -130,15 +129,13 @@ export default function DashboardDrawer(props: DashboardDrawerProps) {
           <DiracLogo />
         </Toolbar>
         {/* Map over user sections and render them as list items in the drawer. */}
-        <DragDropContext onDragEnd={onDragEnd}>
-          <List>
-            {userSections.map((group) => (
-              <ListItem key={group.title} disablePadding>
-                <DrawerItemGroup group={group} setSections={setSections} />
-              </ListItem>
-            ))}
-          </List>
-        </DragDropContext>
+        <List>
+          {userSections.map((group) => (
+            <ListItem key={group.title} disablePadding>
+              <DrawerItemGroup group={group} setSections={setSections} />
+            </ListItem>
+          ))}
+        </List>
         {/* Render a link to documentation, positioned at the bottom of the drawer. */}
         <List style={{ position: "absolute", bottom: "0" }}>
           <ListItem key={"Documentation"}>
