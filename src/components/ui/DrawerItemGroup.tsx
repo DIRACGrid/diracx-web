@@ -1,16 +1,8 @@
-import {
-  Accordion,
-  AccordionDetails,
-  AccordionSummary,
-  Icon,
-  ListItemButton,
-  ListItemIcon,
-  ListItemText,
-} from "@mui/material";
+import { Accordion, AccordionDetails, AccordionSummary } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import React from "react";
-import Link from "next/link";
-import DragIndicatorIcon from "@mui/icons-material/DragIndicator";
+import React, { useEffect } from "react";
+import { dropTargetForElements } from "@atlaskit/pragmatic-drag-and-drop/element/adapter";
+import DrawerItem from "./DrawerItem";
 
 export default function DrawerItemGroup({
   group: { title, extended: expanded, items },
@@ -41,6 +33,23 @@ export default function DrawerItemGroup({
     >
   >;
 }) {
+  const dropRef = React.useRef(null);
+  const [hovered, setHovered] = React.useState(false);
+
+  useEffect(() => {
+    if (!dropRef.current) return;
+    const dropItem = dropRef.current;
+
+    return dropTargetForElements({
+      element: dropItem,
+      getData: () => ({ title }),
+      onDragStart: () => setHovered(true),
+      onDrop: () => setHovered(false),
+      onDragEnter: () => setHovered(true),
+      onDragLeave: () => setHovered(false),
+    });
+  });
+
   const handleChange = (title: string) => (event: any, isExpanded: any) => {
     // Set the extended state of the accordion group.
     setSections((sections) =>
@@ -51,17 +60,19 @@ export default function DrawerItemGroup({
       ),
     );
   };
-
+  const groupTitle = title;
   return (
     <Accordion
       sx={{
         width: "100%",
         "& .MuiAccordion-region": { height: expanded ? "auto" : 0 },
         "& .MuiAccordionDetails-root": { display: expanded ? "block" : "none" },
+        backgroundColor: hovered ? "rgba(0, 30, 100, 0.3)" : "transparent",
       }}
       expanded={expanded}
       onChange={handleChange(title)}
       disableGutters
+      ref={dropRef}
     >
       {/* Accordion summary */}
       <AccordionSummary expandIcon={<ExpandMoreIcon />}>
@@ -70,21 +81,12 @@ export default function DrawerItemGroup({
       {/* Accordion details */}
       <AccordionDetails>
         {items.map(({ title, id, icon, path }, index) => (
-          <ListItemButton
-            disableGutters
-            key={title}
-            component={Link}
-            href={path}
-            sx={{ pl: 2, borderRadius: 2, pr: 1 }}
-          >
-            <ListItemIcon>
-              <Icon component={icon} />
-            </ListItemIcon>
-            <ListItemText primary={title} />
-            <div>
-              <Icon component={DragIndicatorIcon} />
-            </div>
-          </ListItemButton>
+          <DrawerItem
+            key={id}
+            item={{ title, icon, path }}
+            index={index}
+            groupTitle={groupTitle}
+          />
         ))}
       </AccordionDetails>
     </Accordion>
