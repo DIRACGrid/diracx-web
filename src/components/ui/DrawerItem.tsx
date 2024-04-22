@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { createRoot } from "react-dom/client";
 import Link from "next/link";
 import {
   ListItemButton,
@@ -18,6 +19,10 @@ import {
   attachClosestEdge,
   extractClosestEdge,
 } from "@atlaskit/pragmatic-drag-and-drop-hitbox/closest-edge";
+import { setCustomNativeDragPreview } from "@atlaskit/pragmatic-drag-and-drop/element/set-custom-native-drag-preview";
+import { ThemeProvider as MUIThemeProvider } from "@mui/material/styles";
+import { ThemeProvider } from "@/contexts/ThemeProvider";
+import { useMUITheme } from "@/hooks/theme";
 
 export default function DrawerItem({
   item: { title, icon, path },
@@ -30,6 +35,7 @@ export default function DrawerItem({
 }) {
   const dragRef = React.useRef(null);
   const handleRef = React.useRef(null);
+  const theme = useMUITheme();
 
   const [closestEdge, setClosestEdge]: any = useState<Edge | null>(null);
 
@@ -44,6 +50,27 @@ export default function DrawerItem({
         element: element,
         dragHandle: handleItem,
         getInitialData: () => ({ index, title }),
+        onGenerateDragPreview: ({ nativeSetDragImage }) => {
+          setCustomNativeDragPreview({
+            nativeSetDragImage,
+            getOffset: () => ({ x: 165, y: 20 }),
+            render: ({ container }) => {
+              const root = createRoot(container);
+              root.render(
+                <ThemeProvider>
+                  <MUIThemeProvider theme={theme}>
+                    <DrawerItem
+                      item={{ title, icon, path }}
+                      index={index}
+                      groupTitle={groupTitle}
+                    />
+                  </MUIThemeProvider>
+                </ThemeProvider>,
+              );
+              return () => root.unmount();
+            },
+          });
+        },
       }),
       dropTargetForElements({
         element: element,
@@ -87,7 +114,7 @@ export default function DrawerItem({
         },
       }),
     );
-  }, [index, groupTitle]);
+  }, [index, groupTitle, icon, path, theme]);
 
   return (
     <>
@@ -103,13 +130,13 @@ export default function DrawerItem({
           <Icon component={icon} />
         </ListItemIcon>
         <ListItemText primary={title} />
-        <div>
+        <ListItemIcon sx={{ minWidth: "24px" }}>
           <Icon
             component={DragIndicatorIcon}
             sx={{ cursor: "grab" }}
             ref={handleRef}
           />
-        </div>
+        </ListItemIcon>
         {closestEdge && <DropIndicator edge={closestEdge} />}
       </ListItemButton>
     </>

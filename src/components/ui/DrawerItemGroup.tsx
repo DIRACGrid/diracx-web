@@ -44,7 +44,10 @@ export default function DrawerItemGroup({
       element: dropItem,
       getData: () => ({ title }),
       onDragStart: () => setHovered(true),
-      onDrop: () => setHovered(false),
+      onDrop: () => {
+        setHovered(false);
+        handleChange(title)(null, true);
+      },
       onDragEnter: () => setHovered(true),
       onDragLeave: () => setHovered(false),
     });
