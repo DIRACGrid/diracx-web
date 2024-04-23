@@ -21,6 +21,7 @@ import {
 } from "@atlaskit/pragmatic-drag-and-drop-hitbox/closest-edge";
 import { setCustomNativeDragPreview } from "@atlaskit/pragmatic-drag-and-drop/element/set-custom-native-drag-preview";
 import { ThemeProvider as MUIThemeProvider } from "@mui/material/styles";
+import { preserveOffsetOnSource } from "@atlaskit/pragmatic-drag-and-drop/element/preserve-offset-on-source";
 import { ThemeProvider } from "@/contexts/ThemeProvider";
 import { useMUITheme } from "@/hooks/theme";
 
@@ -43,31 +44,41 @@ export default function DrawerItem({
     if (!dragRef.current || !handleRef.current) return;
     const element = dragRef.current;
     const handleItem = handleRef.current;
-    const title = groupTitle;
 
     return combine(
       draggable({
         element: element,
         dragHandle: handleItem,
-        getInitialData: () => ({ index, title }),
-        onGenerateDragPreview: ({ nativeSetDragImage }) => {
+        getInitialData: () => ({ index, title: groupTitle }),
+        onGenerateDragPreview: ({ nativeSetDragImage, source, location }) => {
           setCustomNativeDragPreview({
             nativeSetDragImage,
-            getOffset: () => ({ x: 165, y: 20 }),
             render: ({ container }) => {
               const root = createRoot(container);
               root.render(
                 <ThemeProvider>
                   <MUIThemeProvider theme={theme}>
-                    <DrawerItem
-                      item={{ title, icon, path }}
-                      index={index}
-                      groupTitle={groupTitle}
-                    />
+                    <div
+                      style={{
+                        width: source.element.getBoundingClientRect().width,
+                      }}
+                    >
+                      <DrawerItem
+                        item={{ title, icon, path }}
+                        index={index}
+                        groupTitle={groupTitle}
+                      />
+                    </div>
                   </MUIThemeProvider>
                 </ThemeProvider>,
               );
               return () => root.unmount();
+            },
+            getOffset: ({ container }) => {
+              const elementPos = source.element.getBoundingClientRect();
+              const x = location.current.input.pageX - elementPos.x;
+              const y = location.current.input.pageY - elementPos.y;
+              return { x, y };
             },
           });
         },
@@ -76,7 +87,7 @@ export default function DrawerItem({
         element: element,
         getData: ({ input, element }) => {
           return attachClosestEdge(
-            { index, title },
+            { index, title: groupTitle },
             { input, element, allowedEdges: ["top", "bottom"] },
           );
         },
@@ -114,7 +125,7 @@ export default function DrawerItem({
         },
       }),
     );
-  }, [index, groupTitle, icon, path, theme]);
+  }, [index, groupTitle, icon, path, theme, title]);
 
   return (
     <>

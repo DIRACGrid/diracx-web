@@ -4,16 +4,24 @@ import React, { useEffect } from "react";
 import { dropTargetForElements } from "@atlaskit/pragmatic-drag-and-drop/element/adapter";
 import DrawerItem from "./DrawerItem";
 
+/**
+ * Represents a group of items in a drawer.
+ *
+ * @param group - The group object containing the title, expanded state, and items.
+ * @param setSections - The function to update the sections state.
+ * @returns The JSX element representing the drawer item group.
+ */
 export default function DrawerItemGroup({
   group: { title, extended: expanded, items },
   setSections,
+  handleContextMenu,
 }: {
   group: {
     title: string;
     extended: boolean;
     items: {
       title: string;
-      id: number;
+      id: string;
       icon: React.ComponentType;
       path: string;
     }[];
@@ -25,13 +33,17 @@ export default function DrawerItemGroup({
         extended: boolean;
         items: {
           title: string;
-          id: number;
+          id: string;
           icon: React.ComponentType;
           path: string;
         }[];
       }[]
     >
   >;
+  handleContextMenu: (
+    type: "group" | "item" | null,
+    id: string | null,
+  ) => (event: React.MouseEvent<HTMLElement>) => void;
 }) {
   const dropRef = React.useRef(null);
   const [hovered, setHovered] = React.useState(false);
@@ -68,8 +80,6 @@ export default function DrawerItemGroup({
     <Accordion
       sx={{
         width: "100%",
-        "& .MuiAccordion-region": { height: expanded ? "auto" : 0 },
-        "& .MuiAccordionDetails-root": { display: expanded ? "block" : "none" },
         backgroundColor: hovered ? "rgba(0, 30, 100, 0.3)" : "transparent",
       }}
       expanded={expanded}
@@ -84,12 +94,13 @@ export default function DrawerItemGroup({
       {/* Accordion details */}
       <AccordionDetails>
         {items.map(({ title, id, icon, path }, index) => (
-          <DrawerItem
-            key={id}
-            item={{ title, icon, path }}
-            index={index}
-            groupTitle={groupTitle}
-          />
+          <div onContextMenu={handleContextMenu("item", id)} key={id}>
+            <DrawerItem
+              item={{ title, icon, path }}
+              index={index}
+              groupTitle={groupTitle}
+            />
+          </div>
         ))}
       </AccordionDetails>
     </Accordion>
