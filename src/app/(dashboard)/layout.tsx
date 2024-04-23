@@ -2,9 +2,10 @@
 import * as React from "react";
 import CssBaseline from "@mui/material/CssBaseline";
 import { Box } from "@mui/material";
-import { useMUITheme } from "@/hooks/theme";
 import { ThemeProvider as MUIThemeProvider } from "@mui/material/styles";
+import { useMUITheme } from "@/hooks/theme";
 import Dashboard from "@/components/layout/Dashboard";
+import ApplicationsProvider from "@/contexts/ApplicationsProvider";
 
 export default function JobMonitorLayout({
   children,
@@ -15,19 +16,21 @@ export default function JobMonitorLayout({
 
   return (
     <section>
-      <Dashboard>
-        <MUIThemeProvider theme={theme}>
-          <CssBaseline />
-          <Box
-            sx={{
-              ml: "5%",
-              mr: "5%",
-            }}
-          >
-            {children}
-          </Box>
-        </MUIThemeProvider>
-      </Dashboard>
+      <ApplicationsProvider>
+        <Dashboard>
+          <MUIThemeProvider theme={theme}>
+            <CssBaseline />
+            <Box
+              sx={{
+                ml: "5%",
+                mr: "5%",
+              }}
+            >
+              {children}
+            </Box>
+          </MUIThemeProvider>
+        </Dashboard>
+      </ApplicationsProvider>
     </section>
   );
 }

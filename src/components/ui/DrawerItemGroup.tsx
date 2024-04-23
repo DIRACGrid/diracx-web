@@ -3,6 +3,7 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import React, { useEffect } from "react";
 import { dropTargetForElements } from "@atlaskit/pragmatic-drag-and-drop/element/adapter";
 import DrawerItem from "./DrawerItem";
+import { UserSection } from "@/types/UserSection";
 
 /**
  * Represents a group of items in a drawer.
@@ -26,20 +27,7 @@ export default function DrawerItemGroup({
       path: string;
     }[];
   };
-  setSections: React.Dispatch<
-    React.SetStateAction<
-      {
-        title: string;
-        extended: boolean;
-        items: {
-          title: string;
-          id: string;
-          icon: React.ComponentType;
-          path: string;
-        }[];
-      }[]
-    >
-  >;
+  setSections: React.Dispatch<React.SetStateAction<UserSection[]>>;
   handleContextMenu: (
     type: "group" | "item" | null,
     id: string | null,

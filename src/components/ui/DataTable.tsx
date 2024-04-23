@@ -30,6 +30,7 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { FilterToolbar } from "./FilterToolbar";
 import { Filter } from "@/types/Filter";
 import { Column } from "@/types/Column";
+import { useSearchParamsUtils } from "@/hooks/searchParamsUtils";
 
 /**
  * Descending comparator function
@@ -346,6 +347,7 @@ export function DataTable(props: DataTableProps) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
+  const { getParam, setParam, removeParam } = useSearchParamsUtils();
 
   // Manage URL search params
   const createQueryString = React.useCallback(
@@ -373,9 +375,10 @@ export function DataTable(props: DataTableProps) {
       const queryString = createQueryString(newFilters);
 
       // Push new URL to history without reloading the page
-      router.push(pathname + "?" + queryString);
+      // router.push(pathname + "?" + queryString);
+      setParam("filter", queryString);
     },
-    [createQueryString, pathname, router],
+    [createQueryString, setParam],
   );
 
   // Handle the application of filters

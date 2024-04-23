@@ -14,13 +14,12 @@ import {
   TextField,
   Toolbar,
 } from "@mui/material";
-import { Dashboard, FolderCopy, Monitor } from "@mui/icons-material";
 import MenuBookIcon from "@mui/icons-material/MenuBook";
 import AddIcon from "@mui/icons-material/Add";
 import React, {
-  Component,
   ComponentType,
   ReactEventHandler,
+  useContext,
   useEffect,
   useState,
 } from "react";
@@ -29,6 +28,7 @@ import { extractClosestEdge } from "@atlaskit/pragmatic-drag-and-drop-hitbox/clo
 import DrawerItemGroup from "./DrawerItemGroup";
 import { DiracLogo } from "./DiracLogo";
 import AppDialog from "./ApplicationDialog";
+import { ApplicationsContext } from "@/contexts/ApplicationsProvider";
 
 interface DashboardDrawerProps {
   variant: "permanent" | "temporary";
@@ -71,42 +71,7 @@ export default function DashboardDrawer(props: DashboardDrawerProps) {
 
   // Define the sections that are accessible to users.
   // Each section has an associated icon and path.
-  const [userSections, setSections] = useState([
-    {
-      title: "Dashboard",
-      extended: true,
-      items: [
-        { title: "Dashboard", id: "Dashboard0", icon: Dashboard, path: "/" },
-        {
-          title: "Job Monitor",
-          id: "JobMonitor0",
-          icon: Monitor,
-          path: "/jobmonitor",
-        },
-      ],
-    },
-    {
-      title: "Other",
-      extended: false,
-      items: [
-        {
-          title: "File Catalog",
-          id: "FileCatatlog0",
-          icon: FolderCopy,
-          path: "/filecatalog",
-        },
-      ],
-    },
-    {
-      title: "Other2",
-      extended: false,
-      items: [],
-    },
-  ] as {
-    title: string;
-    extended: boolean;
-    items: { title: string; id: string; icon: ComponentType; path: string }[];
-  }[]);
+  const [userSections, setSections] = useContext(ApplicationsContext);
 
   useEffect(() => {
     return monitorForElements({
@@ -153,79 +118,79 @@ export default function DashboardDrawer(props: DashboardDrawerProps) {
         }
       },
     });
-  }, [userSections]);
 
-  /**
-   * Reorders sections within a group or between different groups.
-   *
-   * @param sourceGroup - The source group from which the section is being moved.
-   * @param destinationGroup - The destination group where the section is being moved to.
-   * @param sourceIndex - The index of the section within the source group.
-   * @param destinationIndex - The index where the section should be placed in the destination group.
-   *                           If null, the section will be placed at the end of the destination group.
-   */
-  function reorderSections(
-    sourceGroup: any,
-    destinationGroup: any,
-    sourceIndex: number,
-    destinationIndex: number | null = null,
-  ) {
-    if (sourceGroup && destinationGroup) {
-      if (
-        sourceGroup.title === destinationGroup.title &&
-        destinationIndex &&
-        sourceIndex < destinationIndex
-      ) {
-        destinationIndex -= 1;
-      }
-      if (
-        sourceGroup.title === destinationGroup.title &&
-        (destinationIndex == null || sourceIndex === destinationIndex)
-      ) {
-        return;
-      }
-
-      if (sourceGroup.title === destinationGroup.title) {
-        const sourceItems = [...sourceGroup.items];
-
-        const [removed] = sourceItems.splice(sourceIndex, 1);
-
-        if (destinationIndex === null) {
-          destinationIndex = sourceItems.length;
+    /**
+     * Reorders sections within a group or between different groups.
+     *
+     * @param sourceGroup - The source group from which the section is being moved.
+     * @param destinationGroup - The destination group where the section is being moved to.
+     * @param sourceIndex - The index of the section within the source group.
+     * @param destinationIndex - The index where the section should be placed in the destination group.
+     *                           If null, the section will be placed at the end of the destination group.
+     */
+    function reorderSections(
+      sourceGroup: any,
+      destinationGroup: any,
+      sourceIndex: number,
+      destinationIndex: number | null = null,
+    ) {
+      if (sourceGroup && destinationGroup) {
+        if (
+          sourceGroup.title === destinationGroup.title &&
+          destinationIndex &&
+          sourceIndex < destinationIndex
+        ) {
+          destinationIndex -= 1;
         }
-        sourceItems.splice(destinationIndex, 0, removed);
-
-        setSections((sections) =>
-          sections.map((section) =>
-            section.title === sourceGroup.title
-              ? { ...section, items: sourceItems }
-              : section,
-          ),
-        );
-      } else {
-        const sourceItems = [...sourceGroup.items];
-
-        const [removed] = sourceItems.splice(sourceIndex, 1);
-
-        const destinationItems = [...destinationGroup.items];
-
-        if (destinationIndex === null) {
-          destinationIndex = destinationItems.length;
+        if (
+          sourceGroup.title === destinationGroup.title &&
+          (destinationIndex == null || sourceIndex === destinationIndex)
+        ) {
+          return;
         }
-        destinationItems.splice(destinationIndex, 0, removed);
 
-        setSections((sections) =>
-          sections.map((section) =>
-            section.title === sourceGroup.title
-              ? { ...section, items: sourceItems }
-              : section.title === destinationGroup.title
-                ? { ...section, items: destinationItems }
+        if (sourceGroup.title === destinationGroup.title) {
+          const sourceItems = [...sourceGroup.items];
+
+          const [removed] = sourceItems.splice(sourceIndex, 1);
+
+          if (destinationIndex === null) {
+            destinationIndex = sourceItems.length;
+          }
+          sourceItems.splice(destinationIndex, 0, removed);
+
+          setSections((sections) =>
+            sections.map((section) =>
+              section.title === sourceGroup.title
+                ? { ...section, items: sourceItems }
                 : section,
-          ),
-        );
+            ),
+          );
+        } else {
+          const sourceItems = [...sourceGroup.items];
+
+          const [removed] = sourceItems.splice(sourceIndex, 1);
+
+          const destinationItems = [...destinationGroup.items];
+
+          if (destinationIndex === null) {
+            destinationIndex = destinationItems.length;
+          }
+          destinationItems.splice(destinationIndex, 0, removed);
+
+          setSections((sections) =>
+            sections.map((section) =>
+              section.title === sourceGroup.title
+                ? { ...section, items: sourceItems }
+                : section.title === destinationGroup.title
+                  ? { ...section, items: destinationItems }
+                  : section,
+            ),
+          );
+        }
       }
     }
-  }
+  }, [setSections, userSections]);
 
   /**
    * Handles the creation of a new app in the dashboard drawer.
@@ -265,6 +230,7 @@ export default function DashboardDrawer(props: DashboardDrawerProps) {
         (sum, group) => sum + group.items.length,
         0,
       )}`,
+      type: appType,
       icon: icon,
       path: path,
     };
