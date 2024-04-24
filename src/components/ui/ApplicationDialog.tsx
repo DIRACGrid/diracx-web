@@ -83,22 +83,6 @@ export default function AppDialog({
             </Grid>
           ))}
         </Grid>
-        {/* <Stack spacing={2}>
-          <Select
-            required
-            fullWidth
-            id="application-type"
-            value={appType}
-            onChange={(event) => setAppType(event.target.value)}
-            input={<OutlinedInput label="Application Type" />}
-          >
-            {applicationList.map((app) => (
-              <MenuItem key={app.name} value={app.name}>
-                {app.name}
-              </MenuItem>
-            ))}
-          </Select>
-        </Stack> */}
       </DialogContent>
       <DialogActions>
         <Button

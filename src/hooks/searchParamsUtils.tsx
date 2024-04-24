@@ -13,16 +13,15 @@ export function useSearchParamsUtils() {
   const pathname = usePathname();
 
   const getParams = useCallback(() => {
-    return searchParams.entries();
+    return new URLSearchParams(searchParams);
   }, [searchParams]);
 
-  const buildQueryString = useCallback((params: Record<string, string>) => {
-    const query = new URLSearchParams();
-    Object.entries(params).forEach(([key, value]) => {
-      query.set(key, value);
-    });
-    return query.toString();
-  }, []);
+  const getAllParam = useCallback(
+    (key: string) => {
+      return searchParams.getAll(key);
+    },
+    [searchParams],
+  );
 
   const getParam = useCallback(
     (key: string) => {
@@ -32,30 +31,33 @@ export function useSearchParamsUtils() {
   );
 
   const setParam = useCallback(
-    (key: string, value: string) => {
-      const params = Object.fromEntries(getParams());
-      router.push(
-        `${pathname}?${buildQueryString({
-          ...params,
-          [key]: value,
-        })}`,
-      );
+    (key: string, value: string | string[]) => {
+      const params = getParams();
+      if (Array.isArray(value)) {
+        params.delete(key);
+        value.forEach((v) => params.append(key, v));
+        params.sort();
+        router.push(`${pathname}?${params.toString()}`);
+      } else {
+        params.set(key, value);
+        params.sort();
+        router.push(`${pathname}?${params.toString()}`);
+      }
     },
-    [buildQueryString, getParams, pathname, router],
+    [getParams, pathname, router],
   );
 
   const removeParam = useCallback(
     (key: string) => {
-      const { [key]: _, ...rest } = Object.fromEntries(getParams());
+      const params = getParams();
+      params.delete(key);
 
       router.push(
-        `${pathname}?${buildQueryString({
-          ...rest,
-        })}`,
+        `${pathname}?${params.toString() === "" ? "" : params.toString()}`,
       );
     },
-    [buildQueryString, getParams, pathname, router],
+    [getParams, pathname, router],
   );
 
-  return { getParam, setParam, removeParam };
+  return { getParam, setParam, removeParam, getAllParam };
 }

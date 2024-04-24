@@ -14,60 +14,69 @@ export const ApplicationsContext = createContext<
 const ApplicationsProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
-  const [userSections, setSections] = useState<UserSection[]>([
-    {
-      title: "Dashboard",
-      extended: true,
-      items: [
-        {
-          title: "Dashboard",
-          type: "Dashboard",
-          id: "Dashboard0",
-          icon: Dashboard,
-          path: "/",
-        },
-        {
-          title: "Job Monitor",
-          type: "Job Monitor",
-          id: "JobMonitor0",
-          icon: Monitor,
-          path: "/jobmonitor",
-        },
-      ],
-    },
-    {
-      title: "Other",
-      extended: false,
-      items: [
-        {
-          title: "File Catalog",
-          type: "File Catalog",
-          id: "FileCatatlog0",
-          icon: FolderCopy,
-          path: "/filecatalog",
-        },
-      ],
-    },
-  ]);
+  const [userSections, setSections] = useState<UserSection[]>([]);
+
   const { getParam, setParam } = useSearchParamsUtils();
 
   useEffect(() => {
     // get user sections from searchParams
     const sectionsParams = getParam("sections");
     if (sectionsParams) {
-      const newSections = JSON.parse(JSONCrush.uncrush(sectionsParams)).map(
-        (section: { items: any[] }) => {
-          section.items = section.items.map((item: any) => {
-            return {
-              ...item,
-              //get icon from ApplicationList
-              icon: applicationList.find((app) => app.name === item.type)?.icon,
-            };
-          });
-          return section;
+      const uncrushed = JSONCrush.uncrush(sectionsParams);
+      try {
+        const newSections = JSON.parse(uncrushed).map(
+          (section: { items: any[] }) => {
+            section.items = section.items.map((item: any) => {
+              return {
+                ...item,
+                //get icon from ApplicationList
+                icon: applicationList.find((app) => app.name === item.type)
+                  ?.icon,
+              };
+            });
+            return section;
+          },
+        );
+        setSections(newSections);
+      } catch (e) {
+        console.error("Error parsing user sections : ", uncrushed, e);
+      }
+    } else {
+      setSections([
+        {
+          title: "Dashboard",
+          extended: true,
+          items: [
+            {
+              title: "Dashboard",
+              type: "Dashboard",
+              id: "Dashboard0",
+              icon: Dashboard,
+              path: "/",
+            },
+            {
+              title: "Job Monitor",
+              type: "Job Monitor",
+              id: "JobMonitor0",
+              icon: Monitor,
+              path: "/jobmonitor",
+            },
+          ],
         },
-      );
-      setSections(newSections);
+        {
+          title: "Other",
+          extended: false,
+          items: [
+            {
+              title: "File Catalog",
+              type: "File Catalog",
+              id: "FileCatatlog0",
+              icon: FolderCopy,
+              path: "/filecatalog",
+            },
+          ],
+        },
+      ]);
     }
   }, [getParam]);
 

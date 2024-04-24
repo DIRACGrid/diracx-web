@@ -31,6 +31,7 @@ import { FilterToolbar } from "./FilterToolbar";
 import { Filter } from "@/types/Filter";
 import { Column } from "@/types/Column";
 import { useSearchParamsUtils } from "@/hooks/searchParamsUtils";
+import { ApplicationsContext } from "@/contexts/ApplicationsProvider";
 
 /**
  * Descending comparator function
@@ -344,41 +345,27 @@ export function DataTable(props: DataTableProps) {
     id: number | null;
   }>({ mouseX: null, mouseY: null, id: null });
   // NextJS router and params
-  const router = useRouter();
-  const pathname = usePathname();
   const searchParams = useSearchParams();
-  const { getParam, setParam, removeParam } = useSearchParamsUtils();
-
-  // Manage URL search params
-  const createQueryString = React.useCallback(
-    (filters: Filter[]) => {
-      const params = new URLSearchParams(searchParams.toString());
-      // Clear existing filters
-      params.delete("filter");
-
-      // Append new filters
-      filters.forEach((filter) => {
-        params.append(
-          "filter",
-          `${filter.id}_${filter.column}_${filter.operator}_${filter.value}`,
-        );
-      });
-
-      return params.toString();
-    },
-    [searchParams],
-  );
+  const { setParam } = useSearchParamsUtils();
 
   const updateFiltersAndUrl = React.useCallback(
     (newFilters: Filter[]) => {
-      // Generate the new query string with all filters
-      const queryString = createQueryString(newFilters);
-
-      // Push new URL to history without reloading the page
-      // router.push(pathname + "?" + queryString);
-      setParam("filter", queryString);
+      // Update the filters in the URL using the setParam function
+      setParam(
+        "filter",
+        newFilters.map(
+          (filter) =>
+            `${filter.id}_${filter.column}_${filter.operator}_${filter.value}`,
+        ),
+      );
     },
-    [createQueryString, setParam],
+    [setParam],
+  );
+
+  const [sections, setSections] = React.useContext(ApplicationsContext);
+  const updateSectionFilters = React.useCallback(
+    /* TODO */ (newFilters: Filter[]) => {},
+    [],
   );
 
   // Handle the application of filters
@@ -393,6 +380,8 @@ export function DataTable(props: DataTableProps) {
 
     // Update the filters in the URL
     updateFiltersAndUrl(filters);
+    // Update the filters in the sections
+    updateSectionFilters(filters);
   };
 
   React.useEffect(() => {
