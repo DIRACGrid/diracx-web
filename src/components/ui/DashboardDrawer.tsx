@@ -205,14 +205,14 @@ export default function DashboardDrawer(props: DashboardDrawerProps) {
     icon: ComponentType,
   ) => {
     let group = userSections[userSections.length - 1];
-    if (!group) {
+    const empty = !group;
+    if (empty) {
       //create a new group if there is no group
       group = {
         title: `Group ${userSections.length + 1}`,
         extended: false,
         items: [],
       };
-      setSections([group]);
     }
 
     let title = `${appType} ${userSections.reduce(
@@ -235,6 +235,13 @@ export default function DashboardDrawer(props: DashboardDrawerProps) {
       path: path,
     };
     group.items.push(newApp);
+    if (empty) {
+      setSections([...userSections, group]);
+    } else {
+      setSections(
+        userSections.map((g) => (g.title === group.title ? group : g)),
+      );
+    }
   };
 
   let isContextStateStable = true;
