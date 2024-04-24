@@ -1,5 +1,6 @@
 import { Dashboard, FolderCopy, Monitor } from "@mui/icons-material";
 import React, { createContext, useEffect, useState } from "react";
+import JSONCrush from "jsoncrush";
 import { useSearchParamsUtils } from "@/hooks/searchParamsUtils";
 import { applicationList } from "@/components/applications/ApplicationList";
 import { UserSection } from "@/types/UserSection";
@@ -54,7 +55,7 @@ const ApplicationsProvider: React.FC<{ children: React.ReactNode }> = ({
     // get user sections from searchParams
     const sectionsParams = getParam("sections");
     if (sectionsParams) {
-      const newSections = JSON.parse(sectionsParams).map(
+      const newSections = JSON.parse(JSONCrush.uncrush(sectionsParams)).map(
         (section: { items: any[] }) => {
           section.items = section.items.map((item: any) => {
             return {
@@ -83,8 +84,7 @@ const ApplicationsProvider: React.FC<{ children: React.ReactNode }> = ({
         }),
       };
     });
-    setParam("sections", JSON.stringify(newSections));
-    console.log(JSON.stringify(newSections));
+    setParam("sections", JSONCrush.crush(JSON.stringify(newSections)));
   }, [setParam, userSections]);
 
   return (
