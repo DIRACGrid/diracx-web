@@ -7,6 +7,6 @@ export type UserSection = {
     type: string;
     id: string;
     icon: React.ComponentType;
-    path: string;
+    data?: any;
   }[];
 };

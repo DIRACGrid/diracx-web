@@ -1,9 +1,11 @@
 import { Dashboard, FolderCopy, Monitor } from "@mui/icons-material";
 import React, { createContext, useEffect, useState } from "react";
 import JSONCrush from "jsoncrush";
+import { useOidc } from "@axa-fr/react-oidc";
 import { useSearchParamsUtils } from "@/hooks/searchParamsUtils";
 import { applicationList } from "@/components/applications/ApplicationList";
 import { UserSection } from "@/types/UserSection";
+import { useOIDCContext } from "@/hooks/oidcConfiguration";
 
 // Create a context for the userSections state
 export const ApplicationsContext = createContext<
@@ -17,6 +19,9 @@ const ApplicationsProvider: React.FC<{ children: React.ReactNode }> = ({
   const [userSections, setSections] = useState<UserSection[]>([]);
 
   const { getParam, setParam } = useSearchParamsUtils();
+
+  const { configuration } = useOIDCContext();
+  const { isAuthenticated } = useOidc(configuration?.scope);
 
   useEffect(() => {
     // get user sections from searchParams
@@ -52,14 +57,12 @@ const ApplicationsProvider: React.FC<{ children: React.ReactNode }> = ({
               type: "Dashboard",
               id: "Dashboard0",
               icon: Dashboard,
-              path: "/",
             },
             {
               title: "Job Monitor",
               type: "Job Monitor",
               id: "JobMonitor0",
               icon: Monitor,
-              path: "/jobmonitor",
             },
           ],
         },
@@ -72,7 +75,6 @@ const ApplicationsProvider: React.FC<{ children: React.ReactNode }> = ({
               type: "File Catalog",
               id: "FileCatatlog0",
               icon: FolderCopy,
-              path: "/filecatalog",
             },
           ],
         },
@@ -81,6 +83,9 @@ const ApplicationsProvider: React.FC<{ children: React.ReactNode }> = ({
   }, [getParam]);
 
   useEffect(() => {
+    if (!isAuthenticated) {
+      return;
+    }
     // save user sections to searchParams (but not icons)
     const newSections = userSections.map((section) => {
       return {
@@ -94,7 +99,7 @@ const ApplicationsProvider: React.FC<{ children: React.ReactNode }> = ({
       };
     });
     setParam("sections", JSONCrush.crush(JSON.stringify(newSections)));
-  }, [setParam, userSections]);
+  }, [isAuthenticated, setParam, userSections]);
 
   return (
     <ApplicationsContext.Provider value={[userSections, setSections]}>

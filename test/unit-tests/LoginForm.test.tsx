@@ -73,11 +73,19 @@ jest.mock("@axa-fr/react-oidc", () => ({
   }),
 }));
 
-jest.mock("next/navigation", () => ({
-  useRouter: () => ({
-    push: jest.fn(),
-  }),
-}));
+const params = new URLSearchParams();
+
+jest.mock("next/navigation", () => {
+  return {
+    usePathname: () => ({
+      pathname: "",
+    }),
+    useRouter: () => ({
+      push: jest.fn(),
+    }),
+    useSearchParams: () => params,
+  };
+});
 
 describe("LoginForm", () => {
   // Should render a text field to select the VO

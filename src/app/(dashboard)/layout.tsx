@@ -6,6 +6,7 @@ import { ThemeProvider as MUIThemeProvider } from "@mui/material/styles";
 import { useMUITheme } from "@/hooks/theme";
 import Dashboard from "@/components/layout/Dashboard";
 import ApplicationsProvider from "@/contexts/ApplicationsProvider";
+import { OIDCSecure } from "@/components/layout/OIDCSecure";
 
 export default function JobMonitorLayout({
   children,
@@ -17,19 +18,21 @@ export default function JobMonitorLayout({
   return (
     <section>
       <ApplicationsProvider>
-        <Dashboard>
-          <MUIThemeProvider theme={theme}>
-            <CssBaseline />
-            <Box
-              sx={{
-                ml: "5%",
-                mr: "5%",
-              }}
-            >
-              {children}
-            </Box>
-          </MUIThemeProvider>
-        </Dashboard>
+        <OIDCSecure>
+          <Dashboard>
+            <MUIThemeProvider theme={theme}>
+              <CssBaseline />
+              <Box
+                sx={{
+                  ml: "5%",
+                  mr: "5%",
+                }}
+              >
+                {children}
+              </Box>
+            </MUIThemeProvider>
+          </Dashboard>
+        </OIDCSecure>
       </ApplicationsProvider>
     </section>
   );

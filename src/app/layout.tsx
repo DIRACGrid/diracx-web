@@ -1,8 +1,6 @@
 import { Inter } from "next/font/google";
 import { OIDCConfigurationProvider } from "@/contexts/OIDCConfigurationProvider";
 import { ThemeProvider } from "@/contexts/ThemeProvider";
-import Dashboard from "@/components/layout/Dashboard";
-import { OIDCSecure } from "@/components/layout/OIDCSecure";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -24,9 +22,7 @@ export default function RootLayout({
     <html lang="en">
       <body className={inter.className}>
         <OIDCConfigurationProvider>
-          <ThemeProvider>
-            <OIDCSecure>{children}</OIDCSecure>
-          </ThemeProvider>
+          <ThemeProvider>{children}</ThemeProvider>
         </OIDCConfigurationProvider>
       </body>
     </html>

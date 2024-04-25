@@ -20,6 +20,8 @@ import { useOIDCContext } from "@/hooks/oidcConfiguration";
 import { useMUITheme } from "@/hooks/theme";
 import { useMetadata, Metadata } from "@/hooks/metadata";
 
+import { useSearchParamsUtils } from "@/hooks/searchParamsUtils";
+
 /**
  * Login form
  * @returns a form
@@ -33,6 +35,8 @@ export function LoginForm() {
   const { configuration, setConfiguration } = useOIDCContext();
   const { isAuthenticated, login } = useOidc(configuration?.scope);
 
+  const { getParam } = useSearchParamsUtils();
+
   // Login if not authenticated
   useEffect(() => {
     if (configuration && configuration.scope && isAuthenticated === false) {
@@ -44,9 +48,14 @@ export function LoginForm() {
   useEffect(() => {
     // Redirect to dashboard if already authenticated
     if (isAuthenticated) {
-      router.push("/");
+      const redirect = getParam("redirect");
+      if (redirect) {
+        router.push(redirect);
+      } else {
+        router.push("/");
+      }
     }
-  }, [isAuthenticated, router]);
+  }, [getParam, isAuthenticated, router]);
 
   // Get default group
   const getDefaultGroup = (data: Metadata | undefined, vo: string): string => {

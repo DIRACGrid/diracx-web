@@ -26,7 +26,7 @@ import {
   Stack,
 } from "@mui/material";
 import { deepOrange } from "@mui/material/colors";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { FilterToolbar } from "./FilterToolbar";
 import { Filter } from "@/types/Filter";
 import { Column } from "@/types/Column";
@@ -346,7 +346,8 @@ export function DataTable(props: DataTableProps) {
   }>({ mouseX: null, mouseY: null, id: null });
   // NextJS router and params
   const searchParams = useSearchParams();
-  const { setParam } = useSearchParamsUtils();
+  const { getParam, setParam } = useSearchParamsUtils();
+  const appId = getParam("appId");
 
   const updateFiltersAndUrl = React.useCallback(
     (newFilters: Filter[]) => {
@@ -364,8 +365,28 @@ export function DataTable(props: DataTableProps) {
 
   const [sections, setSections] = React.useContext(ApplicationsContext);
   const updateSectionFilters = React.useCallback(
-    /* TODO */ (newFilters: Filter[]) => {},
-    [],
+    (newFilters: Filter[]) => {
+      const appId = getParam("appId");
+
+      const section = sections.find((section) =>
+        section.items.some((item) => item.id === appId),
+      );
+      if (section) {
+        const newSection = {
+          ...section,
+          items: section.items.map((item) => {
+            if (item.id === appId) {
+              return { ...item, data: { filters: newFilters } };
+            }
+            return item;
+          }),
+        };
+        setSections((sections) =>
+          sections.map((s) => (s.title === section.title ? newSection : s)),
+        );
+      }
+    },
+    [getParam, sections, setSections],
   );
 
   // Handle the application of filters
@@ -394,6 +415,10 @@ export function DataTable(props: DataTableProps) {
       });
     };
 
+    const item = sections
+      .find((section) => section.items.some((item) => item.id === appId))
+      ?.items.find((item) => item.id === appId);
+
     if (searchParams.has("filter")) {
       // Parse the filters when the component mounts or when the searchParams change
       const initialFilters = parseFiltersFromUrl();
@@ -406,8 +431,26 @@ export function DataTable(props: DataTableProps) {
         value: filter.value,
       }));
       setSearchBody({ search: jsonFilters });
+    } else if (item?.data?.filters) {
+      setFilters(item.data.filters);
+      const jsonFilters = item.data.filters.map(
+        (filter: {
+          id: number;
+          column: string;
+          operator: string;
+          value: string;
+        }) => ({
+          parameter: filter.column,
+          operator: filter.operator,
+          value: filter.value,
+        }),
+      );
+      setSearchBody({ search: jsonFilters });
+    } else {
+      setFilters([]);
+      setSearchBody({ search: [] });
     }
-  }, [searchParams, setFilters, setSearchBody]);
+  }, [appId, searchParams, sections, setFilters, setSearchBody]);
 
   // Manage sorting
   const handleRequestSort = (

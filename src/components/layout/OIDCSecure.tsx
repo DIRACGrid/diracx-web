@@ -21,7 +21,10 @@ export function OIDCSecure({ children }: OIDCProps) {
   useEffect(() => {
     // Redirect to login page if not authenticated
     if (!isAuthenticated) {
-      router.push("/auth");
+      router.push(
+        "/auth?" +
+          new URLSearchParams({ redirect: window.location.href }).toString(),
+      );
     }
   }, [isAuthenticated, router]);
 

@@ -21,22 +21,23 @@ import {
 } from "@atlaskit/pragmatic-drag-and-drop-hitbox/closest-edge";
 import { setCustomNativeDragPreview } from "@atlaskit/pragmatic-drag-and-drop/element/set-custom-native-drag-preview";
 import { ThemeProvider as MUIThemeProvider } from "@mui/material/styles";
-import { preserveOffsetOnSource } from "@atlaskit/pragmatic-drag-and-drop/element/preserve-offset-on-source";
 import { ThemeProvider } from "@/contexts/ThemeProvider";
 import { useMUITheme } from "@/hooks/theme";
+import { useSearchParamsUtils } from "@/hooks/searchParamsUtils";
 
 export default function DrawerItem({
-  item: { title, icon, path },
+  item: { title, id, icon },
   index,
   groupTitle,
 }: {
-  item: { title: string; icon: React.ComponentType; path: string };
+  item: { title: string; id: string; icon: React.ComponentType };
   index: number;
   groupTitle: string;
 }) {
   const dragRef = React.useRef(null);
   const handleRef = React.useRef(null);
   const theme = useMUITheme();
+  const { setParam } = useSearchParamsUtils();
 
   const [closestEdge, setClosestEdge]: any = useState<Edge | null>(null);
 
@@ -63,11 +64,7 @@ export default function DrawerItem({
                         width: source.element.getBoundingClientRect().width,
                       }}
                     >
-                      <DrawerItem
-                        item={{ title, icon, path }}
-                        index={index}
-                        groupTitle={groupTitle}
-                      />
+                      <ItemPreview title={title} icon={icon} />
                     </div>
                   </MUIThemeProvider>
                 </ThemeProvider>,
@@ -125,15 +122,14 @@ export default function DrawerItem({
         },
       }),
     );
-  }, [index, groupTitle, icon, path, theme, title]);
+  }, [index, groupTitle, icon, theme, title, id]);
 
   return (
     <>
       <ListItemButton
         disableGutters
         key={title}
-        component={Link}
-        href={path}
+        onClick={() => setParam("appId", id)}
         sx={{ pl: 2, borderRadius: 2, pr: 1 }}
         ref={dragRef}
       >
@@ -151,5 +147,34 @@ export default function DrawerItem({
         {closestEdge && <DropIndicator edge={closestEdge} />}
       </ListItemButton>
     </>
+  );
+}
+
+function ItemPreview({
+  title,
+  icon,
+}: {
+  title: string;
+  icon: React.ComponentType;
+}) {
+  return (
+    <ListItemButton
+      disableGutters
+      key={title}
+      sx={{
+        pl: 2,
+        borderRadius: 2,
+        pr: 1,
+        backgroundColor: "rgba(100, 100, 100, 0.2)",
+      }}
+    >
+      <ListItemIcon>
+        <Icon component={icon} />
+      </ListItemIcon>
+      <ListItemText primary={title} />
+      <ListItemIcon sx={{ minWidth: "24px" }}>
+        <Icon component={DragIndicatorIcon} sx={{ cursor: "grab" }} />
+      </ListItemIcon>
+    </ListItemButton>
   );
 }

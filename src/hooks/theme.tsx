@@ -37,6 +37,29 @@ export const useMUITheme = () => {
   });
 
   muiTheme.components = {
+    MuiCssBaseline: {
+      styleOverrides: `
+      ::-webkit-scrollbar {
+        width: 10px;
+        border-radius: 5px;
+      }
+      ::-webkit-scrollbar-track {
+        background: ${theme === "dark" ? "#333" : "#f1f1f1"};
+      }
+      ::-webkit-scrollbar-thumb {
+        background: ${theme === "dark" ? "#888" : "#ccc"};
+        border-radius: 5px;
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: ${theme === "dark" ? "#555" : "#999"};
+      }
+      @supports not selector(::-webkit-scrollbar) {
+        html {
+          scrollbar-color: ${theme === "dark" ? "#888 #333" : "#ccc #f1f1f1"};
+        }
+      }
+    `,
+    },
     MuiButton: {
       styleOverrides: {
         contained: {

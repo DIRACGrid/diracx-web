@@ -10,6 +10,12 @@ jest.mock("@axa-fr/react-oidc", () => ({
   useOidc: jest.fn(),
 }));
 
+// In your test file or a Jest setup file
+jest.mock("jsoncrush", () => ({
+  crush: jest.fn().mockImplementation((data) => `crushed-${data}`),
+  uncrush: jest.fn().mockImplementation((data) => data.replace("crushed-", "")),
+}));
+
 describe("<Dashboard>", () => {
   beforeEach(() => {
     // Mock the return value for each test

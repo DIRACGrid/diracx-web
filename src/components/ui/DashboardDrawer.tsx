@@ -199,11 +199,7 @@ export default function DashboardDrawer(props: DashboardDrawerProps) {
    * @param path - The path of the app.
    * @param icon - The icon component for the app.
    */
-  const handleAppCreation = (
-    appType: string,
-    path: string,
-    icon: ComponentType,
-  ) => {
+  const handleAppCreation = (appType: string, icon: ComponentType) => {
     let group = userSections[userSections.length - 1];
     const empty = !group;
     if (empty) {
@@ -217,7 +213,7 @@ export default function DashboardDrawer(props: DashboardDrawerProps) {
 
     let title = `${appType} ${userSections.reduce(
       (sum, group) =>
-        sum + group.items.filter((item) => item.icon === icon).length,
+        sum + group.items.filter((item) => item.type === appType).length,
       1,
     )}`;
     while (group.items.some((item) => item.title === title)) {
@@ -232,7 +228,6 @@ export default function DashboardDrawer(props: DashboardDrawerProps) {
       )}`,
       type: appType,
       icon: icon,
-      path: path,
     };
     group.items.push(newApp);
     if (empty) {

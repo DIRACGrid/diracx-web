@@ -27,7 +27,7 @@ export default function AppDialog({
 }: {
   appDialogOpen: boolean;
   setAppDialogOpen: React.Dispatch<React.SetStateAction<boolean>>;
-  handleCreateApp: (name: string, path: string, icon: ComponentType) => void;
+  handleCreateApp: (name: string, icon: ComponentType) => void;
 }) {
   const [appType, setAppType] = React.useState("");
   return (
@@ -40,12 +40,6 @@ export default function AppDialog({
         onSubmit: (event: React.FormEvent<HTMLFormElement>) => {
           event.preventDefault();
 
-          const path = applicationList.find((app) => app.name === appType)
-            ?.path;
-          if (!path) {
-            console.error("Path not found for application type", appType);
-            return;
-          }
           const icon = applicationList.find((app) => app.name === appType)
             ?.icon;
           if (!icon) {
@@ -53,7 +47,7 @@ export default function AppDialog({
             return;
           }
 
-          handleCreateApp(appType, path, icon as React.ComponentType<any>);
+          handleCreateApp(appType, icon as React.ComponentType<any>);
 
           setAppDialogOpen(false);
         },

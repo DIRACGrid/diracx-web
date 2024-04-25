@@ -24,7 +24,6 @@ export default function DrawerItemGroup({
       title: string;
       id: string;
       icon: React.ComponentType;
-      path: string;
     }[];
   };
   setSections: React.Dispatch<React.SetStateAction<UserSection[]>>;
@@ -81,10 +80,10 @@ export default function DrawerItemGroup({
       </AccordionSummary>
       {/* Accordion details */}
       <AccordionDetails>
-        {items.map(({ title, id, icon, path }, index) => (
+        {items.map(({ title, id, icon }, index) => (
           <div onContextMenu={handleContextMenu("item", id)} key={id}>
             <DrawerItem
-              item={{ title, icon, path }}
+              item={{ title, id, icon }}
               index={index}
               groupTitle={groupTitle}
             />
