@@ -2,7 +2,10 @@ import React from "react";
 import { render, fireEvent } from "@testing-library/react";
 import { useOidc, useOidcAccessToken } from "@axa-fr/react-oidc";
 import Dashboard from "@/components/layout/Dashboard";
+import DashboardDrawer from "@/components/ui/DashboardDrawer";
 import { ThemeProvider } from "@/contexts/ThemeProvider";
+import { ApplicationsContext } from "@/contexts/ApplicationsProvider";
+import { UserSection } from "@/types/UserSection";
 
 // Mock the module
 jest.mock("@axa-fr/react-oidc", () => ({
@@ -10,11 +13,56 @@ jest.mock("@axa-fr/react-oidc", () => ({
   useOidc: jest.fn(),
 }));
 
-// In your test file or a Jest setup file
 jest.mock("jsoncrush", () => ({
   crush: jest.fn().mockImplementation((data) => `crushed-${data}`),
   uncrush: jest.fn().mockImplementation((data) => data.replace("crushed-", "")),
 }));
+
+let mockSections: UserSection[] = [
+  {
+    title: "Group 1",
+    extended: true,
+    items: [
+      {
+        title: "App 1",
+        id: "app1",
+        type: "Dashboard",
+        icon: () => <div>App 1 Icon</div>,
+      },
+    ],
+  },
+];
+
+const params = new URLSearchParams();
+
+jest.mock("next/navigation", () => {
+  return {
+    usePathname: () => ({
+      pathname: "",
+    }),
+    useRouter: () => ({
+      push: jest.fn(),
+    }),
+    useSearchParams: () => params,
+  };
+});
+
+const MockThemeProvider: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}): JSX.Element => (
+  <ThemeProvider>
+    <ApplicationsContext.Provider
+      value={[
+        mockSections,
+        jest.fn((test) => {
+          mockSections = test();
+        }),
+      ]}
+    >
+      {children}
+    </ApplicationsContext.Provider>
+  </ThemeProvider>
+);
 
 describe("<Dashboard>", () => {
   beforeEach(() => {
@@ -72,5 +120,29 @@ describe("<Dashboard>", () => {
 
     // Expect the drawer to now be visible
     expect(getByTestId("drawer-temporary")).toBeVisible();
+  });
+});
+
+describe("<DashboardDrawer>", () => {
+  it("renders correctly", () => {
+    const { getByText } = render(
+      <MockThemeProvider>
+        <DashboardDrawer variant="permanent" />
+      </MockThemeProvider>,
+    );
+
+    expect(getByText("App 1 Icon")).toBeInTheDocument();
+  });
+
+  it("handles context menu", () => {
+    const { getByText, getByTestId } = render(
+      <MockThemeProvider>
+        <DashboardDrawer variant="permanent" />
+      </MockThemeProvider>,
+    );
+
+    fireEvent.contextMenu(getByText("App 1"));
+
+    expect(getByTestId("context-menu")).toBeInTheDocument();
   });
 });

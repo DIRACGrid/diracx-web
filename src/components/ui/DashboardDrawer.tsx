@@ -412,6 +412,7 @@ export default function DashboardDrawer(props: DashboardDrawerProps) {
               ? { top: contextMenu.mouseY, left: contextMenu.mouseX }
               : undefined
           }
+          data-testid="context-menu"
         >
           {contextState.type && (
             <MenuItem onClick={handleRenameClick}>Rename</MenuItem>
