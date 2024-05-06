@@ -23,6 +23,7 @@ export function OIDCSecure({ children }: OIDCProps) {
     if (!isAuthenticated) {
       router.push(
         "/auth?" +
+          // URLSearchParams to ensure that auth redirects users to the URL they came from
           new URLSearchParams({ redirect: window.location.href }).toString(),
       );
     }

@@ -8,37 +8,38 @@ import { UserSection } from "@/types/UserSection";
 /**
  * Represents a group of items in a drawer.
  *
- * @param group - The group object containing the title, expanded state, and items.
- * @param setSections - The function to update the sections state.
- * @returns The JSX element representing the drawer item group.
+ * @component
+ * @param {Object} props - The component props.
+ * @param {Object} props.group - The group object containing the title, expanded state, and items.
+ * @param {string} props.group.title - The title of the group.
+ * @param {boolean} props.group.extended - The expanded state of the group.
+ * @param {Array} props.group.items - The array of items in the group.
+ * @param {Function} props.setSections - The function to set the sections state.
+ * @param {Function} props.handleContextMenu - The function to handle the context menu.
+ * @returns {JSX.Element} The rendered DrawerItemGroup component.
  */
 export default function DrawerItemGroup({
   group: { title, extended: expanded, items },
   setSections,
   handleContextMenu,
 }: {
-  group: {
-    title: string;
-    extended: boolean;
-    items: {
-      title: string;
-      id: string;
-      icon: React.ComponentType;
-    }[];
-  };
+  group: UserSection;
   setSections: React.Dispatch<React.SetStateAction<UserSection[]>>;
   handleContextMenu: (
     type: "group" | "item" | null,
     id: string | null,
   ) => (event: React.MouseEvent<HTMLElement>) => void;
 }) {
+  // Ref to use for the drag and drop target
   const dropRef = React.useRef(null);
+  // State to track whether the user is hovering over the item during a drag operation
   const [hovered, setHovered] = React.useState(false);
 
   useEffect(() => {
     if (!dropRef.current) return;
     const dropItem = dropRef.current;
 
+    // Makes the element a valid drop target, sets up the data transfer and manage the hovered state
     return dropTargetForElements({
       element: dropItem,
       getData: () => ({ title }),
@@ -52,6 +53,7 @@ export default function DrawerItemGroup({
     });
   });
 
+  // Handles expansion of the accordion group
   const handleChange = (title: string) => (event: any, isExpanded: any) => {
     // Set the extended state of the accordion group.
     setSections((sections) =>
@@ -62,7 +64,6 @@ export default function DrawerItemGroup({
       ),
     );
   };
-  const groupTitle = title;
   return (
     <Accordion
       sx={{
@@ -80,12 +81,12 @@ export default function DrawerItemGroup({
       </AccordionSummary>
       {/* Accordion details */}
       <AccordionDetails>
-        {items.map(({ title, id, icon }, index) => (
+        {items.map(({ title: itemTitle, id, icon }, index) => (
           <div onContextMenu={handleContextMenu("item", id)} key={id}>
             <DrawerItem
-              item={{ title, id, icon }}
+              item={{ title: itemTitle, id, icon }}
               index={index}
-              groupTitle={groupTitle}
+              groupTitle={title}
             />
           </div>
         ))}

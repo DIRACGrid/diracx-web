@@ -47,21 +47,19 @@ jest.mock("next/navigation", () => {
   };
 });
 
-const MockThemeProvider: React.FC<{ children: React.ReactNode }> = ({
+const MockApplicationProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }): JSX.Element => (
-  <ThemeProvider>
-    <ApplicationsContext.Provider
-      value={[
-        mockSections,
-        jest.fn((test) => {
-          mockSections = test();
-        }),
-      ]}
-    >
-      {children}
-    </ApplicationsContext.Provider>
-  </ThemeProvider>
+  <ApplicationsContext.Provider
+    value={[
+      mockSections,
+      jest.fn((test) => {
+        mockSections = test();
+      }),
+    ]}
+  >
+    {children}
+  </ApplicationsContext.Provider>
 );
 
 describe("<Dashboard>", () => {
@@ -126,9 +124,11 @@ describe("<Dashboard>", () => {
 describe("<DashboardDrawer>", () => {
   it("renders correctly", () => {
     const { getByText } = render(
-      <MockThemeProvider>
-        <DashboardDrawer variant="permanent" />
-      </MockThemeProvider>,
+      <ThemeProvider>
+        <MockApplicationProvider>
+          <DashboardDrawer variant="permanent" />
+        </MockApplicationProvider>
+      </ThemeProvider>,
     );
 
     expect(getByText("App 1 Icon")).toBeInTheDocument();
@@ -136,9 +136,11 @@ describe("<DashboardDrawer>", () => {
 
   it("handles context menu", () => {
     const { getByText, getByTestId } = render(
-      <MockThemeProvider>
-        <DashboardDrawer variant="permanent" />
-      </MockThemeProvider>,
+      <ThemeProvider>
+        <MockApplicationProvider>
+          <DashboardDrawer variant="permanent" />
+        </MockApplicationProvider>
+      </ThemeProvider>,
     );
 
     fireEvent.contextMenu(getByText("App 1"));

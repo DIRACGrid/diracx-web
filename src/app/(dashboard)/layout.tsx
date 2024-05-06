@@ -8,7 +8,7 @@ import Dashboard from "@/components/layout/Dashboard";
 import ApplicationsProvider from "@/contexts/ApplicationsProvider";
 import { OIDCSecure } from "@/components/layout/OIDCSecure";
 
-export default function JobMonitorLayout({
+export default function DashboardLayout({
   children,
 }: {
   children: React.ReactNode;

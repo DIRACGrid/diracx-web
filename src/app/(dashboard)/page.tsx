@@ -10,12 +10,16 @@ export default function Page() {
   const appId = searchParams.get("appId");
   const [sections] = React.useContext(ApplicationsContext);
 
-  const appType = sections
-    .find((section) => section.items.some((item) => item.id === appId))
-    ?.items.find((item) => item.id === appId)?.type;
+  const appType = React.useMemo(() => {
+    const section = sections.find((section) =>
+      section.items.some((item) => item.id === appId),
+    );
+    return section?.items.find((item) => item.id === appId)?.type;
+  }, [sections, appId]);
 
-  const Component = applicationList.find((app) => app.name === appType)
-    ?.component;
+  const Component = React.useMemo(() => {
+    return applicationList.find((app) => app.name === appType)?.component;
+  }, [appType]);
 
   return Component ? <Component /> : <UserDashboard />;
 }

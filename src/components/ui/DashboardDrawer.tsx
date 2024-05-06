@@ -1,4 +1,3 @@
-import { usePathname } from "next/navigation";
 import {
   Box,
   Button,
@@ -25,10 +24,11 @@ import React, {
 } from "react";
 import { monitorForElements } from "@atlaskit/pragmatic-drag-and-drop/element/adapter";
 import { extractClosestEdge } from "@atlaskit/pragmatic-drag-and-drop-hitbox/closest-edge";
+import Image from "next/image";
 import DrawerItemGroup from "./DrawerItemGroup";
-import { DiracLogo } from "./DiracLogo";
 import AppDialog from "./ApplicationDialog";
 import { ApplicationsContext } from "@/contexts/ApplicationsProvider";
+import { useMUITheme } from "@/hooks/theme";
 
 interface DashboardDrawerProps {
   variant: "permanent" | "temporary";
@@ -45,15 +45,12 @@ interface DashboardDrawerProps {
  * @returns {JSX.Element} The rendered DashboardDrawer component.
  */
 export default function DashboardDrawer(props: DashboardDrawerProps) {
-  // Get the current URL
-  const pathname = usePathname();
   // Determine the container for the Drawer based on whether the window object exists.
   const container =
     window !== undefined ? () => window.document.body : undefined;
   // Check if the drawer is in "temporary" mode.
   const isTemporary = props.variant === "temporary";
-
-  // Wether the modal for Application Creation is open
+  // Whether the modal for Application Creation is open
   const [appDialogOpen, setAppDialogOpen] = useState(false);
 
   const [contextMenu, setContextMenu] = React.useState<{
@@ -73,7 +70,10 @@ export default function DashboardDrawer(props: DashboardDrawerProps) {
   // Each section has an associated icon and path.
   const [userSections, setSections] = useContext(ApplicationsContext);
 
+  const theme = useMUITheme();
+
   useEffect(() => {
+    // Handle changes to sections when drag and drop occurs.
     return monitorForElements({
       onDrop({ source, location }) {
         const target = location.current.dropTargets[0];
@@ -84,6 +84,7 @@ export default function DashboardDrawer(props: DashboardDrawerProps) {
         const targetData = target.data;
 
         if (location.current.dropTargets.length == 2) {
+          // If the target is an item
           const groupTitle = targetData.title;
           const closestEdgeOfTarget = extractClosestEdge(targetData);
           const targetIndex = targetData.index as number;
@@ -105,6 +106,7 @@ export default function DashboardDrawer(props: DashboardDrawerProps) {
             destinationIndex,
           );
         } else {
+          // If the target is a group
           const groupTitle = targetData.title;
           const sourceGroup = userSections.find(
             (group) => group.title == sourceData.title,
@@ -140,13 +142,13 @@ export default function DashboardDrawer(props: DashboardDrawerProps) {
           destinationIndex &&
           sourceIndex < destinationIndex
         ) {
-          destinationIndex -= 1;
+          destinationIndex -= 1; // Corrects the index within the same group if needed
         }
         if (
           sourceGroup.title === destinationGroup.title &&
           (destinationIndex == null || sourceIndex === destinationIndex)
         ) {
-          return;
+          return; // Nothing to do
         }
 
         if (sourceGroup.title === destinationGroup.title) {
@@ -195,8 +197,7 @@ export default function DashboardDrawer(props: DashboardDrawerProps) {
   /**
    * Handles the creation of a new app in the dashboard drawer.
    *
-   * @param appName - The name of the app.
-   * @param path - The path of the app.
+   * @param appType - The type of the app to be created.
    * @param icon - The icon component for the app.
    */
   const handleAppCreation = (appType: string, icon: ComponentType) => {
@@ -361,8 +362,20 @@ export default function DashboardDrawer(props: DashboardDrawerProps) {
           style={{ display: "flex", flexDirection: "column", height: "100%" }}
         >
           {/* Display the logo in the toolbar section of the drawer. */}
-          <Toolbar>
-            <DiracLogo />
+          <Toolbar
+            sx={{
+              position: "sticky",
+              top: "0",
+              zIndex: 1,
+              backgroundColor: theme.palette.background.default,
+            }}
+          >
+            <Image
+              src="/DIRAC-logo.png"
+              alt="DIRAC logo"
+              width={150}
+              height={45}
+            />
           </Toolbar>
           {/* Map over user sections and render them as list items in the drawer. */}
           <List>
@@ -380,8 +393,17 @@ export default function DashboardDrawer(props: DashboardDrawerProps) {
               </ListItem>
             ))}
           </List>
-          {/* Render a link to documentation, positioned at the bottom of the drawer. */}
-          <List sx={{ mt: "auto" }}>
+
+          {/* Render a link to documentation and a button to add applications, positioned at the bottom of the drawer. */}
+          <List
+            sx={{
+              mt: "auto",
+              position: "sticky",
+              bottom: "0",
+              zIndex: 1,
+              backgroundColor: theme.palette.background.default,
+            }}
+          >
             <ListItem key={"Add application"}>
               <ListItemButton onClick={() => setAppDialogOpen(true)}>
                 <ListItemIcon>

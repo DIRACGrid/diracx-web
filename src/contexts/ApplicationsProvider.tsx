@@ -13,9 +13,7 @@ export const ApplicationsContext = createContext<
 >([[], () => {}]);
 
 // Create the ApplicationsProvider component
-const ApplicationsProvider: React.FC<{ children: React.ReactNode }> = ({
-  children,
-}) => {
+const ApplicationsProvider = ({ children }: { children: React.ReactNode }) => {
   const [userSections, setSections] = useState<UserSection[]>([]);
 
   const { getParam, setParam } = useSearchParamsUtils();

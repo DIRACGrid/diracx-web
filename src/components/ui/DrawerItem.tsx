@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { createRoot } from "react-dom/client";
-import Link from "next/link";
 import {
   ListItemButton,
   ListItemIcon,
@@ -25,6 +24,14 @@ import { ThemeProvider } from "@/contexts/ThemeProvider";
 import { useMUITheme } from "@/hooks/theme";
 import { useSearchParamsUtils } from "@/hooks/searchParamsUtils";
 
+/**
+ * Represents a drawer item component.
+ *
+ * @param item - The item object containing the title, id, and icon.
+ * @param index - The index of the item.
+ * @param groupTitle - The title of the group.
+ * @returns The rendered JSX for the drawer item.
+ */
 export default function DrawerItem({
   item: { title, id, icon },
   index,
@@ -34,11 +41,13 @@ export default function DrawerItem({
   index: number;
   groupTitle: string;
 }) {
+  // Ref to use for the draggable element
   const dragRef = React.useRef(null);
+  // Ref to use for the handle of the draggable element, must be a child of the draggable element
   const handleRef = React.useRef(null);
   const theme = useMUITheme();
   const { setParam } = useSearchParamsUtils();
-
+  // Represents the closest edge to the mouse cursor
   const [closestEdge, setClosestEdge]: any = useState<Edge | null>(null);
 
   useEffect(() => {
@@ -47,16 +56,21 @@ export default function DrawerItem({
     const handleItem = handleRef.current;
 
     return combine(
+      // makes the item draggable
       draggable({
         element: element,
         dragHandle: handleItem,
+        // Sets the initial data for the drag and drop interaction
         getInitialData: () => ({ index, title: groupTitle }),
+        // Sets a lightweight version of the real item as a preview
         onGenerateDragPreview: ({ nativeSetDragImage, source, location }) => {
           setCustomNativeDragPreview({
             nativeSetDragImage,
             render: ({ container }) => {
               const root = createRoot(container);
               root.render(
+                // Wraps the preview in the theme provider to ensure the correct theme is applied
+                // This is necessary because the preview is rendered outside the main app
                 <ThemeProvider>
                   <MUIThemeProvider theme={theme}>
                     <div
@@ -71,6 +85,7 @@ export default function DrawerItem({
               );
               return () => root.unmount();
             },
+            // Seamless transition between the preview and the real element
             getOffset: ({ container }) => {
               const elementPos = source.element.getBoundingClientRect();
               const x = location.current.input.pageX - elementPos.x;
@@ -80,6 +95,7 @@ export default function DrawerItem({
           });
         },
       }),
+      // Makes the item a target for dragged elements. Attach the closest edge data and highlight the destination when hovering over the item
       dropTargetForElements({
         element: element,
         getData: ({ input, element }) => {
@@ -150,6 +166,15 @@ export default function DrawerItem({
   );
 }
 
+/**
+ * Lightweight preview of an item in the drawer.
+ * Used when dragging an item to give a visual representation of it with minimal resources.
+ *
+ * @param {Object} props - The component props.
+ * @param {string} props.title - The title of the item.
+ * @param {React.ComponentType} props.icon - The icon component for the item.
+ * @returns {JSX.Element} The rendered item preview.
+ */
 function ItemPreview({
   title,
   icon,
