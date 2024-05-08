@@ -36,7 +36,35 @@ export const useMUITheme = () => {
     },
   });
 
+  const scrollbarBackground = theme === "dark" ? "#333" : "#f1f1f1";
+  const scrollbarThumbBackground = theme === "dark" ? "#888" : "#ccc";
+  const scrollbarThumbHoverBackground = theme === "dark" ? "#555" : "#999";
+  const scrollbarColor = `${scrollbarThumbBackground} ${scrollbarBackground}`;
+
   muiTheme.components = {
+    MuiCssBaseline: {
+      styleOverrides: `
+      ::-webkit-scrollbar {
+        width: 10px;
+        border-radius: 5px;
+      }
+      ::-webkit-scrollbar-track {
+        background: ${scrollbarBackground};
+      }
+      ::-webkit-scrollbar-thumb {
+        background: ${scrollbarThumbBackground};
+        border-radius: 5px;
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: ${scrollbarThumbHoverBackground};
+      }
+      @supports not selector(::-webkit-scrollbar) {
+        html {
+          scrollbar-color: ${scrollbarColor};
+        }
+      }
+    `,
+    },
     MuiButton: {
       styleOverrides: {
         contained: {

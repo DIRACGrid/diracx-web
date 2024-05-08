@@ -9,6 +9,8 @@ jest.mock("@axa-fr/react-oidc", () => ({
   useOidcAccessToken: jest.fn(),
 }));
 
+const params = new URLSearchParams();
+
 jest.mock("next/navigation", () => {
   return {
     usePathname: () => ({
@@ -17,14 +19,17 @@ jest.mock("next/navigation", () => {
     useRouter: () => ({
       push: jest.fn(),
     }),
-    useSearchParams: () => ({
-      has: () => false,
-      getAll: () => [],
-    }),
+    useSearchParams: () => params,
   };
 });
 
 jest.mock("swr", () => jest.fn());
+
+// In your test file or a Jest setup file
+jest.mock("jsoncrush", () => ({
+  crush: jest.fn().mockImplementation((data) => `crushed-${data}`),
+  uncrush: jest.fn().mockImplementation((data) => data.replace("crushed-", "")),
+}));
 
 describe("<JobDataTable />", () => {
   it("displays loading state", () => {

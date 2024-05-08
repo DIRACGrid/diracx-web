@@ -26,10 +26,12 @@ import {
   Stack,
 } from "@mui/material";
 import { deepOrange } from "@mui/material/colors";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { FilterToolbar } from "./FilterToolbar";
 import { Filter } from "@/types/Filter";
 import { Column } from "@/types/Column";
+import { useSearchParamsUtils } from "@/hooks/searchParamsUtils";
+import { ApplicationsContext } from "@/contexts/ApplicationsProvider";
 
 /**
  * Descending comparator function
@@ -343,39 +345,48 @@ export function DataTable(props: DataTableProps) {
     id: number | null;
   }>({ mouseX: null, mouseY: null, id: null });
   // NextJS router and params
-  const router = useRouter();
-  const pathname = usePathname();
   const searchParams = useSearchParams();
-
-  // Manage URL search params
-  const createQueryString = React.useCallback(
-    (filters: Filter[]) => {
-      const params = new URLSearchParams(searchParams.toString());
-      // Clear existing filters
-      params.delete("filter");
-
-      // Append new filters
-      filters.forEach((filter) => {
-        params.append(
-          "filter",
-          `${filter.id}_${filter.column}_${filter.operator}_${filter.value}`,
-        );
-      });
-
-      return params.toString();
-    },
-    [searchParams],
-  );
+  const { getParam, setParam } = useSearchParamsUtils();
+  const appId = getParam("appId");
 
   const updateFiltersAndUrl = React.useCallback(
     (newFilters: Filter[]) => {
-      // Generate the new query string with all filters
-      const queryString = createQueryString(newFilters);
-
-      // Push new URL to history without reloading the page
-      router.push(pathname + "?" + queryString);
+      // Update the filters in the URL using the setParam function
+      setParam(
+        "filter",
+        newFilters.map(
+          (filter) =>
+            `${filter.id}_${filter.column}_${filter.operator}_${filter.value}`,
+        ),
+      );
     },
-    [createQueryString, pathname, router],
+    [setParam],
+  );
+
+  const [sections, setSections] = React.useContext(ApplicationsContext);
+  const updateSectionFilters = React.useCallback(
+    (newFilters: Filter[]) => {
+      const appId = getParam("appId");
+
+      const section = sections.find((section) =>
+        section.items.some((item) => item.id === appId),
+      );
+      if (section) {
+        const newSection = {
+          ...section,
+          items: section.items.map((item) => {
+            if (item.id === appId) {
+              return { ...item, data: { filters: newFilters } };
+            }
+            return item;
+          }),
+        };
+        setSections((sections) =>
+          sections.map((s) => (s.title === section.title ? newSection : s)),
+        );
+      }
+    },
+    [getParam, sections, setSections],
   );
 
   // Handle the application of filters
@@ -390,6 +401,8 @@ export function DataTable(props: DataTableProps) {
 
     // Update the filters in the URL
     updateFiltersAndUrl(filters);
+    // Update the filters in the sections
+    updateSectionFilters(filters);
   };
 
   React.useEffect(() => {
@@ -401,6 +414,10 @@ export function DataTable(props: DataTableProps) {
         return { id: Number(id), column, operator, value };
       });
     };
+
+    const item = sections
+      .find((section) => section.items.some((item) => item.id === appId))
+      ?.items.find((item) => item.id === appId);
 
     if (searchParams.has("filter")) {
       // Parse the filters when the component mounts or when the searchParams change
@@ -414,8 +431,26 @@ export function DataTable(props: DataTableProps) {
         value: filter.value,
       }));
       setSearchBody({ search: jsonFilters });
+    } else if (item?.data?.filters) {
+      setFilters(item.data.filters);
+      const jsonFilters = item.data.filters.map(
+        (filter: {
+          id: number;
+          column: string;
+          operator: string;
+          value: string;
+        }) => ({
+          parameter: filter.column,
+          operator: filter.operator,
+          value: filter.value,
+        }),
+      );
+      setSearchBody({ search: jsonFilters });
+    } else {
+      setFilters([]);
+      setSearchBody({ search: [] });
     }
-  }, [searchParams, setFilters, setSearchBody]);
+  }, [appId, searchParams, sections, setFilters, setSearchBody]);
 
   // Manage sorting
   const handleRequestSort = (
