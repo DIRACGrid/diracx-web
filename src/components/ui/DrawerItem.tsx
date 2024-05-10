@@ -23,6 +23,7 @@ import { ThemeProvider as MUIThemeProvider } from "@mui/material/styles";
 import { ThemeProvider } from "@/contexts/ThemeProvider";
 import { useMUITheme } from "@/hooks/theme";
 import { useSearchParamsUtils } from "@/hooks/searchParamsUtils";
+import { useApplicationId } from "@/hooks/application";
 
 /**
  * Represents a drawer item component.
@@ -49,6 +50,8 @@ export default function DrawerItem({
   const { setParam } = useSearchParamsUtils();
   // Represents the closest edge to the mouse cursor
   const [closestEdge, setClosestEdge]: any = useState<Edge | null>(null);
+
+  const appId = useApplicationId();
 
   useEffect(() => {
     if (!dragRef.current || !handleRef.current) return;
@@ -148,6 +151,7 @@ export default function DrawerItem({
         onClick={() => setParam("appId", id)}
         sx={{ pl: 2, borderRadius: 2, pr: 1 }}
         ref={dragRef}
+        selected={appId === id}
       >
         <ListItemIcon>
           <Icon component={icon} />
