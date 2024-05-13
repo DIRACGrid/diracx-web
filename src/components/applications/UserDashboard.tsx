@@ -1,12 +1,8 @@
 "use client";
 import * as React from "react";
-import CssBaseline from "@mui/material/CssBaseline";
-import { Box } from "@mui/material";
-import { ThemeProvider as MUIThemeProvider } from "@mui/material/styles";
 import { useOidcAccessToken } from "@axa-fr/react-oidc";
-import Dashboard from "../layout/Dashboard";
 import { useOIDCContext } from "@/hooks/oidcConfiguration";
-import { useMUITheme } from "@/hooks/theme";
+import ApplicationHeader from "@/components/ui/ApplicationHeader";
 
 /**
  * Build the User Dashboard page
@@ -22,6 +18,7 @@ export default function UserDashboard() {
 
   return (
     <div>
+      <ApplicationHeader type="Dashboard" />
       <h2>Hello {accessTokenPayload["preferred_username"]}</h2>
 
       <p>To start with, select an application in the side bar</p>

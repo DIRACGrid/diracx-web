@@ -23,7 +23,7 @@ describe("Job Monitor", () => {
   });
 
   it("should render the drawer", () => {
-    cy.get("h2").contains("Job Monitor").should("be.visible");
+    cy.get("header").contains("Job Monitor").should("be.visible");
   });
 
   it("should handle filter addition", () => {

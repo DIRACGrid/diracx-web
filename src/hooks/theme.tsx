@@ -170,6 +170,18 @@ export const useMUITheme = () => {
         },
       },
     },
+    MuiListItemButton: {
+      styleOverrides: {
+        root: {
+          "&.Mui-selected, &.Mui-selected:hover": {
+            backgroundColor:
+              muiTheme.palette.mode === "light"
+                ? lighten(grey[200], 0.2)
+                : darken(grey[800], 0.2),
+          },
+        },
+      },
+    },
   };
 
   return muiTheme;
