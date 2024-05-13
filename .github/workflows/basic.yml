@@ -1,27 +1,25 @@
 name: Basic checks
 
-on:
-    # Triggers the workflow on push or pull request events but only for the master branch
-    push:
-        branches: [main]
-    pull_request:
-        branches: [main]
+on: [push, pull_request]
 
 jobs:
-    build:
-        runs-on: ubuntu-latest
-        steps:
-            - uses: actions/checkout@v4
+  build:
+    runs-on: ubuntu-latest
+    if: github.event_name != 'push' || github.repository == 'DIRACGrid/diracx-web'
+    steps:
+      - uses: actions/checkout@v4
 
-            - name: Install dependencies
-              run: npm install
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 'latest'
+          cache: 'npm'
+      - name: Install dependencies
+        run: npm ci
               
-            - name: Check formatting rules
-              run: npx prettier . --check
-
-            - name: Check code-quality rules
-              run: npm run lint
-
-            - name: Check typescript type validity
-              run: npm run ts-lint
+      - name: Check formatting rules
+        run: npx prettier . --check
+      - name: Check code-quality rules
+        run: npm run lint
+      - name: Check typescript type validity
+        run: npm run ts-lint
 
