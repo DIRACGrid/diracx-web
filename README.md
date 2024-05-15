@@ -1,21 +1,27 @@
 ![Basic tests](https://github.com/DIRACGrid/diracx-web/actions/workflows/basic.yml/badge.svg?branch=main)
-![Basic tests](https://github.com/DIRACGrid/diracx-web/actions/workflows/test.yml/badge.svg?branch=main)
-![Basic tests](https://github.com/DIRACGrid/diracx-web/actions/workflows/containerised.yml/badge.svg?branch=main)
+![Unit tests](https://github.com/DIRACGrid/diracx-web/actions/workflows/test.yml/badge.svg?branch=main)
+![Integration tests](https://github.com/DIRACGrid/diracx-web/actions/workflows/integration-test.yml/badge.svg?branch=main)
+![Deployment](https://github.com/DIRACGrid/diracx-web/actions/workflows/deployment.yml/badge.svg?branch=main)
 
-# DiracX-Web Prototype
+# DiracX-Web
 
 ## Getting started
 
-This will allow you to run a demo setup.
+_Requirements: docker, internet_
 
-The code changes will be reflected in the demo.
-
-Requirement: docker, internet
+This will allow you to run a demo setup:
 
 ```bash
-# Clone the diracx repository
-git clone git@github.com:DIRACGrid/diracx.git
+# Clone the diracx-chart repository
+git clone git@github.com:DIRACGrid/diracx-charts.git
 
+# Run the demo
+diracx-charts/run_demo.sh
+```
+
+You can also start the demo setup in development mode - code changes will be reflected in the demo in real time:
+
+```bash
 # Clone the diracx-web repository
 git clone git@github.com:DIRACGrid/diracx-web.git
 
@@ -23,10 +29,8 @@ git clone git@github.com:DIRACGrid/diracx-web.git
 git clone git@github.com:DIRACGrid/diracx-charts.git
 
 # Run the demo
-diracx-charts/run_demo.sh diracx/ diracx-web/
+diracx-charts/run_demo.sh ./diracx-web
 ```
-
-Open [http://localhost:8000](http://localhost:8000) with your browser to see the result.
 
 ## Contributing
 
@@ -46,13 +50,14 @@ Open [http://localhost:8000](http://localhost:8000) with your browser to see the
 
 Unit tests can be started with:
 
-```
+```bash
 npm test
 ```
 
 End-to-end tests are launched through `cypress` such as:
 
-```
+```bash
+# diracx-charts/run_demo.sh is running
 npx cypress open --config baseUrl=$DIRACX_URL
 ```
 
