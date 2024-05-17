@@ -1,0 +1,78 @@
+{
+  "name": "diracx-web-components",
+  "version": "0.1.0",
+  "description": "Useful components for diracx-web",
+  "scripts": {
+    "build": "tsup --minify",
+    "dev": "tsup --watch --sourcemap"
+  },
+  "author": "",
+  "license": "GPL-3.0",
+  "type": "module",
+  "dependencies": {
+    "@atlaskit/pragmatic-drag-and-drop": "^1.1.3",
+    "@atlaskit/pragmatic-drag-and-drop-hitbox": "^1.0.3",
+    "@atlaskit/pragmatic-drag-and-drop-react-drop-indicator": "^1.1.0",
+    "@axa-fr/react-oidc": "^7.22.6",
+    "@emotion/react": "^11.11.4",
+    "@emotion/styled": "^11.11.5",
+    "@mui/icons-material": "^5.15.18",
+    "@mui/material": "^5.15.18",
+    "@mui/utils": "^5.15.14",
+    "@types/node": "20.11.30",
+    "@types/react": "18.3.3",
+    "@types/react-dom": "18.3.0",
+    "jsoncrush": "^1.1.8",
+    "next": "^14.2.3",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-virtuoso": "^4.7.10",
+    "swr": "^2.2.5"
+  },
+  "devDependencies": {
+    "@microsoft/api-extractor": "^7.43.7",
+    "@swc/core": "^1.5.7",
+    "eslint": "^8.56.0",
+    "eslint-config-next": "^14.2.3",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-import": "^2.29.1",
+    "prettier": "^3.2.5",
+    "tsup": "^8.0.2",
+    "typescript": "^5.4.5"
+  },
+  "exports": {
+    "./package.json": "./package.json",
+    "./components": {
+      "module": "./dist/components/index.js",
+      "require": "./dist/components/index.js",
+      "types": "./dist/components/index.d.ts",
+      "default": "./dist/components/index.js"
+    },
+    "./contexts": {
+      "module": "./dist/contexts/index.js",
+      "require": "./dist/contexts/index.js",
+      "types": "./dist/contexts/index.d.ts",
+      "default": "./dist/contexts/index.js"
+    },
+    "./hooks": {
+      "module": "./dist/hooks/index.js",
+      "require": "./dist/hooks/index.js",
+      "types": "./dist/hooks/index.d.ts",
+      "default": "./dist/hooks/index.js"
+    },
+    "./types": {
+      "module": "./dist/types/index.js",
+      "require": "./dist/types/index.js",
+      "types": "./dist/types/index.d.ts",
+      "default": "./dist/types/index.js"
+    }
+  },
+  "files": [
+    "src",
+    "dist",
+    "components",
+    "contexts",
+    "hooks",
+    "types"
+  ]
+}
