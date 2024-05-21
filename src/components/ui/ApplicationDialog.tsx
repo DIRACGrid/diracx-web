@@ -42,8 +42,9 @@ export default function AppDialog({
         onSubmit: (event: React.FormEvent<HTMLFormElement>) => {
           event.preventDefault();
 
-          const icon = applicationList.find((app) => app.name === appType)
-            ?.icon;
+          const icon = applicationList.find(
+            (app) => app.name === appType,
+          )?.icon;
           if (!icon) {
             console.error("Icon not found for application type", appType);
             return;
