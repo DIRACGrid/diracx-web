@@ -137,7 +137,7 @@ export function JobDataTable() {
   const urlGetJobs = `/api/jobs/search?page=${page + 1}&per_page=${rowsPerPage}`;
   const { data, error, isLoading, isValidating } = useSWR(
     [urlGetJobs, accessToken, "POST", searchBody],
-    fetcher
+    fetcher,
   );
 
   const dataHeader = data?.headers;

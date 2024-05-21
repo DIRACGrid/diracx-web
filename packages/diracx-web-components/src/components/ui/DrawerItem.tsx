@@ -84,7 +84,7 @@ export default function DrawerItem({
                       <ItemPreview title={title} icon={icon} />
                     </div>
                   </MUIThemeProvider>
-                </ThemeProvider>
+                </ThemeProvider>,
               );
               return () => root.unmount();
             },
@@ -104,7 +104,7 @@ export default function DrawerItem({
         getData: ({ input, element }) => {
           return attachClosestEdge(
             { index, title: groupTitle },
-            { input, element, allowedEdges: ["top", "bottom"] }
+            { input, element, allowedEdges: ["top", "bottom"] },
           );
         },
         onDrag({ self, source }) {
@@ -139,7 +139,7 @@ export default function DrawerItem({
         onDrop: () => {
           setClosestEdge(null);
         },
-      })
+      }),
     );
   }, [index, groupTitle, icon, theme, title, id]);
 
@@ -202,10 +202,7 @@ function ItemPreview({
       </ListItemIcon>
       <ListItemText primary={title} />
       <ListItemIcon sx={{ minWidth: "24px" }}>
-        {/* <Icon
-          component={DragIndicatorIcon}
-          sx={{ cursor: "grab" }}
-        /> */}
+        <Icon component={DragIndicator} sx={{ cursor: "grab" }} />
       </ListItemIcon>
     </ListItemButton>
   );

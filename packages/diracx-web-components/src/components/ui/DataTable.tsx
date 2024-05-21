@@ -75,7 +75,7 @@ function DataTableToolbar(props: DataTableToolbarProps) {
       },
       (err) => {
         console.error("Could not copy text: ", err);
-      }
+      },
     );
   };
 
@@ -164,7 +164,7 @@ const VirtuosoTableComponents: TableComponents<Record<string, any>> = {
   TableHead: React.forwardRef<HTMLTableSectionElement>(
     function VirtuosoTableHead(props, ref) {
       return <TableHead {...props} ref={ref} />;
-    }
+    },
   ),
   TableRow: function VirtuosoTableRow({
     item,
@@ -199,7 +199,7 @@ const VirtuosoTableComponents: TableComponents<Record<string, any>> = {
   TableBody: React.forwardRef<HTMLTableSectionElement>(
     function VirtuosoTableBody(props, ref) {
       return <TableBody {...props} ref={ref} />;
-    }
+    },
   ),
 };
 
@@ -300,11 +300,11 @@ export function DataTable(props: DataTableProps) {
         "filter",
         newFilters.map(
           (filter) =>
-            `${filter.id}_${filter.column}_${filter.operator}_${filter.value}`
-        )
+            `${filter.id}_${filter.column}_${filter.operator}_${filter.value}`,
+        ),
       );
     },
-    [setParam]
+    [setParam],
   );
 
   const [sections, setSections] = React.useContext(ApplicationsContext);
@@ -313,7 +313,7 @@ export function DataTable(props: DataTableProps) {
       const appId = getParam("appId");
 
       const section = sections.find((section) =>
-        section.items.some((item) => item.id === appId)
+        section.items.some((item) => item.id === appId),
       );
       if (section) {
         const newSection = {
@@ -326,11 +326,11 @@ export function DataTable(props: DataTableProps) {
           }),
         };
         setSections((sections) =>
-          sections.map((s) => (s.title === section.title ? newSection : s))
+          sections.map((s) => (s.title === section.title ? newSection : s)),
         );
       }
     },
-    [getParam, sections, setSections]
+    [getParam, sections, setSections],
   );
 
   // Handle the application of filters
@@ -388,7 +388,7 @@ export function DataTable(props: DataTableProps) {
           parameter: filter.column,
           operator: filter.operator,
           value: filter.value,
-        })
+        }),
       );
       setSearchBody({ search: jsonFilters });
     } else {
@@ -400,7 +400,7 @@ export function DataTable(props: DataTableProps) {
   // Manage sorting
   const handleRequestSort = (
     event: React.MouseEvent<unknown>,
-    property: string | number
+    property: string | number,
   ) => {
     const isAsc = orderBy === property && order === "asc";
     setOrder(isAsc ? "desc" : "asc");
@@ -434,7 +434,7 @@ export function DataTable(props: DataTableProps) {
     } else if (selectedIndex > 0) {
       newSelected = newSelected.concat(
         selected.slice(0, selectedIndex),
-        selected.slice(selectedIndex + 1)
+        selected.slice(selectedIndex + 1),
       );
     }
 
@@ -447,7 +447,7 @@ export function DataTable(props: DataTableProps) {
   };
 
   const handleChangeRowsPerPage = (
-    event: React.ChangeEvent<HTMLInputElement>
+    event: React.ChangeEvent<HTMLInputElement>,
   ) => {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);

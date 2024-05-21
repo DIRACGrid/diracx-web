@@ -58,6 +58,7 @@ End-to-end tests are launched through `cypress` such as:
 
 ```bash
 # diracx-charts/run_demo.sh is running
+cd packages/diracx-web
 npx cypress open --config baseUrl=$DIRACX_URL
 ```
 

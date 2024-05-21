@@ -42,7 +42,7 @@ export const ApplicationsProvider = ({
               };
             });
             return section;
-          }
+          },
         );
         setSections(newSections);
       } catch (e) {

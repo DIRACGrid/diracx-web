@@ -28,7 +28,7 @@ export default function DrawerItemGroup({
   setSections: React.Dispatch<React.SetStateAction<UserSection[]>>;
   handleContextMenu: (
     type: "group" | "item" | null,
-    id: string | null
+    id: string | null,
   ) => (event: React.MouseEvent<HTMLElement>) => void;
 }) {
   // Ref to use for the drag and drop target
@@ -59,8 +59,10 @@ export default function DrawerItemGroup({
     // Set the extended state of the accordion group.
     setSections((sections) =>
       sections.map((section) =>
-        section.title === title ? { ...section, extended: isExpanded } : section
-      )
+        section.title === title
+          ? { ...section, extended: isExpanded }
+          : section,
+      ),
     );
   };
   return (

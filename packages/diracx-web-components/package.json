@@ -4,7 +4,8 @@
   "description": "Useful components for diracx-web",
   "scripts": {
     "build": "tsup --minify",
-    "dev": "tsup --watch --sourcemap"
+    "dev": "tsup --watch --sourcemap",
+    "test": "jest --ci"
   },
   "author": "",
   "license": "GPL-3.0",
@@ -32,11 +33,18 @@
   "devDependencies": {
     "@microsoft/api-extractor": "^7.43.7",
     "@swc/core": "^1.5.7",
+    "@testing-library/jest-dom": "^6.1.4",
+    "@testing-library/react": "^14.2.2",
+    "@testing-library/user-event": "^14.5.1",
+    "@types/jest": "^29.5.12",
     "eslint": "^8.56.0",
     "eslint-config-next": "^14.2.3",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-import": "^2.29.1",
+    "jest": "^29.7.0",
+    "jest-environment-jsdom": "^29.7.0",
     "prettier": "^3.2.5",
+    "ts-jest": "^29.1.2",
     "tsup": "^8.0.2",
     "typescript": "^5.4.5"
   },

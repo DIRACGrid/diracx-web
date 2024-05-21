@@ -23,7 +23,7 @@ export type ThemeProviderProps = {
  * Theme context
  */
 export const ThemeContext = createContext<ThemeContextType | undefined>(
-  undefined
+  undefined,
 );
 
 /**

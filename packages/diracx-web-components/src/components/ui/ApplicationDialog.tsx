@@ -4,7 +4,6 @@ import {
   DialogTitle,
   DialogContent,
   DialogContentText,
-  DialogActions,
   Button,
   Grid,
   Icon,
@@ -43,7 +42,7 @@ export default function AppDialog({
           event.preventDefault();
 
           const icon = applicationList.find(
-            (app) => app.name === appType
+            (app) => app.name === appType,
           )?.icon;
           if (!icon) {
             console.error("Icon not found for application type", appType);

@@ -27,7 +27,7 @@ export function FilterToolbar(props: FilterToolbarProps) {
   const { columns, filters, setFilters, handleApplyFilters } = props;
   const [anchorEl, setAnchorEl] = React.useState<HTMLElement | null>(null);
   const [selectedFilter, setSelectedFilter] = React.useState<Filter | null>(
-    null
+    null,
   );
   const addFilterButtonRef = React.useRef<HTMLButtonElement>(null);
 
@@ -51,7 +51,7 @@ export function FilterToolbar(props: FilterToolbarProps) {
 
   const handleFilterChange = (index: number, newFilter: Filter) => {
     const updatedFilters = filters.map((filter, i) =>
-      i === index ? newFilter : filter
+      i === index ? newFilter : filter,
     );
     setFilters(updatedFilters);
   };

@@ -1,0 +1,6 @@
+node_modules
+build
+dist
+public
+.github
+jest.config.mjs

@@ -28,5 +28,12 @@
     }
   },
   "include": ["**/*.ts", "**/*.tsx"],
-  "exclude": ["node_modules", "dist", "tsup.config.ts"]
+  "exclude": [
+    "app",
+    "node_modules",
+    "dist",
+    "test",
+    "tsup.config.ts",
+    "jest.setup.ts"
+  ]
 }

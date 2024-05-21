@@ -4,11 +4,10 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "next build && mv out ../..",
     "start": "next start",
     "lint": "next lint",
     "ts-lint": "tsc -noEmit -incremental",
-    "test": "jest --ci",
     "postinstall": "node ../../node_modules/@axa-fr/react-oidc/bin/copy-service-worker-files.mjs public",
     "prepare": "husky"
   },

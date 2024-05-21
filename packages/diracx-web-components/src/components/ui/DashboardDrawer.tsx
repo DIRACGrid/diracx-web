@@ -88,10 +88,10 @@ export default function DashboardDrawer(props: DashboardDrawerProps) {
           const closestEdgeOfTarget = extractClosestEdge(targetData);
           const targetIndex = targetData.index as number;
           const sourceGroup = userSections.find(
-            (group) => group.title == sourceData.title
+            (group) => group.title == sourceData.title,
           );
           const targetGroup = userSections.find(
-            (group) => group.title == groupTitle
+            (group) => group.title == groupTitle,
           );
           const sourceIndex = sourceData.index as number;
           const destinationIndex = (
@@ -102,16 +102,16 @@ export default function DashboardDrawer(props: DashboardDrawerProps) {
             sourceGroup,
             targetGroup,
             sourceIndex,
-            destinationIndex
+            destinationIndex,
           );
         } else {
           // If the target is a group
           const groupTitle = targetData.title;
           const sourceGroup = userSections.find(
-            (group) => group.title == sourceData.title
+            (group) => group.title == sourceData.title,
           );
           const targetGroup = userSections.find(
-            (group) => group.title == groupTitle
+            (group) => group.title == groupTitle,
           );
           const sourceIndex = sourceData.index as number;
 
@@ -133,7 +133,7 @@ export default function DashboardDrawer(props: DashboardDrawerProps) {
       sourceGroup: any,
       destinationGroup: any,
       sourceIndex: number,
-      destinationIndex: number | null = null
+      destinationIndex: number | null = null,
     ) {
       if (sourceGroup && destinationGroup) {
         if (
@@ -164,8 +164,8 @@ export default function DashboardDrawer(props: DashboardDrawerProps) {
             sections.map((section) =>
               section.title === sourceGroup.title
                 ? { ...section, items: sourceItems }
-                : section
-            )
+                : section,
+            ),
           );
         } else {
           const sourceItems = [...sourceGroup.items];
@@ -185,8 +185,8 @@ export default function DashboardDrawer(props: DashboardDrawerProps) {
                 ? { ...section, items: sourceItems }
                 : section.title === destinationGroup.title
                   ? { ...section, items: destinationItems }
-                  : section
-            )
+                  : section,
+            ),
           );
         }
       }
@@ -214,7 +214,7 @@ export default function DashboardDrawer(props: DashboardDrawerProps) {
     let title = `${appType} ${userSections.reduce(
       (sum, group) =>
         sum + group.items.filter((item) => item.type === appType).length,
-      1
+      1,
     )}`;
     while (group.items.some((item) => item.title === title)) {
       title = `${appType} ${parseInt(title.split(" ")[1]) + 1}`;
@@ -224,7 +224,7 @@ export default function DashboardDrawer(props: DashboardDrawerProps) {
       title,
       id: `${title}${userSections.reduce(
         (sum, group) => sum + group.items.length,
-        0
+        0,
       )}`,
       type: appType,
       icon: icon,
@@ -234,7 +234,7 @@ export default function DashboardDrawer(props: DashboardDrawerProps) {
       setSections([...userSections, group]);
     } else {
       setSections(
-        userSections.map((g) => (g.title === group.title ? group : g))
+        userSections.map((g) => (g.title === group.title ? group : g)),
       );
     }
   };
@@ -282,13 +282,13 @@ export default function DashboardDrawer(props: DashboardDrawerProps) {
   const handleDelete = () => {
     if (contextState.type === "group") {
       const newSections = userSections.filter(
-        (group) => group.title !== contextState.id
+        (group) => group.title !== contextState.id,
       );
       setSections(newSections);
     } else if (contextState.type === "item") {
       const newSections = userSections.map((group) => {
         const newItems = group.items.filter(
-          (item) => item.id !== contextState.id
+          (item) => item.id !== contextState.id,
         );
         return { ...group, items: newItems };
       });
