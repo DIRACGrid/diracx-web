@@ -12,6 +12,8 @@
   "scripts": {
     "dev": "lerna run dev --parallel",
     "test": "lerna run test",
-    "build": "lerna run build"
+    "build": "lerna run build",
+    "lint": "lerna run lint",
+    "ts-lint": "lerna run ts-lint"
   }
 }

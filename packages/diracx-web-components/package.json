@@ -5,7 +5,9 @@
   "scripts": {
     "build": "tsup --minify",
     "dev": "tsup --watch --sourcemap",
-    "test": "jest --ci"
+    "test": "jest --ci",
+    "lint": "eslint src",
+    "ts-lint": "tsc -noEmit -incremental"
   },
   "author": "",
   "license": "GPL-3.0",
