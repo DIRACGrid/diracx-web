@@ -13,6 +13,7 @@
     "dev": "lerna run dev --parallel",
     "test": "lerna run test",
     "build": "lerna run build",
+    "build-lib": "lerna run build --scope diracx-web-components",
     "lint": "lerna run lint",
     "ts-lint": "lerna run ts-lint"
   }
