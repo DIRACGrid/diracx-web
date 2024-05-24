@@ -140,6 +140,9 @@ export const useMUITheme = () => {
                 : darken(grey[800], 0.2),
           },
         },
+        head: {
+          backgroundColor: muiTheme.palette.background.default,
+        },
       },
     },
     MuiTableCell: {
@@ -149,6 +152,9 @@ export const useMUITheme = () => {
           borderColor: "divider",
           // Remove the border for the last cell
           "&:last-child": {
+            borderRight: 0,
+          },
+          "&:first-of-type": {
             borderRight: 0,
           },
           textAlign: "left",

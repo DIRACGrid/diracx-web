@@ -128,7 +128,7 @@ export function JobDataTable() {
    * Fetches the jobs from the /api/jobs/search endpoint
    */
   const urlGetJobs = `/api/jobs/search?page=${page + 1}&per_page=${rowsPerPage}`;
-  const { data, error } = useSWR(
+  const { data, error, isLoading, isValidating } = useSWR(
     [urlGetJobs, accessToken, "POST", searchBody],
     fetcher,
   );
@@ -138,22 +138,15 @@ export function JobDataTable() {
 
   // Parse the headers to get the first item, last item and number of items
   const contentRange = dataHeader?.get("content-range");
-  let firstJob = 0,
-    lastJob = 0,
-    totalJobs = 0;
+  let totalJobs = 0;
 
   if (contentRange) {
     const match = contentRange.match(/jobs (\d+)-(\d+)\/(\d+)/);
     if (match) {
-      firstJob = parseInt(match[1]);
-      lastJob = parseInt(match[2]);
       totalJobs = parseInt(match[3]);
     }
-  } else {
-    if (results) {
-      lastJob = results.length - 1;
-      totalJobs = results.length;
-    }
+  } else if (results) {
+    totalJobs = results.length;
   }
 
   const columns = isMobile ? mobileHeadCells : headCells;
@@ -358,8 +351,6 @@ export function JobDataTable() {
         setPage={setPage}
         rowsPerPage={rowsPerPage}
         setRowsPerPage={setRowsPerPage}
-        firstRow={firstJob}
-        lastRow={lastJob}
         totalRows={totalJobs}
         selected={selected}
         setSelected={setSelected}
@@ -369,6 +360,8 @@ export function JobDataTable() {
         columns={columns}
         rows={results}
         error={error}
+        isLoading={isLoading}
+        isValidating={isValidating}
         rowIdentifier="JobID"
         isMobile={isMobile}
         toolbarComponents={toolbarComponents}
