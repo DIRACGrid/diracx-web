@@ -1,5 +1,5 @@
 import useSWRImmutable, { SWRResponse } from "swr";
-import { useDiracxUrl, fetcher } from "./utils";
+import { fetcher } from "./utils";
 
 /**
  * Metadata returned by the /.well-known/dirac-metadata endpoint
@@ -28,13 +28,15 @@ export interface Metadata {
  */
 export function useMetadata() {
   const url = `/.well-known/dirac-metadata`;
-  const { data, error }: SWRResponse<Metadata, any> = useSWRImmutable(
+  const { data, error }: SWRResponse<any, any> = useSWRImmutable(
     [url],
     fetcher,
   );
 
+  const metadata = data?.data as Metadata;
+
   return {
-    data,
+    metadata,
     error,
     isLoading: !data && !error,
   };

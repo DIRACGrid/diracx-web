@@ -29,7 +29,7 @@ import { useSearchParamsUtils } from "@/hooks/searchParamsUtils";
 export function LoginForm() {
   const theme = useMUITheme();
   const router = useRouter();
-  const { data, error, isLoading } = useMetadata();
+  const { metadata, error, isLoading } = useMetadata();
   const [selectedVO, setSelectedVO] = useState<string | null>(null);
   const [selectedGroup, setSelectedGroup] = useState<string | null>(null);
   const { configuration, setConfiguration } = useOIDCContext();
@@ -58,16 +58,19 @@ export function LoginForm() {
   }, [getParam, isAuthenticated, router]);
 
   // Get default group
-  const getDefaultGroup = (data: Metadata | undefined, vo: string): string => {
-    if (!data) {
+  const getDefaultGroup = (
+    metadata: Metadata | undefined,
+    vo: string,
+  ): string => {
+    if (!metadata) {
       return "";
     }
 
-    const defaultGroup = data.virtual_organizations[vo]?.default_group;
+    const defaultGroup = metadata.virtual_organizations[vo]?.default_group;
     if (defaultGroup) {
       return defaultGroup;
     } else {
-      const groupKeys = Object.keys(data.virtual_organizations[vo].groups);
+      const groupKeys = Object.keys(metadata.virtual_organizations[vo].groups);
       return groupKeys.length > 0 ? groupKeys[0] : "";
     }
   };
@@ -79,7 +82,7 @@ export function LoginForm() {
   ) => {
     if (newValue) {
       setSelectedVO(newValue);
-      setSelectedGroup(getDefaultGroup(data, newValue));
+      setSelectedGroup(getDefaultGroup(metadata, newValue));
     }
   };
 
@@ -106,16 +109,17 @@ export function LoginForm() {
   if (error) {
     return <div>An error occurred while fetching metadata.</div>;
   }
-  if (!data) {
+  if (!metadata) {
     return <div>No metadata found.</div>;
   }
 
   // Is there only one VO?
-  const singleVO = data && Object.keys(data.virtual_organizations).length === 1;
+  const singleVO =
+    metadata && Object.keys(metadata.virtual_organizations).length === 1;
   if (singleVO && !selectedVO) {
-    setSelectedVO(Object.keys(data.virtual_organizations)[0]);
+    setSelectedVO(Object.keys(metadata.virtual_organizations)[0]);
     setSelectedGroup(
-      getDefaultGroup(data, Object.keys(data.virtual_organizations)[0]),
+      getDefaultGroup(metadata, Object.keys(metadata.virtual_organizations)[0]),
     );
   }
 
@@ -157,7 +161,7 @@ export function LoginForm() {
             </Typography>
           ) : (
             <Autocomplete
-              options={Object.keys(data.virtual_organizations)}
+              options={Object.keys(metadata.virtual_organizations)}
               getOptionLabel={(option) => option}
               renderInput={(params) => (
                 <TextField
@@ -185,14 +189,14 @@ export function LoginForm() {
                   name={selectedVO}
                   value={
                     selectedGroup ||
-                    data.virtual_organizations[selectedVO].default_group
+                    metadata.virtual_organizations[selectedVO].default_group
                   }
                   label="Select a Group"
                   onChange={handleGroupChange}
                   data-testid="select-group"
                 >
                   {Object.keys(
-                    data.virtual_organizations[selectedVO].groups,
+                    metadata.virtual_organizations[selectedVO].groups,
                   ).map((groupKey) => (
                     <MenuItem key={groupKey} value={groupKey}>
                       {groupKey}
@@ -223,7 +227,7 @@ export function LoginForm() {
                 sx={{ paddingTop: "5%", color: "gray", textAlign: "center" }}
               >
                 Need help?{" "}
-                {data.virtual_organizations[selectedVO].support.message}
+                {metadata.virtual_organizations[selectedVO].support.message}
               </Typography>
             </Box>
           )}

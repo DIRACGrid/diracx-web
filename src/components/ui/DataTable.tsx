@@ -296,6 +296,9 @@ interface DataTableProps {
   setPage: React.Dispatch<React.SetStateAction<number>>;
   rowsPerPage: number;
   setRowsPerPage: React.Dispatch<React.SetStateAction<number>>;
+  firstRow: number;
+  lastRow: number;
+  totalRows: number;
   selected: readonly number[];
   setSelected: React.Dispatch<React.SetStateAction<readonly number[]>>;
   filters: Filter[];
@@ -322,6 +325,9 @@ export function DataTable(props: DataTableProps) {
     setPage,
     rowsPerPage,
     setRowsPerPage,
+    firstRow,
+    lastRow,
+    totalRows,
     selected,
     setSelected,
     filters,
@@ -594,14 +600,14 @@ export function DataTable(props: DataTableProps) {
         handleApplyFilters={handleApplyFilters}
       />
 
-      <Paper sx={{ width: "100%", mb: 2 }}>
+      <Paper sx={{ width: "100%", mb: 1 }}>
         <DataTableToolbar
           title={title}
           numSelected={selected.length}
           selectedIds={selected}
           toolbarComponents={toolbarComponents}
         />
-        <TableContainer sx={{ height: "55vh" }}>
+        <TableContainer sx={{ height: "70vh", width: "100%" }}>
           <Table
             stickyHeader
             sx={{ minWidth: isMobile ? "undefined" : "50vw" }}
@@ -618,9 +624,8 @@ export function DataTable(props: DataTableProps) {
               rowCount={rows.length}
             />
             <TableBody>
-              {stableSort(rows, getComparator(order, orderBy))
-                .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                .map((row, index) => {
+              {stableSort(rows, getComparator(order, orderBy)).map(
+                (row, index) => {
                   const isItemSelected = isSelected(
                     row[rowIdentifier] as number,
                   );
@@ -661,19 +666,25 @@ export function DataTable(props: DataTableProps) {
                       })}
                     </TableRow>
                   );
-                })}
+                },
+              )}
             </TableBody>
           </Table>
         </TableContainer>
         <TablePagination
           rowsPerPageOptions={[25, 50, 100, 500, 1000]}
           component="div"
-          count={rows.length}
+          count={totalRows}
+          showFirstButton={true}
+          showLastButton={true}
           rowsPerPage={rowsPerPage}
           page={page}
           onPageChange={handleChangePage}
           onRowsPerPageChange={handleChangeRowsPerPage}
           labelRowsPerPage={isMobile ? "" : "Rows per page"}
+          labelDisplayedRows={({ from, to, count }) =>
+            `${firstRow + 1}-${lastRow + 1} of ${totalRows}`
+          }
         />
       </Paper>
       <Menu

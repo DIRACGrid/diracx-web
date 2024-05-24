@@ -80,6 +80,7 @@ const renderStatusCell = (status: string) => {
 const headCells: Column[] = [
   { id: "JobID", label: "Job ID" },
   { id: "JobName", label: "Job Name" },
+  { id: "Site", label: "Site" },
   { id: "Status", label: "Status", render: renderStatusCell },
   {
     id: "MinorStatus",
@@ -126,13 +127,34 @@ export function JobDataTable() {
   /**
    * Fetches the jobs from the /api/jobs/search endpoint
    */
-  //TODO: uncomment the following line once page and per_page are used in the backend
-  //const urlGetJobs = `/api/jobs/search?page=${page}&per_page=${rowsPerPage}`;
-  const urlGetJobs = `/api/jobs/search?page=0&per_page=100`;
+  const urlGetJobs = `/api/jobs/search?page=${page + 1}&per_page=${rowsPerPage}`;
   const { data, error } = useSWR(
     [urlGetJobs, accessToken, "POST", searchBody],
     fetcher,
   );
+
+  const dataHeader = data?.headers;
+  const results = data?.data;
+
+  // Parse the headers to get the first item, last item and number of items
+  const contentRange = dataHeader?.get("content-range");
+  let firstJob = 0,
+    lastJob = 0,
+    totalJobs = 0;
+
+  if (contentRange) {
+    const match = contentRange.match(/jobs (\d+)-(\d+)\/(\d+)/);
+    if (match) {
+      firstJob = parseInt(match[1]);
+      lastJob = parseInt(match[2]);
+      totalJobs = parseInt(match[3]);
+    }
+  } else {
+    if (results) {
+      lastJob = results.length - 1;
+      totalJobs = results.length;
+    }
+  }
 
   const columns = isMobile ? mobileHeadCells : headCells;
   const clearSelected = () => setSelected([]);
@@ -156,7 +178,7 @@ export function JobDataTable() {
       const response = await fetch(deleteUrl, requestOptions);
       if (!response.ok)
         throw new Error("An error occurred while deleting jobs.");
-      const data = await response.json();
+      await response.json();
       setBackdropOpen(false);
       mutate([urlGetJobs, accessToken, "POST", searchBody]);
       clearSelected();
@@ -195,7 +217,7 @@ export function JobDataTable() {
       const response = await fetch(killUrl, requestOptions);
       if (!response.ok)
         throw new Error("An error occurred while deleting jobs.");
-      const data = await response.json();
+      await response.json();
       setBackdropOpen(false);
       mutate([urlGetJobs, accessToken, "POST", searchBody]);
       clearSelected();
@@ -234,7 +256,7 @@ export function JobDataTable() {
       const response = await fetch(rescheduleUrl, requestOptions);
       if (!response.ok)
         throw new Error("An error occurred while deleting jobs.");
-      const data = await response.json();
+      await response.json();
       setBackdropOpen(false);
       mutate([urlGetJobs, accessToken, "POST", searchBody]);
       clearSelected();
@@ -336,13 +358,16 @@ export function JobDataTable() {
         setPage={setPage}
         rowsPerPage={rowsPerPage}
         setRowsPerPage={setRowsPerPage}
+        firstRow={firstJob}
+        lastRow={lastJob}
+        totalRows={totalJobs}
         selected={selected}
         setSelected={setSelected}
         filters={filters}
         setFilters={setFilters}
         setSearchBody={setSearchBody}
         columns={columns}
-        rows={data}
+        rows={results}
         error={error}
         rowIdentifier="JobID"
         isMobile={isMobile}
