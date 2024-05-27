@@ -101,6 +101,8 @@ const mobileHeadCells: Column[] = [
   { id: "Status", label: "Status", render: renderStatusCell },
 ];
 
+type Order = "asc" | "desc";
+
 /**
  * The data grid for the jobs
  */
@@ -117,10 +119,17 @@ export function JobDataTable() {
     message: "",
     severity: "success",
   });
+  // State for sorting
+  const [order, setOrder] = React.useState<Order>("asc");
+  const [orderBy, setOrderBy] = React.useState<string | number>("JobID");
+  // State for pagination
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(25);
+  // State for filters
   const [filters, setFilters] = React.useState<Filter[]>([]);
+  // State for search body
   const [searchBody, setSearchBody] = React.useState({});
+  // State for job history
   const [isHistoryDialogOpen, setIsHistoryDialogOpen] = React.useState(false);
   const [jobHistoryData, setJobHistoryData] = React.useState([]);
 
@@ -351,6 +360,10 @@ export function JobDataTable() {
         setPage={setPage}
         rowsPerPage={rowsPerPage}
         setRowsPerPage={setRowsPerPage}
+        order={order}
+        setOrder={setOrder}
+        orderBy={orderBy}
+        setOrderBy={setOrderBy}
         totalRows={totalJobs}
         selected={selected}
         setSelected={setSelected}

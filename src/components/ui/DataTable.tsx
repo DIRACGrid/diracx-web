@@ -36,65 +36,6 @@ import { useSearchParamsUtils } from "@/hooks/searchParamsUtils";
 import { ApplicationsContext } from "@/contexts/ApplicationsProvider";
 
 /**
- * Descending comparator function
- * @param a - the first value to compare
- * @param b - the second value to compare
- * @param orderBy - the key to compare
- * @returns -1 if b is less than a, 1 if b is greater than a, 0 if they are equal
- * @template T - the type of the values to compare
- */
-function descendingComparator<T>(a: T, b: T, orderBy: keyof T) {
-  if (b[orderBy] < a[orderBy]) {
-    return -1;
-  }
-  if (b[orderBy] > a[orderBy]) {
-    return 1;
-  }
-  return 0;
-}
-
-type Order = "asc" | "desc";
-
-/**
- * Get the comparator function for a given key and order
- * @param order - the order to sort by
- * @param orderBy - the key to sort by
- * @returns a comparator function
- * @template Key - the type of the key to sort by
- */
-function getComparator<Key extends keyof any>(
-  order: Order,
-  orderBy: Key,
-): (
-  a: { [key in Key]: number | string },
-  b: { [key in Key]: number | string },
-) => number {
-  return order === "desc"
-    ? (a, b) => descendingComparator(a, b, orderBy)
-    : (a, b) => -descendingComparator(a, b, orderBy);
-}
-
-/**
- * Stable sort function
- * @param array - the array to sort
- * @param comparator - the comparator function
- * @returns the sorted array
- * @template T - the type of the array to sort
- */
-function stableSort<T>(
-  array: readonly T[],
-  comparator: (a: T, b: T) => number,
-) {
-  const stabilizedThis = array.map((el, index) => [el, index] as [T, number]);
-  stabilizedThis.sort((a, b) => {
-    const order = comparator(a[0], b[0]);
-    if (order !== 0) return order;
-    return a[1] - b[1];
-  });
-  return stabilizedThis.map((el) => el[0]);
-}
-
-/**
  * Menu item
  */
 export interface MenuItem {
@@ -191,6 +132,77 @@ function DataTableToolbar(props: DataTableToolbarProps) {
   );
 }
 
+interface TableContextProps {
+  rowIdentifier: string;
+  handleClick: (event: React.MouseEvent, id: number) => void;
+  handleContextMenu: (event: React.MouseEvent, id: number) => void;
+  isSelected: (id: number) => boolean;
+  isMobile: boolean;
+}
+
+// Virtuoso table components: https://virtuoso.dev/
+// Used to render large tables with virtualization, which improves performance
+const VirtuosoTableComponents: TableComponents<Record<string, any>> = {
+  Scroller: React.forwardRef<HTMLDivElement>(function Scroller(props, ref) {
+    return <TableContainer component={Paper} {...props} ref={ref} />;
+  }),
+  Table: function VirtuosoTable(props) {
+    const { isMobile } = props.context as TableContextProps;
+    return (
+      <Table
+        {...props}
+        sx={{
+          borderCollapse: "separate",
+          tableLayout: "fixed",
+          minWidth: isMobile ? "undefined" : "50vw",
+        }}
+        aria-labelledby="tableTitle"
+        size={"small"}
+      />
+    );
+  },
+  TableHead: React.forwardRef<HTMLTableSectionElement>(
+    function VirtuosoTableHead(props, ref) {
+      return <TableHead {...props} ref={ref} />;
+    },
+  ),
+  TableRow: function VirtuosoTableRow({
+    item,
+    ...props
+  }: {
+    item: Record<string, any>;
+    [key: string]: any;
+  }) {
+    const { rowIdentifier, handleClick, handleContextMenu, isSelected } =
+      props.context as TableContextProps;
+
+    if (item) {
+      return (
+        <TableRow
+          {...props}
+          hover
+          onClick={(event) => handleClick(event, item[rowIdentifier])}
+          role="checkbox"
+          aria-checked={isSelected(item[rowIdentifier])}
+          tabIndex={-1}
+          key={item[rowIdentifier]}
+          selected={isSelected(item[rowIdentifier])}
+          onContextMenu={(event) =>
+            handleContextMenu(event, item[rowIdentifier])
+          }
+          style={{ cursor: "context-menu" }}
+        />
+      );
+    }
+    return <TableRow {...props} />;
+  },
+  TableBody: React.forwardRef<HTMLTableSectionElement>(
+    function VirtuosoTableBody(props, ref) {
+      return <TableBody {...props} ref={ref} />;
+    },
+  ),
+};
+
 /**
  * Data table props
  * @property {string} title - the title of the table
@@ -217,6 +229,10 @@ interface DataTableProps {
   setPage: React.Dispatch<React.SetStateAction<number>>;
   rowsPerPage: number;
   setRowsPerPage: React.Dispatch<React.SetStateAction<number>>;
+  order: "asc" | "desc";
+  setOrder: React.Dispatch<React.SetStateAction<"asc" | "desc">>;
+  orderBy: string | number;
+  setOrderBy: React.Dispatch<React.SetStateAction<string | number>>;
   totalRows: number;
   selected: readonly number[];
   setSelected: React.Dispatch<React.SetStateAction<readonly number[]>>;
@@ -246,6 +262,10 @@ export function DataTable(props: DataTableProps) {
     setPage,
     rowsPerPage,
     setRowsPerPage,
+    order,
+    setOrder,
+    orderBy,
+    setOrderBy,
     totalRows,
     selected,
     setSelected,
@@ -262,9 +282,6 @@ export function DataTable(props: DataTableProps) {
     toolbarComponents,
     menuItems,
   } = props;
-  // State for sorting
-  const [order, setOrder] = React.useState<Order>("asc");
-  const [orderBy, setOrderBy] = React.useState<string | number>(rowIdentifier);
   // State for the context menu
   const [contextMenu, setContextMenu] = React.useState<{
     mouseX: number | null;
@@ -388,6 +405,10 @@ export function DataTable(props: DataTableProps) {
     const isAsc = orderBy === property && order === "asc";
     setOrder(isAsc ? "desc" : "asc");
     setOrderBy(property);
+    setSearchBody((prevState: any) => ({
+      ...prevState,
+      sort: [{ parameter: property, direction: isAsc ? "desc" : "asc" }],
+    }));
   };
 
   // Manage selection
@@ -449,28 +470,43 @@ export function DataTable(props: DataTableProps) {
   };
 
   // Wait for the data to load
-  if ((!rows && !error) || isValidating) {
-    const buttonWidth = "calc(20% - 10px)";
+  if ((!rows && !error) || isValidating || isLoading) {
     return (
-      <Box sx={{ width: "100%", p: 1 }} data-testid="skeleton">
-        <Skeleton
-          variant="rectangular"
-          animation="pulse"
-          height={500}
-          width="100%"
+      <>
+        <FilterToolbar
+          columns={columns}
+          filters={filters}
+          setFilters={setFilters}
+          handleApplyFilters={handleApplyFilters}
         />
-      </Box>
+        <Box sx={{ width: "100%", p: 1 }} data-testid="skeleton">
+          <Skeleton
+            variant="rectangular"
+            animation="pulse"
+            height={500}
+            width="100%"
+          />
+        </Box>
+      </>
     );
   }
 
   // Handle errors
   if (error) {
     return (
-      <Box sx={{ width: "100%", marginTop: 2 }}>
-        <Alert severity="error">
-          An error occurred while fetching data. Reload the page.
-        </Alert>
-      </Box>
+      <>
+        <FilterToolbar
+          columns={columns}
+          filters={filters}
+          setFilters={setFilters}
+          handleApplyFilters={handleApplyFilters}
+        />
+        <Box sx={{ width: "100%", marginTop: 2 }}>
+          <Alert severity="error">
+            An error occurred while fetching data. Reload the page.
+          </Alert>
+        </Box>
+      </>
     );
   }
 
@@ -493,65 +529,6 @@ export function DataTable(props: DataTableProps) {
     );
   }
 
-  // Virtuoso table components: https://virtuoso.dev/
-  // Used to render large tables with virtualization, which improves performance
-  const VirtuosoTableComponents: TableComponents<Record<string, any>> = {
-    Scroller: React.forwardRef<HTMLDivElement>(function Scroller(props, ref) {
-      return <TableContainer component={Paper} {...props} ref={ref} />;
-    }),
-    Table: function VirtuosoTable(props) {
-      return (
-        <Table
-          {...props}
-          sx={{
-            borderCollapse: "separate",
-            tableLayout: "fixed",
-            minWidth: isMobile ? "undefined" : "50vw",
-          }}
-          aria-labelledby="tableTitle"
-          size={"small"}
-        />
-      );
-    },
-    TableHead: React.forwardRef<HTMLTableSectionElement>(
-      function VirtuosoTableHead(props, ref) {
-        return <TableHead {...props} ref={ref} />;
-      },
-    ),
-    TableRow: function VirtuosoTableRow({
-      item,
-      ...props
-    }: {
-      item: Record<string, any>;
-      [key: string]: any;
-    }) {
-      if (item) {
-        return (
-          <TableRow
-            {...props}
-            hover
-            onClick={(event) => handleClick(event, item[rowIdentifier])}
-            role="checkbox"
-            aria-checked={isSelected(item[rowIdentifier])}
-            tabIndex={-1}
-            key={item[rowIdentifier]}
-            selected={isSelected(item[rowIdentifier])}
-            onContextMenu={(event) =>
-              handleContextMenu(event, item[rowIdentifier])
-            }
-            style={{ cursor: "context-menu" }}
-          />
-        );
-      }
-      return <TableRow {...props} />;
-    },
-    TableBody: React.forwardRef<HTMLTableSectionElement>(
-      function VirtuosoTableBody(props, ref) {
-        return <TableBody {...props} ref={ref} />;
-      },
-    ),
-  };
-
   return (
     <Box sx={{ width: "100%" }}>
       <FilterToolbar
@@ -570,8 +547,15 @@ export function DataTable(props: DataTableProps) {
         />
         <TableContainer sx={{ height: "65vh", width: "100%" }}>
           <TableVirtuoso
-            data={stableSort(rows, getComparator(order, orderBy))}
+            data={rows}
             components={VirtuosoTableComponents}
+            context={{
+              rowIdentifier,
+              handleClick,
+              handleContextMenu,
+              isSelected,
+              isMobile,
+            }}
             fixedHeaderContent={() => {
               const createSortHandler =
                 (property: string | number) =>
