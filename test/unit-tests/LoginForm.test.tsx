@@ -90,9 +90,9 @@ jest.mock("next/navigation", () => {
 describe("LoginForm", () => {
   // Should render a text field to select the VO
   it("renders correctly multiple VOs", () => {
-    (useMetadata as jest.Mock).mockReturnValue({ data: multiVOMetadata });
+    (useMetadata as jest.Mock).mockReturnValue({ metadata: multiVOMetadata });
 
-    const { getByText } = render(
+    render(
       <ThemeProvider>
         <LoginForm />
       </ThemeProvider>,
@@ -125,9 +125,9 @@ describe("LoginForm", () => {
 
   // Should render a title with the VO name
   it("renders correctly single VO", () => {
-    (useMetadata as jest.Mock).mockReturnValue({ data: singleVOMetadata });
+    (useMetadata as jest.Mock).mockReturnValue({ metadata: singleVOMetadata });
 
-    const { getByText } = render(
+    render(
       <ThemeProvider>
         <LoginForm />
       </ThemeProvider>,

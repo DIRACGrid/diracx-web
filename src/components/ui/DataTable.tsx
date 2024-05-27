@@ -470,7 +470,7 @@ export function DataTable(props: DataTableProps) {
   };
 
   // Wait for the data to load
-  if ((!rows && !error) || isValidating || isLoading) {
+  if (isValidating || isLoading) {
     return (
       <>
         <FilterToolbar
