@@ -1,4 +1,5 @@
 export { default as ApplicationDialog } from "./ApplicationDialog";
+export { default as ApplicationHeader } from "./ApplicationHeader";
 export { default as DashboardDrawer } from "./DashboardDrawer";
 export { DataTable } from "./DataTable";
 export { default as DrawerItem } from "./DrawerItem";

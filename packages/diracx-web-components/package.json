@@ -7,7 +7,8 @@
     "dev": "tsup --watch --sourcemap",
     "test": "jest --ci",
     "lint": "eslint src",
-    "ts-lint": "tsc -noEmit -incremental"
+    "ts-lint": "tsc -noEmit -incremental",
+    "prepack": "npm run build"
   },
   "author": "",
   "license": "GPL-3.0",
@@ -78,11 +79,11 @@
     }
   },
   "files": [
-    "src",
     "dist",
     "components",
     "contexts",
     "hooks",
-    "types"
+    "types",
+    "public"
   ]
 }
