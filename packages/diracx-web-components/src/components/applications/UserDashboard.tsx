@@ -6,9 +6,14 @@ import ApplicationHeader from "@/components/ui/ApplicationHeader";
 
 /**
  * Build the User Dashboard page
+ * @param headerSize - The size of the header, optional
  * @returns User Dashboard content
  */
-export default function UserDashboard() {
+export default function UserDashboard({
+  headerSize,
+}: {
+  headerSize?: "h1" | "h2" | "h3" | "h4" | "h5" | "h6";
+}) {
   const { configuration } = useOIDCContext();
   const { accessTokenPayload } = useOidcAccessToken(configuration?.scope);
 
@@ -18,7 +23,7 @@ export default function UserDashboard() {
 
   return (
     <div>
-      <ApplicationHeader type="Dashboard" />
+      <ApplicationHeader type="Dashboard" size={headerSize} />
       <h2>Hello {accessTokenPayload["preferred_username"]}</h2>
 
       <p>To start with, select an application in the side bar</p>

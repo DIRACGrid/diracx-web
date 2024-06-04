@@ -1,22 +1,38 @@
-import { Dashboard, FolderCopy, Monitor } from "@mui/icons-material";
 import React, { createContext, useEffect, useState } from "react";
+import { Dashboard, FolderCopy, Monitor } from "@mui/icons-material";
 import JSONCrush from "jsoncrush";
 import { useOidc } from "@axa-fr/react-oidc";
 import { useSearchParamsUtils } from "@/hooks/searchParamsUtils";
 import { applicationList } from "@/components/applications/ApplicationList";
 import { UserSection } from "@/types/UserSection";
 import { useOIDCContext } from "@/hooks/oidcConfiguration";
+import ApplicationConfig from "@/types/ApplicationConfig";
 
 // Create a context for the userSections state
 export const ApplicationsContext = createContext<
-  [UserSection[], React.Dispatch<React.SetStateAction<UserSection[]>>]
->([[], () => {}]);
+  [
+    UserSection[],
+    React.Dispatch<React.SetStateAction<UserSection[]>>,
+    ApplicationConfig[],
+  ]
+>([[], () => {}, []]);
 
-// Create the ApplicationsProvider component
+/**
+ * Provides the applications context to its children components.
+ *
+ * @param children - The child components to be wrapped by the provider.
+ * @param appList - The list of application configurations.
+ * @param defaultSections - The default user sections.
+ * @returns The applications provider.
+ */
 export const ApplicationsProvider = ({
   children,
+  appList = applicationList,
+  defaultSections,
 }: {
   children: React.ReactNode;
+  appList?: ApplicationConfig[];
+  defaultSections?: UserSection[];
 }) => {
   const [userSections, setSections] = useState<UserSection[]>([]);
 
@@ -36,9 +52,8 @@ export const ApplicationsProvider = ({
             section.items = section.items.map((item: any) => {
               return {
                 ...item,
-                //get icon from ApplicationList
-                icon: applicationList.find((app) => app.name === item.type)
-                  ?.icon,
+                //get icon from appList
+                icon: appList.find((app) => app.name === item.type)?.icon,
               };
             });
             return section;
@@ -49,40 +64,42 @@ export const ApplicationsProvider = ({
         console.error("Error parsing user sections : ", uncrushed, e);
       }
     } else {
-      setSections([
-        {
-          title: "Dashboard",
-          extended: true,
-          items: [
-            {
-              title: "Dashboard",
-              type: "Dashboard",
-              id: "Dashboard0",
-              icon: Dashboard,
-            },
-            {
-              title: "Job Monitor",
-              type: "Job Monitor",
-              id: "JobMonitor0",
-              icon: Monitor,
-            },
-          ],
-        },
-        {
-          title: "Other",
-          extended: false,
-          items: [
-            {
-              title: "File Catalog",
-              type: "File Catalog",
-              id: "FileCatatlog0",
-              icon: FolderCopy,
-            },
-          ],
-        },
-      ]);
+      setSections(
+        defaultSections || [
+          {
+            title: "Dashboard",
+            extended: true,
+            items: [
+              {
+                title: "Dashboard",
+                type: "Dashboard",
+                id: "Dashboard0",
+                icon: Dashboard,
+              },
+              {
+                title: "Job Monitor",
+                type: "Job Monitor",
+                id: "JobMonitor0",
+                icon: Monitor,
+              },
+            ],
+          },
+          {
+            title: "Other",
+            extended: false,
+            items: [
+              {
+                title: "File Catalog",
+                type: "File Catalog",
+                id: "FileCatalog0",
+                icon: FolderCopy,
+              },
+            ],
+          },
+        ],
+      );
     }
-  }, [getParam]);
+  }, [getParam, appList, defaultSections]);
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -104,7 +121,7 @@ export const ApplicationsProvider = ({
   }, [isAuthenticated, setParam, userSections]);
 
   return (
-    <ApplicationsContext.Provider value={[userSections, setSections]}>
+    <ApplicationsContext.Provider value={[userSections, setSections, appList]}>
       {children}
     </ApplicationsContext.Provider>
   );

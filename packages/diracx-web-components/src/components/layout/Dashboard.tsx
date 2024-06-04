@@ -15,13 +15,15 @@ import { useMUITheme } from "@/hooks/theme";
 
 interface DashboardProps {
   children: React.ReactNode;
+  drawerWidth?: number;
+  logoURL?: string;
 }
 
 /**
  * Build a side bar on the left containing the available sections as well as a top bar.
  * The side bar is expected to collapse if displayed on a small screen
  *
- * @param props - children
+ * @param props - children, drawerWidth, logoURL
  * @return an dashboard layout
  */
 export default function Dashboard(props: DashboardProps) {
@@ -33,7 +35,7 @@ export default function Dashboard(props: DashboardProps) {
   };
 
   /** Drawer width */
-  const drawerWidth = 240;
+  const drawerWidth = props.drawerWidth || 240;
 
   return (
     <Box sx={{ display: "flex" }}>
@@ -87,12 +89,14 @@ export default function Dashboard(props: DashboardProps) {
             mobileOpen={mobileOpen}
             width={drawerWidth}
             handleDrawerToggle={handleDrawerToggle}
+            logoURL={props.logoURL}
           />
           <DashboardDrawer
             variant="permanent"
             mobileOpen={mobileOpen}
             width={drawerWidth}
             handleDrawerToggle={handleDrawerToggle}
+            logoURL={props.logoURL}
           />
         </Box>
         <Box

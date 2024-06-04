@@ -10,7 +10,7 @@ import {
   IconButton,
 } from "@mui/material";
 import { Close } from "@mui/icons-material";
-import { applicationList } from "../applications/ApplicationList";
+import { ApplicationsContext } from "@/contexts/ApplicationsProvider";
 
 /**
  * Renders a dialog component for creating a new application.
@@ -31,6 +31,7 @@ export default function AppDialog({
   handleCreateApp: (name: string, icon: ComponentType) => void;
 }) {
   const [appType, setAppType] = React.useState("");
+  const applicationList = React.useContext(ApplicationsContext)[2];
   return (
     <Dialog
       open={appDialogOpen}

@@ -24,9 +24,14 @@ import { useSearchParamsUtils } from "@/hooks/searchParamsUtils";
 
 /**
  * Login form
+ * @param logoURL the URL of the logo, optional
  * @returns a form
  */
-export function LoginForm() {
+export function LoginForm({
+  logoURL = "/DIRAC-logo-minimal.png",
+}: {
+  logoURL?: string;
+}) {
   const theme = useMUITheme();
   const router = useRouter();
   const { metadata, error, isLoading } = useMetadata();
@@ -143,12 +148,7 @@ export function LoginForm() {
               paddingBottom: "10%",
             }}
           >
-            <Image
-              src="/DIRAC-logo-minimal.png"
-              alt="DIRAC logo"
-              width={150}
-              height={150}
-            />
+            <Image src={logoURL} alt="DIRAC logo" width={150} height={150} />
           </Box>
           {singleVO ? (
             <Typography

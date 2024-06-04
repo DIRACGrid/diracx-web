@@ -34,6 +34,7 @@ interface DashboardDrawerProps {
   mobileOpen: boolean;
   width: number;
   handleDrawerToggle: ReactEventHandler;
+  logoURL?: string;
 }
 
 /**
@@ -68,6 +69,8 @@ export default function DashboardDrawer(props: DashboardDrawerProps) {
   // Define the sections that are accessible to users.
   // Each section has an associated icon and path.
   const [userSections, setSections] = useContext(ApplicationsContext);
+
+  const logoURL = props.logoURL || "/DIRAC-logo.png";
 
   const theme = useMUITheme();
 
@@ -369,12 +372,7 @@ export default function DashboardDrawer(props: DashboardDrawerProps) {
               backgroundColor: theme.palette.background.default,
             }}
           >
-            <Image
-              src="/DIRAC-logo.png"
-              alt="DIRAC logo"
-              width={150}
-              height={45}
-            />
+            <Image src={logoURL} alt="DIRAC logo" width={150} height={45} />
           </Toolbar>
           {/* Map over user sections and render them as list items in the drawer. */}
           <List>
