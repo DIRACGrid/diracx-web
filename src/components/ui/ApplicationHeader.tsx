@@ -1,5 +1,5 @@
 import React from "react";
-import { Stack, Typography } from "@mui/material";
+import { Stack, Typography, useMediaQuery, useTheme } from "@mui/material";
 import { useApplicationTitle } from "@/hooks/application";
 
 /**
@@ -8,10 +8,17 @@ import { useApplicationTitle } from "@/hooks/application";
  * @returns the application header
  */
 export default function ApplicationHeader({ type }: { type: string }) {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const appTitle = useApplicationTitle();
+
   return (
     <header>
-      <Stack spacing={2} direction={"row"} alignItems={"end"}>
+      <Stack
+        spacing={2}
+        direction={isMobile ? "column" : "row"}
+        alignItems={isMobile ? "start" : "end"}
+      >
         {appTitle && (
           <Typography
             color="text.primary"

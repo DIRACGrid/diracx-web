@@ -2,6 +2,7 @@ import React from "react";
 import { render } from "@testing-library/react";
 import useSWR from "swr";
 import { useOidcAccessToken } from "@axa-fr/react-oidc";
+import { VirtuosoMockContext } from "react-virtuoso";
 import { JobDataTable } from "@/components/ui/JobDataTable";
 
 // Mock modules
@@ -32,8 +33,26 @@ jest.mock("jsoncrush", () => ({
 }));
 
 describe("<JobDataTable />", () => {
-  it("displays loading state", () => {
-    (useSWR as jest.Mock).mockReturnValue({ data: null, error: null });
+  it("displays loading state when data is being validated", () => {
+    (useSWR as jest.Mock).mockReturnValue({
+      data: null,
+      error: null,
+      isValidating: true,
+      isLoading: false,
+    });
+    (useOidcAccessToken as jest.Mock).mockReturnValue("1234");
+
+    const { getByTestId } = render(<JobDataTable />);
+    expect(getByTestId("skeleton")).toBeVisible();
+  });
+
+  it("displays loading state when data is being loaded", () => {
+    (useSWR as jest.Mock).mockReturnValue({
+      data: null,
+      error: null,
+      isValidating: false,
+      isLoading: true,
+    });
     (useOidcAccessToken as jest.Mock).mockReturnValue("1234");
 
     const { getByTestId } = render(<JobDataTable />);
@@ -41,7 +60,12 @@ describe("<JobDataTable />", () => {
   });
 
   it("displays error state", () => {
-    (useSWR as jest.Mock).mockReturnValue({ error: true });
+    (useSWR as jest.Mock).mockReturnValue({
+      data: null,
+      error: true,
+      isValidating: false,
+      isLoading: false,
+    });
 
     const { getByText } = render(<JobDataTable />);
     expect(
@@ -50,7 +74,12 @@ describe("<JobDataTable />", () => {
   });
 
   it("displays no jobs data state", () => {
-    (useSWR as jest.Mock).mockReturnValue({ data: [] });
+    (useSWR as jest.Mock).mockReturnValue({
+      data: [],
+      error: false,
+      isValidating: false,
+      isLoading: false,
+    });
 
     const { getByText } = render(<JobDataTable />);
     expect(
@@ -59,18 +88,33 @@ describe("<JobDataTable />", () => {
   });
 
   it("displays jobs data in the grid", () => {
-    const mockData = [
-      {
-        JobID: "1",
-        JobName: "TestJob1",
-        Status: "Running",
-        MinorStatus: "Processing",
-        SubmissionTime: "2023-10-13",
-      },
-    ];
-    (useSWR as jest.Mock).mockReturnValue({ data: mockData });
+    const mockData = {
+      data: [
+        {
+          JobID: "1",
+          JobName: "TestJob1",
+          Status: "Running",
+          MinorStatus: "Processing",
+          SubmissionTime: "2023-10-13",
+        },
+      ],
+    };
+    (useSWR as jest.Mock).mockReturnValue({
+      data: mockData,
+      error: false,
+      isValidating: false,
+      isLoading: false,
+    });
 
-    const { getByText } = render(<JobDataTable />);
+    const { getByText } = render(<JobDataTable />, {
+      wrapper: ({ children }) => (
+        <VirtuosoMockContext.Provider
+          value={{ viewportHeight: 300, itemHeight: 100 }}
+        >
+          {children}
+        </VirtuosoMockContext.Provider>
+      ),
+    });
     expect(getByText("TestJob1")).toBeInTheDocument();
   });
 });

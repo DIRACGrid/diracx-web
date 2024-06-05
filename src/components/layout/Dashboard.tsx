@@ -97,7 +97,7 @@ export default function Dashboard(props: DashboardProps) {
         </Box>
         <Box
           component="main"
-          sx={{ pt: 10, px: 3, width: { sm: `calc(100% - ${drawerWidth}px)` } }}
+          sx={{ pt: 7, width: { sm: `calc(100% - ${drawerWidth}px)` } }}
         >
           {props.children}
         </Box>

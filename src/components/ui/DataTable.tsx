@@ -1,3 +1,4 @@
+"use client";
 import * as React from "react";
 import { alpha } from "@mui/material/styles";
 import Box from "@mui/material/Box";
@@ -27,6 +28,7 @@ import {
 } from "@mui/material";
 import { deepOrange } from "@mui/material/colors";
 import { useSearchParams } from "next/navigation";
+import { TableComponents, TableVirtuoso } from "react-virtuoso";
 import { FilterToolbar } from "./FilterToolbar";
 import { Filter } from "@/types/Filter";
 import { Column } from "@/types/Column";
@@ -34,151 +36,11 @@ import { useSearchParamsUtils } from "@/hooks/searchParamsUtils";
 import { ApplicationsContext } from "@/contexts/ApplicationsProvider";
 
 /**
- * Descending comparator function
- * @param a - the first value to compare
- * @param b - the second value to compare
- * @param orderBy - the key to compare
- * @returns -1 if b is less than a, 1 if b is greater than a, 0 if they are equal
- * @template T - the type of the values to compare
- */
-function descendingComparator<T>(a: T, b: T, orderBy: keyof T) {
-  if (b[orderBy] < a[orderBy]) {
-    return -1;
-  }
-  if (b[orderBy] > a[orderBy]) {
-    return 1;
-  }
-  return 0;
-}
-
-type Order = "asc" | "desc";
-
-/**
- * Get the comparator function for a given key and order
- * @param order - the order to sort by
- * @param orderBy - the key to sort by
- * @returns a comparator function
- * @template Key - the type of the key to sort by
- */
-function getComparator<Key extends keyof any>(
-  order: Order,
-  orderBy: Key,
-): (
-  a: { [key in Key]: number | string },
-  b: { [key in Key]: number | string },
-) => number {
-  return order === "desc"
-    ? (a, b) => descendingComparator(a, b, orderBy)
-    : (a, b) => -descendingComparator(a, b, orderBy);
-}
-
-/**
- * Stable sort function
- * @param array - the array to sort
- * @param comparator - the comparator function
- * @returns the sorted array
- * @template T - the type of the array to sort
- */
-function stableSort<T>(
-  array: readonly T[],
-  comparator: (a: T, b: T) => number,
-) {
-  const stabilizedThis = array.map((el, index) => [el, index] as [T, number]);
-  stabilizedThis.sort((a, b) => {
-    const order = comparator(a[0], b[0]);
-    if (order !== 0) return order;
-    return a[1] - b[1];
-  });
-  return stabilizedThis.map((el) => el[0]);
-}
-
-/**
  * Menu item
  */
 export interface MenuItem {
   label: string;
   onClick: (id: number | null) => void;
-}
-
-/**
- * DataTable head props
- * @property {Column[]} headCells - the head cells for the table
- * @property {number} numSelected - the number of selected rows
- * @property {function} onRequestSort - the function to call when sorting is requested
- * @property {function} onSelectAllClick - the function to call when all rows are selected
- * @property {Order} order - the order to sort by
- * @property {string} orderBy - the key to sort by
- * @property {number} rowCount - the number of rows
- */
-interface DataTableHeadProps {
-  headCells: Column[];
-  numSelected: number;
-  onRequestSort: (
-    event: React.MouseEvent<unknown>,
-    property: string | number,
-  ) => void;
-  onSelectAllClick: (
-    event: React.ChangeEvent<HTMLInputElement>,
-    checked: boolean,
-  ) => void;
-  order: Order;
-  orderBy: string;
-  rowCount: number;
-}
-
-/**
- * Data table head component
- * @param {DataTableHeadProps} props - the props for the component
- */
-function DataTableHead(props: DataTableHeadProps) {
-  const {
-    headCells,
-    onSelectAllClick,
-    order,
-    orderBy,
-    numSelected,
-    rowCount,
-    onRequestSort,
-  } = props;
-  const createSortHandler =
-    (property: string | number) => (event: React.MouseEvent<unknown>) => {
-      onRequestSort(event, property);
-    };
-
-  return (
-    <TableHead>
-      <TableRow>
-        <TableCell padding="checkbox">
-          <Checkbox
-            color="primary"
-            indeterminate={numSelected > 0 && numSelected < rowCount}
-            checked={rowCount > 0 && numSelected === rowCount}
-            onChange={onSelectAllClick}
-            inputProps={{ "aria-label": "select all items" }}
-          />
-        </TableCell>
-        {headCells.map((headCell) => (
-          <TableCell
-            key={headCell.id}
-            sortDirection={orderBy === headCell.id ? order : false}
-          >
-            <TableSortLabel
-              active={orderBy === headCell.id}
-              direction={orderBy === headCell.id ? order : "asc"}
-              onClick={createSortHandler(headCell.id)}
-            >
-              {headCell.label}
-              {orderBy === headCell.id ? (
-                <Box component="span" sx={visuallyHidden}>
-                  {order === "desc" ? "sorted descending" : "sorted ascending"}
-                </Box>
-              ) : null}
-            </TableSortLabel>
-          </TableCell>
-        ))}
-      </TableRow>
-    </TableHead>
-  );
 }
 
 /**
@@ -270,6 +132,77 @@ function DataTableToolbar(props: DataTableToolbarProps) {
   );
 }
 
+interface TableContextProps {
+  rowIdentifier: string;
+  handleClick: (event: React.MouseEvent, id: number) => void;
+  handleContextMenu: (event: React.MouseEvent, id: number) => void;
+  isSelected: (id: number) => boolean;
+  isMobile: boolean;
+}
+
+// Virtuoso table components: https://virtuoso.dev/
+// Used to render large tables with virtualization, which improves performance
+const VirtuosoTableComponents: TableComponents<Record<string, any>> = {
+  Scroller: React.forwardRef<HTMLDivElement>(function Scroller(props, ref) {
+    return <TableContainer component={Paper} {...props} ref={ref} />;
+  }),
+  Table: function VirtuosoTable(props) {
+    const { isMobile } = props.context as TableContextProps;
+    return (
+      <Table
+        {...props}
+        sx={{
+          borderCollapse: "separate",
+          tableLayout: "fixed",
+          minWidth: isMobile ? "undefined" : "50vw",
+        }}
+        aria-labelledby="tableTitle"
+        size={"small"}
+      />
+    );
+  },
+  TableHead: React.forwardRef<HTMLTableSectionElement>(
+    function VirtuosoTableHead(props, ref) {
+      return <TableHead {...props} ref={ref} />;
+    },
+  ),
+  TableRow: function VirtuosoTableRow({
+    item,
+    ...props
+  }: {
+    item: Record<string, any>;
+    [key: string]: any;
+  }) {
+    const { rowIdentifier, handleClick, handleContextMenu, isSelected } =
+      props.context as TableContextProps;
+
+    if (item) {
+      return (
+        <TableRow
+          {...props}
+          hover
+          onClick={(event) => handleClick(event, item[rowIdentifier])}
+          role="checkbox"
+          aria-checked={isSelected(item[rowIdentifier])}
+          tabIndex={-1}
+          key={item[rowIdentifier]}
+          selected={isSelected(item[rowIdentifier])}
+          onContextMenu={(event) =>
+            handleContextMenu(event, item[rowIdentifier])
+          }
+          style={{ cursor: "context-menu" }}
+        />
+      );
+    }
+    return <TableRow {...props} />;
+  },
+  TableBody: React.forwardRef<HTMLTableSectionElement>(
+    function VirtuosoTableBody(props, ref) {
+      return <TableBody {...props} ref={ref} />;
+    },
+  ),
+};
+
 /**
  * Data table props
  * @property {string} title - the title of the table
@@ -296,6 +229,11 @@ interface DataTableProps {
   setPage: React.Dispatch<React.SetStateAction<number>>;
   rowsPerPage: number;
   setRowsPerPage: React.Dispatch<React.SetStateAction<number>>;
+  order: "asc" | "desc";
+  setOrder: React.Dispatch<React.SetStateAction<"asc" | "desc">>;
+  orderBy: string | number;
+  setOrderBy: React.Dispatch<React.SetStateAction<string | number>>;
+  totalRows: number;
   selected: readonly number[];
   setSelected: React.Dispatch<React.SetStateAction<readonly number[]>>;
   filters: Filter[];
@@ -304,6 +242,8 @@ interface DataTableProps {
   columns: Column[];
   rows: any[];
   error: string | null;
+  isValidating: boolean;
+  isLoading: boolean;
   rowIdentifier: string;
   isMobile: boolean;
   toolbarComponents: JSX.Element;
@@ -322,6 +262,11 @@ export function DataTable(props: DataTableProps) {
     setPage,
     rowsPerPage,
     setRowsPerPage,
+    order,
+    setOrder,
+    orderBy,
+    setOrderBy,
+    totalRows,
     selected,
     setSelected,
     filters,
@@ -330,14 +275,13 @@ export function DataTable(props: DataTableProps) {
     columns,
     rows,
     error,
+    isLoading,
+    isValidating,
     rowIdentifier,
     isMobile,
     toolbarComponents,
     menuItems,
   } = props;
-  // State for sorting
-  const [order, setOrder] = React.useState<Order>("asc");
-  const [orderBy, setOrderBy] = React.useState<string | number>(rowIdentifier);
   // State for the context menu
   const [contextMenu, setContextMenu] = React.useState<{
     mouseX: number | null;
@@ -398,6 +342,7 @@ export function DataTable(props: DataTableProps) {
       value: filter.value,
     }));
     setSearchBody({ search: jsonFilters });
+    setPage(0);
 
     // Update the filters in the URL
     updateFiltersAndUrl(filters);
@@ -460,6 +405,10 @@ export function DataTable(props: DataTableProps) {
     const isAsc = orderBy === property && order === "asc";
     setOrder(isAsc ? "desc" : "asc");
     setOrderBy(property);
+    setSearchBody((prevState: any) => ({
+      ...prevState,
+      sort: [{ parameter: property, direction: isAsc ? "desc" : "asc" }],
+    }));
   };
 
   // Manage selection
@@ -521,48 +470,43 @@ export function DataTable(props: DataTableProps) {
   };
 
   // Wait for the data to load
-  if (!rows && !error) {
-    const buttonWidth = "calc(20% - 10px)";
+  if (isValidating || isLoading) {
     return (
-      <Box sx={{ width: "100%", p: 1 }} data-testid="skeleton">
-        <Stack direction="row" spacing={1} sx={{ m: 1 }}>
-          <Skeleton
-            variant="rectangular"
-            animation="pulse"
-            height={50}
-            width={buttonWidth}
-          />
-          <Skeleton
-            variant="rectangular"
-            animation="pulse"
-            height={50}
-            width={buttonWidth}
-          />
-          <Skeleton
-            variant="rectangular"
-            animation="pulse"
-            height={50}
-            width={buttonWidth}
-          />
-        </Stack>
-        <Skeleton
-          variant="rectangular"
-          animation="pulse"
-          height={500}
-          width="100%"
+      <>
+        <FilterToolbar
+          columns={columns}
+          filters={filters}
+          setFilters={setFilters}
+          handleApplyFilters={handleApplyFilters}
         />
-      </Box>
+        <Box sx={{ width: "100%", p: 1 }} data-testid="skeleton">
+          <Skeleton
+            variant="rectangular"
+            animation="pulse"
+            height={500}
+            width="100%"
+          />
+        </Box>
+      </>
     );
   }
 
   // Handle errors
   if (error) {
     return (
-      <Box sx={{ width: "100%", marginTop: 2 }}>
-        <Alert severity="error">
-          An error occurred while fetching data. Reload the page.
-        </Alert>
-      </Box>
+      <>
+        <FilterToolbar
+          columns={columns}
+          filters={filters}
+          setFilters={setFilters}
+          handleApplyFilters={handleApplyFilters}
+        />
+        <Box sx={{ width: "100%", marginTop: 2 }}>
+          <Alert severity="error">
+            An error occurred while fetching data. Reload the page.
+          </Alert>
+        </Box>
+      </>
     );
   }
 
@@ -594,81 +538,102 @@ export function DataTable(props: DataTableProps) {
         handleApplyFilters={handleApplyFilters}
       />
 
-      <Paper sx={{ width: "100%", mb: 2 }}>
+      <Paper sx={{ width: "100%", mb: 1 }}>
         <DataTableToolbar
           title={title}
           numSelected={selected.length}
           selectedIds={selected}
           toolbarComponents={toolbarComponents}
         />
-        <TableContainer sx={{ height: "55vh" }}>
-          <Table
-            stickyHeader
-            sx={{ minWidth: isMobile ? "undefined" : "50vw" }}
-            aria-labelledby="tableTitle"
-            size={"small"}
-          >
-            <DataTableHead
-              headCells={columns}
-              numSelected={selected.length}
-              order={order}
-              orderBy={orderBy.toString()}
-              onSelectAllClick={handleSelectAllClick}
-              onRequestSort={handleRequestSort}
-              rowCount={rows.length}
-            />
-            <TableBody>
-              {stableSort(rows, getComparator(order, orderBy))
-                .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                .map((row, index) => {
-                  const isItemSelected = isSelected(
-                    row[rowIdentifier] as number,
-                  );
-                  const labelId = `enhanced-table-checkbox-${index}`;
+        <TableContainer sx={{ height: "65vh", width: "100%" }}>
+          <TableVirtuoso
+            data={rows}
+            components={VirtuosoTableComponents}
+            context={{
+              rowIdentifier,
+              handleClick,
+              handleContextMenu,
+              isSelected,
+              isMobile,
+            }}
+            fixedHeaderContent={() => {
+              const createSortHandler =
+                (property: string | number) =>
+                (event: React.MouseEvent<unknown>) => {
+                  handleRequestSort(event, property);
+                };
 
-                  return (
-                    <TableRow
-                      hover
-                      onClick={(event) =>
-                        handleClick(event, row[rowIdentifier] as number)
+              return (
+                <TableRow>
+                  <TableCell padding="checkbox">
+                    <Checkbox
+                      color="primary"
+                      indeterminate={
+                        selected.length > 0 && selected.length < rows.length
                       }
-                      role="checkbox"
-                      aria-checked={isItemSelected}
-                      tabIndex={-1}
-                      key={row[rowIdentifier]}
-                      selected={isItemSelected}
-                      onContextMenu={(event) =>
-                        handleContextMenu(event, row[rowIdentifier] as number)
+                      checked={
+                        rows.length > 0 && selected.length === rows.length
                       }
-                      style={{ cursor: "context-menu" }}
+                      onChange={handleSelectAllClick}
+                      inputProps={{ "aria-label": "select all items" }}
+                    />
+                  </TableCell>
+                  {columns.map((headCell) => (
+                    <TableCell
+                      key={headCell.id}
+                      sortDirection={orderBy === headCell.id ? order : false}
                     >
-                      <TableCell padding="checkbox">
-                        <Checkbox
-                          color="primary"
-                          checked={isItemSelected}
-                          inputProps={{ "aria-labelledby": labelId }}
-                        />
+                      <TableSortLabel
+                        active={orderBy === headCell.id}
+                        direction={orderBy === headCell.id ? order : "asc"}
+                        onClick={createSortHandler(headCell.id)}
+                      >
+                        {headCell.label}
+                        {orderBy === headCell.id ? (
+                          <Box component="span" sx={visuallyHidden}>
+                            {order === "desc"
+                              ? "sorted descending"
+                              : "sorted ascending"}
+                          </Box>
+                        ) : null}
+                      </TableSortLabel>
+                    </TableCell>
+                  ))}
+                </TableRow>
+              );
+            }}
+            itemContent={(index: number, row: Record<string, any>) => {
+              const isItemSelected = isSelected(row[rowIdentifier]);
+              const labelId = `enhanced-table-checkbox-${index}`;
+
+              return (
+                <>
+                  <TableCell padding="checkbox">
+                    <Checkbox
+                      color="primary"
+                      checked={isItemSelected}
+                      inputProps={{ "aria-labelledby": labelId }}
+                    />
+                  </TableCell>
+                  {columns.map((column) => {
+                    const cellValue = row[column.id];
+                    return (
+                      <TableCell key={column.id}>
+                        {column.render ? column.render(cellValue) : cellValue}
                       </TableCell>
-                      {columns.map((column) => {
-                        const cellValue = row[column.id];
-                        return (
-                          <TableCell key={column.id}>
-                            {column.render
-                              ? column.render(cellValue)
-                              : cellValue}
-                          </TableCell>
-                        );
-                      })}
-                    </TableRow>
-                  );
-                })}
-            </TableBody>
-          </Table>
+                    );
+                  })}
+                </>
+              );
+            }}
+          />
         </TableContainer>
         <TablePagination
           rowsPerPageOptions={[25, 50, 100, 500, 1000]}
           component="div"
-          count={rows.length}
+          count={totalRows}
+          showFirstButton
+          showLastButton
           rowsPerPage={rowsPerPage}
           page={page}
           onPageChange={handleChangePage}

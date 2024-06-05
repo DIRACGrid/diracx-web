@@ -80,6 +80,7 @@ const renderStatusCell = (status: string) => {
 const headCells: Column[] = [
   { id: "JobID", label: "Job ID" },
   { id: "JobName", label: "Job Name" },
+  { id: "Site", label: "Site" },
   { id: "Status", label: "Status", render: renderStatusCell },
   {
     id: "MinorStatus",
@@ -100,6 +101,8 @@ const mobileHeadCells: Column[] = [
   { id: "Status", label: "Status", render: renderStatusCell },
 ];
 
+type Order = "asc" | "desc";
+
 /**
  * The data grid for the jobs
  */
@@ -116,23 +119,44 @@ export function JobDataTable() {
     message: "",
     severity: "success",
   });
+  // State for sorting
+  const [order, setOrder] = React.useState<Order>("asc");
+  const [orderBy, setOrderBy] = React.useState<string | number>("JobID");
+  // State for pagination
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(25);
+  // State for filters
   const [filters, setFilters] = React.useState<Filter[]>([]);
+  // State for search body
   const [searchBody, setSearchBody] = React.useState({});
+  // State for job history
   const [isHistoryDialogOpen, setIsHistoryDialogOpen] = React.useState(false);
   const [jobHistoryData, setJobHistoryData] = React.useState([]);
 
   /**
    * Fetches the jobs from the /api/jobs/search endpoint
    */
-  //TODO: uncomment the following line once page and per_page are used in the backend
-  //const urlGetJobs = `/api/jobs/search?page=${page}&per_page=${rowsPerPage}`;
-  const urlGetJobs = `/api/jobs/search?page=0&per_page=100`;
-  const { data, error } = useSWR(
+  const urlGetJobs = `/api/jobs/search?page=${page + 1}&per_page=${rowsPerPage}`;
+  const { data, error, isLoading, isValidating } = useSWR(
     [urlGetJobs, accessToken, "POST", searchBody],
     fetcher,
   );
+
+  const dataHeader = data?.headers;
+  const results = data?.data;
+
+  // Parse the headers to get the first item, last item and number of items
+  const contentRange = dataHeader?.get("content-range");
+  let totalJobs = 0;
+
+  if (contentRange) {
+    const match = contentRange.match(/jobs (\d+)-(\d+)\/(\d+)/);
+    if (match) {
+      totalJobs = parseInt(match[3]);
+    }
+  } else if (results) {
+    totalJobs = results.length;
+  }
 
   const columns = isMobile ? mobileHeadCells : headCells;
   const clearSelected = () => setSelected([]);
@@ -156,7 +180,7 @@ export function JobDataTable() {
       const response = await fetch(deleteUrl, requestOptions);
       if (!response.ok)
         throw new Error("An error occurred while deleting jobs.");
-      const data = await response.json();
+      await response.json();
       setBackdropOpen(false);
       mutate([urlGetJobs, accessToken, "POST", searchBody]);
       clearSelected();
@@ -195,7 +219,7 @@ export function JobDataTable() {
       const response = await fetch(killUrl, requestOptions);
       if (!response.ok)
         throw new Error("An error occurred while deleting jobs.");
-      const data = await response.json();
+      await response.json();
       setBackdropOpen(false);
       mutate([urlGetJobs, accessToken, "POST", searchBody]);
       clearSelected();
@@ -234,7 +258,7 @@ export function JobDataTable() {
       const response = await fetch(rescheduleUrl, requestOptions);
       if (!response.ok)
         throw new Error("An error occurred while deleting jobs.");
-      const data = await response.json();
+      await response.json();
       setBackdropOpen(false);
       mutate([urlGetJobs, accessToken, "POST", searchBody]);
       clearSelected();
@@ -336,14 +360,21 @@ export function JobDataTable() {
         setPage={setPage}
         rowsPerPage={rowsPerPage}
         setRowsPerPage={setRowsPerPage}
+        order={order}
+        setOrder={setOrder}
+        orderBy={orderBy}
+        setOrderBy={setOrderBy}
+        totalRows={totalJobs}
         selected={selected}
         setSelected={setSelected}
         filters={filters}
         setFilters={setFilters}
         setSearchBody={setSearchBody}
         columns={columns}
-        rows={data}
+        rows={results}
         error={error}
+        isLoading={isLoading}
+        isValidating={isValidating}
         rowIdentifier="JobID"
         isMobile={isMobile}
         toolbarComponents={toolbarComponents}
