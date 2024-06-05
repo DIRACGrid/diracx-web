@@ -10,10 +10,8 @@ import MenuItem from "@mui/material/MenuItem";
 import Button from "@mui/material/Button";
 import Autocomplete from "@mui/material/Autocomplete";
 import TextField from "@mui/material/TextField";
-import Image from "next/image";
 import { CssBaseline, Stack } from "@mui/material";
 import { ThemeProvider as MUIThemeProvider } from "@mui/material/styles";
-import { useRouter } from "next/navigation";
 import * as React from "react";
 import { useOidc } from "@axa-fr/react-oidc";
 import { useOIDCContext } from "@/hooks/oidcConfiguration";
@@ -21,6 +19,7 @@ import { useMUITheme } from "@/hooks/theme";
 import { useMetadata, Metadata } from "@/hooks/metadata";
 
 import { useSearchParamsUtils } from "@/hooks/searchParamsUtils";
+import { NavigationContext } from "@/contexts/NavigationProvider";
 
 /**
  * Login form
@@ -33,7 +32,7 @@ export function LoginForm({
   logoURL?: string;
 }) {
   const theme = useMUITheme();
-  const router = useRouter();
+  const { setPath } = React.useContext(NavigationContext);
   const { metadata, error, isLoading } = useMetadata();
   const [selectedVO, setSelectedVO] = useState<string | null>(null);
   const [selectedGroup, setSelectedGroup] = useState<string | null>(null);
@@ -55,12 +54,12 @@ export function LoginForm({
     if (isAuthenticated) {
       const redirect = getParam("redirect");
       if (redirect) {
-        router.push(redirect);
+        setPath(redirect);
       } else {
-        router.push("/");
+        setPath("/");
       }
     }
-  }, [getParam, isAuthenticated, router]);
+  }, [getParam, isAuthenticated, setPath]);
 
   // Get default group
   const getDefaultGroup = (
@@ -148,7 +147,7 @@ export function LoginForm({
               paddingBottom: "10%",
             }}
           >
-            <Image src={logoURL} alt="DIRAC logo" width={150} height={150} />
+            <img src={logoURL} alt="DIRAC logo" width={150} height={150} />
           </Box>
           {singleVO ? (
             <Typography

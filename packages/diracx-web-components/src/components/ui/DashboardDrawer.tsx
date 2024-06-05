@@ -23,7 +23,6 @@ import React, {
 } from "react";
 import { monitorForElements } from "@atlaskit/pragmatic-drag-and-drop/element/adapter";
 import { extractClosestEdge } from "@atlaskit/pragmatic-drag-and-drop-hitbox/closest-edge";
-import Image from "next/image";
 import DrawerItemGroup from "./DrawerItemGroup";
 import AppDialog from "./ApplicationDialog";
 import { ApplicationsContext } from "@/contexts/ApplicationsProvider";
@@ -234,9 +233,9 @@ export default function DashboardDrawer(props: DashboardDrawerProps) {
     };
     group.items.push(newApp);
     if (empty) {
-      setSections([...userSections, group]);
+      setSections((userSections) => [...userSections, group]);
     } else {
-      setSections(
+      setSections((userSections) =>
         userSections.map((g) => (g.title === group.title ? group : g)),
       );
     }
@@ -278,24 +277,24 @@ export default function DashboardDrawer(props: DashboardDrawerProps) {
       newGroup.title = `Group ${parseInt(newGroup.title.split(" ")[1]) + 1}`;
     }
 
-    setSections([...userSections, newGroup]);
+    setSections((userSections) => [...userSections, newGroup]);
     handleCloseContextMenu();
   };
 
   const handleDelete = () => {
     if (contextState.type === "group") {
-      const newSections = userSections.filter(
-        (group) => group.title !== contextState.id,
+      setSections((userSections) =>
+        userSections.filter((group) => group.title !== contextState.id),
       );
-      setSections(newSections);
     } else if (contextState.type === "item") {
-      const newSections = userSections.map((group) => {
-        const newItems = group.items.filter(
-          (item) => item.id !== contextState.id,
-        );
-        return { ...group, items: newItems };
-      });
-      setSections(newSections);
+      setSections((userSections) =>
+        userSections.map((group) => {
+          const newItems = group.items.filter(
+            (item) => item.id !== contextState.id,
+          );
+          return { ...group, items: newItems };
+        }),
+      );
     }
     handleCloseContextMenu();
   };
@@ -316,24 +315,26 @@ export default function DashboardDrawer(props: DashboardDrawerProps) {
         return;
       }
       //rename the group
-      const newSections = userSections.map((group) => {
-        if (group.title === contextState.id) {
-          return { ...group, title: renameValue };
-        }
-        return group;
-      });
-      setSections(newSections);
-    } else if (contextState.type === "item") {
-      const newSections = userSections.map((group) => {
-        const newItems = group.items.map((item) => {
-          if (item.id === contextState.id) {
-            return { ...item, title: renameValue };
+      setSections((userSections) =>
+        userSections.map((group) => {
+          if (group.title === contextState.id) {
+            return { ...group, title: renameValue };
           }
-          return item;
-        });
-        return { ...group, items: newItems };
-      });
-      setSections(newSections);
+          return group;
+        }),
+      );
+    } else if (contextState.type === "item") {
+      setSections((userSections) =>
+        userSections.map((group) => {
+          const newItems = group.items.map((item) => {
+            if (item.id === contextState.id) {
+              return { ...item, title: renameValue };
+            }
+            return item;
+          });
+          return { ...group, items: newItems };
+        }),
+      );
     }
 
     popClose();
@@ -372,7 +373,7 @@ export default function DashboardDrawer(props: DashboardDrawerProps) {
               backgroundColor: theme.palette.background.default,
             }}
           >
-            <Image src={logoURL} alt="DIRAC logo" width={150} height={45} />
+            <img src={logoURL} alt="DIRAC logo" width={150} height={45} />
           </Toolbar>
           {/* Map over user sections and render them as list items in the drawer. */}
           <List>

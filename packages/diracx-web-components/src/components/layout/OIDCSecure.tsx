@@ -1,8 +1,8 @@
 "use client";
 import React, { useEffect } from "react";
-import { useRouter } from "next/navigation";
 import { useOidc } from "@axa-fr/react-oidc";
 import { useOIDCContext } from "@/hooks/oidcConfiguration";
+import { NavigationContext } from "@/contexts/NavigationProvider";
 
 interface OIDCProps {
   children: React.ReactNode;
@@ -16,18 +16,20 @@ interface OIDCProps {
 export function OIDCSecure({ children }: OIDCProps) {
   const { configuration } = useOIDCContext();
   const { isAuthenticated } = useOidc(configuration?.scope);
-  const router = useRouter();
+  const { setPath } = React.useContext(NavigationContext);
 
   useEffect(() => {
     // Redirect to login page if not authenticated
     if (!isAuthenticated) {
-      router.push(
+      setPath(
         "/auth?" +
           // URLSearchParams to ensure that auth redirects users to the URL they came from
-          new URLSearchParams({ redirect: window.location.href }).toString(),
+          new URLSearchParams({
+            redirect: window.location.pathname + window.location.search,
+          }).toString(),
       );
     }
-  }, [isAuthenticated, router]);
+  }, [isAuthenticated, setPath]);
 
   return <>{children}</>;
 }

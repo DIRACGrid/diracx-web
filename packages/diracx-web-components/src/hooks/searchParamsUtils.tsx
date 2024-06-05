@@ -1,5 +1,5 @@
-import { useRouter, useSearchParams, usePathname } from "next/navigation";
-import { useCallback } from "react";
+import React, { useMemo, useCallback } from "react";
+import { NavigationContext } from "@/contexts/NavigationProvider";
 
 /**
  * Custom hook for managing search parameters in the URL.
@@ -8,9 +8,10 @@ import { useCallback } from "react";
  * @returns An object containing the `getParam`, `setParam`, and `removeParam` functions.
  */
 export function useSearchParamsUtils() {
-  const router = useRouter();
-  const searchParams = useSearchParams();
-  const pathname = usePathname();
+  const { getPath, setPath, getSearchParams } =
+    React.useContext(NavigationContext);
+  const searchParams = useMemo(() => getSearchParams(), [getSearchParams]);
+  const pathname = useMemo(() => getPath(), [getPath]);
 
   const getParams = useCallback(() => {
     return new URLSearchParams(searchParams);
@@ -37,14 +38,14 @@ export function useSearchParamsUtils() {
         params.delete(key);
         value.forEach((v) => params.append(key, v));
         params.sort();
-        router.push(`${pathname}?${params.toString()}`);
+        setPath(`${pathname}?${params.toString()}`);
       } else {
         params.set(key, value);
         params.sort();
-        router.push(`${pathname}?${params.toString()}`);
+        setPath(`${pathname}?${params.toString()}`);
       }
     },
-    [getParams, pathname, router],
+    [getParams, pathname, setPath],
   );
 
   const removeParam = useCallback(
@@ -52,11 +53,11 @@ export function useSearchParamsUtils() {
       const params = getParams();
       params.delete(key);
 
-      router.push(
+      setPath(
         `${pathname}?${params.toString() === "" ? "" : params.toString()}`,
       );
     },
-    [getParams, pathname, router],
+    [getParams, pathname, setPath],
   );
 
   return { getParam, setParam, removeParam, getAllParam };

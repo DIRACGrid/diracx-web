@@ -17,7 +17,9 @@ describe("DashboardDrawer", { retries: { runMode: 5, openMode: 3 } }, () => {
       cy.get(":nth-child(1) > form > .dex-btn").click();
       cy.url().should("include", "/auth");
     });
-    cy.visit("/");
+    cy.visit(
+      "/?appId=Dashboard0&sections=E-4tru2-93-96-0%27A1316Job70%275AOther4fals2.3.6B80%2755*%28%27title%21%27-Dashboard.B+891Job+792e~items%21E3type%21%2749extended%215%29%5D6id%21%277Monitor8Catalog9%27~A%29%2C*BFileE%5B*%01EBA987654321.-*_",
+    );
   });
 
   it("should render the drawer", () => {
@@ -109,6 +111,7 @@ describe("DashboardDrawer", { retries: { runMode: 5, openMode: 3 } }, () => {
 
     // Check if the drawer is not visible before reloading
     cy.contains("Job Monitor").should("not.be.visible");
+    cy.wait(500);
     cy.url().should("include", "sections=");
 
     cy.reload();

@@ -6,6 +6,7 @@ import DashboardDrawer from "@/components/ui/DashboardDrawer";
 import { ThemeProvider } from "@/contexts/ThemeProvider";
 import { ApplicationsContext } from "@/contexts/ApplicationsProvider";
 import { UserSection } from "@/types/UserSection";
+import { applicationList } from "@/components/applications/ApplicationList";
 
 // Mock the module
 jest.mock("@axa-fr/react-oidc", () => ({
@@ -56,6 +57,7 @@ const MockApplicationProvider: React.FC<{ children: React.ReactNode }> = ({
       jest.fn((test) => {
         mockSections = test();
       }),
+      applicationList,
     ]}
   >
     {children}

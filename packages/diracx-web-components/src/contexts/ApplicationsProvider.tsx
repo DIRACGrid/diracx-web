@@ -1,11 +1,9 @@
-import React, { createContext, useEffect, useState } from "react";
+import React, { createContext, useCallback, useEffect, useState } from "react";
 import { Dashboard, FolderCopy, Monitor } from "@mui/icons-material";
 import JSONCrush from "jsoncrush";
-import { useOidc } from "@axa-fr/react-oidc";
 import { useSearchParamsUtils } from "@/hooks/searchParamsUtils";
 import { applicationList } from "@/components/applications/ApplicationList";
 import { UserSection } from "@/types/UserSection";
-import { useOIDCContext } from "@/hooks/oidcConfiguration";
 import ApplicationConfig from "@/types/ApplicationConfig";
 
 // Create a context for the userSections state
@@ -38,12 +36,33 @@ export const ApplicationsProvider = ({
 
   const { getParam, setParam } = useSearchParamsUtils();
 
-  const { configuration } = useOIDCContext();
-  const { isAuthenticated } = useOidc(configuration?.scope);
+  // get user sections from searchParams
+  const sectionsParams = getParam("sections");
+
+  // save user sections to searchParams (but not icons)
+  const setSectionsParams = useCallback(
+    (sections: UserSection[] | ((prev: UserSection[]) => UserSection[])) => {
+      if (typeof sections === "function") {
+        sections = sections(userSections);
+      }
+      const newSections = sections.map((section) => {
+        return {
+          ...section,
+          items: section.items.map((item) => {
+            return {
+              ...item,
+              icon: () => null,
+            };
+          }),
+        };
+      });
+      setParam("sections", JSONCrush.crush(JSON.stringify(newSections)));
+    },
+    [setParam, userSections],
+  );
 
   useEffect(() => {
-    // get user sections from searchParams
-    const sectionsParams = getParam("sections");
+    if (userSections.length !== 0) return;
     if (sectionsParams) {
       const uncrushed = JSONCrush.uncrush(sectionsParams);
       try {
@@ -59,7 +78,9 @@ export const ApplicationsProvider = ({
             return section;
           },
         );
-        setSections(newSections);
+        if (newSections !== userSections) {
+          setSections(newSections);
+        }
       } catch (e) {
         console.error("Error parsing user sections : ", uncrushed, e);
       }
@@ -99,29 +120,19 @@ export const ApplicationsProvider = ({
         ],
       );
     }
-  }, [getParam, appList, defaultSections]);
-
-  useEffect(() => {
-    if (!isAuthenticated) {
-      return;
-    }
-    // save user sections to searchParams (but not icons)
-    const newSections = userSections.map((section) => {
-      return {
-        ...section,
-        items: section.items.map((item) => {
-          return {
-            ...item,
-            icon: () => null,
-          };
-        }),
-      };
-    });
-    setParam("sections", JSONCrush.crush(JSON.stringify(newSections)));
-  }, [isAuthenticated, setParam, userSections]);
+  }, [appList, defaultSections, sectionsParams]);
 
   return (
-    <ApplicationsContext.Provider value={[userSections, setSections, appList]}>
+    <ApplicationsContext.Provider
+      value={[
+        userSections,
+        (section) => {
+          setSections(section);
+          setSectionsParams(section);
+        },
+        appList,
+      ]}
+    >
       {children}
     </ApplicationsContext.Provider>
   );

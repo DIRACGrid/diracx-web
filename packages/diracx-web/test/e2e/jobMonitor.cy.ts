@@ -128,7 +128,7 @@ describe("Job Monitor", () => {
     cy.get(".MuiChip-label").should("be.visible");
 
     cy.get("button").contains("Apply").click();
-    cy.wait(1000);
+    cy.wait(500);
     cy.reload();
 
     cy.get(".MuiChip-label").should("be.visible");
@@ -149,7 +149,7 @@ describe("Job Monitor", () => {
     cy.get(".MuiChip-label").should("be.visible");
 
     cy.get("button").contains("Apply").click();
-    cy.wait(1000);
+    cy.wait(500);
     cy.get(".MuiButtonBase-root").contains("Job Monitor 2").click();
 
     cy.get(".MuiChip-label").should("not.exist");

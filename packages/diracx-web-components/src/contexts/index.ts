@@ -11,3 +11,4 @@ export {
   ThemeProvider,
   type ThemeProviderProps,
 } from "./ThemeProvider";
+export * from "./NavigationProvider";
