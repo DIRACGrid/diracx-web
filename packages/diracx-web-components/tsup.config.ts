@@ -14,6 +14,7 @@ export default defineConfig([
     experimentalDts: true, // Seems to work fine, lower memory usage and faster than dts
     target: "es5",
     bundle: true,
+    sourcemap: true,
     async onSuccess() {
       // recursively go through each js file in dist and add "use client" to the top
       const distDir = path.join(__dirname, "dist");
@@ -52,8 +53,8 @@ export default defineConfig([
     ],
     format: ["esm", "cjs"],
     experimentalDts: true, // Seems to work fine, lower memory usage and faster than dts
-    clean: true,
     target: "es5",
     bundle: false,
+    sourcemap: true
   },
 ]);

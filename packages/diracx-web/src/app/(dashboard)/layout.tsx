@@ -1,5 +1,5 @@
 "use client";
-import * as React from "react";
+import React from "react";
 import CssBaseline from "@mui/material/CssBaseline";
 import { Box } from "@mui/material";
 import { ThemeProvider as MUIThemeProvider } from "@mui/material/styles";

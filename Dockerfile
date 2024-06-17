@@ -1,3 +1,4 @@
+# syntax=docker/dockerfile:1.7-labs
 # Minimize the size and complexity of the final Docker image by separating the
 # build stage and the runtime stage into two different steps
 
@@ -5,7 +6,7 @@
 FROM node:alpine AS build
 WORKDIR /app
 # Install the project dependencies
-COPY package*.json ./
+COPY --parents package*.json ./
 RUN npm ci
 # Copy the rest of the application to the working directory
 COPY . .

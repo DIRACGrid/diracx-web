@@ -1,5 +1,5 @@
 "use client";
-import * as React from "react";
+import React from "react";
 import { JobDataTable } from "../ui/JobDataTable";
 import ApplicationHeader from "@/components/ui/ApplicationHeader";
 

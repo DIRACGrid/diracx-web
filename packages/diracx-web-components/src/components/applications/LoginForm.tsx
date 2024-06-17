@@ -12,7 +12,7 @@ import Autocomplete from "@mui/material/Autocomplete";
 import TextField from "@mui/material/TextField";
 import { CssBaseline, Stack } from "@mui/material";
 import { ThemeProvider as MUIThemeProvider } from "@mui/material/styles";
-import * as React from "react";
+import React from "react";
 import { useOidc } from "@axa-fr/react-oidc";
 import { useOIDCContext } from "@/hooks/oidcConfiguration";
 import { useMUITheme } from "@/hooks/theme";
