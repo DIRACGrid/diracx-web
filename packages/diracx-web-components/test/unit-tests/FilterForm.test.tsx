@@ -1,6 +1,6 @@
 import React from "react";
 import { render, screen, fireEvent, within } from "@testing-library/react";
-import { FilterForm } from "@/components/ui/FilterForm";
+import { FilterForm } from "@/components/shared/FilterForm";
 
 describe("FilterForm", () => {
   const columns = [
@@ -24,7 +24,7 @@ describe("FilterForm", () => {
         setFilters={setFilters}
         handleFilterChange={handleFilterChange}
         handleFilterMenuClose={handleFilterMenuClose}
-        selectedFilterId={null}
+        selectedFilterId={undefined}
       />,
     );
 
@@ -110,7 +110,7 @@ describe("FilterForm", () => {
         setFilters={setFilters}
         handleFilterChange={handleFilterChange}
         handleFilterMenuClose={handleFilterMenuClose}
-        selectedFilterId={null}
+        selectedFilterId={undefined}
       />,
     );
 

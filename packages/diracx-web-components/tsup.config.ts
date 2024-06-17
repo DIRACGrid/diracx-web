@@ -5,6 +5,7 @@ import { defineConfig } from "tsup";
 export default defineConfig([
   {
     entry: [
+      "src/components/!(index).ts?(x)",
       "src/components/*/!(index).ts?(x)",
       "src/hooks/!(index).ts?(x)",
       "src/contexts/!(index).ts?(x)",

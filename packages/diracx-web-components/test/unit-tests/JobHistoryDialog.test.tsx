@@ -1,6 +1,6 @@
 import React from "react";
 import { render, screen } from "@testing-library/react";
-import { JobHistoryDialog } from "@/components/ui/JobHistoryDialog";
+import { JobHistoryDialog } from "@/components/JobMonitor/JobHistoryDialog";
 
 describe("JobHistoryDialog", () => {
   const historyData = [

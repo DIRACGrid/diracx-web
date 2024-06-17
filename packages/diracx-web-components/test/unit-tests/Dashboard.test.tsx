@@ -1,12 +1,12 @@
 import React from "react";
 import { render, fireEvent } from "@testing-library/react";
 import { useOidc, useOidcAccessToken } from "@axa-fr/react-oidc";
-import Dashboard from "@/components/layout/Dashboard";
-import DashboardDrawer from "@/components/ui/DashboardDrawer";
+import Dashboard from "@/components/DashboardLayout/Dashboard";
+import DashboardDrawer from "@/components/DashboardLayout/DashboardDrawer";
 import { ThemeProvider } from "@/contexts/ThemeProvider";
 import { ApplicationsContext } from "@/contexts/ApplicationsProvider";
 import { UserSection } from "@/types/UserSection";
-import { applicationList } from "@/components/applications/ApplicationList";
+import { applicationList } from "@/components/ApplicationList";
 
 // Mock the module
 jest.mock("@axa-fr/react-oidc", () => ({

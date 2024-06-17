@@ -2,7 +2,7 @@
 
 import React, { useState, createContext } from "react";
 import { OidcConfiguration } from "@axa-fr/react-oidc";
-import { OIDCProvider } from "@/components/layout/OIDCProvider";
+import { OIDCProvider } from "@/components/OIDC/OIDCProvider";
 
 /**
  * OIDC configuration context

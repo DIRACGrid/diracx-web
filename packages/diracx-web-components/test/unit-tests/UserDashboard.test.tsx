@@ -5,7 +5,7 @@ import {
   useOidcAccessToken,
   useOidc,
 } from "@axa-fr/react-oidc";
-import UserDashboard from "@/components/applications/UserDashboard";
+import UserDashboard from "@/components/UserDashboard/UserDashboard";
 import { ThemeProvider } from "@/contexts/ThemeProvider";
 
 // Mock the modules

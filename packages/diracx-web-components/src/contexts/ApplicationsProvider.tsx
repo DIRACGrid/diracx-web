@@ -2,7 +2,7 @@ import React, { createContext, useCallback, useEffect, useState } from "react";
 import { Dashboard, FolderCopy, Monitor } from "@mui/icons-material";
 import JSONCrush from "jsoncrush";
 import { useSearchParamsUtils } from "@/hooks/searchParamsUtils";
-import { applicationList } from "@/components/applications/ApplicationList";
+import { applicationList } from "@/components/ApplicationList";
 import { UserSection } from "@/types/UserSection";
 import ApplicationConfig from "@/types/ApplicationConfig";
 

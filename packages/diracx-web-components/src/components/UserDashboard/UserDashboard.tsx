@@ -2,7 +2,7 @@
 import React from "react";
 import { useOidcAccessToken } from "@axa-fr/react-oidc";
 import { useOIDCContext } from "@/hooks/oidcConfiguration";
-import ApplicationHeader from "@/components/ui/ApplicationHeader";
+import ApplicationHeader from "@/components/shared/ApplicationHeader";
 
 /**
  * Build the User Dashboard page

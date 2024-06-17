@@ -3,7 +3,7 @@ import { render } from "@testing-library/react";
 import useSWR from "swr";
 import { useOidcAccessToken } from "@axa-fr/react-oidc";
 import { VirtuosoMockContext } from "react-virtuoso";
-import { JobDataTable } from "@/components/ui/JobDataTable";
+import { JobDataTable } from "@/components/JobMonitor/JobDataTable";
 
 // Mock modules
 jest.mock("@axa-fr/react-oidc", () => ({

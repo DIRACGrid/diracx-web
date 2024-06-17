@@ -1,7 +1,7 @@
 "use client";
 import React from "react";
-import { JobDataTable } from "../ui/JobDataTable";
-import ApplicationHeader from "@/components/ui/ApplicationHeader";
+import { JobDataTable } from "./JobDataTable";
+import ApplicationHeader from "@/components/shared/ApplicationHeader";
 
 /**
  * Build the Job Monitor application

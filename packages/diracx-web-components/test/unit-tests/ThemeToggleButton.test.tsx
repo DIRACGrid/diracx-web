@@ -1,6 +1,6 @@
 import React from "react";
 import { render, fireEvent } from "@testing-library/react";
-import { ThemeToggleButton } from "@/components/ui/ThemeToggleButton";
+import { ThemeToggleButton } from "@/components/DashboardLayout/ThemeToggleButton";
 import { useTheme } from "@/hooks/theme";
 
 // Mocking the useTheme hook

@@ -1,7 +1,7 @@
 import React from "react";
 import { render, fireEvent } from "@testing-library/react";
 import { useOidcAccessToken, useOidc } from "@axa-fr/react-oidc";
-import { ProfileButton } from "@/components/ui/ProfileButton";
+import { ProfileButton } from "@/components/DashboardLayout/ProfileButton";
 import { OIDCConfigurationContext } from "@/contexts/OIDCConfigurationProvider";
 
 // Mocking the hooks

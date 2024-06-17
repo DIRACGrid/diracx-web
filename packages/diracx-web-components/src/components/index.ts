@@ -1,13 +1,20 @@
 // Application list
-export { applicationList } from "./applications/ApplicationList";
-// Application components
-export { default as UserDashboard } from "./applications/UserDashboard";
-export { default as JobMonitor } from "./applications/JobMonitor";
-export { LoginForm } from "./applications/LoginForm";
-//Layout
-export { default as Dashboard } from "./layout/Dashboard";
-export { OIDCProvider } from "./layout/OIDCProvider";
-export { OIDCSecure } from "./layout/OIDCSecure";
+export { applicationList } from "./ApplicationList";
 
-//UI
-export * from "./ui";
+// Dashboard Layout
+export * from "./DashboardLayout";
+
+// Job Monitor
+export * from "./JobMonitor";
+
+// Login
+export * from "./Login";
+
+// OIDC
+export * from "./OIDC";
+
+// Shared components
+export * from "./shared";
+
+// User Dashboard
+export * from "./UserDashboard";

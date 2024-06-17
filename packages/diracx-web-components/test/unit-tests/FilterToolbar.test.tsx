@@ -1,6 +1,6 @@
 import React from "react";
 import { render, screen, fireEvent } from "@testing-library/react";
-import { FilterToolbar } from "@/components/ui/FilterToolbar";
+import { FilterToolbar } from "@/components/shared/FilterToolbar";
 
 describe("FilterToolbar", () => {
   const columns = [

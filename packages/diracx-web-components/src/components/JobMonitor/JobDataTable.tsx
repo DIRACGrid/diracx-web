@@ -28,7 +28,7 @@ import { useOidcAccessToken } from "@axa-fr/react-oidc";
 import { Delete, Clear, Replay } from "@mui/icons-material";
 import useSWR, { mutate } from "swr";
 import { useOIDCContext } from "../../hooks/oidcConfiguration";
-import { DataTable, MenuItem } from "./DataTable";
+import { DataTable, MenuItem } from "../shared/DataTable";
 import { JobHistoryDialog } from "./JobHistoryDialog";
 import { fetcher } from "@/hooks/utils";
 import { Filter } from "@/types/Filter";
