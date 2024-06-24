@@ -1,11 +1,16 @@
 name: Deployment
 
-on: [push, pull_request]
+on:
+  push:
+    branches-ignore:
+      - dependabot/**
+  pull_request:
+
 
 jobs:
   release-please:
     runs-on: ubuntu-latest
-    if: ${{ github.event_name == 'push' && github.repository == 'DIRACGrid/diracx-web' && github.ref_name == 'main' }}
+    if: ${{ github.event_name == 'push' && github.repository == 'DIRACGrid/diracx-web' }}
     permissions:
       contents: write
       pull-requests: write
