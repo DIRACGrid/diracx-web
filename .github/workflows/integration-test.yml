@@ -1,55 +1,53 @@
 name: Integration Tests
 
-on:
-    push:
-        branches: [main]
-    pull_request:
-        branches: [main]
+on: [push, pull_request]
 
 defaults:
-    run:
-        shell: bash -el {0}
+  run:
+    shell: bash -el {0}
 
 jobs:
-    run-demo:
-        runs-on: ubuntu-latest
-        steps:
-        - uses: actions/checkout@v4
-        - name: Clone source
-          run: |
-            cd ..
-            git clone https://github.com/DIRACGrid/diracx-charts.git
-        - name: Start demo
-          run: |
-            cd ..
-            diracx-charts/run_demo.sh --exit-when-done diracx-web/
-        - name: Debugging information
-          run: |
-            cd ../diracx-charts
-            export KUBECONFIG=$PWD/.demo/kube.conf
-            .demo/kubectl get pods
-            for pod_name in $(.demo/kubectl get pods -o json | jq -r '.items[] | .metadata.name' | grep -vE '(dex|minio|mysql|rabbitmq|opensearch)'); do
-              echo "${pod_name}"
-              .demo/kubectl describe pod/"${pod_name}" || true
-              for container_name in $(.demo/kubectl get pods $pod_name -o jsonpath='{.spec.initContainers[*].name} {.spec.containers[*].name}'); do
-                echo $pod_name $container_name
-                .demo/kubectl logs "${pod_name}" -c "${container_name}" || true
-              done
-            done
-        - name: Check for success
-          run: |
-            cd ../diracx-charts
-            if [ ! -f ".demo/.success" ]; then
-              echo "Demo failed"
-              cat ".demo/.failed"
-              exit 1
-            fi
-        
-        - name: Set DIRACX_URL
-          run: echo "DIRACX_URL=https://$(ifconfig | grep 'inet ' | awk '{ print $2 }' | grep -v '^127' | head -n 1 | cut -d '/' -f 1).nip.io:8000" >> $GITHUB_ENV
+  run-demo:
+    runs-on: ubuntu-latest
+    if: github.event_name != 'push' || github.repository == 'DIRACGrid/diracx-web'
+    steps:
+    - uses: actions/checkout@v4
 
-        - name: Start Cypress
-          uses: cypress-io/github-action@v6
-          with:
-            browser: chrome
-            config: baseUrl=${{ env.DIRACX_URL }}
+    - name: Clone source
+      run: |
+        cd ..
+        git clone https://github.com/DIRACGrid/diracx-charts.git
+    - name: Start demo
+      run: |
+        cd ..
+        diracx-charts/run_demo.sh --exit-when-done diracx-web/
+    - name: Debugging information
+      run: |
+        cd ../diracx-charts
+        export KUBECONFIG=$PWD/.demo/kube.conf
+        .demo/kubectl get pods
+        for pod_name in $(.demo/kubectl get pods -o json | jq -r '.items[] | .metadata.name' | grep -vE '(dex|minio|mysql|rabbitmq|opensearch)'); do
+          echo "${pod_name}"
+          .demo/kubectl describe pod/"${pod_name}" || true
+          for container_name in $(.demo/kubectl get pods $pod_name -o jsonpath='{.spec.initContainers[*].name} {.spec.containers[*].name}'); do
+            echo $pod_name $container_name
+            .demo/kubectl logs "${pod_name}" -c "${container_name}" || true
+          done
+        done
+    - name: Check for success
+      run: |
+        cd ../diracx-charts
+        if [ ! -f ".demo/.success" ]; then
+          echo "Demo failed"
+          cat ".demo/.failed"
+          exit 1
+        fi
+    
+    - name: Set DIRACX_URL
+      run: echo "DIRACX_URL=https://$(ifconfig | grep 'inet ' | awk '{ print $2 }' | grep -v '^127' | head -n 1 | cut -d '/' -f 1).nip.io:8000" >> $GITHUB_ENV
+
+    - name: Start Cypress
+      uses: cypress-io/github-action@v6
+      with:
+        browser: chrome
+        config: baseUrl=${{ env.DIRACX_URL }}
