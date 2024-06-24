@@ -4,8 +4,10 @@ on:
   push:
     branches-ignore:
       - dependabot/**
+      - release-please-**
   pull_request:
-
+    branches-ignore:
+      - release-please-**
 
 jobs:
   release-please:
