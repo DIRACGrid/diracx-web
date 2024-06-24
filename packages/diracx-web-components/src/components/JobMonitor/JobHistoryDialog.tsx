@@ -12,13 +12,20 @@ import {
 import { Close } from "@mui/icons-material";
 
 interface JobHistoryDialogProps {
+  /** Whether the Dialog is open */
   open: boolean;
+  /** The function to close the dialog */
   onClose: () => void;
+  /**
+   * The data for the job history dialog
+   */
   historyData: any[];
 }
 
 /**
- * The data for the job history dialog
+ * Renders a dialog component that displays the job history.
+ *
+ * @returns The rendered JobHistoryDialog component.
  */
 export function JobHistoryDialog(props: JobHistoryDialogProps) {
   const { open, onClose, historyData } = props;

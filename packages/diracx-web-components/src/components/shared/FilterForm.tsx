@@ -24,17 +24,23 @@ import { Column } from "@/types/Column";
  * @property {number} selectedFilterId - the id of the selected filter
  */
 interface FilterFormProps {
+  /** The columns of the data table */
   columns: Column[];
+  /** The function to call when a filter is changed */
   handleFilterChange: (index: number, tempFilter: Filter) => void;
+  /** The function to call when the filter menu is closed */
   handleFilterMenuClose: () => void;
+  /** The filters for the table */
   filters: Filter[];
+  /** The function to set the filters */
   setFilters: React.Dispatch<React.SetStateAction<Filter[]>>;
+  /** The id of the selected filter */
   selectedFilterId: number | undefined;
 }
 
 /**
  * Filter form component
- * @param {FilterFormProps} props - the props for the component
+ *
  * @returns a FilterForm component
  */
 export function FilterForm(props: FilterFormProps) {

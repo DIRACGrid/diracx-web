@@ -5,11 +5,11 @@ import { defineConfig } from "tsup";
 export default defineConfig([
   {
     entry: [
-      "src/components/!(index).ts?(x)",
-      "src/components/*/!(index).ts?(x)",
-      "src/hooks/!(index).ts?(x)",
-      "src/contexts/!(index).ts?(x)",
-      "src/types/!(index).ts?(x)",
+      "src/components/!(index|*.stories).ts?(x)",
+      "src/components/*/!(index|*.stories).ts?(x)",
+      "src/hooks/!(index|*.stories).ts?(x)",
+      "src/contexts/!(index|*.stories).ts?(x)",
+      "src/types/!(index|*.stories).ts?(x)",
     ],
     format: ["esm", "cjs"],
     experimentalDts: true, // Seems to work fine, lower memory usage and faster than dts

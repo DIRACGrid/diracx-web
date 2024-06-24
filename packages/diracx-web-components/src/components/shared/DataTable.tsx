@@ -223,35 +223,59 @@ const VirtuosoTableComponents: TableComponents<Record<string, any>> = {
  * @property {MenuItem[]} menuItems - the menu items
  */
 interface DataTableProps {
+  /** The title of the table */
   title: string;
+  /** The current page */
   page: number;
+  /** The function to call when the page changes */
   setPage: React.Dispatch<React.SetStateAction<number>>;
+  /** The number of rows per page */
   rowsPerPage: number;
+  /** The function to call when the rows per page change */
   setRowsPerPage: React.Dispatch<React.SetStateAction<number>>;
+  /** The order of the table, either "asc" or "desc" */
   order: "asc" | "desc";
+  /** The function to call when the order changes */
   setOrder: React.Dispatch<React.SetStateAction<"asc" | "desc">>;
+  /** The column to order by */
   orderBy: string | number;
+  /** The function to call when the order by changes */
   setOrderBy: React.Dispatch<React.SetStateAction<string | number>>;
+  /** The total number of rows */
   totalRows: number;
+  /** The selected rows */
   selected: readonly number[];
+  /** The function to call when the selected rows change */
   setSelected: React.Dispatch<React.SetStateAction<readonly number[]>>;
+  /** The filters to apply */
   filters: Filter[];
+  /** The function to call when the filters change */
   setFilters: React.Dispatch<React.SetStateAction<Filter[]>>;
+  /** The function to call when the search body changes */
   setSearchBody: (searchBody: any) => void;
+  /** The columns of the table */
   columns: Column[];
+  /** The rows of the table */
   rows: any[];
+  /** The error message */
   error: string | null;
+  /** Whether the table is validating */
   isValidating: boolean;
+  /** Whether the table is loading */
   isLoading: boolean;
+  /** The identifier for the rows */
   rowIdentifier: string;
+  /** Whether the table is displayed on a mobile device */
   isMobile: boolean;
+  /** The components to display in the toolbar */
   toolbarComponents: JSX.Element;
+  /** The context menu items */
   menuItems: MenuItem[];
 }
 
 /**
  * Data table component
- * @param {DataTableProps} props - the props for the component
+ *
  * @returns a DataTable component
  */
 export function DataTable(props: DataTableProps) {

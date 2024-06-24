@@ -14,8 +14,11 @@ import DashboardDrawer from "./DashboardDrawer";
 import { useMUITheme } from "@/hooks/theme";
 
 interface DashboardProps {
+  /** The content to be displayed in the main area */
   children: React.ReactNode;
+  /** The width of the drawer, default to 240 */
   drawerWidth?: number;
+  /** The URL of the logo to be displayed in the drawer */
   logoURL?: string;
 }
 

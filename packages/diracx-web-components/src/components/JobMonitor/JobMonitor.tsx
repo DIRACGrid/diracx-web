@@ -5,12 +5,13 @@ import ApplicationHeader from "@/components/shared/ApplicationHeader";
 
 /**
  * Build the Job Monitor application
- * @param headerSize - The size of the header, optional
+ *
  * @returns Job Monitor content
  */
 export default function JobMonitor({
   headerSize,
 }: {
+  /**  The size of the header, optional, will default to h4 */
   headerSize?: "h1" | "h2" | "h3" | "h4" | "h5" | "h6";
 }) {
   return (

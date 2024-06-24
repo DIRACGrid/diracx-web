@@ -29,10 +29,15 @@ import { ApplicationsContext } from "@/contexts/ApplicationsProvider";
 import { useMUITheme } from "@/hooks/theme";
 
 interface DashboardDrawerProps {
+  /** The variant of the drawer. Usually temporary if on mobile and permanent otherwise. */
   variant: "permanent" | "temporary";
+  /** Whether the drawer is open on mobile. */
   mobileOpen: boolean;
+  /** The width of the drawer. */
   width: number;
+  /** The function to handle the drawer toggle. */
   handleDrawerToggle: ReactEventHandler;
+  /** The URL for the logo image. */
   logoURL?: string;
 }
 

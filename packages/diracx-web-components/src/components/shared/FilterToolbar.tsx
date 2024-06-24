@@ -12,15 +12,19 @@ import { Column } from "@/types/Column";
  * @param {FilterToolbarProps} props - the props for the component
  */
 interface FilterToolbarProps {
+  /** The columns of the data table */
   columns: Column[];
+  /** The filters to apply */
   filters: Filter[];
+  /** The function to set the filters */
   setFilters: React.Dispatch<React.SetStateAction<Filter[]>>;
+  /** The function to apply the filters */
   handleApplyFilters: () => void;
 }
 
 /**
  * Filter toolbar component
- * @param {FilterToolbarProps} props - the props for the component
+ *
  * @returns a FilterToolbar component
  */
 export function FilterToolbar(props: FilterToolbarProps) {

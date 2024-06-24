@@ -26,11 +26,17 @@ import {
 } from "@mui/material";
 import { useOidcAccessToken } from "@axa-fr/react-oidc";
 import { Delete, Clear, Replay } from "@mui/icons-material";
-import useSWR, { mutate } from "swr";
 import { useOIDCContext } from "../../hooks/oidcConfiguration";
 import { DataTable, MenuItem } from "../shared/DataTable";
 import { JobHistoryDialog } from "./JobHistoryDialog";
-import { fetcher } from "@/hooks/utils";
+import {
+  deleteJobs,
+  getJobHistory,
+  killJobs,
+  refreshJobs,
+  rescheduleJobs,
+  useJobs,
+} from "./JobDataService";
 import { Filter } from "@/types/Filter";
 import { Column } from "@/types/Column";
 
@@ -134,10 +140,11 @@ export function JobDataTable() {
   /**
    * Fetches the jobs from the /api/jobs/search endpoint
    */
-  const urlGetJobs = `/api/jobs/search?page=${page + 1}&per_page=${rowsPerPage}`;
-  const { data, error, isLoading, isValidating } = useSWR(
-    [urlGetJobs, accessToken, "POST", searchBody],
-    fetcher,
+  const { data, error, isLoading, isValidating } = useJobs(
+    accessToken,
+    searchBody,
+    page,
+    rowsPerPage,
   );
 
   const dataHeader = data?.headers;
@@ -163,24 +170,11 @@ export function JobDataTable() {
    * Handle the deletion of the selected jobs
    */
   const handleDelete = async (selectedIds: readonly number[]) => {
-    const queryString = selectedIds.map((id) => `job_ids=${id}`).join("&");
-    const deleteUrl = `/api/jobs/?${queryString}`;
-    const requestOptions = {
-      method: "DELETE",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${accessToken}`, // Use the access token for authorization
-      },
-    };
-
     setBackdropOpen(true);
     try {
-      const response = await fetch(deleteUrl, requestOptions);
-      if (!response.ok)
-        throw new Error("An error occurred while deleting jobs.");
-      await response.json();
+      await deleteJobs(selectedIds, accessToken);
       setBackdropOpen(false);
-      mutate([urlGetJobs, accessToken, "POST", searchBody]);
+      refreshJobs(accessToken, searchBody, page, rowsPerPage);
       clearSelected();
       setSnackbarInfo({
         open: true,
@@ -202,24 +196,11 @@ export function JobDataTable() {
    * Handle the killing of the selected jobs
    */
   const handleKill = async (selectedIds: readonly number[]) => {
-    const queryString = selectedIds.map((id) => `job_ids=${id}`).join("&");
-    const killUrl = `/api/jobs/kill?${queryString}`;
-    const requestOptions = {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${accessToken}`, // Use the access token for authorization
-      },
-    };
-
     setBackdropOpen(true);
     try {
-      const response = await fetch(killUrl, requestOptions);
-      if (!response.ok)
-        throw new Error("An error occurred while deleting jobs.");
-      await response.json();
+      await killJobs(selectedIds, accessToken);
       setBackdropOpen(false);
-      mutate([urlGetJobs, accessToken, "POST", searchBody]);
+      refreshJobs(accessToken, searchBody, page, rowsPerPage);
       clearSelected();
       setSnackbarInfo({
         open: true,
@@ -241,24 +222,11 @@ export function JobDataTable() {
    * Handle the rescheduling of the selected jobs
    */
   const handleReschedule = async (selectedIds: readonly number[]) => {
-    const queryString = selectedIds.map((id) => `job_ids=${id}`).join("&");
-    const rescheduleUrl = `/api/jobs/reschedule?${queryString}`;
-    const requestOptions = {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${accessToken}`, // Use the access token for authorization
-      },
-    };
-
     setBackdropOpen(true);
     try {
-      const response = await fetch(rescheduleUrl, requestOptions);
-      if (!response.ok)
-        throw new Error("An error occurred while deleting jobs.");
-      await response.json();
+      await rescheduleJobs(selectedIds, accessToken);
       setBackdropOpen(false);
-      mutate([urlGetJobs, accessToken, "POST", searchBody]);
+      refreshJobs(accessToken, searchBody, page, rowsPerPage);
       clearSelected();
       setSnackbarInfo({
         open: true,
@@ -281,22 +249,9 @@ export function JobDataTable() {
    */
   const handleHistory = async (selectedId: number | null) => {
     if (!selectedId) return;
-
-    const historyUrl = `/api/jobs/${selectedId}/status/history`;
-    const requestOptions = {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${accessToken}`, // Use the access token for authorization
-      },
-    };
-
     setBackdropOpen(true);
     try {
-      const response = await fetch(historyUrl, requestOptions);
-      if (!response.ok)
-        throw new Error("An error occurred while fetching job history.");
-      const data = await response.json();
+      const { data } = await getJobHistory(selectedId, accessToken);
       setBackdropOpen(false);
       // Show the history
       setJobHistoryData(data[selectedId]);

@@ -1,16 +1,11 @@
 import React from "react";
 import { render } from "@testing-library/react";
-import {
-  useOIDCContext,
-  useOidcAccessToken,
-  useOidc,
-} from "@axa-fr/react-oidc";
+import { useOidcAccessToken, useOidc } from "@axa-fr/react-oidc";
 import UserDashboard from "@/components/UserDashboard/UserDashboard";
 import { ThemeProvider } from "@/contexts/ThemeProvider";
 
 // Mock the modules
 jest.mock("@axa-fr/react-oidc", () => ({
-  useOIDCContext: jest.fn(),
   useOidc: jest.fn(),
   useOidcAccessToken: jest.fn(),
 }));
@@ -51,9 +46,6 @@ describe("<UserDashboard />", () => {
 
   it("renders welcome message when accessTokenPayload is defined", () => {
     (useOidc as jest.Mock).mockReturnValue({ isAuthenticated: true });
-    (useOIDCContext as jest.Mock).mockReturnValue({
-      configuration: { scope: "openid" },
-    });
     (useOidcAccessToken as jest.Mock).mockReturnValue({
       accessTokenPayload: { preferred_username: "TestUser" },
     });

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import FormControl from "@mui/material/FormControl";
@@ -12,23 +12,23 @@ import Autocomplete from "@mui/material/Autocomplete";
 import TextField from "@mui/material/TextField";
 import { CssBaseline, Stack } from "@mui/material";
 import { ThemeProvider as MUIThemeProvider } from "@mui/material/styles";
-import React from "react";
 import { useOidc } from "@axa-fr/react-oidc";
+import { useMetadata, Metadata } from "../../hooks/metadata";
 import { useOIDCContext } from "@/hooks/oidcConfiguration";
 import { useMUITheme } from "@/hooks/theme";
-import { useMetadata, Metadata } from "@/hooks/metadata";
 
 import { useSearchParamsUtils } from "@/hooks/searchParamsUtils";
 import { NavigationContext } from "@/contexts/NavigationProvider";
 
 /**
  * Login form
- * @param logoURL the URL of the logo, optional
- * @returns a form
+ *
+ * @returns the form
  */
 export function LoginForm({
   logoURL = "/DIRAC-logo-minimal.png",
 }: {
+  /** The URL of the logo, optional */
   logoURL?: string;
 }) {
   const theme = useMUITheme();

@@ -28,9 +28,6 @@ import { useApplicationId } from "@/hooks/application";
 /**
  * Represents a drawer item component.
  *
- * @param item - The item object containing the title, id, and icon.
- * @param index - The index of the item.
- * @param groupTitle - The title of the group.
  * @returns The rendered JSX for the drawer item.
  */
 export default function DrawerItem({
@@ -38,8 +35,11 @@ export default function DrawerItem({
   index,
   groupTitle,
 }: {
+  /** The item object containing the title, id, and icon. */
   item: { title: string; id: string; icon: React.ComponentType };
+  /** The index of the item. */
   index: number;
+  /** The title of the group. */
   groupTitle: string;
 }) {
   // Ref to use for the draggable element

@@ -16,9 +16,6 @@ import { ApplicationsContext } from "@/contexts/ApplicationsProvider";
  * Renders a dialog component for creating a new application.
  *
  * @param {Object} props - The component props.
- * @param {boolean} props.appDialogOpen - Determines whether the dialog is open or not.
- * @param {React.Dispatch<React.SetStateAction<boolean>>} props.setAppDialogOpen - Function to set the open state of the dialog.
- * @param {(name: string, path: string, icon: ComponentType) => void} props.handleCreateApp - Function to handle the creation of a new application.
  * @returns {JSX.Element} The rendered dialog component.
  */
 export default function AppDialog({
@@ -26,8 +23,11 @@ export default function AppDialog({
   setAppDialogOpen,
   handleCreateApp,
 }: {
+  /** Determines whether the dialog is open or not. */
   appDialogOpen: boolean;
+  /** Function to set the open state of the dialog. */
   setAppDialogOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  /** Function to handle the creation of a new application. */
   handleCreateApp: (name: string, icon: ComponentType) => void;
 }) {
   const [appType, setAppType] = React.useState("");

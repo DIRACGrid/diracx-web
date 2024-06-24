@@ -11,12 +11,6 @@ import { UserSection } from "@/types/UserSection";
  *
  * @component
  * @param {Object} props - The component props.
- * @param {Object} props.group - The group object containing the title, expanded state, and items.
- * @param {string} props.group.title - The title of the group.
- * @param {boolean} props.group.extended - The expanded state of the group.
- * @param {Array} props.group.items - The array of items in the group.
- * @param {Function} props.setSections - The function to set the sections state.
- * @param {Function} props.handleContextMenu - The function to handle the context menu.
  * @returns {JSX.Element} The rendered DrawerItemGroup component.
  */
 export default function DrawerItemGroup({
@@ -24,8 +18,11 @@ export default function DrawerItemGroup({
   setSections,
   handleContextMenu,
 }: {
+  /** The group object containing the title, expanded state, and items. */
   group: UserSection;
+  /** The function to set the sections state. */
   setSections: React.Dispatch<React.SetStateAction<UserSection[]>>;
+  /** The function to handle the context menu. */
   handleContextMenu: (
     type: "group" | "item" | null,
     id: string | null,
