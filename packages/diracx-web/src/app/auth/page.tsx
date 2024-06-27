@@ -1,5 +1,5 @@
 "use client";
-import { LoginForm } from "diracx-web-components/components";
+import { LoginForm } from "@dirac-grid/diracx-web-components/components";
 
 export default function Page() {
   return <LoginForm />;

@@ -1,8 +1,8 @@
 "use client";
 import React, { useEffect } from "react";
-import { UserDashboard } from "diracx-web-components/components";
-import { ApplicationsContext } from "diracx-web-components/contexts";
-import { useSearchParamsUtils } from "diracx-web-components/hooks";
+import { UserDashboard } from "@dirac-grid/diracx-web-components/components";
+import { ApplicationsContext } from "@dirac-grid/diracx-web-components/contexts";
+import { useSearchParamsUtils } from "@dirac-grid/diracx-web-components/hooks";
 import { applicationList } from "@/example-extension/applicationList";
 
 export default function Page() {

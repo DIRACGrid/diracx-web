@@ -13,9 +13,9 @@
     "dev": "lerna run dev --parallel",
     "test": "lerna run test",
     "build": "lerna run build",
-    "build-lib": "lerna run build --scope diracx-web-components",
+    "build-lib": "lerna run build --scope @dirac-grid/diracx-web-components",
     "lint": "lerna run lint",
     "ts-lint": "lerna run ts-lint",
-    "pack": "npm pack -w diracx-web-components"
+    "pack": "npm pack -w @dirac-grid/diracx-web-components"
   }
 }

@@ -3,12 +3,15 @@ import React from "react";
 import CssBaseline from "@mui/material/CssBaseline";
 import { Box } from "@mui/material";
 import { ThemeProvider as MUIThemeProvider } from "@mui/material/styles";
-import { OIDCSecure, Dashboard } from "diracx-web-components/components";
+import {
+  OIDCSecure,
+  Dashboard,
+} from "@dirac-grid/diracx-web-components/components";
 import {
   ApplicationsProvider,
   NavigationProvider,
-} from "diracx-web-components/contexts";
-import { useMUITheme } from "diracx-web-components/hooks";
+} from "@dirac-grid/diracx-web-components/contexts";
+import { useMUITheme } from "@dirac-grid/diracx-web-components/hooks";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 export default function DashboardLayout({

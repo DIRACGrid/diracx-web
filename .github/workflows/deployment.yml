@@ -28,6 +28,15 @@ jobs:
           config-file: release-please-config.json
           manifest-file: .release-please-manifest.json
 
+      # Release Please has already incremented versions and published tags, so we just
+      # need to publish all unpublished versions to NPM here
+      # See: https://github.com/lerna/lerna/tree/main/commands/publish#bump-from-package
+      - name: Publish to NPM
+        if: ${{ steps.release.outputs.releases_created }}
+        env:
+          NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
+        run: npx lerna publish from-package --no-push --no-private --yes
+
   build-deploy-dev-image:
     runs-on: ubuntu-latest
     if: ${{ github.event_name != 'push' || github.repository == 'DIRACGrid/diracx-web' }}

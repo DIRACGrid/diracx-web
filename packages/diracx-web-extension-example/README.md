@@ -81,8 +81,8 @@ To add new apps to your extension, you can create new components in your extensi
 It is then pretty easy to add them to DiracX Web by extending the `applicationList` from `diracx-web-components/components`, and passing the new list to the `ApplicationProvider` from `diracx-web-components/contexts`.
 
 ```tsx
-import { ApplicationProvider } from "diracx-web-components/contexts";
-import { applicationList } from "diracx-web-components/components";
+import { ApplicationProvider } from "@dirac-grid/diracx-web-components/contexts";
+import { applicationList } from "@dirac-grid/diracx-web-components/components";
 
 const newApp = {
   name: "New App",
