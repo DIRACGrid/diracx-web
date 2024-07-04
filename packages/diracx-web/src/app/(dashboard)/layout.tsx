@@ -6,12 +6,12 @@ import { ThemeProvider as MUIThemeProvider } from "@mui/material/styles";
 import {
   OIDCSecure,
   Dashboard,
-} from "@dirac-grid/diracx-web-components/components";
+} from "@loxeris/diracx-web-components/components";
 import {
   ApplicationsProvider,
   NavigationProvider,
-} from "@dirac-grid/diracx-web-components/contexts";
-import { useMUITheme } from "@dirac-grid/diracx-web-components/hooks";
+} from "@loxeris/diracx-web-components/contexts";
+import { useMUITheme } from "@loxeris/diracx-web-components/hooks";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 export default function DashboardLayout({
