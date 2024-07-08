@@ -4,3 +4,6 @@ dist
 public
 .github
 jest.config.mjs
+release-please-config.json
+.release-please-manifest.json
+CHANGELOG.md

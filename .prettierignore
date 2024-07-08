@@ -16,3 +16,7 @@ packages/*/tsup.config.ts
 packages/*/.next
 packages/*/.tsup
 packages/*/out
+
+**/release-please-config.json
+**/.release-please-manifest.json
+**/CHANGELOG.md
