@@ -2,7 +2,7 @@ import { Inter } from "next/font/google";
 import {
   OIDCConfigurationProvider,
   ThemeProvider,
-} from "@loxeris/diracx-web-components/contexts";
+} from "@diracgrid/diracx-web-components/contexts";
 
 const inter = Inter({ subsets: ["latin"] });
 

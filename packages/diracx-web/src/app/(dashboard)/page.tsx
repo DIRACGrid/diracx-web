@@ -4,8 +4,8 @@ import { useSearchParams } from "next/navigation";
 import {
   UserDashboard,
   applicationList,
-} from "@loxeris/diracx-web-components/components";
-import { ApplicationsContext } from "@loxeris/diracx-web-components/contexts";
+} from "@diracgrid/diracx-web-components/components";
+import { ApplicationsContext } from "@diracgrid/diracx-web-components/contexts";
 
 export default function Page() {
   const searchParams = useSearchParams();

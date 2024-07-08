@@ -1,8 +1,8 @@
 "use client";
 import * as React from "react";
 import { useOidcAccessToken } from "@axa-fr/react-oidc";
-import { ApplicationHeader } from "@loxeris/diracx-web-components/components";
-import { useOIDCContext } from "@loxeris/diracx-web-components/hooks";
+import { ApplicationHeader } from "@diracgrid/diracx-web-components/components";
+import { useOIDCContext } from "@diracgrid/diracx-web-components/hooks";
 import { Box } from "@mui/material";
 
 /**
