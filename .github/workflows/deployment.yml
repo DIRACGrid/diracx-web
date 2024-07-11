@@ -112,7 +112,7 @@ jobs:
     permissions:
       id-token: write
       pages: write
-    if: ${{ github.event_name == 'push' && github.repository == 'DIRACGrid/diracx-web' && github.ref_name == 'main'}}
+    if: ${{ github.event_name == 'push'}}
     steps:
       - uses: actions/checkout@v4
  
