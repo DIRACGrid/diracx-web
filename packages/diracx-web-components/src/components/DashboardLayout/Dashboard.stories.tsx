@@ -70,7 +70,12 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {
-  args: { children: <div></div> },
+  args: {
+    children: <div></div>,
+    logoURL: process.env.STORYBOOK_DEV
+      ? undefined
+      : "/diracx-web/DIRAC-logo.png",
+  },
   render: (props) => {
     useOidc.mockReturnValue({
       login: () => {},

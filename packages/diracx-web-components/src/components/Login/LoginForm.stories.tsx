@@ -34,6 +34,11 @@ const meta = {
       );
     },
   ],
+  args: {
+    logoURL: process.env.STORYBOOK_DEV
+      ? undefined
+      : "/diracx-web/DIRAC-logo-minimal.png",
+  },
 } satisfies Meta<typeof LoginForm>;
 
 export default meta;
@@ -96,13 +101,13 @@ const multiVOMetadata = {
 };
 
 export const SingleVO: Story = {
-  render() {
+  render(props) {
     useMetadata.mockReturnValue({
       metadata: singleVOMetadata,
       error: null,
       isLoading: false,
     });
-    return <LoginForm />;
+    return <LoginForm {...props} />;
   },
 };
 
@@ -111,12 +116,12 @@ export const MultiVO: Story = {
     logoURL:
       "https://raw.githubusercontent.com/DIRACGrid/management/master/branding/diracx/svg/diracx-logo-square-minimal.svg",
   },
-  render() {
+  render(props) {
     useMetadata.mockReturnValue({
       metadata: multiVOMetadata,
       error: null,
       isLoading: false,
     });
-    return <LoginForm />;
+    return <LoginForm {...props} />;
   },
 };

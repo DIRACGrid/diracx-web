@@ -124,4 +124,4 @@ jobs:
         with:
           build_command: npm run build-storybook -w @dirac-grid/diracx-web-components
           path: packages/diracx-web-components/storybook-static
-          checkout: false # default: true
+          checkout: false

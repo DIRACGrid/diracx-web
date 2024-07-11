@@ -70,5 +70,8 @@ export const Default: Story = {
     mobileOpen: false,
     handleDrawerToggle: () => {},
     width: 240,
+    logoURL: process.env.STORYBOOK_DEV
+      ? undefined
+      : "/diracx-web/DIRAC-logo.png",
   },
 };
