@@ -1,8 +1,5 @@
 import { Inter } from "next/font/google";
-import {
-  OIDCConfigurationProvider,
-  ThemeProvider,
-} from "@diracgrid/diracx-web-components/contexts";
+import { Suspense } from "react";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -23,9 +20,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        <OIDCConfigurationProvider>
-          <ThemeProvider>{children}</ThemeProvider>
-        </OIDCConfigurationProvider>
+        <Suspense>{children}</Suspense>
       </body>
     </html>
   );

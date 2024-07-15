@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build && mv out ../..",
+    "build": "next build && rm -rf ../../out && mv out ../..",
     "start": "next start",
     "lint": "next lint",
     "ts-lint": "tsc -noEmit -incremental",

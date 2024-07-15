@@ -12,3 +12,4 @@ export {
   type ThemeProviderProps,
 } from "./ThemeProvider";
 export * from "./NavigationProvider";
+export * from "./DiracXWebProviders";

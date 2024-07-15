@@ -1,7 +1,7 @@
 "use client";
 import React from "react";
+import { DiracXWebProviders } from "@diracgrid/diracx-web-components/contexts";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { NavigationProvider } from "@diracgrid/diracx-web-components/contexts";
 
 export default function AuthLayout({
   children,
@@ -12,12 +12,14 @@ export default function AuthLayout({
   const router = useRouter();
   const searchParams = useSearchParams();
   return (
-    <NavigationProvider
+    <DiracXWebProviders
       getPath={() => pathname}
-      setPath={router.push}
+      setPath={(path: string) => {
+        router.push(path);
+      }}
       getSearchParams={() => searchParams}
     >
       {children}
-    </NavigationProvider>
+    </DiracXWebProviders>
   );
 }
