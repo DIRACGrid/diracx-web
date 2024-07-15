@@ -18,6 +18,9 @@
     },
     "packages/diracx-web-components": {
       "component": "diracx-web-components"
+    },
+    "packages/diracx-web-extension-example": {
+      "component": "diracx-web-extension-example"
     }
   },
   "plugins": [
@@ -28,7 +31,7 @@
     {
       "type": "linked-versions",
       "groupName": "DiracX-Web",
-      "components": ["root", "diracx-web", "diracx-web-components"]
+      "components": ["root", "diracx-web", "diracx-web-components", "diracx-web-extension-example"]
     }
   ],
   "$schema": "https://raw.githubusercontent.com/googleapis/release-please/main/schemas/config.json"
