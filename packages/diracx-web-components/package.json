@@ -1,8 +1,11 @@
 {
-  "name": "@diracgrid/diracx-web-components",
-  "version": "0.1.0-a1",
+  "name": "@dirac-grid/test-lib",
+  "version": "0.1.0-a1-test",
   "repository": "https://github.com/DIRACGrid/diracx-web",
   "description": "Useful components for diracx-web",
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "build": "tsup --minify",
     "dev": "tsup --watch",
