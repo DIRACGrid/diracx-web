@@ -1,5 +1,5 @@
-import { applicationList } from "@dirac-grid/test-lib/components";
-import { ApplicationConfig } from "@dirac-grid/test-lib/types";
+import { applicationList } from "@dirac-grid/diracx-web-components/components";
+import { ApplicationConfig } from "@dirac-grid/diracx-web-components/types";
 import { BugReport } from "@mui/icons-material";
 import TestApp from "@/example-extension/components/applications/testApp";
 

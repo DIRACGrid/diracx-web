@@ -1,6 +1,6 @@
 "use client";
 import React from "react";
-import { DiracXWebProviders } from "@dirac-grid/test-lib/contexts";
+import { DiracXWebProviders } from "@dirac-grid/diracx-web-components/contexts";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 export default function AuthLayout({

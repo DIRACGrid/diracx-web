@@ -1,8 +1,11 @@
 "use client";
 import React from "react";
 import { Box } from "@mui/material";
-import { DiracXWebProviders } from "@dirac-grid/test-lib/contexts";
-import { OIDCSecure, Dashboard } from "@dirac-grid/test-lib/components";
+import { DiracXWebProviders } from "@dirac-grid/diracx-web-components/contexts";
+import {
+  OIDCSecure,
+  Dashboard,
+} from "@dirac-grid/diracx-web-components/components";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 export default function DashboardLayout({

@@ -30,7 +30,8 @@ jobs:
 
   build-deploy-library-package:
     runs-on: ubuntu-latest
-    if: ${{ github.event_name == 'push' }}
+    needs: release-please
+    if: ${{ github.event_name == 'push' && github.repository == 'DIRACGrid/diracx-web' && needs.release-please.outputs.release_created == 'true' }}
     permissions:
       contents: read
       packages: write

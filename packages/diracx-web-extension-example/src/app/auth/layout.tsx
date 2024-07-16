@@ -1,7 +1,7 @@
 "use client";
 import React from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { NavigationProvider } from "@dirac-grid/test-lib/contexts";
+import { NavigationProvider } from "@dirac-grid/diracx-web-components/contexts";
 
 export default function AuthLayout({
   children,

@@ -3,12 +3,15 @@ import * as React from "react";
 import CssBaseline from "@mui/material/CssBaseline";
 import { Box } from "@mui/material";
 import { ThemeProvider as MUIThemeProvider } from "@mui/material/styles";
-import { OIDCSecure, Dashboard } from "@dirac-grid/test-lib/components";
+import {
+  OIDCSecure,
+  Dashboard,
+} from "@dirac-grid/diracx-web-components/components";
 import {
   ApplicationsProvider,
   NavigationProvider,
-} from "@dirac-grid/test-lib/contexts";
-import { useMUITheme } from "@dirac-grid/test-lib/hooks";
+} from "@dirac-grid/diracx-web-components/contexts";
+import { useMUITheme } from "@dirac-grid/diracx-web-components/hooks";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { applicationList } from "@/example-extension/applicationList";
 import { defaultSections } from "@/example-extension/defaultSections";
