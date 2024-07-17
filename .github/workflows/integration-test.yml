@@ -23,7 +23,7 @@ jobs:
     - name: Clone source
       run: |
         cd ..
-        git clone https://github.com/Loxeris/diracx-charts.git -b "feat_diracx-web-port-env-&-node-modules-size"
+        git clone https://github.com/DIRACGrid/diracx-charts.git
     - name: Start demo
       run: |
         cd ..

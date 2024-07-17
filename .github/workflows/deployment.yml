@@ -53,6 +53,26 @@ jobs:
         NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
       run: npx lerna publish from-package --no-push --no-private --yes
 
+  build-deploy-storybook-docs:
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      pages: write
+    if: ${{ github.event_name == 'push' && github.repository == 'DIRACGrid/diracx-web' && github.ref_name == 'main'}}
+    steps:
+      - uses: actions/checkout@v4
+ 
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 'latest'
+          cache: 'npm'
+ 
+      - uses: bitovi/github-actions-storybook-to-github-pages@v1.0.3
+        with:
+          build_command: npm run build-storybook -w @dirac-grid/diracx-web-components
+          path: packages/diracx-web-components/storybook-static
+          checkout: false
+
   build-deploy-dev-image:
     runs-on: ubuntu-latest
     if: ${{ github.event_name != 'push' || github.repository == 'DIRACGrid/diracx-web' }}
@@ -106,22 +126,3 @@ jobs:
           push: true
           tags: ghcr.io/diracgrid/diracx-web/static:${{ needs.release-please.outputs.tag_name }}
           platforms: linux/amd64,linux/arm64
-  
-  build-deploy-storybook-docs:
-    runs-on: ubuntu-latest
-    permissions:
-      id-token: write
-      pages: write
-    if: ${{ github.event_name == 'push' && github.repository == 'DIRACGrid/diracx-web' && github.ref_name == 'main'}}
-    steps:
-      - uses: actions/checkout@v4
- 
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 'latest'
- 
-      - uses: bitovi/github-actions-storybook-to-github-pages@v1.0.3
-        with:
-          build_command: npm run build-storybook -w @dirac-grid/diracx-web-components
-          path: packages/diracx-web-components/storybook-static
-          checkout: false
