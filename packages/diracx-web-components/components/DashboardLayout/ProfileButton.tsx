@@ -12,7 +12,7 @@ import {
   MenuItem,
   Tooltip,
 } from "@mui/material";
-import { deepOrange } from "@mui/material/colors";
+import { cyan } from "@mui/material/colors";
 import React from "react";
 import { useOIDCContext } from "@/hooks/oidcConfiguration";
 
@@ -62,7 +62,7 @@ export function ProfileButton() {
           aria-haspopup="true"
           aria-expanded={open ? "true" : undefined}
         >
-          <Avatar sx={{ bgcolor: deepOrange[500] }}>
+          <Avatar sx={{ bgcolor: cyan[500] }}>
             {accessTokenPayload["preferred_username"][0]}
           </Avatar>
         </IconButton>

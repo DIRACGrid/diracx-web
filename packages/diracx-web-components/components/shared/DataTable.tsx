@@ -26,13 +26,13 @@ import {
   Snackbar,
   Stack,
 } from "@mui/material";
-import { deepOrange } from "@mui/material/colors";
+import { cyan } from "@mui/material/colors";
 import { TableComponents, TableVirtuoso } from "react-virtuoso";
-import { FilterToolbar } from "./FilterToolbar";
 import { Filter } from "@/types/Filter";
 import { Column } from "@/types/Column";
 import { useSearchParamsUtils } from "@/hooks/searchParamsUtils";
 import { ApplicationsContext } from "@/contexts/ApplicationsProvider";
+import { FilterToolbar } from "./FilterToolbar";
 
 /**
  * Menu item
@@ -86,7 +86,7 @@ function DataTableToolbar(props: DataTableToolbarProps) {
       sx={{
         ...(numSelected > 0 && {
           bgcolor: (theme) =>
-            alpha(deepOrange[500], theme.palette.action.activatedOpacity),
+            alpha(cyan[500], theme.palette.action.activatedOpacity),
         }),
       }}
     >

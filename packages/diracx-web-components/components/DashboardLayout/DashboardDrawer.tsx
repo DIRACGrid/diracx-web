@@ -23,10 +23,10 @@ import React, {
 } from "react";
 import { monitorForElements } from "@atlaskit/pragmatic-drag-and-drop/element/adapter";
 import { extractClosestEdge } from "@atlaskit/pragmatic-drag-and-drop-hitbox/closest-edge";
-import DrawerItemGroup from "./DrawerItemGroup";
-import AppDialog from "./ApplicationDialog";
 import { ApplicationsContext } from "@/contexts/ApplicationsProvider";
 import { useMUITheme } from "@/hooks/theme";
+import DrawerItemGroup from "./DrawerItemGroup";
+import AppDialog from "./ApplicationDialog";
 
 interface DashboardDrawerProps {
   /** The variant of the drawer. Usually temporary if on mobile and permanent otherwise. */
@@ -378,7 +378,7 @@ export default function DashboardDrawer(props: DashboardDrawerProps) {
               backgroundColor: theme.palette.background.default,
             }}
           >
-            <img src={logoURL} alt="DIRAC logo" width={150} height={45} />
+            <img src={logoURL} alt="DIRAC logo" style={{ maxWidth: "100%" }} />
           </Toolbar>
           {/* Map over user sections and render them as list items in the drawer. */}
           <List>

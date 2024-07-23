@@ -2,7 +2,8 @@ import React from "react";
 import { StoryObj, Meta } from "@storybook/react";
 import { Paper, ThemeProvider } from "@mui/material";
 import { useMUITheme } from "../../hooks/theme";
-import { ApplicationsContext, NavigationProvider } from "../../contexts";
+import { ApplicationsContext } from "../../contexts/ApplicationsProvider";
+import { NavigationProvider } from "../../contexts/NavigationProvider";
 import ApplicationHeader from "./ApplicationHeader";
 
 const meta = {

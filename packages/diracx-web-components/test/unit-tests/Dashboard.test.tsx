@@ -34,20 +34,6 @@ let mockSections: UserSection[] = [
   },
 ];
 
-const params = new URLSearchParams();
-
-jest.mock("next/navigation", () => {
-  return {
-    usePathname: () => ({
-      pathname: "",
-    }),
-    useRouter: () => ({
-      push: jest.fn(),
-    }),
-    useSearchParams: () => params,
-  };
-});
-
 const MockApplicationProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }): JSX.Element => (

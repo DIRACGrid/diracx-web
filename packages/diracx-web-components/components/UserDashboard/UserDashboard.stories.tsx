@@ -4,7 +4,8 @@ import { ThemeProvider as MUIThemeProvider } from "@mui/material/styles";
 import { Paper } from "@mui/material";
 import { useOidcAccessToken } from "../../mocks/react-oidc.mock";
 import { useMUITheme } from "../../hooks/theme";
-import { ApplicationsContext, NavigationProvider } from "../../contexts";
+import { ApplicationsContext } from "../../contexts/ApplicationsProvider";
+import { NavigationProvider } from "../../contexts/NavigationProvider";
 import UserDashboard from "./UserDashboard";
 
 const meta = {

@@ -20,7 +20,7 @@ You can either create a new repository or fork this repository to build your Dir
 2. **Clone the forked repository** to your local machine:
 
    ```bash
-   git clone https://github.com/YOUR_USERNAME/diracx-web-extension-example.git
+   git clone https://github.com/YOUR_USERNAME/diracx-web.git
    cd diracx-web-extension-example
    ```
 

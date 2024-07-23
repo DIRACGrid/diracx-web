@@ -26,6 +26,8 @@ import {
 } from "@mui/material";
 import { useOidcAccessToken } from "@axa-fr/react-oidc";
 import { Delete, Clear, Replay } from "@mui/icons-material";
+import { Filter } from "@/types/Filter";
+import { Column } from "@/types/Column";
 import { useOIDCContext } from "../../hooks/oidcConfiguration";
 import { DataTable, MenuItem } from "../shared/DataTable";
 import { JobHistoryDialog } from "./JobHistoryDialog";
@@ -37,8 +39,6 @@ import {
   rescheduleJobs,
   useJobs,
 } from "./JobDataService";
-import { Filter } from "@/types/Filter";
-import { Column } from "@/types/Column";
 
 /**
  * Renders the status cell with colors

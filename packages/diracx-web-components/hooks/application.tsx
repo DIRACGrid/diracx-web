@@ -1,6 +1,6 @@
 import { useContext, useMemo } from "react";
-import { useSearchParamsUtils } from "@/hooks/searchParamsUtils";
 import { ApplicationsContext } from "@/contexts/ApplicationsProvider";
+import { useSearchParamsUtils } from "@/hooks/searchParamsUtils";
 
 /**
  * Custom hook to access the application id from the URL

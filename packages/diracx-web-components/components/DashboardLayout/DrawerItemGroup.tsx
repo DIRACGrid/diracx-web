@@ -3,8 +3,8 @@ import { Accordion, AccordionDetails, AccordionSummary } from "@mui/material";
 import { ExpandMore } from "@mui/icons-material";
 import React, { useEffect } from "react";
 import { dropTargetForElements } from "@atlaskit/pragmatic-drag-and-drop/element/adapter";
-import DrawerItem from "./DrawerItem";
 import { UserSection } from "@/types/UserSection";
+import DrawerItem from "./DrawerItem";
 
 /**
  * Represents a group of items in a drawer.

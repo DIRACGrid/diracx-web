@@ -6,7 +6,6 @@
     "declaration": true,
     "declarationDir": "dist",
     "sourceMap": true,
-    "rootDir": ".",
     "allowJs": true,
     "skipLibCheck": true,
     "strict": true,
@@ -17,25 +16,17 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "jsx": "react-jsx",
-    "types": ["react", "react-dom", "node"],
-    "plugins": [
-      {
-        "name": "next"
-      }
+    "types": [
+      "react",
+      "react-dom",
+      "node",
+      "jest",
+      "jest-environment-jsdom",
+      "@testing-library/jest-dom"
     ],
     "paths": {
-      "@/*": ["./*"]
+      "@/*": ["../*"]
     }
   },
-  "include": ["**/*.ts", "**/*.tsx"],
-  "exclude": [
-    "app",
-    "node_modules",
-    "dist",
-    "test",
-    "tsup.config.ts",
-    "jest.setup.ts",
-    "**/*.stories.*",
-    "mocks",
-  ]
+  "include": ["**/*.ts", "**/*.tsx"]
 }

@@ -5,11 +5,11 @@ import { defineConfig } from "tsup";
 export default defineConfig([
   {
     entry: [
-      "src/components/!(index|*.stories).ts?(x)",
-      "src/components/*/!(index|*.stories).ts?(x)",
-      "src/hooks/!(index|*.stories).ts?(x)",
-      "src/contexts/!(index|*.stories).ts?(x)",
-      "src/types/!(index|*.stories).ts?(x)",
+      "components/!(index|*.stories).ts?(x)",
+      "components/*/!(index|*.stories).ts?(x)",
+      "hooks/!(index|*.stories).ts?(x)",
+      "contexts/!(index|*.stories).ts?(x)",
+      "types/!(index|*.stories).ts?(x)",
     ],
     format: ["esm", "cjs"],
     experimentalDts: true, // Seems to work fine, lower memory usage and faster than dts
@@ -46,16 +46,16 @@ export default defineConfig([
   },
   {
     entry: [
-      "src/components/index.ts",
-      "src/components/*/index.ts",
-      "src/hooks/index.ts",
-      "src/contexts/index.ts",
-      "src/types/index.ts",
+      "components/index.ts",
+      "components/*/index.ts",
+      "hooks/index.ts",
+      "contexts/index.ts",
+      "types/index.ts",
     ],
     format: ["esm", "cjs"],
     experimentalDts: true, // Seems to work fine, lower memory usage and faster than dts
     target: "es5",
     bundle: false,
-    sourcemap: true
+    sourcemap: true,
   },
 ]);

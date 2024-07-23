@@ -4,7 +4,7 @@ import type { Meta, StoryObj } from "@storybook/react";
 import { ThemeProvider } from "@mui/material";
 import { useArgs } from "@storybook/core/preview-api";
 
-import { ApplicationsContext } from "../../contexts";
+import { ApplicationsContext } from "../../contexts/ApplicationsProvider";
 import { useOidcAccessToken } from "../../mocks/react-oidc.mock";
 import { applicationList } from "../ApplicationList";
 import { useMUITheme } from "../../hooks/theme";

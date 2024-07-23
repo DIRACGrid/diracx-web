@@ -8,10 +8,10 @@ import { Menu } from "@mui/icons-material";
 import Toolbar from "@mui/material/Toolbar";
 import Stack from "@mui/material/Stack";
 import { ThemeProvider as MUIThemeProvider } from "@mui/material/styles";
+import { useMUITheme } from "@/hooks/theme";
 import { ProfileButton } from "./ProfileButton";
 import { ThemeToggleButton } from "./ThemeToggleButton";
 import DashboardDrawer from "./DashboardDrawer";
-import { useMUITheme } from "@/hooks/theme";
 
 interface DashboardProps {
   /** The content to be displayed in the main area */

@@ -3,9 +3,9 @@ import { FilterList, Delete, Send } from "@mui/icons-material";
 import Chip from "@mui/material/Chip";
 import Button from "@mui/material/Button";
 import { Popover, Stack, Tooltip } from "@mui/material";
-import { FilterForm } from "./FilterForm";
 import { Filter } from "@/types/Filter";
 import { Column } from "@/types/Column";
+import { FilterForm } from "./FilterForm";
 
 /**
  * Filter toolbar component

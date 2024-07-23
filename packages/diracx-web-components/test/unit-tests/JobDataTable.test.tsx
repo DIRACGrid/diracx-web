@@ -10,20 +10,6 @@ jest.mock("@axa-fr/react-oidc", () => ({
   useOidcAccessToken: jest.fn(),
 }));
 
-const params = new URLSearchParams();
-
-jest.mock("next/navigation", () => {
-  return {
-    usePathname: () => ({
-      pathname: "",
-    }),
-    useRouter: () => ({
-      push: jest.fn(),
-    }),
-    useSearchParams: () => params,
-  };
-});
-
 jest.mock("swr", () => jest.fn());
 
 // In your test file or a Jest setup file

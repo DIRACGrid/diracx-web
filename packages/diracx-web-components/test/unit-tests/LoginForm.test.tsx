@@ -60,9 +60,9 @@ const multiVOMetadata = {
 };
 
 // Mock the necessary hooks and external modules
-jest.mock("../../src/hooks/metadata");
+jest.mock("../../hooks/metadata");
 
-jest.mock("../../src/hooks/utils", () => ({
+jest.mock("../../hooks/utils", () => ({
   useDiracxUrl: () => "https://example.com",
 }));
 
@@ -72,20 +72,6 @@ jest.mock("@axa-fr/react-oidc", () => ({
     isAuthenticated: false,
   }),
 }));
-
-const params = new URLSearchParams();
-
-jest.mock("next/navigation", () => {
-  return {
-    usePathname: () => ({
-      pathname: "",
-    }),
-    useRouter: () => ({
-      push: jest.fn(),
-    }),
-    useSearchParams: () => params,
-  };
-});
 
 describe("LoginForm", () => {
   // Should render a text field to select the VO

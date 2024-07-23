@@ -15,20 +15,6 @@ jest.mock("jsoncrush", () => ({
   uncrush: jest.fn().mockImplementation((data) => data.replace("crushed-", "")),
 }));
 
-const params = new URLSearchParams();
-
-jest.mock("next/navigation", () => {
-  return {
-    usePathname: () => ({
-      pathname: "",
-    }),
-    useRouter: () => ({
-      push: jest.fn(),
-    }),
-    useSearchParams: () => params,
-  };
-});
-
 describe("<UserDashboard />", () => {
   it("renders not authenticated message when accessTokenPayload is not defined", () => {
     (useOidc as jest.Mock).mockReturnValue({ isAuthenticated: false });

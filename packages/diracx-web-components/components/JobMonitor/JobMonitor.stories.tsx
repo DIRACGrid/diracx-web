@@ -3,7 +3,8 @@ import { StoryObj, Meta } from "@storybook/react";
 import { Paper, ThemeProvider } from "@mui/material";
 import { useJobs } from "../../mocks/JobDataService.mock";
 import { useOidcAccessToken } from "../../mocks/react-oidc.mock";
-import { NavigationProvider, ApplicationsContext } from "../../contexts";
+import { ApplicationsContext } from "../../contexts/ApplicationsProvider";
+import { NavigationProvider } from "../../contexts/NavigationProvider";
 import { useMUITheme } from "../../hooks/theme";
 import JobMonitor from "./JobMonitor";
 

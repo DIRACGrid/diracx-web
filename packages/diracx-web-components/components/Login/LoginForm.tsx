@@ -13,12 +13,12 @@ import TextField from "@mui/material/TextField";
 import { CssBaseline, Stack } from "@mui/material";
 import { ThemeProvider as MUIThemeProvider } from "@mui/material/styles";
 import { useOidc } from "@axa-fr/react-oidc";
-import { useMetadata, Metadata } from "../../hooks/metadata";
 import { useOIDCContext } from "@/hooks/oidcConfiguration";
 import { useMUITheme } from "@/hooks/theme";
 
 import { useSearchParamsUtils } from "@/hooks/searchParamsUtils";
 import { NavigationContext } from "@/contexts/NavigationProvider";
+import { useMetadata, Metadata } from "../../hooks/metadata";
 
 /**
  * Login form

@@ -3,7 +3,8 @@ import type { Meta, StoryObj } from "@storybook/react";
 
 import { Dashboard as DashboardIcon } from "@mui/icons-material";
 import { Box } from "@mui/material";
-import { NavigationProvider, ApplicationsContext } from "../../contexts";
+import { ApplicationsContext } from "../../contexts/ApplicationsProvider";
+import { NavigationProvider } from "../../contexts/NavigationProvider";
 import { useOidc, useOidcAccessToken } from "../../mocks/react-oidc.mock";
 import { applicationList } from "../ApplicationList";
 import Dashboard from "./Dashboard";

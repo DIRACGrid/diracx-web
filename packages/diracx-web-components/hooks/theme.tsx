@@ -1,5 +1,5 @@
 import { PaletteMode } from "@mui/material";
-import { deepOrange, grey, lightGreen } from "@mui/material/colors";
+import { grey, lightGreen, cyan } from "@mui/material/colors";
 import { createTheme, darken, lighten } from "@mui/material/styles";
 import { useContext } from "react";
 import { ThemeContext } from "@/contexts/ThemeProvider";
@@ -73,7 +73,7 @@ export const useMUITheme = () => {
           backgroundColor: lightGreen[700],
           "&:hover": {
             color: "white",
-            backgroundColor: deepOrange[500],
+            backgroundColor: cyan[500],
           },
         },
         outlined: {
@@ -81,8 +81,8 @@ export const useMUITheme = () => {
           color: lightGreen[700],
           borderColor: lightGreen[700],
           "&:hover": {
-            color: deepOrange[500],
-            borderColor: deepOrange[500],
+            color: cyan[500],
+            borderColor: cyan[500],
             backgroundColor: "transparent",
           },
         },
@@ -90,9 +90,9 @@ export const useMUITheme = () => {
           // Target the 'text' variant
           color: lightGreen[700],
           "&:hover": {
-            color: deepOrange[500],
+            color: cyan[500],
             backgroundColor: "transparent",
-            //underline in deep orange
+            //underline in cyan
             textDecoration: "underline",
           },
         },
@@ -171,7 +171,7 @@ export const useMUITheme = () => {
             color: lightGreen[700],
           },
           "&.MuiCheckbox-indeterminate": {
-            color: deepOrange[500],
+            color: cyan[500],
           },
         },
       },

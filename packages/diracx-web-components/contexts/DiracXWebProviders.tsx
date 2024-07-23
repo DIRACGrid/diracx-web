@@ -1,5 +1,5 @@
 import { CssBaseline, ThemeProvider as MUIThemeProvider } from "@mui/material";
-import { useMUITheme } from "../hooks";
+import { useMUITheme } from "../hooks/theme";
 import {
   OIDCConfigurationProvider,
   ThemeProvider,

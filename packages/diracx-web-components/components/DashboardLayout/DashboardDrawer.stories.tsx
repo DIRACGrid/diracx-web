@@ -6,7 +6,7 @@ import { Dashboard } from "@mui/icons-material";
 import { ThemeProvider as MUIThemeProvider } from "@mui/material/styles";
 import { useMUITheme } from "../../hooks/theme";
 import { useOidc, useOidcAccessToken } from "../../mocks/react-oidc.mock";
-import { ApplicationsContext } from "../../contexts";
+import { ApplicationsContext } from "../../contexts/ApplicationsProvider";
 import { applicationList } from "../ApplicationList";
 import DashboardDrawer from "./DashboardDrawer";
 

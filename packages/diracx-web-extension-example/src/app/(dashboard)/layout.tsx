@@ -9,6 +9,7 @@ import {
 } from "@dirac-grid/diracx-web-components/components";
 import {
   ApplicationsProvider,
+  DiracXWebProviders,
   NavigationProvider,
 } from "@dirac-grid/diracx-web-components/contexts";
 import { useMUITheme } from "@dirac-grid/diracx-web-components/hooks";
@@ -28,37 +29,32 @@ export default function DashboardLayout({
   const searchParams = useSearchParams();
 
   const customLogoURL =
-    "https://raw.githubusercontent.com/DIRACGrid/management/81ba3d4ccc763d1d4b58878cbe6957f894c1576f/branding/diracx/svg/diracx-logo-full.svg";
+    "https://mattermost.web.cern.ch/files/oktn8gxjobrb9gwkznx3hx3z7w/public?h=VpJiHpv03q76Pv6KqX90y-dkGxOResdO9xFOa4JsMr4";
   return (
-    <section>
-      <NavigationProvider
-        getPath={() => pathname}
-        setPath={(path: string) => {
-          router.push(path);
-        }}
-        getSearchParams={() => searchParams}
+    <DiracXWebProviders
+      getPath={() => pathname}
+      setPath={(path: string) => {
+        router.push(path);
+      }}
+      getSearchParams={() => searchParams}
+    >
+      <ApplicationsProvider
+        appList={applicationList}
+        defaultSections={defaultSections}
       >
-        <ApplicationsProvider
-          appList={applicationList}
-          defaultSections={defaultSections}
-        >
-          <OIDCSecure>
-            <Dashboard logoURL={customLogoURL} drawerWidth={250}>
-              <MUIThemeProvider theme={theme}>
-                <CssBaseline />
-                <Box
-                  sx={{
-                    ml: "5%",
-                    mr: "5%",
-                  }}
-                >
-                  {children}
-                </Box>
-              </MUIThemeProvider>
-            </Dashboard>
-          </OIDCSecure>
-        </ApplicationsProvider>
-      </NavigationProvider>
-    </section>
+        <OIDCSecure>
+          <Dashboard logoURL={customLogoURL} drawerWidth={250}>
+            <Box
+              sx={{
+                ml: "5%",
+                mr: "5%",
+              }}
+            >
+              {children}
+            </Box>
+          </Dashboard>
+        </OIDCSecure>
+      </ApplicationsProvider>
+    </DiracXWebProviders>
   );
 }

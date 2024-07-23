@@ -1,7 +1,7 @@
 import type { Preview } from "@storybook/react";
 import React from "react";
 import { CssBaseline } from "@mui/material";
-import { ThemeProvider } from "../src/contexts";
+import { ThemeProvider } from "../contexts/ThemeProvider";
 
 const preview: Preview = {
   parameters: {
@@ -15,7 +15,7 @@ const preview: Preview = {
   decorators: [
     (Story) => (
       <ThemeProvider>
-        <div style={{ width: "55vw" }}>
+        <div style={{ width: "900px" }}>
           <CssBaseline />
           <Story />
         </div>
