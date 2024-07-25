@@ -1,5 +1,6 @@
-import { applicationList } from "@/example-extension/applicationList";
+import { applicationList } from "@/gubbins/applicationList";
 
+// New default user sections
 export const defaultSections: {
   title: string;
   extended: boolean;

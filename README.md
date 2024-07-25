@@ -13,7 +13,7 @@ This repository is organized as a monorepo, with the following key packages:
 
 - [diracx-web](packages/diracx-web)
 - [diracx-web-components](packages/diracx-web-components)
-- [diracx-web-extension-example](packages/diracx-web-extension-example)
+- [extensions](packages/extensions)
 
 ![Architecture diagram](docs/architecture_overview.png)
 
@@ -23,13 +23,13 @@ This repository is organized as a monorepo, with the following key packages:
 
 - **DiracX-Web-Components**: A library of reusable React components designed for integration within the `DiracX-Web` package and to facilitate the creation of custom DiracX web extensions.
 
-- **DiracX-Web-Extension-Example**: An illustrative example of a web extension demonstrating how to extend the functionality of `DiracX-Web` using the components from the `DiracX-Web-Components` package.
+- **Extensions**: An illustrative example of a web extension demonstrating how to extend the functionality of `DiracX-Web` using the components from the `DiracX-Web-Components` package.
 
 ### Project Management
 
-- **Lerna**: Utilized for efficient monorepo management. Useful to run scripts or commands across all packages while handling errors correctly.
-- **npm**: Used for dependency management.
-- **Release-Please**: Automated release management for the project.
+- [**Lerna**](https://lerna.js.org/docs/introduction): Utilized for efficient monorepo management. Useful to run scripts or commands across all packages while handling errors correctly.
+- [**npm**](https://docs.npmjs.com/): Used for dependency management.
+- [**Release-Please**](https://github.com/googleapis/release-please): Automated release management for the project.
 
 The dependency management is further detailed in the [Package Management](docs/package-management.md) documentation.
 

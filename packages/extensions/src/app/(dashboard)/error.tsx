@@ -1,5 +1,6 @@
 "use client";
 
+//Error fallback component
 export default function Error({
   error,
   reset,

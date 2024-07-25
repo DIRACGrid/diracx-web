@@ -6,10 +6,11 @@ import { useOIDCContext } from "@dirac-grid/diracx-web-components/hooks";
 import { Box } from "@mui/material";
 
 /**
- * Build the User Dashboard page
- * @returns User Dashboard content
+ * Build a Test page
+ * @returns the example component
  */
 export default function UserDashboard() {
+  // Get info from the auth token
   const { configuration } = useOIDCContext();
   const { accessTokenPayload } = useOidcAccessToken(configuration?.scope);
 

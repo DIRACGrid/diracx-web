@@ -24,5 +24,5 @@ From the [npm documentation](https://docs.npmjs.com/cli/v10/using-npm/workspaces
 }
 ```
 
-Note that any packages not listed in the `workspaces` (i.e. `diracx-web-extension-example` here) array are not considered workspaces. They will not be managed from the root of the monorepo and will not have access to the linked packages in the root `node_modules`, hence they will fetch them from the npm registry.
+Note that any packages not listed in the `workspaces` (i.e. `extensions` here) array are not considered workspaces. They will not be managed from the root of the monorepo and will not have access to the linked packages in the root `node_modules`, hence they will fetch them from the npm registry.
 Additionally, these packages will have their own `node_modules` folder.

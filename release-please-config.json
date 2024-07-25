@@ -19,7 +19,7 @@
     "packages/diracx-web-components": {
       "component": "diracx-web-components"
     },
-    "packages/diracx-web-extension-example": {
+    "packages/extensions": {
       "component": "diracx-web-extension-example"
     }
   },

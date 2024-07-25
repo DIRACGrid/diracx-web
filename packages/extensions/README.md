@@ -1,0 +1,180 @@
+# Creating a Next.js DiracX Web Extension
+
+This project aims to provide an example for creating a basic Next.js web extension for DiracX. It includes the necessary configuration and setup to get you started quickly.
+
+## Prerequisites
+
+Before starting, ensure you have the following installed:
+
+- [Docker](https://www.docker.com/get-started)
+- [Node.js](https://nodejs.org/)
+- [Git](https://git-scm.com/)
+
+## Getting Started
+
+You can either create a new repository or fork this repository to build your DiracX extension. Follow one of the methods below:
+
+### Method 1: Fork the Repository
+
+1. **Fork this repository** on GitHub.
+2. **Clone the forked repository** to your local machine:
+
+   ```bash
+   git clone https://github.com/YOUR_USERNAME/diracx-web.git
+   cd diracx-web/packages/extensions
+   npm install
+   ```
+
+### Method 2: Create a New Next.js Project
+
+1. **Create a new Next.js project** using the following command:
+
+   ```bash
+   npx create-next-app your-extension
+   cd your-extension
+   ```
+
+2. **Add the DiracX Web Components Library** to your project:
+
+   ```bash
+   npm install @dirac-grid/diracx-web-components
+   ```
+
+   To include additional dependencies in your project, such as `cypress` for end-to-end tests, you can follow these steps:
+
+   Run the following command to install the desired dependency:
+
+   ```bash
+   npm install <dependency-name>
+   ```
+
+   Add the `--save-dev` or `-D` flag to install the dependency as a development dependency.
+
+   Replace `<dependency-name>` with the name of the dependency you want to install.
+
+   For example, to install `cypress`, run:
+
+   ```bash
+   npm install cypress -D
+   ```
+
+   Make sure to consult the documentation of each dependency for further instructions on how to use them in your project.
+
+   For `cypress`, you can refer to the [Cypress documentation](https://docs.cypress.io/guides/overview/why-cypress.html) for detailed usage instructions.
+
+3. **Add the OIDC postinstall script** to your `package.json` file to copy necessary service worker files:
+
+   ```json
+   "scripts": {
+     "postinstall": "node ./node_modules/@axa-fr/react-oidc/bin/copy-service-worker-files.mjs public"
+   }
+   ```
+
+   This is needed to update the service worker files when the OIDC library version changes.
+
+   See the [OIDC library documentation](https://github.com/AxaFrance/oidc-client/tree/main/packages/react-oidc#getting-started) for more information.
+
+4. **Modify the app pages** to use components from the `diracx-components` library (e.g., providers, apps).
+
+### Architecture
+
+We strongly recommend following the directory structure below to keep your project organized:
+
+- `/src/app`: Contains the main application logic and Next.js setup. This directory houses the core of the application built using Next.js, where each page.tsx file represents a page in the application with [folder-based routing](https://nextjs.org/docs/app/building-your-application/routing). [Next.js Official Documentation](https://nextjs.org/docs)
+
+- `/src/<your extension>`: This directory includes the source code related to your extension. You can create custom components, hooks, ... in this directory.
+  - `/src/<your extension>/components`: Contains custom React components. This folder includes reusable UI components built using React. Components in React are independent, reusable pieces of UI that can manage their own state. [React Components](https://reactjs.org/docs/components-and-props.html)
+  - `/src/<your extension>/contexts`: Manages global state using React Context. This folder contains context providers which are used to manage and share global state across the application. React Context provides a way to pass data through the component tree without having to pass props down manually at every level. [React Context](https://reactjs.org/docs/context.html)
+  - `/src/<your extension>/hooks`: Custom React hooks for encapsulating reusable logic. This directory includes custom hooks. Hooks are special functions that let you "hook into" React state and lifecycle features from function components. [React Hooks](https://reactjs.org/docs/hooks-intro.html)
+  - `/src/<your extension>/types`: TypeScript type definitions for the application. This folder contains TypeScript type definitions to ensure type safety throughout the application.
+
+### Running the Extension with DiracX Charts
+
+To start your DiracX extension follow these steps:
+
+1. **Clone the `diracx-charts` repository** in a parent directory:
+
+   ```bash
+   git clone git@github.com:DIRACGrid/diracx-charts.git
+   ```
+
+2. **Run the demo script** with the path to your extension:
+
+   ```bash
+   ./diracx-charts/run_demo.sh path/to/your-extension
+   ```
+
+This will run the DiracX Demo with your extension.
+
+## Customizing the Extension
+
+You can customize your extension by modifying the files in the `src` directory. This is where you’ll find the main components and logic of your extension.
+
+Having a directory dedicated to your extension components will help you keep your code organized and easy to maintain.
+
+### Extending the DiracX Apps
+
+To add new apps to your extension, you can create new components in your extension directory.
+
+[`testApp`](src/gubbins/components/TestApp/testApp.tsx) provides an example of a basic app component.
+
+It is then pretty easy to add them to DiracX Web by extending the `applicationList` (the list of apps available in DiracX-Web) from `diracx-web-components/components`.
+
+Context providers are used to manage and share global state across the application. You can use the `ApplicationProvider` from `diracx-web-components/contexts` to pass the list of applications to the components that need it.
+It is used in this example in the [(Dashboard) directory's layout.tsx](<src/app/(dashboard)/layout.tsx>) file.
+
+If you need more info on Contexts, you can check the [React documentation](https://reactjs.org/docs/context.html).
+
+```tsx
+// import the Application Context Provider and the default application list from the library
+import { ApplicationProvider } from "@dirac-grid/diracx-web-components/contexts";
+import { applicationList } from "@dirac-grid/diracx-web-components/components";
+
+// The new Application you want to add
+const newApp = {
+  name: "New App", // Its name
+  icon: new-app-icon, // An icon for the app, you can import some from "@mui/icons-material"
+  component: NewAppComponent, // The component you made for your Application
+};
+
+// Make a new list with all elements of the default list + the new application
+const newApplicationList = [...applicationList, newApp];
+
+// Use your new list by passing in the Application provider in a page's layout
+<ApplicationProvider appList={newApplicationList}>...</ApplicationProvider>;
+```
+
+In this example, the new App list is defined in a [separate file](src/gubbins/applicationList.ts)
+
+Feel free to explore and adjust the code to fit your requirements.
+
+## Deployment
+
+Deployment of the extension can be done using the Dockerfile provided in the repository. The Dockerfile builds the Next.js application and serves it using a nginx server.
+
+See [Docker's Documentation](https://docs.docker.com/get-started/) for more information on how to deploy your application using Docker.
+It can be automatically deployed using CI/CD tools like GitHub Actions, GitLab CI/CD, or Jenkins.
+
+## Good Practices
+
+- **Code Quality**: Ensure your code is clean, well-documented, and follows best practices. Use tools like [ESLint](https://eslint.org/) and [Prettier](https://prettier.io/) to maintain code quality.
+
+- **Testing**:
+
+  - **Component Testing**: Write tests for your components to ensure they work as expected. Use [Jest](https://jestjs.io/) for unit testing and snapshot testing of your React components.
+  - **Application Testing**: Use [Cypress](https://www.cypress.io/) for end-to-end testing to simulate real user interactions and ensure your application behaves correctly.
+  - **Test Coverage**: Maintain good test coverage to ensure that your critical features are well-protected during updates. Tools like Jest provide [coverage reports](https://jestjs.io/docs/code-coverage) that help you identify untested parts of your code.
+
+- **Accessibility**: Make your extension accessible to all users. Use semantic HTML, ARIA attributes, and test your extension with different screen sizes and assistive technologies.
+
+- **Security**:
+
+  - **Dependency Management**: Keeping dependencies up to date is crucial for security and performance. Using deprecated packages can expose your application to known vulnerabilities.
+  - **Identifying Vulnerabilities**: Regularly check for known vulnerabilities in your dependencies. Tools like [`npm audit`](https://docs.npmjs.com/cli/v7/commands/npm-audit) can help spot these issues.
+  - **Automating Updates**: Use tools like [Dependabot](https://github.com/dependabot) or [Renovate](https://www.whitesourcesoftware.com/free-developer-tools/renovate/) to automate dependency updates. These tools can automatically create pull requests to update dependencies, making it easier to stay current and see if updates are compatible with tests used in CI. Keeping dependencies up to date is crucial for security as deprecated packages can expose your application to known vulnerabilities.
+
+By following these practices, you'll ensure that your codebase remains robust, secure, and maintainable.
+
+## License
+
+This project is licensed under the GNU General Public License v3.0 (GPL-3.0). Please refer to the [LICENSE](LICENSE) file for more details.

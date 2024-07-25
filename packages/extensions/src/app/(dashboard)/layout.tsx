@@ -1,8 +1,6 @@
 "use client";
 import * as React from "react";
-import CssBaseline from "@mui/material/CssBaseline";
 import { Box } from "@mui/material";
-import { ThemeProvider as MUIThemeProvider } from "@mui/material/styles";
 import {
   OIDCSecure,
   Dashboard,
@@ -10,39 +8,41 @@ import {
 import {
   ApplicationsProvider,
   DiracXWebProviders,
-  NavigationProvider,
 } from "@dirac-grid/diracx-web-components/contexts";
-import { useMUITheme } from "@dirac-grid/diracx-web-components/hooks";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { applicationList } from "@/example-extension/applicationList";
-import { defaultSections } from "@/example-extension/defaultSections";
+import { applicationList } from "@/gubbins/applicationList";
+import { defaultSections } from "@/gubbins/defaultSections";
 
+// Layout for the dashboard: setup the providers and the dashboard for the applications
 export default function DashboardLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const theme = useMUITheme();
-
+  // Get the pathname, router and search params from the next/navigation package, needed for navigation and routing
   const pathname = usePathname();
   const router = useRouter();
   const searchParams = useSearchParams();
 
+  // A custom logo URL can be used for the dashboard
   const customLogoURL =
     "https://mattermost.web.cern.ch/files/oktn8gxjobrb9gwkznx3hx3z7w/public?h=VpJiHpv03q76Pv6KqX90y-dkGxOResdO9xFOa4JsMr4";
   return (
+    // DiracXWebProviders is the main provider for the DiracX Web components, you need to give it the pathname, router and search params
     <DiracXWebProviders
       getPath={() => pathname}
-      setPath={(path: string) => {
-        router.push(path);
-      }}
+      setPath={router.push}
       getSearchParams={() => searchParams}
     >
+      {/* ApplicationsProvider is the provider for the applications, you can give it customized application list or default sections to override them.
+      No need to use it if you don't want to customize the applications */}
       <ApplicationsProvider
         appList={applicationList}
         defaultSections={defaultSections}
       >
+        {/* OIDCSecure is used to make sure the user is authenticated before accessing the dashboard */}
         <OIDCSecure>
+          {/* Dashboard is the main layout for the applications, you can optionally give it a custom logo URL and a drawer width */}
           <Dashboard logoURL={customLogoURL} drawerWidth={250}>
             <Box
               sx={{
