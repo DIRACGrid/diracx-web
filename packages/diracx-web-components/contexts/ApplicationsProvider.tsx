@@ -1,4 +1,10 @@
-import React, { createContext, useCallback, useEffect, useState } from "react";
+import React, {
+  createContext,
+  useCallback,
+  useMemo,
+  useEffect,
+  useState,
+} from "react";
 import { Dashboard, FolderCopy, Monitor } from "@mui/icons-material";
 import JSONCrush from "jsoncrush";
 import { useSearchParamsUtils } from "@/hooks/searchParamsUtils";
@@ -36,9 +42,6 @@ export const ApplicationsProvider = ({
 
   const { getParam, setParam } = useSearchParamsUtils();
 
-  // get user sections from searchParams
-  const sectionsParams = getParam("sections");
-
   // save user sections to searchParams (but not icons)
   const setSectionsParams = useCallback(
     (sections: UserSection[] | ((prev: UserSection[]) => UserSection[])) => {
@@ -60,6 +63,9 @@ export const ApplicationsProvider = ({
     },
     [setParam, userSections],
   );
+
+  // get user sections from searchParams
+  const sectionsParams = useMemo(() => getParam("sections"), [getParam]);
 
   useEffect(() => {
     if (userSections.length !== 0) return;
