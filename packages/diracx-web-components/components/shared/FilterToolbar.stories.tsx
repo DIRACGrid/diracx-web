@@ -43,13 +43,18 @@ export const Default: Story = {
       { id: "name", label: "Name" },
       { id: "age", label: "Age" },
     ],
-    filters: [{ id: 0, column: "id", operator: "eq", value: "1" }],
+    filters: [
+      { id: 0, column: "id", operator: "eq", value: "1" },
+      { id: 1, column: "id", operator: "neq", value: "2" },
+    ],
     setFilters: () => {},
     handleApplyFilters: () => {},
+    appliedFilters: [{ id: 0, column: "id", operator: "eq", value: "1" }],
   },
   render: (props) => {
-    const [, updateArgs] = useArgs();
+    const [{ filters }, updateArgs] = useArgs();
     props.setFilters = (filters) => updateArgs({ filters });
+    props.handleApplyFilters = () => updateArgs({ appliedFilters: filters });
     return <FilterToolbar {...props} />;
   },
 };
