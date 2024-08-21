@@ -1,8 +1,29 @@
 import { PaletteMode } from "@mui/material";
-import { grey, lightGreen, cyan } from "@mui/material/colors";
-import { createTheme, darken, lighten } from "@mui/material/styles";
+import { cyan, grey, lightGreen } from "@mui/material/colors";
+import {
+  createTheme,
+  darken,
+  lighten,
+  getContrastRatio,
+} from "@mui/material/styles";
 import { useContext } from "react";
 import { ThemeContext } from "@/contexts/ThemeProvider";
+
+declare module "@mui/material/styles" {
+  interface Palette {
+    chipColor: Palette["primary"];
+  }
+
+  interface PaletteOptions {
+    chipColor?: PaletteOptions["primary"];
+  }
+}
+
+declare module "@mui/material/Chip" {
+  interface ChipPropsColorOverrides {
+    chipColor: true;
+  }
+}
 
 /**
  * Custom hook to access the theme context
@@ -26,6 +47,12 @@ export const useTheme = () => {
 export const useMUITheme = () => {
   const { theme } = useTheme();
 
+  const primary = lightGreen[700];
+  const secondary = cyan[500];
+
+  const chipColor =
+    theme === "light" ? lighten(primary, 0.5) : darken(primary, 0.5);
+
   // Create a Material-UI theme based on the current mode
   const muiTheme = createTheme({
     palette: {
@@ -33,11 +60,13 @@ export const useMUITheme = () => {
       primary: {
         main: "#ffffff",
       },
+      chipColor: {
+        main: chipColor,
+        contrastText:
+          getContrastRatio(chipColor, "#fff") > 4.5 ? "#fff" : "#111",
+      },
     },
   });
-
-  const primary = lightGreen[700];
-  const secondary = cyan[500];
 
   const scrollbarBackground = theme === "dark" ? "#333" : "#f1f1f1";
   const scrollbarThumbBackground = theme === "dark" ? "#888" : "#ccc";
@@ -98,13 +127,6 @@ export const useMUITheme = () => {
             //underline in cyan
             textDecoration: "underline",
           },
-        },
-      },
-    },
-    MuiChip: {
-      styleOverrides: {
-        root: {
-          backgroundColor: lighten(primary, 0.75),
         },
       },
     },
