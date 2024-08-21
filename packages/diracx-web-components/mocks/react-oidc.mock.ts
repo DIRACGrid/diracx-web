@@ -1,4 +1,5 @@
 import { fn } from "@storybook/test";
+// Aliased the '@axa-fr/react-oidc' library as '@actual/react-oidc' in the Storybook config to prevent the mock from importing itself.
 // @ts-ignore: Cannot find module '@actual/react-oidc'
 import * as actual from "@actual/react-oidc";
 

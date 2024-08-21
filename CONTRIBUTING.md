@@ -2,6 +2,20 @@
 
 Thank you for your interest in contributing to our project! We appreciate all contributions, big and small. Below are some guidelines to help you get started.
 
+## Bug reporting and discussions
+
+- Want to report a bug?
+  Open an [Issue](https://github.com/DIRACGrid/diracx-web/issues).
+- Need technical support to configure `diracx-web`?
+  Start a [Support discussion](https://github.com/DIRACGrid/diracx-web/discussions/categories/support).
+
+- Want to make a general feedback about the [DIRAC web application](https://github.com/DIRACGrid/WebAppDIRAC)?
+  Answer to the [Survey](https://github.com/DIRACGrid/diracx-web/discussions/categories/surveys) by creating a new discussion.
+- Want to request a feature?
+  Create a [User Story](https://github.com/DIRACGrid/diracx-web/discussions/categories/user-personas-and-stories) to describe your need.
+- Want to discuss about UX/UI design?
+  Share your [Design idea](https://github.com/DIRACGrid/diracx-web/discussions/categories/design-ideas).
+
 ## How to Contribute
 
 ### 1. Opening an Issue

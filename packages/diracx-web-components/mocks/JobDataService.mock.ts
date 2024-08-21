@@ -1,4 +1,5 @@
 import { fn } from "@storybook/test";
+// Aliased '@/components/JobMonitor/JobDataService' as '@actual/components/JobMonitor/JobDataService' in the Storybook config to prevent the mock from importing itself.
 // @ts-ignore: Cannot find module '@actual/components/JobMonitor/JobDataService'
 import * as actual from "@actual/components/JobMonitor/JobDataService";
 
