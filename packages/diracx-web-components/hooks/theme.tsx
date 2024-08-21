@@ -36,6 +36,9 @@ export const useMUITheme = () => {
     },
   });
 
+  const primary = lightGreen[700];
+  const secondary = cyan[500];
+
   const scrollbarBackground = theme === "dark" ? "#333" : "#f1f1f1";
   const scrollbarThumbBackground = theme === "dark" ? "#888" : "#ccc";
   const scrollbarThumbHoverBackground = theme === "dark" ? "#555" : "#999";
@@ -70,27 +73,27 @@ export const useMUITheme = () => {
         contained: {
           // Target the 'contained' variant
           color: "white",
-          backgroundColor: lightGreen[700],
+          backgroundColor: primary,
           "&:hover": {
             color: "white",
-            backgroundColor: cyan[500],
+            backgroundColor: secondary,
           },
         },
         outlined: {
           // Target the 'outlined' variant
-          color: lightGreen[700],
-          borderColor: lightGreen[700],
+          color: primary,
+          borderColor: primary,
           "&:hover": {
-            color: cyan[500],
-            borderColor: cyan[500],
+            color: secondary,
+            borderColor: secondary,
             backgroundColor: "transparent",
           },
         },
         text: {
           // Target the 'text' variant
-          color: lightGreen[700],
+          color: primary,
           "&:hover": {
-            color: cyan[500],
+            color: secondary,
             backgroundColor: "transparent",
             //underline in cyan
             textDecoration: "underline",
@@ -168,10 +171,10 @@ export const useMUITheme = () => {
       styleOverrides: {
         root: {
           "&.Mui-checked": {
-            color: lightGreen[700],
+            color: primary,
           },
           "&.MuiCheckbox-indeterminate": {
-            color: cyan[500],
+            color: secondary,
           },
         },
       },

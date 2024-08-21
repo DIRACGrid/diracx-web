@@ -15,7 +15,7 @@ const preview: Preview = {
   decorators: [
     (Story) => (
       <ThemeProvider>
-        <div style={{ width: "900px" }}>
+        <div style={{ width: "60vw", maxWidth: "900px" }}>
           <CssBaseline />
           <Story />
         </div>

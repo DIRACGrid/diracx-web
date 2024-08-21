@@ -1,7 +1,7 @@
 "use client";
 import React from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { NavigationProvider } from "@dirac-grid/diracx-web-components/contexts";
+import { DiracXWebProviders } from "@dirac-grid/diracx-web-components/contexts";
 
 // Layout for the authentication page: setup the navigation provider
 export default function AuthLayout({
@@ -14,13 +14,13 @@ export default function AuthLayout({
   const router = useRouter();
   const searchParams = useSearchParams();
   return (
-    // NavigationProvider is the provider for the DiracX Web Navigation, you need to give it the pathname, router and search params
-    <NavigationProvider
+    // DiracXWebProviders is the main provider for the DiracX Web components, you need to give it the pathname, router and search params
+    <DiracXWebProviders
       getPath={() => pathname}
       setPath={router.push}
       getSearchParams={() => searchParams}
     >
       {children}
-    </NavigationProvider>
+    </DiracXWebProviders>
   );
 }

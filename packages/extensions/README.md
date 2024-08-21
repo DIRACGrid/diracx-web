@@ -1,5 +1,7 @@
 # Creating a Next.js DiracX Web Extension
 
+![Extension Logo](public/robot.png)
+
 This project aims to provide an example for creating a basic Next.js web extension for DiracX. It includes the necessary configuration and setup to get you started quickly.
 
 ## Prerequisites
@@ -9,6 +11,12 @@ Before starting, ensure you have the following installed:
 - [Docker](https://www.docker.com/get-started)
 - [Node.js](https://nodejs.org/)
 - [Git](https://git-scm.com/)
+
+And ensure you have basic knowledge of:
+
+- [React](https://react.dev/)
+- [Next.js](https://nextjs.org/)
+- [MUI](https://mui.com/)
 
 ## Getting Started
 
@@ -24,6 +32,8 @@ You can either create a new repository or fork this repository to build your Dir
    cd diracx-web/packages/extensions
    npm install
    ```
+
+3. **Modify the app pages** to use components from the `diracx-components` library (e.g., providers, apps).
 
 ### Method 2: Create a New Next.js Project
 
@@ -74,13 +84,34 @@ You can either create a new repository or fork this repository to build your Dir
 
    See the [OIDC library documentation](https://github.com/AxaFrance/oidc-client/tree/main/packages/react-oidc#getting-started) for more information.
 
-4. **Modify the app pages** to use components from the `diracx-components` library (e.g., providers, apps).
+4. **Edit the Next.js config** with these options:
+
+   ```js
+      output: "export",
+      images: {
+         unoptimized: true,
+      },
+   ```
+
+   The output is set to `export` to have a static application.
+   Images are left unoptimized because it's not well-supported with a static export.
+
+5. **Add the nginx config** located in the [`config/nginx`](config/nginx/) directory.
+   This adjustment ensures that Nginx can correctly handle requests for .html files and fall back appropriately, preventing the `404: Not Found` errors encountered when accessing routes like `/auth`. (see [#57](https://github.com/DIRACGrid/diracx-web/pull/57))
+
+6. **Organize your pages** in the `src/app` app directory.
+   The `<DiracXWebProviders>` context is needed by most of the components of `diracx-web-components`, so you should include it in the layouts of your application. Use `<OIDCSecure>` to require authentication on a route. You can also override some default values of certain contexts like `<ApplicationProvider>` for the application list.
+   Finally, some components have some personalization options (i.e. the logo URL for the dashboard), check the [Storybook documentation](https://diracgrid.github.io/diracx-web/) to see the props of each component.
+   Check [the app directory](src/app/) in this example to have a reference.
 
 ### Architecture
 
 We strongly recommend following the directory structure below to keep your project organized:
 
-- `/src/app`: Contains the main application logic and Next.js setup. This directory houses the core of the application built using Next.js, where each page.tsx file represents a page in the application with [folder-based routing](https://nextjs.org/docs/app/building-your-application/routing). [Next.js Official Documentation](https://nextjs.org/docs)
+- `/src/app`: Contains the main application logic and Next.js setup. This directory houses the core of the application built using Next.js, where each page.tsx file represents a page in the application with [folder-based routing](https://nextjs.org/docs/app/building-your-application/routing). [Next.js Official Documentation](https://nextjs.org/docs).
+  The page.tsx files contain the UI for a route and layout.tsx files handles the shared UI for a segment and its children.
+  In this example the `(Dashboard)` folder manages the main interface where users interact with the app's primary functions. Names in parentheses are ignored for the route, so it is the root URL.
+  The `auth` folder handles the authentication of users, and the route is `/auth`.
 
 - `/src/<your extension>`: This directory includes the source code related to your extension. You can create custom components, hooks, ... in this directory.
   - `/src/<your extension>/components`: Contains custom React components. This folder includes reusable UI components built using React. Components in React are independent, reusable pieces of UI that can manage their own state. [React Components](https://reactjs.org/docs/components-and-props.html)
@@ -116,7 +147,7 @@ Having a directory dedicated to your extension components will help you keep you
 
 To add new apps to your extension, you can create new components in your extension directory.
 
-[`testApp`](src/gubbins/components/TestApp/testApp.tsx) provides an example of a basic app component.
+[`testApp`](src/gubbins/components/TestApp/testApp.tsx) provides an example of a basic app component and the [Storybook documentation](https://diracgrid.github.io/diracx-web/) showcases all the components you can use from the library in an interactive interface.
 
 It is then pretty easy to add them to DiracX Web by extending the `applicationList` (the list of apps available in DiracX-Web) from `diracx-web-components/components`.
 

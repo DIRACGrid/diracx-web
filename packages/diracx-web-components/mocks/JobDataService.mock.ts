@@ -1,4 +1,5 @@
 import { fn } from "@storybook/test";
+// @ts-ignore: Cannot find module '@actual/components/JobMonitor/JobDataService'
 import * as actual from "@actual/components/JobMonitor/JobDataService";
 
 export const useJobs = fn(actual.useJobs);

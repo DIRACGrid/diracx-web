@@ -13,9 +13,8 @@ import {
   TextField,
   Toolbar,
 } from "@mui/material";
-import { MenuBook, Add } from "@mui/icons-material";
+import { MenuBook, Add, SvgIconComponent } from "@mui/icons-material";
 import React, {
-  ComponentType,
   ReactEventHandler,
   useContext,
   useEffect,
@@ -206,7 +205,7 @@ export default function DashboardDrawer(props: DashboardDrawerProps) {
    * @param appType - The type of the app to be created.
    * @param icon - The icon component for the app.
    */
-  const handleAppCreation = (appType: string, icon: ComponentType) => {
+  const handleAppCreation = (appType: string, icon: SvgIconComponent) => {
     let group = userSections[userSections.length - 1];
     const empty = !group;
     if (empty) {

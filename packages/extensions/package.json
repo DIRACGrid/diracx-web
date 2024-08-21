@@ -11,6 +11,7 @@
     "postinstall": "node ./node_modules/@axa-fr/react-oidc/bin/copy-service-worker-files.mjs public"
   },
   "dependencies": {
+    "@axa-fr/react-oidc": "^7.22.6",
     "@dirac-grid/diracx-web-components": "0.1.0-a1",
     "autoprefixer": "10.4.19",
     "next": "14.2.3",

@@ -75,7 +75,7 @@ export const Default: Story = {
     children: <div></div>,
     logoURL: process.env.STORYBOOK_DEV
       ? undefined
-      : "/diracx-web/DIRAC-logo.png",
+      : "/diracx-web/DIRAC-logo.png", // we need to add "/diracx-web" at the start of the url in production because of the repo name in the github pages url
   },
   render: (props) => {
     useOidc.mockReturnValue({

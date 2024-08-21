@@ -76,6 +76,8 @@ diracx-charts/run_demo.sh ./diracx-web
 - Want to discuss about UX/UI design?
   Share your [Design idea](https://github.com/DIRACGrid/diracx-web/discussions/categories/design-ideas).
 
+See the [Contributing guidelines](/CONTRIBUTING.md)
+
 ## Testing
 
 Unit tests can be started with:

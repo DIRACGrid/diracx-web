@@ -1,3 +1,5 @@
+import { SvgIconComponent } from "@mui/icons-material";
+
 // Define the type for the userSections state
 export type UserSection = {
   title: string;
@@ -6,7 +8,7 @@ export type UserSection = {
     title: string;
     type: string;
     id: string;
-    icon: React.ComponentType;
+    icon: SvgIconComponent;
     data?: any;
   }[];
 };

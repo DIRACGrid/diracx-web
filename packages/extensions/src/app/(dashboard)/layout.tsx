@@ -25,8 +25,7 @@ export default function DashboardLayout({
   const searchParams = useSearchParams();
 
   // A custom logo URL can be used for the dashboard
-  const customLogoURL =
-    "https://mattermost.web.cern.ch/files/oktn8gxjobrb9gwkznx3hx3z7w/public?h=VpJiHpv03q76Pv6KqX90y-dkGxOResdO9xFOa4JsMr4";
+  const customLogoURL = "/robot.png";
   return (
     // DiracXWebProviders is the main provider for the DiracX Web components, you need to give it the pathname, router and search params
     <DiracXWebProviders

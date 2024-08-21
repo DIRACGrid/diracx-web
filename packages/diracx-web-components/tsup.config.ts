@@ -11,9 +11,9 @@ export default defineConfig([
       "contexts/!(index|*.stories).ts?(x)",
       "types/!(index|*.stories).ts?(x)",
     ],
-    format: ["esm", "cjs"],
+    format: ["esm"],
     experimentalDts: true, // Seems to work fine, lower memory usage and faster than dts
-    target: "es5",
+    target: "es6",
     bundle: true,
     sourcemap: true,
     async onSuccess() {

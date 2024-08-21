@@ -37,7 +37,7 @@ const meta = {
   args: {
     logoURL: process.env.STORYBOOK_DEV
       ? undefined
-      : "/diracx-web/DIRAC-logo-minimal.png",
+      : "/diracx-web/DIRAC-logo-minimal.png", // we need to add "/diracx-web" at the start of the url in production because of the repo name in the github pages url
   },
 } satisfies Meta<typeof LoginForm>;
 
