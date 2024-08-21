@@ -104,7 +104,7 @@ export const useMUITheme = () => {
     MuiChip: {
       styleOverrides: {
         root: {
-          backgroundColor: lightGreen[100],
+          backgroundColor: lighten(primary, 0.75),
         },
       },
     },
