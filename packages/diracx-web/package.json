@@ -1,0 +1,50 @@
+{
+  "name": "diracx-web",
+  "version": "0.1.0-a1",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build && rm -rf ../../out && mv out ../..",
+    "start": "next start",
+    "lint": "next lint",
+    "ts-lint": "tsc -noEmit -incremental",
+    "postinstall": "node ../../node_modules/@axa-fr/react-oidc/bin/copy-service-worker-files.mjs public"
+  },
+  "dependencies": {
+    "@axa-fr/react-oidc": "^7.22.6",
+    "@dirac-grid/diracx-web-components": "^0.1.0-a1",
+    "@emotion/react": "^11.11.4",
+    "@emotion/styled": "^11.11.5",
+    "@mui/icons-material": "^5.15.18",
+    "@mui/material": "^5.15.18",
+    "@types/node": "20.11.30",
+    "@types/react": "18.3.3",
+    "@types/react-dom": "18.3.0",
+    "autoprefixer": "10.4.19",
+    "next": "^14.2.3",
+    "postcss": "8.4.38",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "server-only": "^0.0.1",
+    "sharp": "^0.33.3",
+    "swr": "^2.2.5"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^19.3.0",
+    "@commitlint/config-conventional": "^19.2.2",
+    "cypress": "^13.12.0",
+    "eslint": "^8.56.0",
+    "eslint-config-next": "^14.2.3",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-import": "^2.29.1",
+    "lint-staged": "^15.2.2",
+    "prettier": "^3.2.5",
+    "tsc-files": "^1.1.4",
+    "typescript": "5.4.5"
+  },
+  "lint-staged": {
+    "*.{js,ts,jsx,tsx}": "eslint --cache --fix",
+    "*.{js,ts,jsx,tsx,css,md}": "prettier --write",
+    "src/**/*.{ts,tsx}": "tsc-files --noEmit"
+  }
+}

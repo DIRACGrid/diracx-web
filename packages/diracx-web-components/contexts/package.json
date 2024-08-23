@@ -1,0 +1,6 @@
+{
+  "private": true,
+  "main": "../dist/contexts/index.cjs",
+  "module": "../dist/contexts/index.js",
+  "types": "../dist/contexts/index.d.ts"
+}

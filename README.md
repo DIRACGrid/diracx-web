@@ -5,6 +5,36 @@
 
 # DiracX-Web
 
+## Overview
+
+`diracx-web` is a web application that provides a user interface to interact with the [DiracX](https://github.com/DIRACGrid/diracx) service and is part of the [DIRAC](https://github.com/DIRACGrid) ecosystem.
+
+This repository is organized as a monorepo, with the following key packages:
+
+- [diracx-web](packages/diracx-web)
+- [diracx-web-components](packages/diracx-web-components)
+- [extensions](packages/extensions)
+
+![Architecture diagram](docs/architecture_overview.png)
+
+### Packages
+
+- **DiracX-Web**: Vanilla Dirac web interface based on Next.js. Leverages components from `DiracX-Web-Components` to provide core functionalities.
+
+- **DiracX-Web-Components**: A library of reusable React components designed for integration within the `DiracX-Web` package and to facilitate the creation of custom DiracX web extensions.
+
+- **Extensions**: An illustrative example of a web extension demonstrating how to extend the functionality of `DiracX-Web` using the components from the `DiracX-Web-Components` package.
+
+### Project Management
+
+- [**Lerna**](https://lerna.js.org/docs/introduction): Utilized for efficient monorepo management. Useful to run scripts or commands across all packages while handling errors correctly.
+- [**npm**](https://docs.npmjs.com/): Used for dependency management.
+- [**Release-Please**](https://github.com/googleapis/release-please): Automated release management for the project.
+
+The dependency management is further detailed in the [Package Management](docs/package-management.md) documentation.
+
+For more detailed and interactive documentation, visit our [Storybook](https://diracgrid.github.io/diracx-web) instance.
+
 ## Getting started
 
 _Requirements: docker, internet_
@@ -34,17 +64,7 @@ diracx-charts/run_demo.sh ./diracx-web
 
 ## Contributing
 
-- Want to report a bug?
-  Open an [Issue](https://github.com/DIRACGrid/diracx-web/issues).
-- Need technical support to configure `diracx-web`?
-  Start a [Support discussion](https://github.com/DIRACGrid/diracx-web/discussions/categories/support).
-
-- Want to make a general feedback about the [DIRAC web application](https://github.com/DIRACGrid/WebAppDIRAC)?
-  Answer to the [Survey](https://github.com/DIRACGrid/diracx-web/discussions/categories/surveys) by creating a new discussion.
-- Want to request a feature?
-  Create a [User Story](https://github.com/DIRACGrid/diracx-web/discussions/categories/user-personas-and-stories) to describe your need.
-- Want to discuss about UX/UI design?
-  Share your [Design idea](https://github.com/DIRACGrid/diracx-web/discussions/categories/design-ideas).
+See the [Contributing guidelines](/CONTRIBUTING.md)
 
 ## Testing
 

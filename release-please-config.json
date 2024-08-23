@@ -10,7 +10,29 @@
   "include-component-in-tag": false,
   "prerelease-type": "a",
   "packages": {
-    ".": {}
+    ".": {
+      "component": "root"
+    },
+    "packages/diracx-web": {
+      "component": "diracx-web"
+    },
+    "packages/diracx-web-components": {
+      "component": "diracx-web-components"
+    },
+    "packages/extensions": {
+      "component": "diracx-web-extension-example"
+    }
   },
+  "plugins": [
+    {
+      "type": "node-workspace",
+      "merge": false
+    },
+    {
+      "type": "linked-versions",
+      "groupName": "DiracX-Web",
+      "components": ["root", "diracx-web", "diracx-web-components", "diracx-web-extension-example"]
+    }
+  ],
   "$schema": "https://raw.githubusercontent.com/googleapis/release-please/main/schemas/config.json"
 }
