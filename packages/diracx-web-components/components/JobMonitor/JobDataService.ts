@@ -99,3 +99,28 @@ export function getJobHistory(
   const historyUrl = `/api/jobs/${jobId}/status/history`;
   return fetcher([historyUrl, token]);
 }
+
+export function getSandboxes(
+  jobId: number,
+  token: any,
+): Promise<{ headers: Headers; data: any }> {
+  const url = `/api/jobs/${jobId}/sandbox`;
+  return fetcher([url, token]);
+}
+
+export function getSandbox(
+  jobId: number,
+  sbType: "input" | "output",
+  token: any,
+): Promise<{ headers: Headers; data: any }> {
+  const url = `/api/jobs/${jobId}/sandbox/${sbType}`;
+  return fetcher([url, token]);
+}
+
+export function getSandboxUrl(
+  pfn: string,
+  token: any,
+): Promise<{ headers: Headers; data: any }> {
+  const url = `/api/jobs/sandbox?pfn=${pfn}`;
+  return fetcher([url, token]);
+}
