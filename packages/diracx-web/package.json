@@ -13,7 +13,7 @@
   "dependencies": {
     "@axa-fr/react-oidc": "^7.22.6",
     "@dirac-grid/diracx-web-components": "^0.1.0-a2",
-    "@emotion/react": "^11.11.4",
+    "@emotion/react": "^11.13.3",
     "@emotion/styled": "^11.11.5",
     "@mui/icons-material": "^5.15.18",
     "@mui/material": "^5.15.18",
