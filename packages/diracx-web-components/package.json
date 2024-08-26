@@ -1,6 +1,6 @@
 {
   "name": "@dirac-grid/diracx-web-components",
-  "version": "0.1.0-a1-test",
+  "version": "0.1.0-a2",
   "repository": "https://github.com/DIRACGrid/diracx-web",
   "description": "Useful components for diracx-web",
   "publishConfig": {

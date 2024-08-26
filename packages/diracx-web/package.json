@@ -1,6 +1,6 @@
 {
   "name": "diracx-web",
-  "version": "0.1.0-a1",
+  "version": "0.1.0-a2",
   "private": true,
   "scripts": {
     "dev": "next dev",
@@ -12,7 +12,7 @@
   },
   "dependencies": {
     "@axa-fr/react-oidc": "^7.22.6",
-    "@dirac-grid/diracx-web-components": "^0.1.0-a1",
+    "@dirac-grid/diracx-web-components": "^0.1.0-a2",
     "@emotion/react": "^11.11.4",
     "@emotion/styled": "^11.11.5",
     "@mui/icons-material": "^5.15.18",
