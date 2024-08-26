@@ -7,6 +7,7 @@ on:
       - release-please-**
   pull_request:
     branches-ignore:
+      - dependabot/**
       - release-please-**
 
 jobs:
