@@ -10,3 +10,7 @@ updates:
     directory: "/"
     schedule:
       interval: "weekly"
+  - package-ecosystem: "npm"
+    directory: "/packages/extensions"
+    schedule:
+      interval: "weekly"
