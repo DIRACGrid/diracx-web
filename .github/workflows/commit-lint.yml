@@ -3,17 +3,15 @@ name: Commit Lint
 on:
   push:
     branches-ignore:
-      - dependabot/**
       - release-please-**
   pull_request:
     branches-ignore:
-      - dependabot/**
       - release-please-**
 
 jobs:
   commitlint:
     runs-on: ubuntu-latest
-    if: github.event_name != 'push' || github.repository == 'DIRACGrid/diracx-web'
+    if: github.actor != 'dependabot[bot]' && (github.event_name != 'push' || github.repository == 'DIRACGrid/diracx-web')
     steps:
       - uses: actions/checkout@v4
         with:
