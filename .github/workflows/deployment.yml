@@ -58,7 +58,7 @@ jobs:
     permissions:
       id-token: write
       pages: write
-    if: ${{ github.event_name == 'push' && github.repository == 'DIRACGrid/diracx-web' && github.ref_name == 'main'}}
+    if: ${{ github.event_name == 'push' && github.repository == 'DIRACGrid/diracx-web' }}
     steps:
       - uses: actions/checkout@v4
  
@@ -68,10 +68,15 @@ jobs:
           cache: 'npm'
  
       - uses: bitovi/github-actions-storybook-to-github-pages@v1.0.3
+        if: ${{ github.ref_name == 'main' }}
         with:
           build_command: npm run build-storybook -w @dirac-grid/diracx-web-components
           path: packages/diracx-web-components/storybook-static
           checkout: false
+      
+      - name: Build documentation
+        if: ${{ github.ref_name != 'main' }}
+        run: npm ci && npm run build-storybook -w @dirac-grid/diracx-web-components
 
   build-deploy-dev-image:
     runs-on: ubuntu-latest
