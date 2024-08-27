@@ -82,10 +82,31 @@ const renderStatusCell = (status: string) => {
  * The head cells for the data grid (desktop version)
  */
 const headCells: Column[] = [
-  { id: "JobID", label: "Job ID" },
+  { id: "JobID", label: "Job ID", type: "number" },
   { id: "JobName", label: "Job Name" },
   { id: "Site", label: "Site" },
-  { id: "Status", label: "Status", render: renderStatusCell },
+  {
+    id: "Status",
+    label: "Status",
+    render: renderStatusCell,
+    type: [
+      "Submitting",
+      "Received",
+      "Checking",
+      "Staging",
+      "Waiting",
+      "Matched",
+      "Running",
+      "Rescheduled",
+      "Completing",
+      "Completed",
+      "Done",
+      "Failed",
+      "Stalled",
+      "Killed",
+      "Deleted",
+    ].sort(),
+  },
   {
     id: "MinorStatus",
     label: "Minor Status",
@@ -93,6 +114,7 @@ const headCells: Column[] = [
   {
     id: "SubmissionTime",
     label: "Submission Time",
+    type: "DateTime",
   },
 ];
 

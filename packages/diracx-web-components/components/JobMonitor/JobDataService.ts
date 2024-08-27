@@ -1,5 +1,7 @@
 import useSWR, { mutate } from "swr";
 import { fetcher } from "@/hooks/utils";
+import { Filter } from "@/types";
+import dayjs from "dayjs";
 
 /**
  * Custom hook for fetching jobs data.
@@ -16,6 +18,19 @@ export const useJobs = (
   page: number,
   rowsPerPage: number,
 ) => {
+  searchBody.search = searchBody.search?.map((filter: any) => {
+    if (filter.operator == "last") {
+      return {
+        column: filter.column,
+        operator: "gt",
+        value: dayjs()
+          .subtract(1, filter.value as "hour" | "day" | "month" | "year")
+          .toISOString(),
+        values: filter.values,
+      };
+    }
+    return filter;
+  });
   const urlGetJobs = `/api/jobs/search?page=${page + 1}&per_page=${rowsPerPage}`;
   return useSWR([urlGetJobs, accessToken, "POST", searchBody], fetcher);
 };
@@ -34,6 +49,19 @@ export const refreshJobs = (
   page: number,
   rowsPerPage: number,
 ) => {
+  searchBody.search = searchBody.search?.map((filter: any) => {
+    if (filter.operator == "last") {
+      return {
+        column: filter.column,
+        operator: "gt",
+        value: dayjs()
+          .subtract(1, filter.value as "hour" | "day" | "month" | "year")
+          .toISOString(),
+        values: filter.values,
+      };
+    }
+    return filter;
+  });
   const urlGetJobs = `/api/jobs/search?page=${page + 1}&per_page=${rowsPerPage}`;
   mutate([urlGetJobs, accessToken, "POST", searchBody]);
 };

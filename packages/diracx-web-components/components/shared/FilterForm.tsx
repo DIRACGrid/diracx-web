@@ -14,6 +14,10 @@ import {
 } from "@mui/material";
 import { Filter } from "@/types/Filter";
 import { Column } from "@/types/Column";
+import { DateTimePicker, LocalizationProvider } from "@mui/x-date-pickers";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import dayjs from "dayjs";
+import "dayjs/locale/en-gb";
 
 /**
  * Filter form props
@@ -62,13 +66,18 @@ export function FilterForm(props: FilterFormProps) {
     if (filterIndex !== -1) {
       setTempFilter(filters[filterIndex]);
     } else {
-      setTempFilter({ id: Date.now(), column: "", operator: "eq", value: "" });
+      setTempFilter({
+        id: Date.now(),
+        column: "",
+        operator: "eq",
+        value: "",
+      });
     }
   }, [filters, filterIndex]);
 
   if (!tempFilter) return null;
 
-  const onChange = (field: string, value: string) => {
+  const onChange = (field: string, value: string | string[] | undefined) => {
     setTempFilter((prevFilter: Filter | null) => {
       if (prevFilter === null) {
         return null; // or initialize a new Filter object as appropriate
@@ -91,6 +100,8 @@ export function FilterForm(props: FilterFormProps) {
     handleFilterMenuClose();
   };
 
+  const selectedColumn = columns.find((c) => c.id == tempFilter.column);
+
   return (
     <Box sx={{ p: 2 }}>
       <Stack spacing={2} alignItems="flex-start">
@@ -98,11 +109,23 @@ export function FilterForm(props: FilterFormProps) {
           Edit Filter
         </Typography>
         <Stack direction="row" spacing={2}>
-          <FormControl variant="outlined" fullWidth>
+          <FormControl variant="outlined">
             <InputLabel id="column">Column</InputLabel>
             <Select
               value={tempFilter.column}
-              onChange={(e) => onChange("column", e.target.value)}
+              onChange={(e) => {
+                onChange("column", e.target.value);
+                console.log(columns.find((c) => c.id == e.target.value)?.type);
+                if (
+                  columns.find((c) => c.id == e.target.value)?.type ==
+                  "DateTime"
+                )
+                  onChange("operator", "last");
+                else if (tempFilter.operator == "last") {
+                  onChange("operator", "eq");
+                  onChange("value", "");
+                }
+              }}
               label="Column"
               labelId="column"
               data-testid="filter-form-select-column"
@@ -116,34 +139,155 @@ export function FilterForm(props: FilterFormProps) {
             </Select>
           </FormControl>
 
-          <FormControl variant="outlined" fullWidth>
+          <FormControl variant="outlined">
             <InputLabel id="operator">Operator</InputLabel>
             <Select
               value={tempFilter.operator}
-              onChange={(e) => onChange("operator", e.target.value)}
+              onChange={(e) => {
+                onChange(
+                  ["in", "not in"].includes(e.target.value)
+                    ? "values"
+                    : "value",
+                  [] || "",
+                );
+                onChange(
+                  ["in", "not in"].includes(e.target.value)
+                    ? "value"
+                    : "values",
+                  undefined,
+                );
+                onChange("operator", e.target.value);
+              }}
               label="Operator"
               labelId="operator"
               data-testid="filter-form-select-operator"
               sx={{ minWidth: 120 }}
             >
-              <MenuItem value="eq">equals to</MenuItem>
-              <MenuItem value="neq">not equals to</MenuItem>
-              <MenuItem value="gt">is greater than</MenuItem>
-              <MenuItem value="lt">is lower than</MenuItem>
-              <MenuItem value="like">like</MenuItem>
+              {selectedColumn?.type != "DateTime" && (
+                <MenuItem value="eq">equals to</MenuItem>
+              )}
+              {selectedColumn?.type != "DateTime" && (
+                <MenuItem value="neq">not equals to</MenuItem>
+              )}
+
+              {selectedColumn?.type == "DateTime" && (
+                <MenuItem value="last">in the last</MenuItem>
+              )}
+
+              {typeof selectedColumn?.type != "object" && (
+                <MenuItem value="gt">is greater than</MenuItem>
+              )}
+              {typeof selectedColumn?.type != "object" && (
+                <MenuItem value="lt">is lower than</MenuItem>
+              )}
+              {(typeof selectedColumn?.type == "object" ||
+                selectedColumn?.type == "number") && (
+                <MenuItem value="in">is in</MenuItem>
+              )}
+              {(typeof selectedColumn?.type == "object" ||
+                selectedColumn?.type == "number") && (
+                <MenuItem value="not in">is not in</MenuItem>
+              )}
+              {selectedColumn?.type != "DateTime" && (
+                <MenuItem value="like">like</MenuItem>
+              )}
             </Select>
           </FormControl>
 
-          <FormControl variant="outlined" fullWidth>
-            <TextField
-              id="value"
-              variant="outlined"
-              label="Value"
-              value={tempFilter.value}
-              onChange={(e) => onChange("value", e.target.value)}
-              sx={{ flexGrow: 1 }}
-            />
-          </FormControl>
+          <LocalizationProvider
+            dateAdapter={AdapterDayjs}
+            adapterLocale={"en-gb"}
+          >
+            <FormControl variant="outlined">
+              {typeof selectedColumn?.type == "object" &&
+              tempFilter.operator != "like" ? (
+                <>
+                  <InputLabel id="value">Value</InputLabel>
+                  <Select
+                    label="Value"
+                    labelId="value"
+                    value={
+                      ["in", "not in"].includes(tempFilter.operator)
+                        ? tempFilter.values
+                        : tempFilter.value
+                    }
+                    onChange={(e) =>
+                      onChange(
+                        ["in", "not in"].includes(tempFilter.operator)
+                          ? "values"
+                          : "value",
+                        e.target.value,
+                      )
+                    }
+                    multiple={["in", "not in"].includes(tempFilter.operator)}
+                    sx={{ minWidth: 100 }}
+                  >
+                    {selectedColumn?.type.map((val: string) => (
+                      <MenuItem key={val} value={val}>
+                        {selectedColumn.render
+                          ? selectedColumn.render(val)
+                          : val}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </>
+              ) : selectedColumn?.type == "DateTime" &&
+                tempFilter.operator != "last" ? (
+                <DateTimePicker
+                  label="Value"
+                  value={dayjs(tempFilter.value)}
+                  onChange={(e) => onChange("value", e?.toISOString() || "")}
+                  views={["year", "day", "hours", "minutes", "seconds"]}
+                />
+              ) : selectedColumn?.type == "DateTime" &&
+                tempFilter.operator == "last" ? (
+                <>
+                  <InputLabel id="value">Value</InputLabel>
+                  <Select
+                    label="Value"
+                    labelId="value"
+                    value={tempFilter.value}
+                    onChange={(e) => onChange("value", e.target.value)}
+                    sx={{ minWidth: 100 }}
+                  >
+                    <MenuItem value="hour">Hour</MenuItem>
+                    <MenuItem value="week">Week</MenuItem>
+                    <MenuItem value="month">Month</MenuItem>
+                    <MenuItem value="year">Year</MenuItem>
+                  </Select>
+                </>
+              ) : selectedColumn?.type == "number" &&
+                !["in", "not in", "like"].includes(tempFilter.operator) ? (
+                <TextField
+                  id="value"
+                  variant="outlined"
+                  label="Value"
+                  value={tempFilter.value}
+                  onChange={(e) => onChange("value", e.target.value)}
+                  type="number"
+                />
+              ) : selectedColumn?.type == "number" &&
+                ["in", "not in"].includes(tempFilter.operator) ? (
+                <TextField
+                  id="value"
+                  variant="outlined"
+                  label="Value"
+                  value={tempFilter.values?.join(" ")}
+                  onChange={(e) =>
+                    onChange("values", e.target.value.split(" "))
+                  }
+                />
+              ) : (
+                <TextField
+                  id="value"
+                  variant="outlined"
+                  label="Value"
+                  value={tempFilter.value}
+                  onChange={(e) => onChange("value", e.target.value)}
+                />
+              )}
+            </FormControl>
+          </LocalizationProvider>
 
           <Tooltip title="Finish editing filter">
             <IconButton onClick={() => applyChanges()} color="success">

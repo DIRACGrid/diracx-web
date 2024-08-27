@@ -205,7 +205,7 @@ export function FilterToolbar(props: FilterToolbarProps) {
         {filters.map((filter: Filter, index: number) => (
           <Chip
             key={index}
-            label={`${filter.column} ${filter.operator} ${filter.value}`}
+            label={`${filter.column} ${filter.operator} ${filter.value || filter.values}`}
             onClick={(event) => {
               handleFilterMenuOpen(event); // Open the menu
               setSelectedFilter(filter); // Set the selected filter
