@@ -45,7 +45,7 @@
     "@microsoft/api-extractor": "^7.43.7",
     "@storybook/addon-essentials": "^8.2.1",
     "@storybook/addon-interactions": "^8.2.1",
-    "@storybook/addon-links": "^8.2.1",
+    "@storybook/addon-links": "^8.2.9",
     "@storybook/blocks": "^8.2.1",
     "@storybook/nextjs": "^8.2.1",
     "@storybook/react": "^8.2.1",
