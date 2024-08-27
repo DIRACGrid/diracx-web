@@ -6,6 +6,7 @@ import { Alert, Popover, Stack, Tooltip } from "@mui/material";
 import { Filter } from "@/types/Filter";
 import { Column } from "@/types/Column";
 import { FilterForm } from "./FilterForm";
+import "@/hooks/theme";
 
 /**
  * Filter toolbar component
