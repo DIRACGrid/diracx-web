@@ -10,6 +10,27 @@ on:
       - release-please-**
 
 jobs:
+  run-lint:
+    runs-on: ubuntu-latest
+    # Run the tests only if It's a PR or if the repo is DIRACGrid/diracx-web
+    if: github.event_name != 'push' || github.repository == 'DIRACGrid/diracx-web'
+    steps:
+      # Checkout the new source code
+      - uses: actions/checkout@v4
+      
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 'latest'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+        working-directory: packages/extensions
+      
+      - name: Check code-quality rules
+        run: npm run lint
+        working-directory: packages/extensions
+
   run-demo:
     runs-on: ubuntu-latest
     # Run the tests only if It's a PR or if the repo is DIRACGrid/diracx-web
