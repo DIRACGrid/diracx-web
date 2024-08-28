@@ -53,12 +53,12 @@ jobs:
         NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
       run: npx lerna publish from-package --no-push --no-private --yes
 
-  build-deploy-storybook-docs:
+  build-storybook-docs:
     runs-on: ubuntu-latest
     permissions:
       id-token: write
       pages: write
-    if: ${{ github.event_name == 'push' && github.repository == 'DIRACGrid/diracx-web' }}
+    if: ${{  github.event_name != 'push' || github.repository == 'DIRACGrid/diracx-web' }}
     steps:
       - uses: actions/checkout@v4
  
@@ -66,18 +66,30 @@ jobs:
         with:
           node-version: 'latest'
           cache: 'npm'
- 
-      - uses: bitovi/github-actions-storybook-to-github-pages@v1.0.3
-        if: ${{ github.ref_name == 'main' }}
-        with:
-          build_command: npm run build-storybook -w @dirac-grid/diracx-web-components
-          path: packages/diracx-web-components/storybook-static
-          checkout: false
-      
+          
       - name: Build documentation
-        if: ${{ github.ref_name != 'main' }}
         run: npm ci && npm run build-storybook -w @dirac-grid/diracx-web-components
 
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with: 
+          path: packages/diracx-web-components/storybook-static
+
+  deploy-storybook-docs:
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      pages: write
+    needs: [build-storybook-docs, release-please]
+    if: needs.release-please.outputs.release_created == 'true'
+    steps:    
+      - id: deploy
+        name: Deploy to GitHub Pages
+        uses: actions/deploy-pages@v4
+        with:
+          token: ${{ github.token }}
+               
+          
   build-deploy-dev-image:
     runs-on: ubuntu-latest
     if: ${{ github.event_name != 'push' || github.repository == 'DIRACGrid/diracx-web' }}
