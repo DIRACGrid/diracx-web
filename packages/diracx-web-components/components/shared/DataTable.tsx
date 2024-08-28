@@ -314,6 +314,8 @@ export function DataTable(props: DataTableProps) {
   const { getAllParam, getParam, setParam } = useSearchParamsUtils();
   const appId = getParam("appId");
 
+  const [appliedFilters, setAppliedFilters] = React.useState<Filter[]>(filters);
+
   const updateFiltersAndUrl = React.useCallback(
     (newFilters: Filter[]) => {
       // Update the filters in the URL using the setParam function
@@ -364,6 +366,7 @@ export function DataTable(props: DataTableProps) {
     }));
     setSearchBody({ search: jsonFilters });
     setPage(0);
+    setAppliedFilters(filters);
 
     // Update the filters in the URL
     updateFiltersAndUrl(filters);
@@ -371,35 +374,19 @@ export function DataTable(props: DataTableProps) {
     updateSectionFilters(filters);
   };
 
+  const SectionItem = React.useMemo(
+    () =>
+      sections
+        .find((section) => section.items.some((item) => item.id === appId))
+        ?.items.find((item) => item.id === appId),
+    [appId, sections],
+  );
+
   React.useEffect(() => {
-    // Function to parse the filters from the URL search params
-    const parseFiltersFromUrl = () => {
-      const filterStrings = getAllParam("filter");
-      return filterStrings.map((filterString: string) => {
-        const [id, column, operator, value] = filterString.split("_");
-        return { id: Number(id), column, operator, value };
-      });
-    };
-
-    const item = sections
-      .find((section) => section.items.some((item) => item.id === appId))
-      ?.items.find((item) => item.id === appId);
-
-    if (getParam("filter")) {
-      // Parse the filters when the component mounts or when the searchParams change
-      const initialFilters = parseFiltersFromUrl();
-      // Set the filters (they will be displayed in the UI)
-      setFilters(initialFilters);
-      // Apply the filters to get the filtered data
-      const jsonFilters = initialFilters.map((filter) => ({
-        parameter: filter.column,
-        operator: filter.operator,
-        value: filter.value,
-      }));
-      setSearchBody({ search: jsonFilters });
-    } else if (item?.data?.filters) {
-      setFilters(item.data.filters);
-      const jsonFilters = item.data.filters.map(
+    if (SectionItem?.data?.filters) {
+      setFilters(SectionItem.data.filters);
+      setAppliedFilters(SectionItem.data.filters);
+      const jsonFilters = SectionItem.data.filters.map(
         (filter: {
           id: number;
           column: string;
@@ -416,7 +403,7 @@ export function DataTable(props: DataTableProps) {
       setFilters([]);
       setSearchBody({ search: [] });
     }
-  }, [appId, getAllParam, getParam, sections, setFilters, setSearchBody]);
+  }, [SectionItem?.data?.filters, setFilters, setSearchBody]);
 
   // Manage sorting
   const handleRequestSort = (
@@ -498,6 +485,7 @@ export function DataTable(props: DataTableProps) {
           columns={columns}
           filters={filters}
           setFilters={setFilters}
+          appliedFilters={appliedFilters}
           handleApplyFilters={handleApplyFilters}
         />
         <Box sx={{ width: "100%", p: 1 }} data-testid="skeleton">
@@ -520,6 +508,7 @@ export function DataTable(props: DataTableProps) {
           columns={columns}
           filters={filters}
           setFilters={setFilters}
+          appliedFilters={appliedFilters}
           handleApplyFilters={handleApplyFilters}
         />
         <Box sx={{ width: "100%", marginTop: 2 }}>
@@ -539,6 +528,7 @@ export function DataTable(props: DataTableProps) {
           columns={columns}
           filters={filters}
           setFilters={setFilters}
+          appliedFilters={appliedFilters}
           handleApplyFilters={handleApplyFilters}
         />
         <Box sx={{ width: "100%", marginTop: 2 }}>
@@ -556,6 +546,7 @@ export function DataTable(props: DataTableProps) {
         columns={columns}
         filters={filters}
         setFilters={setFilters}
+        appliedFilters={appliedFilters}
         handleApplyFilters={handleApplyFilters}
       />
 

@@ -1,6 +1,9 @@
 import React from "react";
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen, fireEvent, cleanup } from "@testing-library/react";
+import { ThemeProvider as MUIThemeProvider } from "@mui/material";
 import { FilterToolbar } from "@/components/shared/FilterToolbar";
+import { ThemeProvider } from "@/contexts/ThemeProvider";
+import { useMUITheme } from "@/hooks/theme";
 
 describe("FilterToolbar", () => {
   const columns = [
@@ -12,17 +15,25 @@ describe("FilterToolbar", () => {
     { id: 1, column: "column1", operator: "eq", value: "value1" },
     { id: 2, column: "column2", operator: "neq", value: "value2" },
   ];
+  const appliedFilters = [
+    { id: 1, column: "column1", operator: "eq", value: "value1" },
+  ];
   const setFilters = jest.fn();
   const handleApplyFilters = jest.fn();
 
   beforeEach(() => {
     render(
-      <FilterToolbar
-        columns={columns}
-        filters={filters}
-        setFilters={setFilters}
-        handleApplyFilters={handleApplyFilters}
-      />,
+      <ThemeProvider>
+        <MUIProviders>
+          <FilterToolbar
+            columns={columns}
+            filters={filters}
+            setFilters={setFilters}
+            handleApplyFilters={handleApplyFilters}
+            appliedFilters={appliedFilters}
+          />
+        </MUIProviders>
+      </ThemeProvider>,
     );
   });
 
@@ -34,6 +45,48 @@ describe("FilterToolbar", () => {
     expect(addFilterButton).toBeInTheDocument();
     expect(applyFiltersButton).toBeInTheDocument();
     expect(clearAllFiltersButton).toBeInTheDocument();
+  });
+
+  it("renders the chip with chipColor when the filter is applied", () => {
+    const chipApplied = screen.getByText("column1 eq value1").closest("div");
+    const chipUnapplied = screen.getByText("column2 neq value2").closest("div");
+
+    expect(chipApplied).toHaveClass("MuiChip-colorChipColor");
+    expect(chipUnapplied).not.toHaveClass("MuiChip-colorChipColor");
+  });
+
+  it("renders the warning when there are unapplied filters", () => {
+    const warningMessage = screen.getByText(
+      'Some filter changes have not been applied. Please click on "Apply filters" to update your results.',
+    );
+
+    expect(warningMessage).toBeInTheDocument();
+
+    appliedFilters.push({
+      id: 2,
+      column: "column2",
+      operator: "neq",
+      value: "value2",
+    });
+
+    cleanup();
+
+    render(
+      <ThemeProvider>
+        <MUIProviders>
+          <FilterToolbar
+            columns={columns}
+            filters={filters}
+            setFilters={setFilters}
+            handleApplyFilters={handleApplyFilters}
+            appliedFilters={appliedFilters}
+          />
+        </MUIProviders>
+      </ThemeProvider>,
+    );
+
+    expect(warningMessage).not.toBeInTheDocument();
+    appliedFilters.pop();
   });
 
   it("opens the filter form when 'Add filter' button is clicked", () => {
@@ -70,3 +123,8 @@ describe("FilterToolbar", () => {
     expect(setFilters).toHaveBeenCalledWith([filters[1]]);
   });
 });
+
+function MUIProviders({ children }: { children: React.ReactNode }) {
+  const theme = useMUITheme();
+  return <MUIThemeProvider theme={theme}>{children}</MUIThemeProvider>;
+}

@@ -2,10 +2,11 @@ import React from "react";
 import { FilterList, Delete, Send } from "@mui/icons-material";
 import Chip from "@mui/material/Chip";
 import Button from "@mui/material/Button";
-import { Popover, Stack, Tooltip } from "@mui/material";
+import { Alert, Popover, Stack, Tooltip } from "@mui/material";
 import { Filter } from "@/types/Filter";
 import { Column } from "@/types/Column";
 import { FilterForm } from "./FilterForm";
+import "@/hooks/theme";
 
 /**
  * Filter toolbar component
@@ -18,6 +19,8 @@ interface FilterToolbarProps {
   filters: Filter[];
   /** The function to set the filters */
   setFilters: React.Dispatch<React.SetStateAction<Filter[]>>;
+  /** The applied filters */
+  appliedFilters: Filter[];
   /** The function to apply the filters */
   handleApplyFilters: () => void;
 }
@@ -28,7 +31,8 @@ interface FilterToolbarProps {
  * @returns a FilterToolbar component
  */
 export function FilterToolbar(props: FilterToolbarProps) {
-  const { columns, filters, setFilters, handleApplyFilters } = props;
+  const { columns, filters, setFilters, appliedFilters, handleApplyFilters } =
+    props;
   const [anchorEl, setAnchorEl] = React.useState<HTMLElement | null>(null);
   const [selectedFilter, setSelectedFilter] = React.useState<Filter | null>(
     null,
@@ -81,6 +85,17 @@ export function FilterToolbar(props: FilterToolbarProps) {
   const handleRemoveFilter = (index: number) => {
     setFilters(filters.filter((_, i) => i !== index));
   };
+
+  const changesUnapplied = React.useCallback(() => {
+    return JSON.stringify(filters) !== JSON.stringify(appliedFilters);
+  }, [filters, appliedFilters]);
+
+  const isApplied = React.useCallback(
+    (filter: Filter) => {
+      return appliedFilters.some((f) => f.id == filter.id);
+    },
+    [appliedFilters],
+  );
 
   // Keyboard shortcuts
   React.useEffect(() => {
@@ -142,37 +157,51 @@ export function FilterToolbar(props: FilterToolbarProps) {
 
   return (
     <>
-      <Stack direction="row" spacing={1} sx={{ m: 1 }}>
+      <Stack direction="row" spacing={1} sx={{ m: 1 }} alignItems={"center"}>
         <Tooltip title="Alt+Shift+a" placement="top">
-          <Button
-            variant="text"
-            startIcon={<FilterList />}
-            onClick={handleAddFilter}
-            ref={addFilterButtonRef}
-          >
-            <span>Add filter</span>
-          </Button>
+          <span>
+            <Button
+              variant="text"
+              startIcon={<FilterList />}
+              onClick={handleAddFilter}
+              ref={addFilterButtonRef}
+            >
+              <span>Add filter</span>
+            </Button>
+          </span>
         </Tooltip>
         <Tooltip title="Alt+Shift+p" placement="top">
-          <Button
-            variant="text"
-            startIcon={<Send />}
-            onClick={() => handleApplyFilters()}
-          >
-            <span>Apply filters</span>
-          </Button>
+          <span>
+            <Button
+              variant="text"
+              startIcon={<Send />}
+              onClick={() => handleApplyFilters()}
+              disabled={!changesUnapplied()}
+            >
+              <span>Apply filters</span>
+            </Button>
+          </span>
         </Tooltip>
         <Tooltip title="Alt+Shift+c" placement="top">
-          <Button
-            variant="text"
-            startIcon={<Delete />}
-            onClick={handleRemoveAllFilters}
-          >
-            <span>Clear all filters</span>
-          </Button>
+          <span>
+            <Button
+              variant="text"
+              startIcon={<Delete />}
+              onClick={handleRemoveAllFilters}
+              disabled={filters.length === 0}
+            >
+              <span>Clear all filters</span>
+            </Button>
+          </span>
         </Tooltip>
       </Stack>
-      <Stack direction="row" spacing={1} sx={{ m: 1, flexWrap: "wrap" }}>
+      <Stack
+        direction="row"
+        spacing={1}
+        flexWrap="wrap"
+        useFlexGap
+        sx={{ m: 1 }}
+      >
         {filters.map((filter: Filter, index: number) => (
           <Chip
             key={index}
@@ -184,10 +213,11 @@ export function FilterToolbar(props: FilterToolbarProps) {
             onDelete={() => {
               handleRemoveFilter(index);
             }}
-            color="primary"
+            color={isApplied(filter) ? "chipColor" : "default"}
             sx={{ m: 0.5 }}
           />
         ))}
+
         <Popover
           open={open}
           onClose={handleFilterMenuClose}
@@ -207,6 +237,12 @@ export function FilterToolbar(props: FilterToolbarProps) {
           />
         </Popover>
       </Stack>
+      {changesUnapplied() && (
+        <Alert severity="info">
+          Some filter changes have not been applied. Please click on &quot;Apply
+          filters&quot; to update your results.
+        </Alert>
+      )}
     </>
   );
 }
