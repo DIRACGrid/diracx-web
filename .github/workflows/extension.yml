@@ -1,4 +1,4 @@
-name: Integration Tests
+name: Gubbins extension
 
 on:
   push:
@@ -12,18 +12,25 @@ on:
 jobs:
   run-demo:
     runs-on: ubuntu-latest
+    # Run the tests only if It's a PR or if the repo is DIRACGrid/diracx-web
     if: github.event_name != 'push' || github.repository == 'DIRACGrid/diracx-web'
     steps:
-    - uses: actions/checkout@v4
-
-    - name: Clone source
+    # Checkout the new source code
+    - uses: actions/checkout@v4 
+      
+    # Clone diracx-charts
+    - name: Clone source 
       run: |
         cd ..
         git clone https://github.com/DIRACGrid/diracx-charts.git
-    - name: Start demo
+  
+    # Runs the demo with the extension source code
+    - name: Start demo 
       run: |
         cd ..
-        diracx-charts/run_demo.sh --exit-when-done diracx-web/
+        diracx-charts/run_demo.sh --exit-when-done diracx-web/packages/extensions
+    
+    # Prints some debugging information in case something goes wrong
     - name: Debugging information
       run: |
         cd ../diracx-charts
@@ -37,6 +44,7 @@ jobs:
             .demo/kubectl logs "${pod_name}" -c "${container_name}" || true
           done
         done
+      
     - name: Check for success
       run: |
         cd ../diracx-charts
@@ -46,9 +54,11 @@ jobs:
           exit 1
         fi
     
+    # Find the URL to be tested and put it in the github environment
     - name: Set DIRACX_URL
       run: echo "DIRACX_URL=https://$(ifconfig | grep 'inet ' | awk '{ print $2 }' | grep -v '^127' | head -n 1 | cut -d '/' -f 1).nip.io:8000" >> $GITHUB_ENV
 
+    # Run e2e tests with Cypress
     - name: Start Cypress
       uses: cypress-io/github-action@v6
       with:
