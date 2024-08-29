@@ -179,12 +179,20 @@ In this example, the new App list is defined in a [separate file](src/gubbins/ap
 
 Feel free to explore and adjust the code to fit your requirements.
 
+## Continuous integration
+
+Continuous integration helps to make sure the application still works correctly after every change pushed to the repository.
+
+You can find a GitHub workflow example at [`.github/workflows/extension.yml`](/.github/workflows/extension.yml).
+
 ## Deployment
 
 Deployment of the extension can be done using the Dockerfile provided in the repository. The Dockerfile builds the Next.js application and serves it using a nginx server.
 
 See [Docker's Documentation](https://docs.docker.com/get-started/) for more information on how to deploy your application using Docker.
 It can be automatically deployed using CI/CD tools like GitHub Actions, GitLab CI/CD, or Jenkins.
+
+You can find an example of deployment using GitHub Actions with the job `build-deploy-gubbins-image` in [`.github/workflows/deployment.yml`](/.github/workflows/deployment.yml).
 
 ## Good Practices
 
