@@ -4,17 +4,22 @@
   "private": true,
   "workspaces": [
     "packages/diracx-web-components",
-    "packages/diracx-web"
+    "packages/diracx-web",
+    "packages/extensions"
   ],
   "devDependencies": {
     "husky": "^9.0.11",
     "lerna": "^8.1.3"
   },
   "scripts": {
-    "dev": "lerna run dev --parallel",
-    "test": "lerna run test",
-    "build": "lerna run build",
+    "dev": "npm run dev:diracx-web",
+    "dev:diracx-web": "lerna run dev --parallel --include-dependencies --scope diracx-web",
+    "dev:extension": "lerna run dev --parallel --include-dependencies --scope diracx-web-extension-example",
+    "build": "npm run build:diracx-web",
+    "build:diracx-web": "lerna run build --include-dependencies --scope diracx-web",
+    "build:extension": "lerna run build --include-dependencies --scope diracx-web-extension-example && rm -rf ./out && mv ./packages/extensions/out .",
     "build-lib": "lerna run build --scope @dirac-grid/diracx-web-components",
+    "test": "lerna run test",
     "lint": "lerna run lint",
     "ts-lint": "lerna run ts-lint",
     "prepare": "husky"

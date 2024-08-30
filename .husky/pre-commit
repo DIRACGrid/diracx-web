@@ -1,4 +1,4 @@
 #!/bin/sh
 . "$(dirname "$0")/_/husky.sh"
 
-npx lerna exec -- npx lint-staged
+npx lerna exec --ignore diracx-web-extension-example -- npx lint-staged
