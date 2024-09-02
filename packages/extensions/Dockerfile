@@ -5,11 +5,11 @@
 FROM node:alpine AS build
 WORKDIR /app
 # Copy the application to the working directory
-COPY . .
+COPY ../.. .
 # Install the project dependencies
 RUN npm ci
 # Build the static export with telemetry disabled (https://nextjs.org/telemetry)
-RUN NEXT_TELEMETRY_DISABLED=1 npm run build
+RUN NEXT_TELEMETRY_DISABLED=1 npm run build:extension
 
 # Stage 2: Copy the website from the previous container to a Nginx container
 FROM nginxinc/nginx-unprivileged:alpine
