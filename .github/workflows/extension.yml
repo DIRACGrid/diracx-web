@@ -25,7 +25,6 @@ jobs:
 
       - name: Install dependencies
         run: npm ci
-        working-directory: packages/extensions
       
       - name: Check code-quality rules
         run: npm run lint
@@ -49,7 +48,7 @@ jobs:
     - name: Start demo 
       run: |
         cd ..
-        diracx-charts/run_demo.sh --exit-when-done diracx-web/packages/extensions
+        diracx-charts/run_demo.sh --exit-when-done diracx-web
     
     # Prints some debugging information in case something goes wrong
     - name: Debugging information
