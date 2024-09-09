@@ -34,6 +34,8 @@ import { JobHistoryDialog } from "./JobHistoryDialog";
 import {
   deleteJobs,
   getJobHistory,
+  getSandbox,
+  getSandboxUrl,
   killJobs,
   refreshJobs,
   rescheduleJobs,
@@ -271,6 +273,34 @@ export function JobDataTable() {
     setIsHistoryDialogOpen(false);
   };
 
+  const handleSandboxDl = async (
+    jobId: number | null,
+    sbType: "input" | "output",
+  ) => {
+    if (!jobId) return;
+    setBackdropOpen(true);
+    try {
+      const { data } = await getSandbox(jobId, sbType, accessToken);
+      if (!data) throw new Error("No sandbox found");
+      const pfn = data[0];
+      setBackdropOpen(false);
+      console.log("SandBox pfn:", pfn);
+      if (pfn) {
+        const { data } = await getSandboxUrl(pfn, accessToken);
+        if (data?.url) window.open(data.url);
+        else throw new Error("Could not fetch the sandbox url");
+      } else throw new Error("No sandbox found");
+    } catch (error: any) {
+      setSnackbarInfo({
+        open: true,
+        message: "Fetching Sandbox failed: " + error.message,
+        severity: "error",
+      });
+    } finally {
+      setBackdropOpen(false);
+    }
+  };
+
   /**
    * The toolbar components for the data grid
    */
@@ -299,6 +329,14 @@ export function JobDataTable() {
    */
   const menuItems: MenuItem[] = [
     { label: "Get history", onClick: (id: number | null) => handleHistory(id) },
+    {
+      label: "Download input Sandbox",
+      onClick: (id: number | null) => handleSandboxDl(id, "input"),
+    },
+    {
+      label: "Download output Sandbox",
+      onClick: (id: number | null) => handleSandboxDl(id, "output"),
+    },
   ];
 
   /**
