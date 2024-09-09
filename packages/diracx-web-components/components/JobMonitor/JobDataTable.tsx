@@ -40,28 +40,28 @@ import {
   useJobs,
 } from "./JobDataService";
 
+const statusColors: { [key: string]: string } = {
+  Submitting: purple[500],
+  Received: blueGrey[500],
+  Checking: teal[500],
+  Staging: lightBlue[500],
+  Waiting: amber[600],
+  Matched: blue[300],
+  Running: blue[900],
+  Rescheduled: lime[700],
+  Completing: orange[500],
+  Completed: green[300],
+  Done: green[500],
+  Failed: red[500],
+  Stalled: amber[900],
+  Killed: red[900],
+  Deleted: grey[500],
+};
+
 /**
  * Renders the status cell with colors
  */
 const renderStatusCell = (status: string) => {
-  const statusColors: { [key: string]: string } = {
-    Submitting: purple[500],
-    Received: blueGrey[500],
-    Checking: teal[500],
-    Staging: lightBlue[500],
-    Waiting: amber[600],
-    Matched: blue[300],
-    Running: blue[900],
-    Rescheduled: lime[700],
-    Completing: orange[500],
-    Completed: green[300],
-    Done: green[500],
-    Failed: red[500],
-    Stalled: amber[900],
-    Killed: red[900],
-    Deleted: grey[500],
-  };
-
   return (
     <Box
       sx={{
@@ -89,23 +89,7 @@ const headCells: Column[] = [
     id: "Status",
     label: "Status",
     render: renderStatusCell,
-    type: [
-      "Submitting",
-      "Received",
-      "Checking",
-      "Staging",
-      "Waiting",
-      "Matched",
-      "Running",
-      "Rescheduled",
-      "Completing",
-      "Completed",
-      "Done",
-      "Failed",
-      "Stalled",
-      "Killed",
-      "Deleted",
-    ].sort(),
+    type: Object.keys(statusColors).sort(),
   },
   {
     id: "MinorStatus",

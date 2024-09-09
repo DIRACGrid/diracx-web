@@ -32,7 +32,6 @@ import { Filter } from "@/types/Filter";
 import { Column } from "@/types/Column";
 import { useSearchParamsUtils } from "@/hooks/searchParamsUtils";
 import { ApplicationsContext } from "@/contexts/ApplicationsProvider";
-import dayjs from "dayjs";
 import { FilterToolbar } from "./FilterToolbar";
 
 /**
