@@ -1,17 +1,9 @@
 import { applicationList } from "@/gubbins/applicationList";
+import { UserSection } from "@dirac-grid/diracx-web-components/types";
+import { BugReport } from "@mui/icons-material";
 
 // New default user sections
-export const defaultSections: {
-  title: string;
-  extended: boolean;
-  items: {
-    title: string;
-    type: string;
-    id: string;
-    icon: React.ComponentType<{}>;
-    data?: any;
-  }[];
-}[] = [
+export const defaultSections: UserSection[] = [
   {
     title: "Default Applications",
     extended: true,
@@ -22,7 +14,7 @@ export const defaultSections: {
         type: "Test App",
         icon:
           applicationList.find((app) => app.name === "Test App")?.icon ||
-          (() => <div></div>),
+          BugReport,
       },
       {
         title: "Dashboard",
@@ -30,7 +22,7 @@ export const defaultSections: {
         type: "Dashboard",
         icon:
           applicationList.find((app) => app.name === "Dashboard")?.icon ||
-          (() => <div></div>),
+          BugReport,
       },
       {
         title: "Job Monitor",
@@ -38,7 +30,7 @@ export const defaultSections: {
         type: "Job Monitor",
         icon:
           applicationList.find((app) => app.name === "Job Monitor")?.icon ||
-          (() => <div></div>),
+          BugReport,
       },
       {
         title: "File Catalog",
@@ -46,7 +38,7 @@ export const defaultSections: {
         type: "File Catalog",
         icon:
           applicationList.find((app) => app.name === "File Catalog")?.icon ||
-          (() => <div></div>),
+          BugReport,
       },
     ],
   },
