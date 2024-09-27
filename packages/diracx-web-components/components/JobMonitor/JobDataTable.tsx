@@ -40,28 +40,28 @@ import {
   useJobs,
 } from "./JobDataService";
 
+const statusColors: { [key: string]: string } = {
+  Submitting: purple[500],
+  Received: blueGrey[500],
+  Checking: teal[500],
+  Staging: lightBlue[500],
+  Waiting: amber[600],
+  Matched: blue[300],
+  Running: blue[900],
+  Rescheduled: lime[700],
+  Completing: orange[500],
+  Completed: green[300],
+  Done: green[500],
+  Failed: red[500],
+  Stalled: amber[900],
+  Killed: red[900],
+  Deleted: grey[500],
+};
+
 /**
  * Renders the status cell with colors
  */
 const renderStatusCell = (status: string) => {
-  const statusColors: { [key: string]: string } = {
-    Submitting: purple[500],
-    Received: blueGrey[500],
-    Checking: teal[500],
-    Staging: lightBlue[500],
-    Waiting: amber[600],
-    Matched: blue[300],
-    Running: blue[900],
-    Rescheduled: lime[700],
-    Completing: orange[500],
-    Completed: green[300],
-    Done: green[500],
-    Failed: red[500],
-    Stalled: amber[900],
-    Killed: red[900],
-    Deleted: grey[500],
-  };
-
   return (
     <Box
       sx={{
@@ -82,10 +82,15 @@ const renderStatusCell = (status: string) => {
  * The head cells for the data grid (desktop version)
  */
 const headCells: Column[] = [
-  { id: "JobID", label: "Job ID" },
+  { id: "JobID", label: "Job ID", type: "number" },
   { id: "JobName", label: "Job Name" },
   { id: "Site", label: "Site" },
-  { id: "Status", label: "Status", render: renderStatusCell },
+  {
+    id: "Status",
+    label: "Status",
+    render: renderStatusCell,
+    type: Object.keys(statusColors).sort(),
+  },
   {
     id: "MinorStatus",
     label: "Minor Status",
@@ -93,6 +98,7 @@ const headCells: Column[] = [
   {
     id: "SubmissionTime",
     label: "Submission Time",
+    type: "DateTime",
   },
 ];
 

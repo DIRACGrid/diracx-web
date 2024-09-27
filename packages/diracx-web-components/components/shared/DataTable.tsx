@@ -363,6 +363,7 @@ export function DataTable(props: DataTableProps) {
       parameter: filter.column,
       operator: filter.operator,
       value: filter.value,
+      values: filter.values,
     }));
     setSearchBody({ search: jsonFilters });
     setPage(0);
@@ -386,18 +387,12 @@ export function DataTable(props: DataTableProps) {
     if (SectionItem?.data?.filters) {
       setFilters(SectionItem.data.filters);
       setAppliedFilters(SectionItem.data.filters);
-      const jsonFilters = SectionItem.data.filters.map(
-        (filter: {
-          id: number;
-          column: string;
-          operator: string;
-          value: string;
-        }) => ({
-          parameter: filter.column,
-          operator: filter.operator,
-          value: filter.value,
-        }),
-      );
+      const jsonFilters = SectionItem.data.filters.map((filter: Filter) => ({
+        parameter: filter.column,
+        operator: filter.operator,
+        value: filter.value,
+        values: filter.values,
+      }));
       setSearchBody({ search: jsonFilters });
     } else {
       setFilters([]);
