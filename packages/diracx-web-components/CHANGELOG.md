@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.1.0-a3](https://github.com/DIRACGrid/diracx-web/compare/v0.1.0-a2...v0.1.0-a3) (2024-09-27)
+
+
+### Features
+
+* better filter ux ([e9c1599](https://github.com/DIRACGrid/diracx-web/commit/e9c1599511aa492b11afd7fa887180272d548598))
+* **datatable:** adapt input fields for filter values ([7b14979](https://github.com/DIRACGrid/diracx-web/commit/7b149798a68beff9873f4961ec1cbdc35e4bf21d))
+
+
+### Bug Fixes
+
+* filters not applied are cleared when changing the sections ([dda6abc](https://github.com/DIRACGrid/diracx-web/commit/dda6abc080d8ed70478165a4565cb7c7ebe8e117))
+* **tsc-files:** tsc-files does not recognize chipColor ([48818ff](https://github.com/DIRACGrid/diracx-web/commit/48818ffaf5c689edf4e420820c39cd9a03257038))
+
 ## [0.1.0-a2](https://github.com/DIRACGrid/diracx-web/compare/v0.1.0-a1...v0.1.0-a2) (2024-08-26)
 
 
