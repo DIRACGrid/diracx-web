@@ -1,9 +1,20 @@
 "use client";
 import { useOidc, useOidcAccessToken } from "@axa-fr/react-oidc";
-import { Logout } from "@mui/icons-material";
 import {
+  Info,
+  Logout,
+  CorporateFare,
+  Groups,
+  Person,
+  ExpandMore,
+} from "@mui/icons-material";
+import {
+  Accordion,
+  AccordionDetails,
+  AccordionSummary,
   Avatar,
   Button,
+  Chip,
   Divider,
   IconButton,
   Link,
@@ -11,6 +22,7 @@ import {
   Menu,
   MenuItem,
   Tooltip,
+  Typography,
 } from "@mui/material";
 import { cyan } from "@mui/material/colors";
 import React from "react";
@@ -72,7 +84,6 @@ export function ProfileButton() {
         id="account-menu"
         open={open}
         onClose={handleClose}
-        onClick={handleClose}
         slotProps={{
           paper: {
             elevation: 0,
@@ -104,10 +115,71 @@ export function ProfileButton() {
         transformOrigin={{ horizontal: "right", vertical: "top" }}
         anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
       >
-        <MenuItem onClick={handleClose}>
-          <Avatar /> Profile
+        <MenuItem>
+          <table>
+            <tr>
+              <td>
+                <Tooltip title="Username">
+                  <Person />
+                </Tooltip>
+              </td>
+              <td>
+                <span>{accessTokenPayload["preferred_username"]}</span>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <Tooltip title="Group">
+                  <Groups />
+                </Tooltip>
+              </td>
+              <td>
+                <span>{accessTokenPayload["dirac_group"]}</span>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <Tooltip title="VO">
+                  <CorporateFare />
+                </Tooltip>
+              </td>
+              <td>
+                <span>{accessTokenPayload["vo"]}</span>
+              </td>
+            </tr>
+          </table>
+        </MenuItem>
+        <MenuItem>
+          <Accordion>
+            <AccordionSummary
+              expandIcon={<ExpandMore />}
+              aria-controls="panel1a-content"
+              id="panel1a-header"
+            >
+              <Typography>Properties</Typography>
+            </AccordionSummary>
+            <AccordionDetails>
+              <Chip
+                label={accessTokenPayload["dirac_properties"]?.map(
+                  (property: string, index: number) => (
+                    <li key={index}>{property}</li>
+                  ),
+                )}
+              />
+            </AccordionDetails>
+          </Accordion>
         </MenuItem>
         <Divider />
+        <MenuItem
+          onClick={() => {
+            handleClose();
+          }}
+        >
+          <ListItemIcon>
+            <Info fontSize="small" />
+          </ListItemIcon>
+          About
+        </MenuItem>
         <MenuItem
           onClick={() => {
             handleClose();

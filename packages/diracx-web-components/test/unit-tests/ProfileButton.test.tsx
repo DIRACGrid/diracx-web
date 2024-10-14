@@ -1,6 +1,10 @@
 import React from "react";
 import { render, fireEvent } from "@testing-library/react";
-import { useOidcAccessToken, useOidc } from "@axa-fr/react-oidc";
+import {
+  useOidcAccessToken,
+  useOidc,
+  OidcConfiguration,
+} from "@axa-fr/react-oidc";
 import { ProfileButton } from "@/components/DashboardLayout/ProfileButton";
 import { OIDCConfigurationContext } from "@/contexts/OIDCConfigurationProvider";
 
@@ -35,13 +39,29 @@ describe("<ProfileButton />", () => {
     (useOidc as jest.Mock).mockReturnValue({ isAuthenticated: true });
     (useOidcAccessToken as jest.Mock).mockReturnValue({
       accessToken: "mockAccessToken",
-      accessTokenPayload: { preferred_username: "John" },
+      accessTokenPayload: {
+        preferred_username: "John",
+        vo: "DiracVO",
+        dirac_group: "dirac_user",
+        dirac_properties: ["NormalUser"],
+      },
     });
 
     const { getByText, queryByText } = render(<ProfileButton />);
     fireEvent.click(getByText("J"));
-    expect(queryByText("Profile")).toBeInTheDocument();
+
+    expect(queryByText("John")).toBeInTheDocument();
+    expect(queryByText("DiracVO")).toBeInTheDocument();
+    expect(queryByText("dirac_user")).toBeInTheDocument();
+    expect(queryByText("Properties")).toBeInTheDocument();
+    expect(queryByText("About")).toBeInTheDocument();
     expect(queryByText("Logout")).toBeInTheDocument();
+
+    // Open the "Properties" section
+    fireEvent.click(getByText("Properties"));
+
+    // Ensure the "NormalUser" property is displayed within the "Properties" section
+    expect(queryByText("NormalUser")).toBeInTheDocument();
   });
 
   it('calls the logout function when "Logout" is clicked', () => {
@@ -57,7 +77,12 @@ describe("<ProfileButton />", () => {
 
     // Mock context value
     const mockContextValue = {
-      configuration: { scope: "mockScope" },
+      configuration: {
+        scope: "fake_scope",
+        client_id: "fake_id",
+        redirect_uri: "fake_uri",
+        authority: "fake_authority",
+      } as OidcConfiguration,
       setConfiguration: jest.fn(),
     };
 
