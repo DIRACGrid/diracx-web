@@ -40,7 +40,7 @@
     "swr": "^2.2.5"
   },
   "devDependencies": {
-    "@babel/preset-env": "^7.24.8",
+    "@babel/preset-env": "^7.25.8",
     "@babel/preset-react": "^7.24.7",
     "@babel/preset-typescript": "^7.24.7",
     "@chromatic-com/storybook": "^1.5.0",
