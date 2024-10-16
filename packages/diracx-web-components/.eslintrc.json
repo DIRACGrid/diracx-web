@@ -16,6 +16,7 @@
     "import/no-unused-modules": ["error"],
     "import/no-useless-path-segments": ["error"],
     "import/no-unresolved": ["off"],
+    "react/prop-types": "off",
     "react/react-in-jsx-scope": "off"
   },
   "parser": "@typescript-eslint/parser",

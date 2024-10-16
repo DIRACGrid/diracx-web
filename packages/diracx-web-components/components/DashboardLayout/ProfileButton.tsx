@@ -21,6 +21,7 @@ import {
   ListItemIcon,
   Menu,
   MenuItem,
+  Stack,
   Tooltip,
   Typography,
 } from "@mui/material";
@@ -117,36 +118,38 @@ export function ProfileButton() {
       >
         <MenuItem>
           <table>
-            <tr>
-              <td>
-                <Tooltip title="Username">
-                  <Person />
-                </Tooltip>
-              </td>
-              <td>
-                <span>{accessTokenPayload["preferred_username"]}</span>
-              </td>
-            </tr>
-            <tr>
-              <td>
-                <Tooltip title="Group">
-                  <Groups />
-                </Tooltip>
-              </td>
-              <td>
-                <span>{accessTokenPayload["dirac_group"]}</span>
-              </td>
-            </tr>
-            <tr>
-              <td>
-                <Tooltip title="VO">
-                  <CorporateFare />
-                </Tooltip>
-              </td>
-              <td>
-                <span>{accessTokenPayload["vo"]}</span>
-              </td>
-            </tr>
+            <tbody>
+              <tr>
+                <td>
+                  <Tooltip title="Username">
+                    <Person />
+                  </Tooltip>
+                </td>
+                <td>
+                  <span>{accessTokenPayload["preferred_username"]}</span>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <Tooltip title="Group">
+                    <Groups />
+                  </Tooltip>
+                </td>
+                <td>
+                  <span>{accessTokenPayload["dirac_group"]}</span>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <Tooltip title="VO">
+                    <CorporateFare />
+                  </Tooltip>
+                </td>
+                <td>
+                  <span>{accessTokenPayload["vo"]}</span>
+                </td>
+              </tr>
+            </tbody>
           </table>
         </MenuItem>
         <MenuItem>
@@ -159,13 +162,13 @@ export function ProfileButton() {
               <Typography>Properties</Typography>
             </AccordionSummary>
             <AccordionDetails>
-              <Chip
-                label={accessTokenPayload["dirac_properties"]?.map(
+              <Stack spacing={1} flexWrap="wrap">
+                {accessTokenPayload["dirac_properties"]?.map(
                   (property: string, index: number) => (
-                    <li key={index}>{property}</li>
+                    <Chip key={index} label={property} sx={{ m: 0.5 }} />
                   ),
                 )}
-              />
+              </Stack>
             </AccordionDetails>
           </Accordion>
         </MenuItem>

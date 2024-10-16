@@ -49,7 +49,7 @@ export default function DrawerItem({
   const theme = useMUITheme();
   const { setParam } = useSearchParamsUtils();
   // Represents the closest edge to the mouse cursor
-  const [closestEdge, setClosestEdge]: any = useState<Edge | null>(null);
+  const [closestEdge, setClosestEdge] = useState<Edge | null>(null);
 
   const appId = useApplicationId();
 
@@ -89,7 +89,7 @@ export default function DrawerItem({
               return () => root.unmount();
             },
             // Seamless transition between the preview and the real element
-            getOffset: ({ container }) => {
+            getOffset: () => {
               const elementPos = source.element.getBoundingClientRect();
               const x = location.current.input.pageX - elementPos.x;
               const y = location.current.input.pageY - elementPos.y;

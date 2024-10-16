@@ -1,9 +1,11 @@
 import useSWR, { mutate } from "swr";
-import { fetcher } from "@/hooks/utils";
 import dayjs from "dayjs";
+import { fetcher } from "@/hooks/utils";
+import { Filter, SearchBody, Job } from "@/types";
+import { JobHistory } from "@/types/JobHistory";
 
-function processSearchBody(searchBody: any) {
-  searchBody.search = searchBody.search?.map((filter: any) => {
+function processSearchBody(searchBody: SearchBody) {
+  searchBody.search = searchBody.search?.map((filter: Filter) => {
     if (filter.operator == "last") {
       return {
         parameter: filter.parameter,
@@ -29,13 +31,16 @@ function processSearchBody(searchBody: any) {
  */
 export const useJobs = (
   accessToken: string,
-  searchBody: any,
+  searchBody: SearchBody,
   page: number,
   rowsPerPage: number,
 ) => {
   processSearchBody(searchBody);
   const urlGetJobs = `/api/jobs/search?page=${page + 1}&per_page=${rowsPerPage}`;
-  return useSWR([urlGetJobs, accessToken, "POST", searchBody], fetcher);
+
+  return useSWR([urlGetJobs, accessToken, "POST", searchBody], (args) =>
+    fetcher<Job[]>(args),
+  );
 };
 
 /**
@@ -48,7 +53,7 @@ export const useJobs = (
  */
 export const refreshJobs = (
   accessToken: string,
-  searchBody: any,
+  searchBody: SearchBody,
   page: number,
   rowsPerPage: number,
 ) => {
@@ -61,16 +66,16 @@ export const refreshJobs = (
  * Deletes jobs with the specified IDs.
  *
  * @param selectedIds - An array of job IDs to delete.
- * @param token - The authentication token.
+ * @param accessToken - The authentication token.
  * @returns A Promise that resolves to an object containing the response headers and data.
  */
 export function deleteJobs(
   selectedIds: readonly number[],
-  token: any,
-): Promise<{ headers: Headers; data: any }> {
+  accessToken: string,
+): Promise<{ headers: Headers; data: number[] }> {
   const queryString = selectedIds.map((id) => `job_ids=${id}`).join("&");
   const deleteUrl = `/api/jobs/?${queryString}`;
-  return fetcher([deleteUrl, token, "DELETE"]);
+  return fetcher([deleteUrl, accessToken, "DELETE"]);
 }
 
 /**
@@ -82,11 +87,11 @@ export function deleteJobs(
  */
 export function killJobs(
   selectedIds: readonly number[],
-  token: any,
-): Promise<{ headers: Headers; data: any }> {
+  accessToken: string,
+): Promise<{ headers: Headers; data: number[] }> {
   const queryString = selectedIds.map((id) => `job_ids=${id}`).join("&");
   const killUrl = `/api/jobs/kill?${queryString}`;
-  return fetcher([killUrl, token, "POST"]);
+  return fetcher([killUrl, accessToken, "POST"]);
 }
 
 /**
@@ -98,11 +103,11 @@ export function killJobs(
  */
 export function rescheduleJobs(
   selectedIds: readonly number[],
-  token: any,
-): Promise<{ headers: Headers; data: any }> {
+  accessToken: string,
+): Promise<{ headers: Headers; data: number[] }> {
   const queryString = selectedIds.map((id) => `job_ids=${id}`).join("&");
   const rescheduleUrl = `/api/jobs/reschedule?${queryString}`;
-  return fetcher([rescheduleUrl, token, "POST"]);
+  return fetcher([rescheduleUrl, accessToken, "POST"]);
 }
 
 /**
@@ -113,8 +118,8 @@ export function rescheduleJobs(
  */
 export function getJobHistory(
   jobId: number,
-  token: any,
-): Promise<{ headers: Headers; data: any }> {
+  accessToken: string,
+): Promise<{ headers: Headers; data: { [key: number]: JobHistory[] } }> {
   const historyUrl = `/api/jobs/${jobId}/status/history`;
-  return fetcher([historyUrl, token]);
+  return fetcher([historyUrl, accessToken]);
 }

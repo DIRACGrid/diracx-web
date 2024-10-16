@@ -7,6 +7,7 @@ import { ApplicationsContext } from "../../contexts/ApplicationsProvider";
 import { NavigationProvider } from "../../contexts/NavigationProvider";
 import { useOidc, useOidcAccessToken } from "../../mocks/react-oidc.mock";
 import { applicationList } from "../ApplicationList";
+import { DashboardGroup } from "../../types/DashboardGroup";
 import Dashboard from "./Dashboard";
 
 const meta = {
@@ -22,7 +23,9 @@ const meta = {
   },
   decorators: [
     (Story) => {
-      const [sections, setSections] = React.useState([
+      const [userDashboard, setUserDashboard] = React.useState<
+        DashboardGroup[]
+      >([
         {
           title: "Group Title",
           extended: true,
@@ -47,7 +50,7 @@ const meta = {
           }}
         >
           <ApplicationsContext.Provider
-            value={[sections, setSections, applicationList]}
+            value={[userDashboard, setUserDashboard, applicationList]}
           >
             <Box sx={{ height: "50vh" }}>
               <Story />

@@ -1,5 +1,4 @@
 "use client";
-import React from "react";
 import { useOidcAccessToken } from "@axa-fr/react-oidc/";
 import { useOIDCContext } from "@/hooks/oidcConfiguration";
 import ApplicationHeader from "@/components/shared/ApplicationHeader";
@@ -9,7 +8,7 @@ import ApplicationHeader from "@/components/shared/ApplicationHeader";
  *
  * @returns User Dashboard content
  */
-export default function UserDashboard({
+export default function BaseApplication({
   headerSize,
 }: {
   /** The size of the header, optional, will default to h4 */

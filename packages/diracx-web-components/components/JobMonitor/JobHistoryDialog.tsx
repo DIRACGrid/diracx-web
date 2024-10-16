@@ -10,6 +10,7 @@ import {
   TableRow,
 } from "@mui/material";
 import { Close } from "@mui/icons-material";
+import { JobHistory } from "@/types/JobHistory";
 
 interface JobHistoryDialogProps {
   /** Whether the Dialog is open */
@@ -19,7 +20,7 @@ interface JobHistoryDialogProps {
   /**
    * The data for the job history dialog
    */
-  historyData: any[];
+  historyData: JobHistory[];
 }
 
 /**

@@ -22,10 +22,11 @@ import React, {
 } from "react";
 import { monitorForElements } from "@atlaskit/pragmatic-drag-and-drop/element/adapter";
 import { extractClosestEdge } from "@atlaskit/pragmatic-drag-and-drop-hitbox/closest-edge";
-import { ApplicationsContext } from "@/contexts/ApplicationsProvider";
-import { useMUITheme } from "@/hooks/theme";
 import DrawerItemGroup from "./DrawerItemGroup";
 import AppDialog from "./ApplicationDialog";
+import { ApplicationsContext } from "@/contexts/ApplicationsProvider";
+import { useMUITheme } from "@/hooks/theme";
+import { DashboardGroup } from "@/types";
 
 interface DashboardDrawerProps {
   /** The variant of the drawer. Usually temporary if on mobile and permanent otherwise. */
@@ -66,19 +67,21 @@ export default function DashboardDrawer(props: DashboardDrawerProps) {
     id: string | null;
   }>({ type: null, id: null });
 
-  const [popAnchorEl, setPopAnchorEl] = React.useState(null);
+  const [popAnchorEl, setPopAnchorEl] = React.useState<HTMLElement | null>(
+    null,
+  );
   const [renameValue, setRenameValue] = React.useState("");
 
-  // Define the sections that are accessible to users.
-  // Each section has an associated icon and path.
-  const [userSections, setSections] = useContext(ApplicationsContext);
+  // Define the applications that are accessible to users.
+  // Each application has an associated icon and path.
+  const [userDashboard, setUserDashboard] = useContext(ApplicationsContext);
 
   const logoURL = props.logoURL || "/DIRAC-logo.png";
 
   const theme = useMUITheme();
 
   useEffect(() => {
-    // Handle changes to sections when drag and drop occurs.
+    // Handle changes to app instances when drag and drop occurs.
     return monitorForElements({
       onDrop({ source, location }) {
         const target = location.current.dropTargets[0];
@@ -93,10 +96,10 @@ export default function DashboardDrawer(props: DashboardDrawerProps) {
           const groupTitle = targetData.title;
           const closestEdgeOfTarget = extractClosestEdge(targetData);
           const targetIndex = targetData.index as number;
-          const sourceGroup = userSections.find(
+          const sourceGroup = userDashboard.find(
             (group) => group.title == sourceData.title,
           );
-          const targetGroup = userSections.find(
+          const targetGroup = userDashboard.find(
             (group) => group.title == groupTitle,
           );
           const sourceIndex = sourceData.index as number;
@@ -113,10 +116,10 @@ export default function DashboardDrawer(props: DashboardDrawerProps) {
         } else {
           // If the target is a group
           const groupTitle = targetData.title;
-          const sourceGroup = userSections.find(
+          const sourceGroup = userDashboard.find(
             (group) => group.title == sourceData.title,
           );
-          const targetGroup = userSections.find(
+          const targetGroup = userDashboard.find(
             (group) => group.title == groupTitle,
           );
           const sourceIndex = sourceData.index as number;
@@ -127,17 +130,17 @@ export default function DashboardDrawer(props: DashboardDrawerProps) {
     });
 
     /**
-     * Reorders sections within a group or between different groups.
+     * Reorders app instances within a group or between different groups.
      *
-     * @param sourceGroup - The source group from which the section is being moved.
-     * @param destinationGroup - The destination group where the section is being moved to.
-     * @param sourceIndex - The index of the section within the source group.
-     * @param destinationIndex - The index where the section should be placed in the destination group.
-     *                           If null, the section will be placed at the end of the destination group.
+     * @param sourceGroup - The source group from which the app instance is being moved.
+     * @param destinationGroup - The destination group where the app instance is being moved to.
+     * @param sourceIndex - The index of the app instance within the source group.
+     * @param destinationIndex - The index where the app instance should be placed in the destination group.
+     *                           If null, the app instance will be placed at the end of the destination group.
      */
     function reorderSections(
-      sourceGroup: any,
-      destinationGroup: any,
+      sourceGroup: DashboardGroup | undefined,
+      destinationGroup: DashboardGroup | undefined,
       sourceIndex: number,
       destinationIndex: number | null = null,
     ) {
@@ -166,11 +169,11 @@ export default function DashboardDrawer(props: DashboardDrawerProps) {
           }
           sourceItems.splice(destinationIndex, 0, removed);
 
-          setSections((sections) =>
-            sections.map((section) =>
-              section.title === sourceGroup.title
-                ? { ...section, items: sourceItems }
-                : section,
+          setUserDashboard((groups) =>
+            groups.map((group) =>
+              group.title === sourceGroup.title
+                ? { ...group, items: sourceItems }
+                : group,
             ),
           );
         } else {
@@ -185,19 +188,19 @@ export default function DashboardDrawer(props: DashboardDrawerProps) {
           }
           destinationItems.splice(destinationIndex, 0, removed);
 
-          setSections((sections) =>
-            sections.map((section) =>
-              section.title === sourceGroup.title
-                ? { ...section, items: sourceItems }
-                : section.title === destinationGroup.title
-                  ? { ...section, items: destinationItems }
-                  : section,
+          setUserDashboard((groups) =>
+            groups.map((group) =>
+              group.title === sourceGroup.title
+                ? { ...group, items: sourceItems }
+                : group.title === destinationGroup.title
+                  ? { ...group, items: destinationItems }
+                  : group,
             ),
           );
         }
       }
     }
-  }, [setSections, userSections]);
+  }, [setUserDashboard, userDashboard]);
 
   /**
    * Handles the creation of a new app in the dashboard drawer.
@@ -206,18 +209,18 @@ export default function DashboardDrawer(props: DashboardDrawerProps) {
    * @param icon - The icon component for the app.
    */
   const handleAppCreation = (appType: string, icon: SvgIconComponent) => {
-    let group = userSections[userSections.length - 1];
+    let group = userDashboard[userDashboard.length - 1];
     const empty = !group;
     if (empty) {
       //create a new group if there is no group
       group = {
-        title: `Group ${userSections.length + 1}`,
+        title: `Group ${userDashboard.length + 1}`,
         extended: false,
         items: [],
       };
     }
 
-    let title = `${appType} ${userSections.reduce(
+    let title = `${appType} ${userDashboard.reduce(
       (sum, group) =>
         sum + group.items.filter((item) => item.type === appType).length,
       1,
@@ -228,7 +231,7 @@ export default function DashboardDrawer(props: DashboardDrawerProps) {
 
     const newApp = {
       title,
-      id: `${title}${userSections.reduce(
+      id: `${title}${userDashboard.reduce(
         (sum, group) => sum + group.items.length,
         0,
       )}`,
@@ -237,10 +240,10 @@ export default function DashboardDrawer(props: DashboardDrawerProps) {
     };
     group.items.push(newApp);
     if (empty) {
-      setSections((userSections) => [...userSections, group]);
+      setUserDashboard((userDashboard) => [...userDashboard, group]);
     } else {
-      setSections((userSections) =>
-        userSections.map((g) => (g.title === group.title ? group : g)),
+      setUserDashboard((userDashboard) =>
+        userDashboard.map((g) => (g.title === group.title ? group : g)),
       );
     }
   };
@@ -273,26 +276,26 @@ export default function DashboardDrawer(props: DashboardDrawerProps) {
 
   const handleNewGroup = () => {
     const newGroup = {
-      title: `Group ${userSections.length + 1}`,
+      title: `Group ${userDashboard.length + 1}`,
       extended: false,
       items: [],
     };
-    while (userSections.some((group) => group.title === newGroup.title)) {
+    while (userDashboard.some((group) => group.title === newGroup.title)) {
       newGroup.title = `Group ${parseInt(newGroup.title.split(" ")[1]) + 1}`;
     }
 
-    setSections((userSections) => [...userSections, newGroup]);
+    setUserDashboard((userDashboard) => [...userDashboard, newGroup]);
     handleCloseContextMenu();
   };
 
   const handleDelete = () => {
     if (contextState.type === "group") {
-      setSections((userSections) =>
-        userSections.filter((group) => group.title !== contextState.id),
+      setUserDashboard((userDashboard) =>
+        userDashboard.filter((group) => group.title !== contextState.id),
       );
     } else if (contextState.type === "item") {
-      setSections((userSections) =>
-        userSections.map((group) => {
+      setUserDashboard((userDashboard) =>
+        userDashboard.map((group) => {
           const newItems = group.items.filter(
             (item) => item.id !== contextState.id,
           );
@@ -303,7 +306,7 @@ export default function DashboardDrawer(props: DashboardDrawerProps) {
     handleCloseContextMenu();
   };
 
-  const handleRenameClick = (event: any) => {
+  const handleRenameClick = (event: React.MouseEvent<HTMLElement>) => {
     setPopAnchorEl(event.currentTarget);
   };
 
@@ -315,12 +318,12 @@ export default function DashboardDrawer(props: DashboardDrawerProps) {
   const handleRename = () => {
     if (contextState.type === "group") {
       //check if the name is already taken
-      if (userSections.some((group) => group.title === renameValue)) {
+      if (userDashboard.some((group) => group.title === renameValue)) {
         return;
       }
       //rename the group
-      setSections((userSections) =>
-        userSections.map((group) => {
+      setUserDashboard((userDashboard) =>
+        userDashboard.map((group) => {
           if (group.title === contextState.id) {
             return { ...group, title: renameValue };
           }
@@ -328,8 +331,8 @@ export default function DashboardDrawer(props: DashboardDrawerProps) {
         }),
       );
     } else if (contextState.type === "item") {
-      setSections((userSections) =>
-        userSections.map((group) => {
+      setUserDashboard((userDashboard) =>
+        userDashboard.map((group) => {
           const newItems = group.items.map((item) => {
             if (item.id === contextState.id) {
               return { ...item, title: renameValue };
@@ -379,9 +382,9 @@ export default function DashboardDrawer(props: DashboardDrawerProps) {
           >
             <img src={logoURL} alt="DIRAC logo" style={{ maxWidth: "100%" }} />
           </Toolbar>
-          {/* Map over user sections and render them as list items in the drawer. */}
+          {/* Map over user app instances and render them as list items in the drawer. */}
           <List>
-            {userSections.map((group) => (
+            {userDashboard.map((group) => (
               <ListItem
                 key={group.title}
                 disablePadding
@@ -389,7 +392,7 @@ export default function DashboardDrawer(props: DashboardDrawerProps) {
               >
                 <DrawerItemGroup
                   group={group}
-                  setSections={setSections}
+                  setUserDashboard={setUserDashboard}
                   handleContextMenu={handleContextMenu}
                 />
               </ListItem>

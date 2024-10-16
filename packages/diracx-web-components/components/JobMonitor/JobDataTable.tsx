@@ -26,8 +26,6 @@ import {
 } from "@mui/material";
 import { useOidcAccessToken } from "@axa-fr/react-oidc";
 import { Delete, Clear, Replay } from "@mui/icons-material";
-import { Filter } from "@/types/Filter";
-import { Column } from "@/types/Column";
 import { useOIDCContext } from "../../hooks/oidcConfiguration";
 import { DataTable, MenuItem } from "../shared/DataTable";
 import { JobHistoryDialog } from "./JobHistoryDialog";
@@ -39,6 +37,10 @@ import {
   rescheduleJobs,
   useJobs,
 } from "./JobDataService";
+import { Column } from "@/types/Column";
+import { InternalFilter } from "@/types/Filter";
+import { JobHistory } from "@/types/JobHistory";
+import { Job, SearchBody } from "@/types";
 
 const statusColors: { [key: string]: string } = {
   Submitting: purple[500],
@@ -61,7 +63,10 @@ const statusColors: { [key: string]: string } = {
 /**
  * Renders the status cell with colors
  */
-const renderStatusCell = (status: string) => {
+const renderStatusCell = (status: unknown) => {
+  if (typeof status !== "string") {
+    return null; // or handle other types as needed
+  }
   return (
     <Box
       sx={{
@@ -136,12 +141,12 @@ export function JobDataTable() {
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(25);
   // State for filters
-  const [filters, setFilters] = React.useState<Filter[]>([]);
+  const [filters, setFilters] = React.useState<InternalFilter[]>([]);
   // State for search body
-  const [searchBody, setSearchBody] = React.useState({});
+  const [searchBody, setSearchBody] = React.useState<SearchBody>({});
   // State for job history
   const [isHistoryDialogOpen, setIsHistoryDialogOpen] = React.useState(false);
-  const [jobHistoryData, setJobHistoryData] = React.useState([]);
+  const [jobHistoryData, setJobHistoryData] = React.useState<JobHistory[]>([]);
 
   /**
    * Fetches the jobs from the /api/jobs/search endpoint
@@ -154,7 +159,7 @@ export function JobDataTable() {
   );
 
   const dataHeader = data?.headers;
-  const results = data?.data;
+  const results = data?.data || [];
 
   // Parse the headers to get the first item, last item and number of items
   const contentRange = dataHeader?.get("content-range");
@@ -187,10 +192,15 @@ export function JobDataTable() {
         message: "Deleted successfully",
         severity: "success",
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
+      let errorMessage = "An unknown error occurred";
+
+      if (error instanceof Error) {
+        errorMessage = error.message;
+      }
       setSnackbarInfo({
         open: true,
-        message: "Delete failed: " + error.message,
+        message: "Delete failed: " + errorMessage,
         severity: "error",
       });
     } finally {
@@ -213,10 +223,15 @@ export function JobDataTable() {
         message: "Killed successfully",
         severity: "success",
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
+      let errorMessage = "An unknown error occurred";
+
+      if (error instanceof Error) {
+        errorMessage = error.message;
+      }
       setSnackbarInfo({
         open: true,
-        message: "Kill failed: " + error.message,
+        message: "Kill failed: " + errorMessage,
         severity: "error",
       });
     } finally {
@@ -239,10 +254,15 @@ export function JobDataTable() {
         message: "Rescheduled successfully",
         severity: "success",
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
+      let errorMessage = "An unknown error occurred";
+
+      if (error instanceof Error) {
+        errorMessage = error.message;
+      }
       setSnackbarInfo({
         open: true,
-        message: "Reschedule failed: " + error.message,
+        message: "Reschedule failed: " + errorMessage,
         severity: "error",
       });
     } finally {
@@ -262,10 +282,15 @@ export function JobDataTable() {
       // Show the history
       setJobHistoryData(data[selectedId]);
       setIsHistoryDialogOpen(true);
-    } catch (error: any) {
+    } catch (error: unknown) {
+      let errorMessage = "An unknown error occurred";
+
+      if (error instanceof Error) {
+        errorMessage = error.message;
+      }
       setSnackbarInfo({
         open: true,
-        message: "Fetching history failed: " + error.message,
+        message: "Fetching history failed: " + errorMessage,
         severity: "error",
       });
     } finally {
@@ -312,8 +337,8 @@ export function JobDataTable() {
    */
 
   return (
-    <>
-      <DataTable
+    <Box>
+      <DataTable<Job>
         title="List of Jobs"
         page={page}
         setPage={setPage}
@@ -363,6 +388,6 @@ export function JobDataTable() {
         onClose={handleHistoryClose}
         historyData={jobHistoryData}
       />
-    </>
+    </Box>
   );
 }

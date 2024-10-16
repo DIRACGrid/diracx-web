@@ -1,7 +1,7 @@
 import React from "react";
 import { render } from "@testing-library/react";
 import { useOidcAccessToken, useOidc } from "@axa-fr/react-oidc";
-import UserDashboard from "@/components/UserDashboard/UserDashboard";
+import BaseApp from "@/components/BaseApp/BaseApp";
 import { ThemeProvider } from "@/contexts/ThemeProvider";
 
 // Mock the modules
@@ -15,7 +15,7 @@ jest.mock("jsoncrush", () => ({
   uncrush: jest.fn().mockImplementation((data) => data.replace("crushed-", "")),
 }));
 
-describe("<UserDashboard />", () => {
+describe("<BaseApp />", () => {
   it("renders not authenticated message when accessTokenPayload is not defined", () => {
     (useOidc as jest.Mock).mockReturnValue({ isAuthenticated: false });
     (useOidcAccessToken as jest.Mock).mockReturnValue({
@@ -24,7 +24,7 @@ describe("<UserDashboard />", () => {
 
     const { getByText } = render(
       <ThemeProvider>
-        <UserDashboard />
+        <BaseApp />
       </ThemeProvider>,
     );
     expect(getByText("Not authenticated")).toBeInTheDocument();
@@ -38,7 +38,7 @@ describe("<UserDashboard />", () => {
 
     const { getByText } = render(
       <ThemeProvider>
-        <UserDashboard />
+        <BaseApp />
       </ThemeProvider>,
     );
     expect(getByText("Hello TestUser")).toBeInTheDocument();

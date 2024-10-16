@@ -8,10 +8,10 @@ import { Menu } from "@mui/icons-material";
 import Toolbar from "@mui/material/Toolbar";
 import Stack from "@mui/material/Stack";
 import { ThemeProvider as MUIThemeProvider } from "@mui/material/styles";
-import { useMUITheme } from "@/hooks/theme";
 import { ProfileButton } from "./ProfileButton";
 import { ThemeToggleButton } from "./ThemeToggleButton";
 import DashboardDrawer from "./DashboardDrawer";
+import { useMUITheme } from "@/hooks/theme";
 
 interface DashboardProps {
   /** The content to be displayed in the main area */
@@ -23,7 +23,7 @@ interface DashboardProps {
 }
 
 /**
- * Build a side bar on the left containing the available sections as well as a top bar.
+ * Build a side bar on the left containing the available groups as well as a top bar.
  * The side bar is expected to collapse if displayed on a small screen
  *
  * @param props - children, drawerWidth, logoURL

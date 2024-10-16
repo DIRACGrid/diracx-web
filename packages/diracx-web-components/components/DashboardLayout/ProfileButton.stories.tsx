@@ -29,7 +29,12 @@ const meta = {
   async beforeEach() {
     useOidcAccessToken.mockReturnValue({
       accessToken: "123456789",
-      accessTokenPayload: { preferred_username: "John Doe" },
+      accessTokenPayload: {
+        preferred_username: "John Doe",
+        vo: "dirac",
+        dirac_group: "dirac_user",
+        dirac_properties: ["NormalUser", "AnotherProperty"],
+      },
     });
     useOidc.mockReturnValue({
       login: () => {},

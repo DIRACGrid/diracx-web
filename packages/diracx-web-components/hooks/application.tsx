@@ -19,19 +19,19 @@ export function useApplicationId() {
  * @returns the application title
  */
 export function useApplicationTitle() {
-  const [sections] = useContext(ApplicationsContext);
+  const [userDashboard] = useContext(ApplicationsContext);
   const appId = useApplicationId();
 
   return useMemo(() => {
-    if (!sections || !appId) return null;
+    if (!userDashboard || !appId) return null;
 
-    const app = sections.reduce(
-      (acc, section) => {
+    const app = userDashboard.reduce(
+      (acc, group) => {
         if (acc) return acc;
-        return section.items.find((app) => app.id === appId);
+        return group.items.find((app) => app.id === appId);
       },
       undefined as { title: string } | undefined,
     );
     return app?.title;
-  }, [sections, appId]);
+  }, [userDashboard, appId]);
 }

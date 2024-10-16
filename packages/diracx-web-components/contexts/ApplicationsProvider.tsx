@@ -5,19 +5,20 @@ import React, {
   useEffect,
   useState,
 } from "react";
-import { Dashboard, FolderCopy, Monitor } from "@mui/icons-material";
+import { Monitor } from "@mui/icons-material";
 import JSONCrush from "jsoncrush";
 import { useSearchParamsUtils } from "@/hooks/searchParamsUtils";
 import { applicationList } from "@/components/ApplicationList";
-import { UserSection } from "@/types/UserSection";
-import ApplicationConfig from "@/types/ApplicationConfig";
+import { DashboardGroup } from "@/types/DashboardGroup";
+import ApplicationMetadata from "@/types/ApplicationMetadata";
+import { DashboardItem } from "@/types/DashboardItem";
 
-// Create a context for the userSections state
+// Create a context for the UserDashboard state
 export const ApplicationsContext = createContext<
   [
-    UserSection[],
-    React.Dispatch<React.SetStateAction<UserSection[]>>,
-    ApplicationConfig[],
+    DashboardGroup[],
+    React.Dispatch<React.SetStateAction<DashboardGroup[]>>,
+    ApplicationMetadata[],
   ]
 >([[], () => {}, []]);
 
@@ -26,32 +27,34 @@ export const ApplicationsContext = createContext<
  *
  * @param children - The child components to be wrapped by the provider.
  * @param appList - The list of application configurations.
- * @param defaultSections - The default user sections.
+ * @param defaultUserDashboard - The default user dashboard.
  * @returns The applications provider.
  */
 export const ApplicationsProvider = ({
   children,
   appList = applicationList,
-  defaultSections,
+  defaultUserDashboard,
 }: {
   children: React.ReactNode;
-  appList?: ApplicationConfig[];
-  defaultSections?: UserSection[];
+  appList?: ApplicationMetadata[];
+  defaultUserDashboard?: DashboardGroup[];
 }) => {
-  const [userSections, setSections] = useState<UserSection[]>([]);
+  const [userDashboard, setUserDashboard] = useState<DashboardGroup[]>([]);
 
   const { getParam, setParam } = useSearchParamsUtils();
 
-  // save user sections to searchParams (but not icons)
-  const setSectionsParams = useCallback(
-    (sections: UserSection[] | ((prev: UserSection[]) => UserSection[])) => {
-      if (typeof sections === "function") {
-        sections = sections(userSections);
+  // save user dashboard to searchParams (but not icons)
+  const setUserDashboardParams = useCallback(
+    (
+      groups: DashboardGroup[] | ((prev: DashboardGroup[]) => DashboardGroup[]),
+    ) => {
+      if (typeof groups === "function") {
+        groups = groups(userDashboard);
       }
-      const newSections = sections.map((section) => {
+      const newSections = groups.map((group) => {
         return {
-          ...section,
-          items: section.items.map((item) => {
+          ...group,
+          items: group.items.map((item) => {
             return {
               ...item,
               icon: () => null,
@@ -59,82 +62,65 @@ export const ApplicationsProvider = ({
           }),
         };
       });
-      setParam("sections", JSONCrush.crush(JSON.stringify(newSections)));
+      setParam("dashboard", JSONCrush.crush(JSON.stringify(newSections)));
     },
-    [setParam, userSections],
+    [setParam, userDashboard],
   );
 
   // get user sections from searchParams
-  const sectionsParams = useMemo(() => getParam("sections"), [getParam]);
+  const groupsParams = useMemo(() => getParam("dashboard"), [getParam]);
 
   useEffect(() => {
-    if (userSections.length !== 0) return;
-    if (sectionsParams) {
-      const uncrushed = JSONCrush.uncrush(sectionsParams);
+    if (userDashboard.length !== 0) return;
+    if (groupsParams) {
+      const uncrushed = JSONCrush.uncrush(groupsParams);
       try {
-        const newSections = JSON.parse(uncrushed).map(
-          (section: { items: any[] }) => {
-            section.items = section.items.map((item: any) => {
+        const newSections: DashboardGroup[] = JSON.parse(uncrushed).map(
+          (group: DashboardGroup) => {
+            group.items = group.items.map((item: DashboardItem) => {
               return {
                 ...item,
                 //get icon from appList
-                icon: appList.find((app) => app.name === item.type)?.icon,
+                icon:
+                  appList.find((app) => app.name === item.type)?.icon || null,
               };
             });
-            return section;
+            return group;
           },
         );
-        if (newSections !== userSections) {
-          setSections(newSections);
+        if (newSections !== userDashboard) {
+          setUserDashboard(newSections);
         }
       } catch (e) {
-        console.error("Error parsing user sections : ", uncrushed, e);
+        console.error("Error parsing user dashboard : ", uncrushed, e);
       }
     } else {
-      setSections(
-        defaultSections || [
+      setUserDashboard(
+        defaultUserDashboard || [
           {
-            title: "Dashboard",
+            title: "My dashboard",
             extended: true,
             items: [
               {
-                title: "Dashboard",
-                type: "Dashboard",
-                id: "Dashboard0",
-                icon: Dashboard,
-              },
-              {
-                title: "Job Monitor",
+                title: "My Jobs",
                 type: "Job Monitor",
                 id: "JobMonitor0",
                 icon: Monitor,
               },
             ],
           },
-          {
-            title: "Other",
-            extended: false,
-            items: [
-              {
-                title: "File Catalog",
-                type: "File Catalog",
-                id: "FileCatalog0",
-                icon: FolderCopy,
-              },
-            ],
-          },
         ],
       );
     }
-  }, [appList, defaultSections, sectionsParams]);
+  }, [appList, defaultUserDashboard, groupsParams]);
 
   return (
     <ApplicationsContext.Provider
       value={[
-        userSections,
-        (section) => {
-          setSections(section);
-          setSectionsParams(section);
+        userDashboard,
+        (group) => {
+          setUserDashboard(group);
+          setUserDashboardParams(group);
         },
         appList,
       ]}

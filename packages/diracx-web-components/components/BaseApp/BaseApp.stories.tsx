@@ -2,15 +2,16 @@ import React from "react";
 import { StoryObj, Meta } from "@storybook/react";
 import { ThemeProvider as MUIThemeProvider } from "@mui/material/styles";
 import { Paper } from "@mui/material";
+import { Apps } from "@mui/icons-material";
 import { useOidcAccessToken } from "../../mocks/react-oidc.mock";
 import { useMUITheme } from "../../hooks/theme";
 import { ApplicationsContext } from "../../contexts/ApplicationsProvider";
 import { NavigationProvider } from "../../contexts/NavigationProvider";
-import UserDashboard from "./UserDashboard";
+import BaseApp from "./BaseApp";
 
 const meta = {
-  title: "User Dashboard/UserDashboard",
-  component: UserDashboard,
+  title: "Base Application",
+  component: BaseApp,
   parameters: {
     layout: "centered",
   },
@@ -49,7 +50,7 @@ const meta = {
                   {
                     id: "example",
                     title: "App Name",
-                    icon: React.Component,
+                    icon: Apps,
                     type: "test",
                   },
                 ],
@@ -69,7 +70,7 @@ const meta = {
       useOidcAccessToken.mockRestore();
     };
   },
-} satisfies Meta<typeof UserDashboard>;
+} satisfies Meta<typeof BaseApp>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
@@ -82,7 +83,7 @@ export const LoggedIn: Story = {
     useOidcAccessToken.mockReturnValue({
       accessTokenPayload: { preferred_username: "John Doe" },
     });
-    return <UserDashboard {...props} />;
+    return <BaseApp {...props} />;
   },
 };
 
@@ -94,6 +95,6 @@ export const LoggedOff: Story = {
     useOidcAccessToken.mockReturnValue({
       accessTokenPayload: null,
     });
-    return <UserDashboard {...props} />;
+    return <BaseApp {...props} />;
   },
 };

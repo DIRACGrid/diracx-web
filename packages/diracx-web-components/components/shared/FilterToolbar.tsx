@@ -3,9 +3,9 @@ import { FilterList, Delete, Send } from "@mui/icons-material";
 import Chip from "@mui/material/Chip";
 import Button from "@mui/material/Button";
 import { Alert, Popover, Stack, Tooltip } from "@mui/material";
-import { Filter } from "@/types/Filter";
-import { Column } from "@/types/Column";
 import { FilterForm } from "./FilterForm";
+import { InternalFilter } from "@/types/Filter";
+import { Column } from "@/types/Column";
 import "@/hooks/theme";
 
 /**
@@ -16,11 +16,11 @@ interface FilterToolbarProps {
   /** The columns of the data table */
   columns: Column[];
   /** The filters to apply */
-  filters: Filter[];
+  filters: InternalFilter[];
   /** The function to set the filters */
-  setFilters: React.Dispatch<React.SetStateAction<Filter[]>>;
+  setFilters: React.Dispatch<React.SetStateAction<InternalFilter[]>>;
   /** The applied filters */
-  appliedFilters: Filter[];
+  appliedFilters: InternalFilter[];
   /** The function to apply the filters */
   handleApplyFilters: () => void;
 }
@@ -34,9 +34,8 @@ export function FilterToolbar(props: FilterToolbarProps) {
   const { columns, filters, setFilters, appliedFilters, handleApplyFilters } =
     props;
   const [anchorEl, setAnchorEl] = React.useState<HTMLElement | null>(null);
-  const [selectedFilter, setSelectedFilter] = React.useState<Filter | null>(
-    null,
-  );
+  const [selectedFilter, setSelectedFilter] =
+    React.useState<InternalFilter | null>(null);
   const addFilterButtonRef = React.useRef<HTMLButtonElement>(null);
 
   // Filter actions
@@ -45,7 +44,7 @@ export function FilterToolbar(props: FilterToolbarProps) {
     // It is just a placeholder to open the filter form
     const newFilter = {
       id: Date.now(),
-      column: "",
+      parameter: "",
       operator: "eq",
       value: "",
     };
@@ -57,7 +56,7 @@ export function FilterToolbar(props: FilterToolbarProps) {
     setFilters([]);
   }, [setFilters]);
 
-  const handleFilterChange = (index: number, newFilter: Filter) => {
+  const handleFilterChange = (index: number, newFilter: InternalFilter) => {
     const updatedFilters = filters.map((filter, i) =>
       i === index ? newFilter : filter,
     );
@@ -91,35 +90,27 @@ export function FilterToolbar(props: FilterToolbarProps) {
   }, [filters, appliedFilters]);
 
   const isApplied = React.useCallback(
-    (filter: Filter) => {
+    (filter: InternalFilter) => {
       return appliedFilters.some((f) => f.id == filter.id);
     },
     [appliedFilters],
   );
 
+  function debounce<T extends (event: KeyboardEvent) => void>(
+    func: T,
+    wait: number,
+  ) {
+    let timeout: ReturnType<typeof setTimeout> | undefined;
+
+    return function executedFunction(event: KeyboardEvent) {
+      clearTimeout(timeout);
+      timeout = setTimeout(() => func(event), wait);
+    };
+  }
+
   // Keyboard shortcuts
   React.useEffect(() => {
-    function debounce(func: (...args: any[]) => void, wait: number) {
-      let timeout: ReturnType<typeof setTimeout> | undefined;
-
-      return function executedFunction(...args: any[]) {
-        const later = () => {
-          clearTimeout(timeout);
-          func(...args);
-        };
-
-        clearTimeout(timeout);
-        timeout = setTimeout(later, wait);
-      };
-    }
-
-    const handleKeyPress = (event: {
-      altKey: any;
-      shiftKey: any;
-      key: string;
-      preventDefault: () => void;
-      stopPropagation: () => void;
-    }) => {
+    const handleKeyPress = (event: KeyboardEvent) => {
       if (event.altKey && event.shiftKey) {
         switch (event.key.toLowerCase()) {
           case "a":
@@ -202,10 +193,10 @@ export function FilterToolbar(props: FilterToolbarProps) {
         useFlexGap
         sx={{ m: 1 }}
       >
-        {filters.map((filter: Filter, index: number) => (
+        {filters.map((filter: InternalFilter, index: number) => (
           <Chip
             key={index}
-            label={`${filter.column} ${filter.operator} ${filter.value || filter.values}`}
+            label={`${filter.parameter} ${filter.operator} ${filter.value || filter.values}`}
             onClick={(event) => {
               handleFilterMenuOpen(event); // Open the menu
               setSelectedFilter(filter); // Set the selected filter

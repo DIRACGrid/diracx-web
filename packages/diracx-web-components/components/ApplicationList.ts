@@ -1,10 +1,10 @@
 import { Dashboard, FolderCopy, Monitor } from "@mui/icons-material";
-import ApplicationConfig from "@/types/ApplicationConfig";
 import JobMonitor from "./JobMonitor/JobMonitor";
-import UserDashboard from "./UserDashboard/UserDashboard";
+import BaseApp from "./BaseApp/BaseApp";
+import ApplicationMetadata from "@/types/ApplicationMetadata";
 
-export const applicationList: ApplicationConfig[] = [
-  { name: "Dashboard", component: UserDashboard, icon: Dashboard },
+export const applicationList: ApplicationMetadata[] = [
+  { name: "Base Application", component: BaseApp, icon: Dashboard },
   {
     name: "Job Monitor",
     component: JobMonitor,

@@ -1,7 +1,7 @@
 import { applicationList } from "@/gubbins/applicationList";
 
-// New default user sections
-export const defaultSections: {
+// New default user dashboard groups
+export const defaultUserDashboard: {
   title: string;
   extended: boolean;
   items: {

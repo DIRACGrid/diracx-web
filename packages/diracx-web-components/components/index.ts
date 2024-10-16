@@ -16,5 +16,5 @@ export * from "./OIDC";
 // Shared components
 export * from "./shared";
 
-// User Dashboard
-export * from "./UserDashboard";
+// Base Application
+export * from "./BaseApp";

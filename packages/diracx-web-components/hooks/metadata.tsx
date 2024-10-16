@@ -28,12 +28,16 @@ export interface Metadata {
  */
 export function useMetadata() {
   const url = `/.well-known/dirac-metadata`;
-  const { data, error }: SWRResponse<any, any> = useSWRImmutable(
+
+  const {
+    data,
+    error,
+  }: SWRResponse<{ headers: Headers; data: Metadata }, Error> = useSWRImmutable(
     [url],
-    fetcher,
+    (args) => fetcher<Metadata>(args),
   );
 
-  const metadata = data?.data as Metadata;
+  const metadata = data?.data;
 
   return {
     metadata,

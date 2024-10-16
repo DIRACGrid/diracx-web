@@ -7,16 +7,17 @@ import {
   InputLabel,
   MenuItem,
   Select,
+  SelectChangeEvent,
   Stack,
   TextField,
   Tooltip,
   Typography,
 } from "@mui/material";
-import { Filter } from "@/types/Filter";
-import { Column } from "@/types/Column";
 import { DateTimePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import dayjs from "dayjs";
+import { Column } from "@/types/Column";
+import { InternalFilter } from "@/types/Filter";
 import "dayjs/locale/en-gb"; // needed by LocalizationProvider to format Dates to dd-mm-yyyy
 
 /**
@@ -24,20 +25,20 @@ import "dayjs/locale/en-gb"; // needed by LocalizationProvider to format Dates t
  * @property {Column[]} columns - the columns on which to filter
  * @property {function} handleFilterChange - the function to call when a filter is changed
  * @property {function} handleFilterMenuClose - the function to call when the filter menu is closed
- * @property {Filter[]} filters - the filters for the table
+ * @property {InternalFilter[]} filters - the filters for the table
  * @property {number} selectedFilterId - the id of the selected filter
  */
 interface FilterFormProps {
   /** The columns of the data table */
   columns: Column[];
   /** The function to call when a filter is changed */
-  handleFilterChange: (index: number, tempFilter: Filter) => void;
+  handleFilterChange: (index: number, tempFilter: InternalFilter) => void;
   /** The function to call when the filter menu is closed */
   handleFilterMenuClose: () => void;
   /** The filters for the table */
-  filters: Filter[];
+  filters: InternalFilter[];
   /** The function to set the filters */
-  setFilters: React.Dispatch<React.SetStateAction<Filter[]>>;
+  setFilters: React.Dispatch<React.SetStateAction<InternalFilter[]>>;
   /** The id of the selected filter */
   selectedFilterId: number | undefined;
 }
@@ -56,7 +57,9 @@ export function FilterForm(props: FilterFormProps) {
     handleFilterMenuClose,
     selectedFilterId,
   } = props;
-  const [tempFilter, setTempFilter] = React.useState<Filter | null>(null);
+  const [tempFilter, setTempFilter] = React.useState<InternalFilter | null>(
+    null,
+  );
 
   // Find the index using the filter ID
   const filterIndex = filters.findIndex((f) => f.id === selectedFilterId);
@@ -68,7 +71,7 @@ export function FilterForm(props: FilterFormProps) {
     } else {
       setTempFilter({
         id: Date.now(),
-        column: "",
+        parameter: "",
         operator: "eq",
         value: "",
       });
@@ -78,12 +81,12 @@ export function FilterForm(props: FilterFormProps) {
   if (!tempFilter) return null;
 
   const onChange = (field: string, value: string | string[] | undefined) => {
-    setTempFilter((prevFilter: Filter | null) => {
+    setTempFilter((prevFilter: InternalFilter | null) => {
       if (prevFilter === null) {
         return null; // or initialize a new Filter object as appropriate
       }
       // Ensuring all fields of Filter are always defined
-      const updatedFilter: Filter = {
+      const updatedFilter: InternalFilter = {
         ...prevFilter,
         [field]: value,
       };
@@ -100,27 +103,28 @@ export function FilterForm(props: FilterFormProps) {
     handleFilterMenuClose();
   };
 
-  const selectedColumn = columns.find((c) => c.id == tempFilter.column);
+  const selectedColumn = columns.find((c) => c.id == tempFilter.parameter);
 
-  const types: {
-    [type: string]: { operators: string[]; defaultOperator: string };
-  } = {
-    DateTime: { operators: ["last", "gt", "lt"], defaultOperator: "last" },
-    category: {
-      operators: ["eq", "neq", "in", "not in", "like"],
-      defaultOperator: "eq",
-    },
-    number: {
-      operators: ["eq", "neq", "gt", "lt", "like"],
-      defaultOperator: "eq",
-    },
-    default: {
-      operators: ["eq", "neq", "gt", "lt", "like"],
-      defaultOperator: "eq",
-    },
+  const columnType = selectedColumn?.type;
+  const isCategory = Array.isArray(columnType);
+  const isDateTime = columnType === "DateTime";
+  const isNumber = columnType === "number";
+
+  const operatorOptions = {
+    DateTime: ["last", "gt", "lt"],
+    category: ["eq", "neq", "in", "not in", "like"],
+    number: ["eq", "neq", "gt", "lt", "in", "not in", "like"],
+    default: ["eq", "neq", "gt", "lt", "like"],
   };
 
-  const operatorText: { [operator: string]: string } = {
+  const defaultOperators = {
+    DateTime: "last",
+    category: "eq",
+    number: "eq",
+    default: "eq",
+  };
+
+  const operatorLabels: { [operator: string]: string } = {
     eq: "equals to",
     neq: "not equals to",
     last: "in the last",
@@ -131,47 +135,66 @@ export function FilterForm(props: FilterFormProps) {
     like: "like",
   };
 
-  function operatorSelector() {
-    if (tempFilter)
-      return (
-        <FormControl variant="outlined">
-          <InputLabel id="operator">Operator</InputLabel>
-          <Select
-            value={tempFilter.operator}
-            onChange={(e) => {
-              onChange(
-                ["in", "not in"].includes(e.target.value) ? "values" : "value",
-                [] || "",
-              );
-              onChange(
-                ["in", "not in"].includes(e.target.value) ? "value" : "values",
-                undefined,
-              );
-              onChange("operator", e.target.value);
-            }}
-            label="Operator"
-            labelId="operator"
-            data-testid="filter-form-select-operator"
-            sx={{ minWidth: 120 }}
-          >
-            {types[
-              typeof selectedColumn?.type == "object"
-                ? "category"
-                : selectedColumn?.type || "default"
-            ].operators.map((operator) => (
-              <MenuItem key={operator} value={operator}>
-                {operatorText[operator]}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-      );
-  }
+  const getOperatorType = () => {
+    if (isDateTime) return "DateTime";
+    if (isCategory) return "category";
+    if (isNumber) return "number";
+    return "default";
+  };
 
-  function valueSelector() {
+  const operatorType = getOperatorType();
+
+  const operators = operatorOptions[operatorType];
+
+  const operatorSelector = (
+    <FormControl variant="outlined">
+      <InputLabel id="operator">Operator</InputLabel>
+      <Select
+        value={tempFilter.operator}
+        onChange={(e) => {
+          const newOperator = e.target.value;
+          onChange("operator", newOperator);
+          if (["in", "not in"].includes(newOperator)) {
+            onChange("values", []);
+            onChange("value", undefined);
+          } else {
+            onChange("value", "");
+            onChange("values", undefined);
+          }
+        }}
+        label="Operator"
+        labelId="operator"
+        data-testid="filter-form-select-operator"
+        sx={{ minWidth: 120 }}
+      >
+        {operators.map((operator) => (
+          <MenuItem key={operator} value={operator}>
+            {operatorLabels[operator]}
+          </MenuItem>
+        ))}
+      </Select>
+    </FormControl>
+  );
+
+  const valueSelector = () => {
     if (!tempFilter) return null;
-    if (selectedColumn?.type == "DateTime") {
-      if (tempFilter.operator != "last")
+
+    const isMultiple = ["in", "not in"].includes(tempFilter.operator);
+    const selectValue = isMultiple
+      ? ((tempFilter.values || []) as string[])
+      : ((tempFilter.value || "") as string);
+
+    const handleValueChange = (e: SelectChangeEvent<unknown>) => {
+      const value = e.target.value;
+      if (isMultiple) {
+        onChange("values", value as string[]);
+      } else {
+        onChange("value", value as string);
+      }
+    };
+
+    if (isDateTime) {
+      if (tempFilter.operator !== "last") {
         return (
           <LocalizationProvider
             dateAdapter={AdapterDayjs}
@@ -187,7 +210,7 @@ export function FilterForm(props: FilterFormProps) {
             </FormControl>
           </LocalizationProvider>
         );
-      else
+      } else {
         return (
           <FormControl variant="outlined">
             <InputLabel id="value">Value</InputLabel>
@@ -199,50 +222,41 @@ export function FilterForm(props: FilterFormProps) {
               sx={{ minWidth: 100 }}
             >
               <MenuItem value="hour">Hour</MenuItem>
+              <MenuItem value="day">Day</MenuItem>
               <MenuItem value="week">Week</MenuItem>
               <MenuItem value="month">Month</MenuItem>
               <MenuItem value="year">Year</MenuItem>
             </Select>
           </FormControl>
         );
+      }
     }
 
-    if (
-      typeof selectedColumn?.type == "object" &&
-      tempFilter.operator != "like"
-    )
+    if (isCategory && tempFilter.operator !== "like") {
       return (
         <FormControl variant="outlined">
           <InputLabel id="value">Value</InputLabel>
           <Select
             label="Value"
             labelId="value"
-            value={
-              ["in", "not in"].includes(tempFilter.operator)
-                ? tempFilter.values
-                : tempFilter.value
-            }
-            onChange={(e) =>
-              onChange(
-                ["in", "not in"].includes(tempFilter.operator)
-                  ? "values"
-                  : "value",
-                e.target.value,
-              )
-            }
-            multiple={["in", "not in"].includes(tempFilter.operator)}
+            value={selectValue}
+            onChange={handleValueChange}
+            multiple={isMultiple}
             sx={{ minWidth: 100 }}
           >
-            {selectedColumn?.type.map((val: string) => (
-              <MenuItem key={val} value={val}>
-                {selectedColumn.render ? selectedColumn.render(val) : val}
-              </MenuItem>
-            ))}
+            {Array.isArray(columnType) &&
+              columnType.map((val) => (
+                <MenuItem key={val} value={val}>
+                  {selectedColumn?.render ? selectedColumn.render(val) : val}
+                </MenuItem>
+              ))}
           </Select>
         </FormControl>
       );
-    if (selectedColumn?.type == "number") {
-      if (!["in", "not in", "like"].includes(tempFilter.operator))
+    }
+
+    if (isNumber) {
+      if (!["in", "not in", "like"].includes(tempFilter.operator)) {
         return (
           <FormControl variant="outlined">
             <TextField
@@ -255,19 +269,21 @@ export function FilterForm(props: FilterFormProps) {
             />
           </FormControl>
         );
-      else if (["in", "not in"].includes(tempFilter.operator))
+      } else if (isMultiple) {
         return (
           <FormControl variant="outlined">
             <TextField
               id="value"
               variant="outlined"
               label="Value"
-              value={tempFilter.values?.join(" ")}
-              onChange={(e) => onChange("values", e.target.value.split(" "))}
+              value={(tempFilter.values || []).join(",")}
+              onChange={(e) => onChange("values", e.target.value.split(","))}
             />
           </FormControl>
         );
+      }
     }
+
     return (
       <FormControl variant="outlined">
         <TextField
@@ -279,7 +295,7 @@ export function FilterForm(props: FilterFormProps) {
         />
       </FormControl>
     );
-  }
+  };
 
   return (
     <Box sx={{ p: 2 }}>
@@ -289,36 +305,41 @@ export function FilterForm(props: FilterFormProps) {
         </Typography>
         <Stack direction="row" spacing={2}>
           <FormControl variant="outlined">
-            <InputLabel id="column">Column</InputLabel>
+            <InputLabel id="parameter">Parameter</InputLabel>
             <Select
-              value={tempFilter.column}
+              value={tempFilter.parameter}
               onChange={(e) => {
-                onChange("column", e.target.value);
-                onChange(
-                  "operator",
-                  types[
-                    typeof columns.find((v) => v.id == e.target.value)?.type ==
-                    "object"
+                const parameter = e.target.value;
+                onChange("parameter", parameter);
+
+                const column = columns.find((v) => v.id === parameter);
+                const colType = column?.type;
+                const typeKey =
+                  colType === "DateTime"
+                    ? "DateTime"
+                    : Array.isArray(colType)
                       ? "category"
-                      : (columns.find((v) => v.id == e.target.value)
-                          ?.type as string) || "default"
-                  ]?.defaultOperator,
-                );
+                      : colType === "number"
+                        ? "number"
+                        : "default";
+
+                const defaultOp = defaultOperators[typeKey];
+                onChange("operator", defaultOp);
               }}
-              label="Column"
-              labelId="column"
-              data-testid="filter-form-select-column"
+              label="Parameter"
+              labelId="parameter"
+              data-testid="filter-form-select-parameter"
               sx={{ minWidth: 120 }}
             >
               {columns.map((column) => (
-                <MenuItem key={column.id} value={column.id}>
+                <MenuItem key={String(column.id)} value={column.id}>
                   {column.label}
                 </MenuItem>
               ))}
             </Select>
           </FormControl>
 
-          {operatorSelector()}
+          {operatorSelector}
 
           {valueSelector()}
 

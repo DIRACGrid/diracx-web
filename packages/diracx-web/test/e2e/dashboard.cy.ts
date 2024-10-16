@@ -18,7 +18,7 @@ describe("DashboardDrawer", { retries: { runMode: 5, openMode: 3 } }, () => {
       cy.url().should("include", "/auth");
     });
     cy.visit(
-      "/?appId=Dashboard0&sections=E-4tru2-93-96-0%27A1316Job70%275AOther4fals2.3.6B80%2755*%28%27title%21%27-Dashboard.B+891Job+792e~items%21E3type%21%2749extended%215%29%5D6id%21%277Monitor8Catalog9%27~A%29%2C*BFileE%5B*%01EBA987654321.-*_",
+      "/?appId=Dashboard0&dashboard=E-4tru2-93-96-0%27A1316Job70%275AOther4fals2.3.6B80%2755*%28%27title%21%27-Dashboard.B+891Job+792e~items%21E3type%21%2749extended%215%29%5D6id%21%277Monitor8Catalog9%27~A%29%2C*BFileE%5B*%01EBA987654321.-*_",
     );
   });
 
@@ -112,7 +112,7 @@ describe("DashboardDrawer", { retries: { runMode: 5, openMode: 3 } }, () => {
     // Check if the drawer is not visible before reloading
     cy.contains("Job Monitor").should("not.be.visible");
     cy.wait(500);
-    cy.url().should("include", "sections=");
+    cy.url().should("include", "dashboard=");
 
     cy.reload();
     // Check if the drawer is still not visible after reloading
@@ -121,7 +121,7 @@ describe("DashboardDrawer", { retries: { runMode: 5, openMode: 3 } }, () => {
 
   it("should load the state of the drawer from url", () => {
     cy.visit(
-      "/?sections=%5B%28%27title%21%27Test+Value%27~extended%21true~items%21%5B%5D%29%5D_",
+      "/?dashboard=%5B%28%27title%21%27Test+Value%27~extended%21true~items%21%5B%5D%29%5D_",
     );
 
     // Check if there is a group with the title "Test Value"

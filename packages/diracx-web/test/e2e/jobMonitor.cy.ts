@@ -18,7 +18,7 @@ describe("Job Monitor", () => {
 
     // Visit the page where the Job Monitor is rendered
     cy.visit(
-      "/?appId=JobMonitor0&sections=6%21%27Test+Group%27~extended%21true~items%216*.~id430%27%29%2C-5%27~id51.%29%5D%29%5D*4+3-%28%27title.%27~type*%273Monitor4%21%27Job5*+26%5B-%016543.-*_",
+      "/?appId=JobMonitor0&userDashboard=6%21%27Test+Group%27~extended%21true~items%216*.~id430%27%29%2C-5%27~id51.%29%5D%29%5D*4+3-%28%27title.%27~type*%273Monitor4%21%27Job5*+26%5B-%016543.-*_",
     );
   });
 

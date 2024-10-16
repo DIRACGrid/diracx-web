@@ -6,6 +6,7 @@ import { ThemeProvider as MUIThemeProvider } from "@mui/material/styles";
 import { Dashboard } from "@mui/icons-material";
 import { useMUITheme } from "../../hooks/theme";
 import { useOidc, useOidcAccessToken } from "../../mocks/react-oidc.mock";
+import { DashboardGroup } from "../../types/DashboardGroup";
 import DrawerItemGroup from "./DrawerItemGroup";
 
 const meta = {
@@ -59,17 +60,17 @@ export const Default: Story = {
       ],
     },
     handleContextMenu: () => () => {},
-    setSections: () => {},
+    setUserDashboard: () => {},
   },
   render: (props) => {
     const [, updateArgs] = useArgs();
-    const updateSections = (sections) => {
-      if (typeof sections === "function") {
-        sections = sections([props.group]);
+    const updateGroups = (groups: React.SetStateAction<DashboardGroup[]>) => {
+      if (typeof groups === "function") {
+        groups = groups([props.group]);
       }
-      updateArgs({ group: sections[0] });
+      updateArgs({ group: groups[0] });
     };
-    props.setSections = updateSections;
+    props.setUserDashboard = updateGroups;
     return <DrawerItemGroup {...props} />;
   },
 };
