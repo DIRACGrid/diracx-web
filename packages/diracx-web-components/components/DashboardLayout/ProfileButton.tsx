@@ -13,6 +13,7 @@ import {
   AccordionDetails,
   AccordionSummary,
   Avatar,
+  Box,
   Button,
   Chip,
   Divider,
@@ -116,61 +117,59 @@ export function ProfileButton() {
         transformOrigin={{ horizontal: "right", vertical: "top" }}
         anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
       >
-        <MenuItem>
-          <table>
-            <tbody>
-              <tr>
-                <td>
-                  <Tooltip title="Username">
-                    <Person />
-                  </Tooltip>
-                </td>
-                <td>
-                  <span>{accessTokenPayload["preferred_username"]}</span>
-                </td>
-              </tr>
-              <tr>
-                <td>
-                  <Tooltip title="Group">
-                    <Groups />
-                  </Tooltip>
-                </td>
-                <td>
-                  <span>{accessTokenPayload["dirac_group"]}</span>
-                </td>
-              </tr>
-              <tr>
-                <td>
-                  <Tooltip title="VO">
-                    <CorporateFare />
-                  </Tooltip>
-                </td>
-                <td>
-                  <span>{accessTokenPayload["vo"]}</span>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </MenuItem>
-        <MenuItem>
-          <Accordion>
-            <AccordionSummary
-              expandIcon={<ExpandMore />}
-              aria-controls="panel1a-content"
-              id="panel1a-header"
-            >
-              <Typography>Properties</Typography>
-            </AccordionSummary>
-            <AccordionDetails>
-              <Stack spacing={1} flexWrap="wrap">
-                {accessTokenPayload["dirac_properties"]?.map(
-                  (property: string, index: number) => (
-                    <Chip key={index} label={property} sx={{ m: 0.5 }} />
-                  ),
-                )}
-              </Stack>
-            </AccordionDetails>
-          </Accordion>
+        <MenuItem disableRipple>
+          <Stack>
+            <Stack direction={"row"} spacing={1}>
+              <Tooltip title="Username">
+                <Person color="action" />
+              </Tooltip>
+              <Typography variant="subtitle1">
+                {accessTokenPayload["preferred_username"]}
+              </Typography>
+            </Stack>
+            <Divider />
+
+            <Box mt={1} />
+
+            <Stack direction={"row"} spacing={1}>
+              <Tooltip title="Group">
+                <Groups color="action" />
+              </Tooltip>
+              <Typography variant="body2">
+                {accessTokenPayload["dirac_group"]}
+              </Typography>
+            </Stack>
+
+            <Stack direction={"row"} spacing={1}>
+              <Tooltip title="VO">
+                <CorporateFare color="action" />
+              </Tooltip>
+              <Typography variant="body2">
+                {accessTokenPayload["vo"]}
+              </Typography>
+            </Stack>
+
+            <Box mt={2} />
+
+            <Accordion>
+              <AccordionSummary
+                expandIcon={<ExpandMore />}
+                aria-controls="panel1a-content"
+                id="panel1a-header"
+              >
+                <Typography>Properties</Typography>
+              </AccordionSummary>
+              <AccordionDetails>
+                <Stack spacing={1} flexWrap="wrap">
+                  {accessTokenPayload["dirac_properties"]?.map(
+                    (property: string, index: number) => (
+                      <Chip key={index} label={property} sx={{ m: 0.5 }} />
+                    ),
+                  )}
+                </Stack>
+              </AccordionDetails>
+            </Accordion>
+          </Stack>
         </MenuItem>
         <Divider />
         <MenuItem
