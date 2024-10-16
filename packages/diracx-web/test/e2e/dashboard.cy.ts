@@ -36,11 +36,11 @@ describe("DashboardDrawer", { retries: { runMode: 5, openMode: 3 } }, () => {
   it("should handle application addition", () => {
     cy.contains("Add application").click();
 
-    cy.get("button").contains("Dashboard").click().click();
+    cy.get("button").contains("Base Application").click().click();
 
     cy.contains("Other").click();
     // Check if the application is added
-    cy.contains("Dashboard 2").should("be.visible");
+    cy.contains("Base Application 1").should("be.visible");
   });
 
   it("should handle application deletion", () => {
@@ -55,12 +55,12 @@ describe("DashboardDrawer", { retries: { runMode: 5, openMode: 3 } }, () => {
     cy.get(".MuiListItemButton-root").contains("Dashboard").rightclick();
     cy.contains("Rename").click();
 
-    cy.get("input").type("Dashboard 1");
+    cy.get("input").type("Base App1");
     cy.get("button").contains("Rename").click();
 
     // Check if the application is renamed
     cy.get(".MuiListItemButton-root")
-      .contains("Dashboard 1")
+      .contains("Base App1")
       .should("be.visible");
   });
 
@@ -139,9 +139,7 @@ describe("DashboardDrawer", { retries: { runMode: 5, openMode: 3 } }, () => {
     dragAndDrop(
       cy.contains("[draggable=true]", "Job Monitor").first(),
       cy.contains("[data-drop-target-for-element=true]", "Other").first(),
-      cy.get(
-        '.MuiAccordionDetails-root > :nth-child(2) > .MuiButtonBase-root  .css-1blhdvq-MuiListItemIcon-root > [data-testid="DragIndicatorIcon"]',
-      ),
+      cy.get('[data-testid="drag-handle"]').eq(1),
     );
 
     // Check if the application is dropped

@@ -162,6 +162,7 @@ export default function DrawerItem({
             component={DragIndicator}
             sx={{ cursor: "grab" }}
             ref={handleRef}
+            data-testid="drag-handle"
           />
         </ListItemIcon>
         {closestEdge && <DropIndicator edge={closestEdge} />}

@@ -18,7 +18,7 @@ describe("Job Monitor", () => {
 
     // Visit the page where the Job Monitor is rendered
     cy.visit(
-      "/?appId=JobMonitor0&userDashboard=6%21%27Test+Group%27~extended%21true~items%216*.~id430%27%29%2C-5%27~id51.%29%5D%29%5D*4+3-%28%27title.%27~type*%273Monitor4%21%27Job5*+26%5B-%016543.-*_",
+      "/?appId=JobMonitor0&dashboard=6%21%27My+dashboard%27~extended%21true~items%216*.~id430%27%29%2C-5%27~id51.%29%5D%29%5D*4+3-%28%27title.%27~type*%273Monitor4%21%27Job5*+26%5B-%016543.-*_&userDashboard=6%21%27Test+Group%27~extended%21true~items%216*.~id430%27%29%2C-5%27~id51.%29%5D%29%5D*4+3-%28%27title.%27~type*%273Monitor4%21%27Job5*+26%5B-%016543.-*_",
     );
   });
 
@@ -30,7 +30,7 @@ describe("Job Monitor", () => {
     cy.get("button").contains("Add filter").click();
 
     cy.get(
-      '[data-testid="filter-form-select-column"] > .MuiSelect-select',
+      '[data-testid="filter-form-select-parameter"] > .MuiSelect-select',
     ).click();
     cy.get('[data-value="JobName"]').click();
     cy.get("#value").type("test");
@@ -45,7 +45,7 @@ describe("Job Monitor", () => {
     cy.get("button").contains("Add filter").click();
 
     cy.get(
-      '[data-testid="filter-form-select-column"] > .MuiSelect-select',
+      '[data-testid="filter-form-select-parameter"] > .MuiSelect-select',
     ).click();
     cy.get('[data-value="JobName"]').click();
     cy.get("#value").type("test");
@@ -63,7 +63,7 @@ describe("Job Monitor", () => {
     cy.get("button").contains("Add filter").click();
 
     cy.get(
-      '[data-testid="filter-form-select-column"] > .MuiSelect-select',
+      '[data-testid="filter-form-select-parameter"] > .MuiSelect-select',
     ).click();
     cy.get('[data-value="JobName"]').click();
     cy.get("#value").type("test");
@@ -86,7 +86,7 @@ describe("Job Monitor", () => {
     cy.get("button").contains("Add filter").click();
 
     cy.get(
-      '[data-testid="filter-form-select-column"] > .MuiSelect-select',
+      '[data-testid="filter-form-select-parameter"] > .MuiSelect-select',
     ).click();
     cy.get('[data-value="JobName"]').click();
     cy.get("#value").type("test");
@@ -98,7 +98,7 @@ describe("Job Monitor", () => {
 
     cy.get("button").contains("Add filter").click();
     cy.get(
-      '[data-testid="filter-form-select-column"] > .MuiSelect-select',
+      '[data-testid="filter-form-select-parameter"] > .MuiSelect-select',
     ).click();
     cy.get('[data-value="JobName"]').click();
     cy.get("#value").type("test2");
@@ -117,7 +117,7 @@ describe("Job Monitor", () => {
     cy.get("button").contains("Add filter").click();
 
     cy.get(
-      '[data-testid="filter-form-select-column"] > .MuiSelect-select',
+      '[data-testid="filter-form-select-parameter"] > .MuiSelect-select',
     ).click();
     cy.get('[data-value="JobName"]').click();
     cy.get("#value").type("test");
@@ -138,7 +138,7 @@ describe("Job Monitor", () => {
     cy.get("button").contains("Add filter").click();
 
     cy.get(
-      '[data-testid="filter-form-select-column"] > .MuiSelect-select',
+      '[data-testid="filter-form-select-parameter"] > .MuiSelect-select',
     ).click();
     cy.get('[data-value="JobName"]').click();
     cy.get("#value").type("test");
