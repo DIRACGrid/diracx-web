@@ -3,12 +3,11 @@ import type { Meta, StoryObj } from "@storybook/react";
 
 import { Box } from "@mui/material";
 import { Dashboard } from "@mui/icons-material";
-import { ThemeProvider as MUIThemeProvider } from "@mui/material/styles";
-import { useMUITheme } from "../../hooks/theme";
 import { useOidc, useOidcAccessToken } from "../../mocks/react-oidc.mock";
 import { ApplicationsContext } from "../../contexts/ApplicationsProvider";
 import { applicationList } from "../ApplicationList";
 import { DashboardGroup } from "../../types";
+import { ThemeProvider } from "../../contexts/ThemeProvider";
 import DashboardDrawer from "./DashboardDrawer";
 
 const meta = {
@@ -20,7 +19,6 @@ const meta = {
   tags: ["autodocs"],
   decorators: [
     (Story) => {
-      const theme = useMUITheme();
       const [userDashboard, setUserDashboard] = React.useState<
         DashboardGroup[]
       >([
@@ -41,11 +39,11 @@ const meta = {
         <ApplicationsContext.Provider
           value={[userDashboard, setUserDashboard, applicationList]}
         >
-          <MUIThemeProvider theme={theme}>
+          <ThemeProvider>
             <Box sx={{ width: "240px", height: "50vh" }}>
               <Story />
             </Box>
-          </MUIThemeProvider>
+          </ThemeProvider>
         </ApplicationsContext.Provider>
       );
     },

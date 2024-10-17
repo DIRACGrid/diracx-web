@@ -1,36 +1,32 @@
 import React from "react";
-import { CheckCircle } from "@mui/icons-material";
 import {
-  Box,
+  Button,
   FormControl,
-  IconButton,
   InputLabel,
   MenuItem,
   Select,
   SelectChangeEvent,
   Stack,
   TextField,
-  Tooltip,
-  Typography,
 } from "@mui/material";
 import { DateTimePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { Column } from "@tanstack/react-table";
 import dayjs from "dayjs";
-import { Column } from "@/types/Column";
 import { InternalFilter } from "@/types/Filter";
 import "dayjs/locale/en-gb"; // needed by LocalizationProvider to format Dates to dd-mm-yyyy
 
 /**
  * Filter form props
- * @property {Column[]} columns - the columns on which to filter
+ * @property {AccessorKeyColumnDef[]} columns - the columns on which to filter
  * @property {function} handleFilterChange - the function to call when a filter is changed
  * @property {function} handleFilterMenuClose - the function to call when the filter menu is closed
  * @property {InternalFilter[]} filters - the filters for the table
  * @property {number} selectedFilterId - the id of the selected filter
  */
-interface FilterFormProps {
+export interface FilterFormProps<T extends Record<string, unknown>> {
   /** The columns of the data table */
-  columns: Column[];
+  columns: Column<T>[];
   /** The function to call when a filter is changed */
   handleFilterChange: (index: number, tempFilter: InternalFilter) => void;
   /** The function to call when the filter menu is closed */
@@ -48,7 +44,9 @@ interface FilterFormProps {
  *
  * @returns a FilterForm component
  */
-export function FilterForm(props: FilterFormProps) {
+export function FilterForm<T extends Record<string, unknown>>(
+  props: FilterFormProps<T>,
+) {
   const {
     columns,
     filters,
@@ -60,7 +58,6 @@ export function FilterForm(props: FilterFormProps) {
   const [tempFilter, setTempFilter] = React.useState<InternalFilter | null>(
     null,
   );
-
   // Find the index using the filter ID
   const filterIndex = filters.findIndex((f) => f.id === selectedFilterId);
 
@@ -105,20 +102,20 @@ export function FilterForm(props: FilterFormProps) {
 
   const selectedColumn = columns.find((c) => c.id == tempFilter.parameter);
 
-  const columnType = selectedColumn?.type;
-  const isCategory = Array.isArray(columnType);
-  const isDateTime = columnType === "DateTime";
+  const columnType = selectedColumn?.columnDef.meta?.type || "default";
+  const isCategory = Array.isArray(selectedColumn?.columnDef.meta?.values);
+  const isDateTime = columnType === "date";
   const isNumber = columnType === "number";
 
   const operatorOptions = {
-    DateTime: ["last", "gt", "lt"],
+    date: ["last", "gt", "lt"],
     category: ["eq", "neq", "in", "not in", "like"],
     number: ["eq", "neq", "gt", "lt", "in", "not in", "like"],
     default: ["eq", "neq", "gt", "lt", "like"],
   };
 
   const defaultOperators = {
-    DateTime: "last",
+    date: "last",
     category: "eq",
     number: "eq",
     default: "eq",
@@ -136,18 +133,17 @@ export function FilterForm(props: FilterFormProps) {
   };
 
   const getOperatorType = () => {
-    if (isDateTime) return "DateTime";
+    if (isDateTime) return "date";
     if (isCategory) return "category";
     if (isNumber) return "number";
     return "default";
   };
 
   const operatorType = getOperatorType();
-
   const operators = operatorOptions[operatorType];
 
   const operatorSelector = (
-    <FormControl variant="outlined">
+    <FormControl fullWidth variant="outlined" sx={{ margin: 1 }}>
       <InputLabel id="operator">Operator</InputLabel>
       <Select
         value={tempFilter.operator}
@@ -200,7 +196,7 @@ export function FilterForm(props: FilterFormProps) {
             dateAdapter={AdapterDayjs}
             adapterLocale={"en-gb"}
           >
-            <FormControl variant="outlined">
+            <FormControl fullWidth variant="outlined" sx={{ margin: 1 }}>
               <DateTimePicker
                 label="Value"
                 value={dayjs(tempFilter.value)}
@@ -212,7 +208,7 @@ export function FilterForm(props: FilterFormProps) {
         );
       } else {
         return (
-          <FormControl variant="outlined">
+          <FormControl fullWidth variant="outlined" sx={{ margin: 1 }}>
             <InputLabel id="value">Value</InputLabel>
             <Select
               label="Value"
@@ -234,7 +230,7 @@ export function FilterForm(props: FilterFormProps) {
 
     if (isCategory && tempFilter.operator !== "like") {
       return (
-        <FormControl variant="outlined">
+        <FormControl fullWidth variant="outlined" sx={{ margin: 1 }}>
           <InputLabel id="value">Value</InputLabel>
           <Select
             label="Value"
@@ -244,12 +240,11 @@ export function FilterForm(props: FilterFormProps) {
             multiple={isMultiple}
             sx={{ minWidth: 100 }}
           >
-            {Array.isArray(columnType) &&
-              columnType.map((val) => (
-                <MenuItem key={val} value={val}>
-                  {selectedColumn?.render ? selectedColumn.render(val) : val}
-                </MenuItem>
-              ))}
+            {selectedColumn?.columnDef.meta?.values?.map((val: string) => (
+              <MenuItem key={val} value={val}>
+                {val}
+              </MenuItem>
+            ))}
           </Select>
         </FormControl>
       );
@@ -258,7 +253,7 @@ export function FilterForm(props: FilterFormProps) {
     if (isNumber) {
       if (!["in", "not in", "like"].includes(tempFilter.operator)) {
         return (
-          <FormControl variant="outlined">
+          <FormControl fullWidth variant="outlined" sx={{ margin: 1 }}>
             <TextField
               id="value"
               variant="outlined"
@@ -271,7 +266,7 @@ export function FilterForm(props: FilterFormProps) {
         );
       } else if (isMultiple) {
         return (
-          <FormControl variant="outlined">
+          <FormControl fullWidth variant="outlined" sx={{ margin: 1 }}>
             <TextField
               id="value"
               variant="outlined"
@@ -285,7 +280,7 @@ export function FilterForm(props: FilterFormProps) {
     }
 
     return (
-      <FormControl variant="outlined">
+      <FormControl fullWidth variant="outlined" sx={{ margin: 1 }}>
         <TextField
           id="value"
           variant="outlined"
@@ -298,58 +293,57 @@ export function FilterForm(props: FilterFormProps) {
   };
 
   return (
-    <Box sx={{ p: 2 }}>
-      <Stack spacing={2} alignItems="flex-start">
-        <Typography variant="h6" padding={1}>
-          Edit Filter
-        </Typography>
-        <Stack direction="row" spacing={2}>
-          <FormControl variant="outlined">
-            <InputLabel id="parameter">Parameter</InputLabel>
-            <Select
-              value={tempFilter.parameter}
-              onChange={(e) => {
-                const parameter = e.target.value;
-                onChange("parameter", parameter);
+    <Stack spacing={2} sx={{ width: "100%", padding: 1 }}>
+      <FormControl fullWidth variant="outlined">
+        <InputLabel id="parameter">Parameter</InputLabel>
+        <Select
+          value={tempFilter.parameter}
+          onChange={(e) => {
+            const parameter = e.target.value;
+            onChange("parameter", parameter);
 
-                const column = columns.find((v) => v.id === parameter);
-                const colType = column?.type;
-                const typeKey =
-                  colType === "DateTime"
-                    ? "DateTime"
-                    : Array.isArray(colType)
-                      ? "category"
-                      : colType === "number"
-                        ? "number"
-                        : "default";
+            const column = columns.find((v) => v.id === parameter);
+            const colType = column?.columnDef.meta?.type || "default";
+            const typeKey =
+              colType === "date"
+                ? "date"
+                : Array.isArray(colType)
+                  ? "category"
+                  : colType === "number"
+                    ? "number"
+                    : "default";
 
-                const defaultOp = defaultOperators[typeKey];
-                onChange("operator", defaultOp);
-              }}
-              label="Parameter"
-              labelId="parameter"
-              data-testid="filter-form-select-parameter"
-              sx={{ minWidth: 120 }}
+            const defaultOp = defaultOperators[typeKey];
+            onChange("operator", defaultOp);
+            onChange("value", "");
+          }}
+          label="Parameter"
+          labelId="parameter"
+          data-testid="filter-form-select-parameter"
+        >
+          {columns.map((column) => (
+            <MenuItem
+              key={column.id.toString()}
+              value={column.id as string | number}
             >
-              {columns.map((column) => (
-                <MenuItem key={String(column.id)} value={column.id}>
-                  {column.label}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
+              {column.columnDef.header?.toString()}
+            </MenuItem>
+          ))}
+        </Select>
+      </FormControl>
 
-          {operatorSelector}
+      {operatorSelector}
 
-          {valueSelector()}
+      {valueSelector()}
 
-          <Tooltip title="Finish editing filter">
-            <IconButton onClick={() => applyChanges()} color="success">
-              <CheckCircle />
-            </IconButton>
-          </Tooltip>
-        </Stack>
-      </Stack>
-    </Box>
+      <Button
+        onClick={() => applyChanges()}
+        color="success"
+        variant="contained"
+        data-testid="filter-form-add-button"
+      >
+        Add
+      </Button>
+    </Stack>
   );
 }

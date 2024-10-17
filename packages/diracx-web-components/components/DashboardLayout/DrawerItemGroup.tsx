@@ -1,5 +1,10 @@
 "use client";
-import { Accordion, AccordionDetails, AccordionSummary } from "@mui/material";
+import {
+  Accordion,
+  AccordionDetails,
+  AccordionSummary,
+  TextField,
+} from "@mui/material";
 import { ExpandMore, Apps } from "@mui/icons-material";
 import React, { useEffect } from "react";
 import { dropTargetForElements } from "@atlaskit/pragmatic-drag-and-drop/element/adapter";
@@ -17,6 +22,12 @@ export default function DrawerItemGroup({
   group: { title, extended: expanded, items },
   setUserDashboard,
   handleContextMenu,
+  renamingGroupId,
+  setRenamingGroupId,
+  renamingItemId,
+  setRenamingItemId,
+  renameValue,
+  setRenameValue,
 }: {
   /** The group object containing the title, expanded state, and items. */
   group: DashboardGroup;
@@ -27,6 +38,18 @@ export default function DrawerItemGroup({
     type: "group" | "item" | null,
     id: string | null,
   ) => (event: React.MouseEvent<HTMLElement>) => void;
+  /** The ID of the group being renamed. */
+  renamingGroupId: string | null;
+  /** The function to set the renaming group ID. */
+  setRenamingGroupId: React.Dispatch<React.SetStateAction<string | null>>;
+  /** The ID of the item being renamed. */
+  renamingItemId: string | null;
+  /** The function to set the renaming item ID. */
+  setRenamingItemId: React.Dispatch<React.SetStateAction<string | null>>;
+  /** The value of the rename input. */
+  renameValue: string;
+  /** The function to set the rename input value. */
+  setRenameValue: React.Dispatch<React.SetStateAction<string>>;
 }) {
   // Ref to use for the drag and drop target
   const dropRef = React.useRef(null);
@@ -61,6 +84,19 @@ export default function DrawerItemGroup({
         ),
       );
     };
+
+  // Handle renaming of the group
+  const handleGroupRename = () => {
+    if (renameValue.trim() === "") return;
+    setUserDashboard((groups) =>
+      groups.map((group) =>
+        group.title === title ? { ...group, title: renameValue } : group,
+      ),
+    );
+    setRenamingGroupId(null);
+    setRenameValue("");
+  };
+
   return (
     <Accordion
       sx={{
@@ -73,7 +109,26 @@ export default function DrawerItemGroup({
       ref={dropRef}
     >
       {/* Accordion summary */}
-      <AccordionSummary expandIcon={<ExpandMore />}>{title}</AccordionSummary>
+      <AccordionSummary expandIcon={<ExpandMore />}>
+        {renamingGroupId === title ? (
+          <TextField
+            value={renameValue}
+            onChange={(e) => setRenameValue(e.target.value)}
+            onBlur={handleGroupRename}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                handleGroupRename();
+              } else if (e.key === "Escape") {
+                setRenamingGroupId(null);
+              }
+            }}
+            autoFocus
+            size="small"
+          />
+        ) : (
+          <div onContextMenu={handleContextMenu("group", title)}>{title}</div>
+        )}
+      </AccordionSummary>
       {/* Accordion details */}
       <AccordionDetails>
         {items.map(({ title: itemTitle, id, icon }, index) => (
@@ -82,6 +137,11 @@ export default function DrawerItemGroup({
               item={{ title: itemTitle, id, icon: icon || Apps }}
               index={index}
               groupTitle={title}
+              renamingItemId={renamingItemId}
+              setRenamingItemId={setRenamingItemId}
+              renameValue={renameValue}
+              setRenameValue={setRenameValue}
+              setUserDashboard={setUserDashboard}
             />
           </div>
         ))}

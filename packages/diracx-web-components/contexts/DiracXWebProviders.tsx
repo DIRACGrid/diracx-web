@@ -1,5 +1,3 @@
-import { CssBaseline, ThemeProvider as MUIThemeProvider } from "@mui/material";
-import { useMUITheme } from "../hooks/theme";
 import {
   OIDCConfigurationProvider,
   ThemeProvider,
@@ -20,27 +18,15 @@ export function DiracXWebProviders({
 }) {
   return (
     <OIDCConfigurationProvider>
-      <ThemeProvider>
-        <NavigationProvider
-          getPath={getPath}
-          setPath={setPath}
-          getSearchParams={getSearchParams}
-        >
-          <ApplicationsProvider>
-            <MUIProviders>{children}</MUIProviders>
-          </ApplicationsProvider>
-        </NavigationProvider>
-      </ThemeProvider>
+      <NavigationProvider
+        getPath={getPath}
+        setPath={setPath}
+        getSearchParams={getSearchParams}
+      >
+        <ApplicationsProvider>
+          <ThemeProvider>{children}</ThemeProvider>
+        </ApplicationsProvider>
+      </NavigationProvider>
     </OIDCConfigurationProvider>
-  );
-}
-
-function MUIProviders({ children }: { children: React.ReactNode }) {
-  const theme = useMUITheme();
-  return (
-    <MUIThemeProvider theme={theme}>
-      <CssBaseline />
-      {children}
-    </MUIThemeProvider>
   );
 }

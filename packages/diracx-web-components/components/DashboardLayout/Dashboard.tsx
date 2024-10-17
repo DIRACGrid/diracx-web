@@ -2,16 +2,15 @@
 import React from "react";
 import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
-import CssBaseline from "@mui/material/CssBaseline";
 import IconButton from "@mui/material/IconButton";
 import { Menu } from "@mui/icons-material";
 import Toolbar from "@mui/material/Toolbar";
 import Stack from "@mui/material/Stack";
-import { ThemeProvider as MUIThemeProvider } from "@mui/material/styles";
+import { Typography, useMediaQuery, useTheme } from "@mui/material";
 import { ProfileButton } from "./ProfileButton";
 import { ThemeToggleButton } from "./ThemeToggleButton";
 import DashboardDrawer from "./DashboardDrawer";
-import { useMUITheme } from "@/hooks/theme";
+import { useApplicationTitle, useApplicationType } from "@/hooks/application";
 
 interface DashboardProps {
   /** The content to be displayed in the main area */
@@ -30,85 +29,123 @@ interface DashboardProps {
  * @return an dashboard layout
  */
 export default function Dashboard(props: DashboardProps) {
-  const theme = useMUITheme();
+  const { children, drawerWidth = 240, logoURL } = props;
+
+  const appTitle = useApplicationTitle();
+  const appType = useApplicationType();
+
+  /** Theme and media query */
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+
   /** State management for mobile drawer */
   const [mobileOpen, setMobileOpen] = React.useState(false);
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
   };
 
-  /** Drawer width */
-  const drawerWidth = props.drawerWidth || 240;
-
   return (
-    <Box sx={{ display: "flex" }}>
-      <CssBaseline />
-      <MUIThemeProvider theme={theme}>
-        <AppBar
-          position="fixed"
-          elevation={0}
-          sx={{
-            width: { sm: `calc(100% - ${drawerWidth}px)` },
-            ml: { sm: `${drawerWidth}px` },
-          }}
-        >
-          <Stack direction="row">
+    <Box sx={{ display: "flex", height: "100vh" }}>
+      <AppBar
+        position="fixed"
+        elevation={0}
+        sx={{
+          width: { sm: `calc(100% - ${drawerWidth}px)` },
+          marginLeft: { sm: `${drawerWidth}px` },
+        }}
+      >
+        <Stack direction="row" alignItems="center" spacing={2}>
+          {isMobile && (
             <Toolbar>
               <IconButton
                 aria-label="open drawer"
                 edge="start"
                 onClick={handleDrawerToggle}
-                sx={{ mr: 2, display: { sm: "none" } }}
+                sx={{ display: { sm: "none" } }}
                 data-testid="drawer-toggle-button"
               >
                 <Menu />
               </IconButton>
             </Toolbar>
-            <Toolbar
+          )}
+
+          <Stack
+            spacing={1}
+            direction={"row"}
+            alignItems={"end"}
+            sx={{
+              flexGrow: 1,
+              overflow: "hidden",
+              whiteSpace: "nowrap",
+              textOverflow: "ellipsis",
+            }}
+          >
+            <Typography
+              color="text.primary"
+              variant={isMobile ? "h6" : "h4"}
+              fontWeight={"bold"}
+              width={"fit-content"}
               sx={{
-                justifyContent: "space-between",
-                flexGrow: 1,
+                overflow: "hidden",
+                whiteSpace: "nowrap",
+                textOverflow: "ellipsis",
+                paddingLeft: 2,
               }}
             >
-              <div />
-              <Stack direction="row">
-                <ThemeToggleButton />
-                <ProfileButton />
-              </Stack>
-            </Toolbar>
+              {appTitle}
+            </Typography>
+            <Typography
+              color="text.secondary"
+              variant={isMobile ? "body2" : "subtitle1"}
+              width={"fit-content"}
+              sx={{
+                overflow: "hidden",
+                whiteSpace: "nowrap",
+                textOverflow: "ellipsis",
+              }}
+            >
+              {appType}
+            </Typography>
           </Stack>
-        </AppBar>
-        <Box
-          component="nav"
-          sx={{ width: { sm: drawerWidth }, flexShrink: { sm: 0 } }}
-          aria-label="side bar"
-        >
-          {/* Here two types of drawers are rendered:
-           1. Temporary drawer: Visible on small screens (xs) and is collapsible.
-           2. Permanent drawer: Visible on larger screens (sm) and stays fixed.
-          Depending on the screen size, only one will be visible at a time. */}
-          <DashboardDrawer
-            variant="temporary"
-            mobileOpen={mobileOpen}
-            width={drawerWidth}
-            handleDrawerToggle={handleDrawerToggle}
-            logoURL={props.logoURL}
-          />
-          <DashboardDrawer
-            variant="permanent"
-            mobileOpen={mobileOpen}
-            width={drawerWidth}
-            handleDrawerToggle={handleDrawerToggle}
-            logoURL={props.logoURL}
-          />
-        </Box>
-        <Box
-          component="main"
-          sx={{ pt: 7, width: { sm: `calc(100% - ${drawerWidth}px)` } }}
-        >
-          {props.children}
-        </Box>
-      </MUIThemeProvider>
+
+          <Toolbar
+            sx={{
+              justifyContent: "flex-end",
+              flexGrow: 0,
+            }}
+          >
+            <Stack direction="row" spacing={1} alignItems="center">
+              <ThemeToggleButton />
+              <ProfileButton />
+            </Stack>
+          </Toolbar>
+        </Stack>
+      </AppBar>
+      <Box
+        component="nav"
+        sx={{ width: { sm: drawerWidth }, flexShrink: { sm: 0 } }}
+        aria-label="side bar"
+      >
+        <DashboardDrawer
+          variant={isMobile ? "temporary" : "permanent"}
+          mobileOpen={mobileOpen}
+          width={drawerWidth}
+          handleDrawerToggle={handleDrawerToggle}
+          logoURL={logoURL}
+        />
+      </Box>
+      <Box
+        component="main"
+        sx={{
+          flexGrow: 1,
+          display: "flex",
+          flexDirection: "column",
+          width: { sm: `${drawerWidth}px` },
+        }}
+      >
+        <Toolbar />
+        {children}
+      </Box>
     </Box>
   );
 }

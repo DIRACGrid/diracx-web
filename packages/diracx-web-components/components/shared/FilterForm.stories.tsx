@@ -1,19 +1,67 @@
 import React from "react";
-import { StoryObj, Meta } from "@storybook/react";
-import { ThemeProvider as MUIThemeProvider } from "@mui/material/styles";
+import { StoryObj } from "@storybook/react";
 import { Paper } from "@mui/material";
-import { useMUITheme } from "../../hooks/theme";
-import { FilterForm } from "./FilterForm";
+import {
+  createColumnHelper,
+  getCoreRowModel,
+  useReactTable,
+} from "@tanstack/react-table";
+import { ThemeProvider } from "../../contexts/ThemeProvider";
+import { FilterForm, FilterFormProps } from "./FilterForm";
+
+interface SimpleItem extends Record<string, unknown> {
+  id: number;
+  name: string;
+  email: string;
+}
+
+const columnHelper = createColumnHelper<SimpleItem>();
+
+const columnDefs = [
+  columnHelper.accessor("id", {
+    header: "ID",
+    meta: { type: "number" },
+  }),
+  columnHelper.accessor("name", {
+    header: "Name",
+    meta: { type: "string" },
+  }),
+  columnHelper.accessor("email", {
+    header: "Email",
+    meta: { type: "string" },
+  }),
+];
+
+const data: SimpleItem[] = [
+  { id: 1, name: "John Doe", email: "john@example.com" },
+];
+
+// Wrapper component to initialize the table
+const FilterFormWrapper: React.FC<
+  Omit<FilterFormProps<SimpleItem>, "columns">
+> = (props) => {
+  const table = useReactTable<SimpleItem>({
+    data,
+    columns: columnDefs,
+    getCoreRowModel: getCoreRowModel(),
+  });
+
+  return <FilterForm<SimpleItem> {...props} columns={table.getAllColumns()} />;
+};
 
 const meta = {
   title: "shared/FilterForm",
-  component: FilterForm,
+  component: FilterFormWrapper,
   parameters: {
     layout: "centered",
   },
   tags: ["autodocs"],
   argTypes: {
-    columns: { control: "object" },
+    columns: {
+      control: false,
+      description: "`array` of tan stack `Column`",
+      required: true,
+    },
     filters: { control: "object" },
     setFilters: { control: "object" },
     handleFilterChange: { control: "object" },
@@ -22,29 +70,23 @@ const meta = {
   },
   decorators: [
     (Story) => {
-      const theme = useMUITheme();
       return (
-        <MUIThemeProvider theme={theme}>
+        <ThemeProvider>
           <Paper sx={{ p: 2 }}>
             <Story />
           </Paper>
-        </MUIThemeProvider>
+        </ThemeProvider>
       );
     },
   ],
-} satisfies Meta<typeof FilterForm>;
+};
 
 export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {
   args: {
-    columns: [
-      { id: "id", label: "ID" },
-      { id: "name", label: "Name" },
-      { id: "age", label: "Age" },
-    ],
-    filters: [{ id: 0, column: "id", operator: "eq", value: "1" }],
+    filters: [{ id: 0, parameter: "id", operator: "eq", value: "1" }],
     setFilters: () => {},
     handleFilterChange: () => {},
     handleFilterMenuClose: () => {},

@@ -1,13 +1,12 @@
 import React from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 
-import { ThemeProvider } from "@mui/material";
 import { useArgs } from "@storybook/core/preview-api";
 
 import { ApplicationsContext } from "../../contexts/ApplicationsProvider";
 import { useOidcAccessToken } from "../../mocks/react-oidc.mock";
 import { applicationList } from "../ApplicationList";
-import { useMUITheme } from "../../hooks/theme";
+import { ThemeProvider } from "../../contexts/ThemeProvider";
 import ApplicationDialog from "./ApplicationDialog";
 
 const meta = {
@@ -31,9 +30,8 @@ const meta = {
       );
     },
     (Story) => {
-      const theme = useMUITheme();
       return (
-        <ThemeProvider theme={theme}>
+        <ThemeProvider>
           <Story />
         </ThemeProvider>
       );

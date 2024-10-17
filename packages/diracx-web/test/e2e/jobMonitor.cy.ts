@@ -20,28 +20,349 @@ describe("Job Monitor", () => {
     cy.visit(
       "/?appId=JobMonitor0&dashboard=6%21%27My+dashboard%27~extended%21true~items%216*.~id430%27%29%2C-5%27~id51.%29%5D%29%5D*4+3-%28%27title.%27~type*%273Monitor4%21%27Job5*+26%5B-%016543.-*_&userDashboard=6%21%27Test+Group%27~extended%21true~items%216*.~id430%27%29%2C-5%27~id51.%29%5D%29%5D*4+3-%28%27title.%27~type*%273Monitor4%21%27Job5*+26%5B-%016543.-*_",
     );
+
+    // Is there a table with enough jobs? If not we should add some jobs
+    const checkAndAddJobs = (minNumberOfJobs) => {
+      cy.get(".MuiTablePagination-displayedRows").then(($pagination) => {
+        const lastNumber = parseInt($pagination.text().split(" ").pop() || "0");
+
+        if (lastNumber < minNumberOfJobs) {
+          const numberOfJobsToAdd = minNumberOfJobs - lastNumber;
+          addJobs(numberOfJobsToAdd);
+        } else {
+          // Ensure the table is visible
+          cy.get("table").should("be.visible");
+        }
+      });
+    };
+
+    const addJobs = (numberOfJobs) => {
+      // Retrieve the access token from session storage
+      cy.window().then((win) => {
+        const sessionData = win.sessionStorage.getItem(
+          "oidc.vo:diracAdmin group:admin",
+        );
+
+        if (!sessionData) {
+          throw new Error("Access token not found in session storage");
+        }
+
+        const accessToken = JSON.parse(sessionData).tokens.accessToken;
+
+        Cypress._.times(numberOfJobs, () => {
+          cy.request({
+            method: "POST",
+            url: "/api/jobs",
+            headers: {
+              Authorization: `Bearer ${accessToken}`,
+            },
+            body: ['Arguments = "jobDescription.xml -o LogLevel=INFO'],
+          }).then((response) => {
+            expect(response.status).to.eq(200);
+          });
+        });
+      });
+    };
+
+    cy.contains("Loading OIDC Configuration").should("not.exist");
+    cy.contains("Loading").should("not.exist");
+    cy.get('[data-testid="loading-skeleton"]').should("not.exist");
+
+    cy.get("body").then(($body) => {
+      if (
+        $body.find('div:contains("No data or no results match your filters.")')
+          .length > 0
+      ) {
+        cy.log("No data available, adding jobs");
+        addJobs(55);
+      } else {
+        cy.log("Data available, checking if enough jobs are present");
+        checkAndAddJobs(55);
+      }
+    });
   });
 
   it("should render the drawer", () => {
     cy.get("header").contains("Job Monitor").should("be.visible");
   });
 
+  /** Pagination */
+
+  it("should make sure the initial pagination is correct", () => {
+    cy.get('[aria-label="Go to previous page"]').should("be.disabled");
+    cy.get('[aria-label="Go to first page"]').should("be.disabled");
+    cy.get('[aria-label="Go to next page"]').should("not.be.disabled");
+    cy.get('[aria-label="Go to last page"]').should("not.be.disabled");
+
+    cy.get(".MuiTablePagination-displayedRows").then(($pagination) => {
+      // Extract the page index, the number of items per page and the total number of items
+      const text = $pagination.text(); // "1-25 of 55"
+      expect(text).to.match(/\d+[–-]\d+ of \d+/);
+
+      // Extract numbers using a regular expression
+      const match = text.match(/\d+/g);
+      if (match) {
+        const [pageIndexBegin, pageIndexEnd, totalItems] = match.map(Number);
+        expect(pageIndexBegin).to.equal(1);
+        expect(pageIndexEnd).to.equal(25);
+        expect(totalItems).to.be.greaterThan(50);
+      }
+    });
+
+    cy.get("table thead tr th").eq(1).should("contain.text", "ID");
+    cy.get("table tbody tr")
+      .first()
+      .find("td")
+      .eq(1)
+      .should("contain.text", "1");
+
+    cy.get('[data-testid="virtuoso-scroller"]').scrollTo("bottom");
+    cy.wait(500); // Wait for the items to load
+    cy.get("table tbody tr")
+      .last()
+      .find("td")
+      .eq(1)
+      .should("contain.text", "25");
+  });
+
+  it("should go to the next page", () => {
+    // Go to the next page
+    cy.get('[aria-label="Go to next page"]').click();
+
+    cy.get(".MuiTablePagination-displayedRows").then(($pagination) => {
+      // Extract the page index, the number of items per page and the total number of items
+      const text = $pagination.text(); // "26-50 of 55"
+      expect(text).to.match(/\d+[–-]\d+ of \d+/);
+
+      // Extract numbers using a regular expression
+      const match = text.match(/\d+/g);
+      if (match) {
+        const [pageIndexBegin, pageIndexEnd, totalItems] = match.map(Number);
+        expect(pageIndexBegin).to.equal(26);
+        expect(pageIndexEnd).to.equal(50);
+        expect(totalItems).to.be.greaterThan(50);
+      }
+    });
+
+    cy.get("table thead tr th").eq(1).should("contain.text", "ID");
+    cy.get("table tbody tr")
+      .first()
+      .find("td")
+      .eq(1)
+      .should("contain.text", "26");
+
+    cy.get('[data-testid="virtuoso-scroller"]').scrollTo("bottom");
+    cy.wait(500); // Wait for the items to load
+    cy.get("table tbody tr")
+      .last()
+      .find("td")
+      .eq(1)
+      .should("contain.text", "50");
+  });
+
+  it("should change the page size changed", () => {
+    cy.get(".MuiTablePagination-input .MuiSelect-select").click();
+    cy.contains("50").click();
+
+    cy.get(".MuiTablePagination-displayedRows").then(($pagination) => {
+      // Extract the page index, the number of items per page and the total number of items
+      const text = $pagination.text(); // "26-50 of 55"
+      expect(text).to.match(/\d+[–-]\d+ of \d+/);
+
+      // Extract numbers using a regular expression
+      const match = text.match(/\d+/g);
+      if (match) {
+        const [pageIndexBegin, pageIndexEnd, totalItems] = match.map(Number);
+        expect(pageIndexBegin).to.equal(1);
+        expect(pageIndexEnd).to.equal(50);
+        expect(totalItems).to.be.greaterThan(50);
+      }
+    });
+
+    cy.get("table thead tr th").eq(1).should("contain.text", "ID");
+    cy.get("table tbody tr")
+      .first()
+      .find("td")
+      .eq(1)
+      .should("contain.text", "1");
+
+    cy.get('[data-testid="virtuoso-scroller"]').scrollTo("bottom");
+    cy.wait(500); // Wait for the items to load
+    cy.get("table tbody tr")
+      .last()
+      .find("td")
+      .eq(1)
+      .should("contain.text", "50");
+  });
+
+  /** Row interactions */
+
+  it("should display job history dialog", () => {
+    cy.get("table tbody tr").first().find("td").eq(3).rightclick();
+
+    // A context menu should appear
+    cy.contains("Get history").should("be.visible");
+    cy.contains("Get history").click();
+
+    // A dialog should appear
+    cy.contains("Job History: 1").should("be.visible");
+  });
+
+  it("should kill jobs", () => {
+    cy.get("[data-index=1]").click();
+    cy.get("[data-index=2]").click();
+    cy.get("[data-index=3]").click();
+
+    cy.get('[data-testid="ClearIcon"] > path').click();
+
+    // Make sure the job status is "Killed"
+    cy.get("[data-index=1]").find("td").eq(2).should("contain", "Killed");
+    cy.get("[data-index=2]").find("td").eq(2).should("contain.text", "Killed");
+    cy.get("[data-index=3]").find("td").eq(2).should("contain.text", "Killed");
+  });
+
+  it("should delete jobs", () => {
+    cy.get("[data-index=1]").click();
+    cy.get("[data-index=2]").click();
+    cy.get("[data-index=3]").click();
+
+    cy.get('[data-testid="delete-jobs-button"] > path').click();
+
+    // Make sure the job status is "Deleted"
+    cy.get("[data-index=1]").find("td").eq(2).should("contain", "Deleted");
+    cy.get("[data-index=1]").find("td").eq(2).should("contain", "Deleted");
+    cy.get("[data-index=1]").find("td").eq(2).should("contain", "Deleted");
+  });
+
+  it("should reschedule jobs", () => {
+    cy.get("[data-index=1]").click();
+    cy.get("[data-index=2]").click();
+    cy.get("[data-index=3]").click();
+
+    cy.get('[data-testid="ReplayIcon"] > path').click();
+
+    // Make sure the job status is "Received"
+    cy.get("[data-index=1]").find("td").eq(2).should("contain", "Received");
+    cy.get("[data-index=1]").find("td").eq(2).should("contain", "Received");
+    cy.get("[data-index=1]").find("td").eq(2).should("contain", "Received");
+  });
+
+  /** Column interactions */
+
+  it("should hide/show columns", () => {
+    // Loop over the table column and make sure that "VO" is not present
+    cy.get("table thead tr th").each(($th) => {
+      if ($th.text() === "VO") {
+        expect($th).to.not.exist;
+      }
+      if ($th.text() === "Status") {
+        expect($th).to.exist;
+      }
+    });
+
+    // Click on the visibility icon
+    cy.get('[data-testid="VisibilityIcon"] > path').click();
+    cy.get('[data-testid="column-visibility-popover"]').should("be.visible");
+
+    // Hide the "Status" column and Show the "VO" column
+    cy.get('[data-testid="column-visibility-popover"]').within(() => {
+      cy.contains("VO").parent().find('input[type="checkbox"]').click();
+    });
+    cy.get('[data-testid="column-visibility-popover"]').within(() => {
+      cy.contains("Status").parent().find('input[type="checkbox"]').click();
+    });
+
+    // Close the popover by clicking outside
+    cy.get("body").click(0, 0);
+    cy.get('[data-testid="column-visibility-popover"]').should("not.exist");
+
+    // Loop over the table column and make sure that "VO" is present
+    cy.get("table thead tr th").each(($th) => {
+      if ($th.text() === "VO") {
+        expect($th).to.exist;
+      }
+      if ($th.text() === "Status") {
+        expect($th).to.not.exist;
+      }
+    });
+  });
+
+  it("should resize a column", () => {
+    cy.get("table thead tr th")
+      .eq(2)
+      .invoke("width")
+      .then((initialWidth) => {
+        // Convert the width to a number
+        const initialWidthNum = Number(initialWidth);
+
+        // Resize the column
+        cy.get(
+          ".MuiTableHead-root > .MuiTableRow-root > :nth-child(3) > .MuiBox-root",
+        )
+          .trigger("mousedown", { which: 1 }) // Start the drag
+          .trigger("mousemove", { clientX: 200 }) // Move to the desired location
+          .trigger("mouseup"); // Release to finish resizing
+
+        // Check if the column width has changed (it should be larger than the initial width)
+        cy.get("table thead tr th")
+          .eq(2)
+          .invoke("width")
+          .then((newWidth) => {
+            // Convert the new width to a number and compare
+            const newWidthNum = Number(newWidth);
+            expect(initialWidthNum).to.be.greaterThan(newWidthNum);
+          });
+      });
+  });
+
+  it("should sort column", () => {
+    cy.get("table tbody tr")
+      .first()
+      .find("td")
+      .eq(1)
+      .should("contain.text", "1");
+    cy.get('[data-testid="sort-JobID"]').click();
+    cy.get("table tbody tr")
+      .first()
+      .find("td")
+      .eq(1)
+      .should("not.contain.text", "1");
+    cy.get('[data-testid="sort-JobID"]').click();
+    cy.get("table tbody tr")
+      .first()
+      .find("td")
+      .eq(1)
+      .should("contain.text", "1");
+  });
+
+  /** Filters */
+
   it("should handle filter addition", () => {
+    cy.get("table").should("be.visible");
     cy.get("button").contains("Add filter").click();
+
+    // "Apply filters" button should not be visible (only the refresh button)
+    cy.get("button").contains("Refresh page").should("exist");
+    cy.get("button").contains("Apply filters").should("not.exist");
 
     cy.get(
       '[data-testid="filter-form-select-parameter"] > .MuiSelect-select',
     ).click();
-    cy.get('[data-value="JobName"]').click();
-    cy.get("#value").type("test");
-    cy.get(
-      ".css-1x33toh-MuiStack-root > .MuiStack-root > .MuiButtonBase-root",
-    ).click();
+    cy.get('[data-value="JobID"]').click();
+    cy.get("#value").type("1");
+    cy.get('[data-testid="filter-form-add-button"]').contains("Add").click();
 
     cy.get(".MuiChip-label").should("be.visible");
+    // Filters should not be applied yet
+    cy.get("table tbody tr").should("not.have.length", 1);
+
+    // "Apply filters" button should be visible (not the refresh button)
+    cy.get("button").contains("Apply filters").should("exist");
+    cy.get("button").contains("Refresh page").should("not.exist");
   });
 
   it("should handle filter deletion", () => {
+    cy.get("table").should("be.visible");
     cy.get("button").contains("Add filter").click();
 
     cy.get(
@@ -49,9 +370,7 @@ describe("Job Monitor", () => {
     ).click();
     cy.get('[data-value="JobName"]').click();
     cy.get("#value").type("test");
-    cy.get(
-      ".css-1x33toh-MuiStack-root > .MuiStack-root > .MuiButtonBase-root",
-    ).click();
+    cy.get('[data-testid="filter-form-add-button"]').contains("Add").click();
 
     cy.get(".MuiChip-label").should("be.visible");
 
@@ -60,6 +379,7 @@ describe("Job Monitor", () => {
   });
 
   it("should handle filter editing", () => {
+    cy.get("table").should("be.visible");
     cy.get("button").contains("Add filter").click();
 
     cy.get(
@@ -67,22 +387,19 @@ describe("Job Monitor", () => {
     ).click();
     cy.get('[data-value="JobName"]').click();
     cy.get("#value").type("test");
-    cy.get(
-      ".css-1x33toh-MuiStack-root > .MuiStack-root > .MuiButtonBase-root",
-    ).click();
+    cy.get('[data-testid="filter-form-add-button"]').contains("Add").click();
 
     cy.get(".MuiChip-label").should("be.visible");
 
     cy.get(".MuiChip-label").click();
     cy.get("#value").clear().type("test2");
-    cy.get(
-      ".css-1x33toh-MuiStack-root > .MuiStack-root > .MuiButtonBase-root",
-    ).click();
+    cy.get('[data-testid="filter-form-add-button"]').contains("Add").click();
 
     cy.get(".MuiChip-label").contains("test2").should("be.visible");
   });
 
   it("should handle filter clear", () => {
+    cy.get("table").should("be.visible");
     cy.get("button").contains("Add filter").click();
 
     cy.get(
@@ -90,9 +407,7 @@ describe("Job Monitor", () => {
     ).click();
     cy.get('[data-value="JobName"]').click();
     cy.get("#value").type("test");
-    cy.get(
-      ".css-1x33toh-MuiStack-root > .MuiStack-root > .MuiButtonBase-root",
-    ).click();
+    cy.get('[data-testid="filter-form-add-button"]').contains("Add").click();
 
     cy.get(".MuiChip-label").should("be.visible");
 
@@ -102,9 +417,7 @@ describe("Job Monitor", () => {
     ).click();
     cy.get('[data-value="JobName"]').click();
     cy.get("#value").type("test2");
-    cy.get(
-      ".css-1x33toh-MuiStack-root > .MuiStack-root > .MuiButtonBase-root",
-    ).click();
+    cy.get('[data-testid="filter-form-add-button"]').contains("Add").click();
 
     cy.get(".MuiChip-label").should("be.visible");
 
@@ -114,16 +427,15 @@ describe("Job Monitor", () => {
   });
 
   it("should handle filter apply and persist", () => {
+    cy.get("table").should("be.visible");
     cy.get("button").contains("Add filter").click();
 
     cy.get(
       '[data-testid="filter-form-select-parameter"] > .MuiSelect-select',
     ).click();
-    cy.get('[data-value="JobName"]').click();
-    cy.get("#value").type("test");
-    cy.get(
-      ".css-1x33toh-MuiStack-root > .MuiStack-root > .MuiButtonBase-root",
-    ).click();
+    cy.get('[data-value="JobID"]').click();
+    cy.get("#value").type("1");
+    cy.get('[data-testid="filter-form-add-button"]').contains("Add").click();
 
     cy.get(".MuiChip-label").should("be.visible");
 
@@ -132,19 +444,19 @@ describe("Job Monitor", () => {
     cy.reload();
 
     cy.get(".MuiChip-label").should("be.visible");
+    cy.get("table tbody tr").should("have.length", 1);
   });
 
   it("should handle filter apply and save filters in dashboard", () => {
+    cy.get("table").should("be.visible");
     cy.get("button").contains("Add filter").click();
 
     cy.get(
       '[data-testid="filter-form-select-parameter"] > .MuiSelect-select',
     ).click();
-    cy.get('[data-value="JobName"]').click();
-    cy.get("#value").type("test");
-    cy.get(
-      ".css-1x33toh-MuiStack-root > .MuiStack-root > .MuiButtonBase-root",
-    ).click();
+    cy.get('[data-value="JobID"]').click();
+    cy.get("#value").type("5");
+    cy.get('[data-testid="filter-form-add-button"]').contains("Add").click();
 
     cy.get(".MuiChip-label").should("be.visible");
 

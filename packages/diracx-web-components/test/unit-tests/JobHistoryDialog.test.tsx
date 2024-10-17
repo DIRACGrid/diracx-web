@@ -26,11 +26,12 @@ describe("JobHistoryDialog", () => {
         open={true}
         onClose={jest.fn()}
         historyData={historyData}
+        jobId={1}
       />,
     );
 
     // Dialog title
-    const dialogTitle = screen.getByText("Job History");
+    const dialogTitle = screen.getByText("Job History: 1");
     expect(dialogTitle).toBeInTheDocument();
 
     // Table headers
@@ -66,11 +67,12 @@ describe("JobHistoryDialog", () => {
         open={false}
         onClose={jest.fn()}
         historyData={historyData}
+        jobId={1050}
       />,
     );
 
     // Dialog title
-    const dialogTitle = screen.queryByText("Job History");
+    const dialogTitle = screen.queryByText("Job History: 1050");
     expect(dialogTitle).not.toBeInTheDocument();
 
     // Table headers
