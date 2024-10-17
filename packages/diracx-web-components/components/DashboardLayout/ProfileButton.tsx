@@ -1,16 +1,30 @@
 "use client";
 import { useOidc, useOidcAccessToken } from "@axa-fr/react-oidc";
-import { Logout } from "@mui/icons-material";
 import {
+  Info,
+  Logout,
+  CorporateFare,
+  Groups,
+  Person,
+  ExpandMore,
+} from "@mui/icons-material";
+import {
+  Accordion,
+  AccordionDetails,
+  AccordionSummary,
   Avatar,
+  Box,
   Button,
+  Chip,
   Divider,
   IconButton,
   Link,
   ListItemIcon,
   Menu,
   MenuItem,
+  Stack,
   Tooltip,
+  Typography,
 } from "@mui/material";
 import { cyan } from "@mui/material/colors";
 import React from "react";
@@ -72,7 +86,6 @@ export function ProfileButton() {
         id="account-menu"
         open={open}
         onClose={handleClose}
-        onClick={handleClose}
         slotProps={{
           paper: {
             elevation: 0,
@@ -104,10 +117,71 @@ export function ProfileButton() {
         transformOrigin={{ horizontal: "right", vertical: "top" }}
         anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
       >
-        <MenuItem onClick={handleClose}>
-          <Avatar /> Profile
+        <MenuItem disableRipple>
+          <Stack>
+            <Stack direction={"row"} spacing={1}>
+              <Tooltip title="Username">
+                <Person color="action" />
+              </Tooltip>
+              <Typography variant="subtitle1">
+                {accessTokenPayload["preferred_username"]}
+              </Typography>
+            </Stack>
+            <Divider />
+
+            <Box mt={1} />
+
+            <Stack direction={"row"} spacing={1}>
+              <Tooltip title="Group">
+                <Groups color="action" />
+              </Tooltip>
+              <Typography variant="body2">
+                {accessTokenPayload["dirac_group"]}
+              </Typography>
+            </Stack>
+
+            <Stack direction={"row"} spacing={1}>
+              <Tooltip title="VO">
+                <CorporateFare color="action" />
+              </Tooltip>
+              <Typography variant="body2">
+                {accessTokenPayload["vo"]}
+              </Typography>
+            </Stack>
+
+            <Box mt={2} />
+
+            <Accordion>
+              <AccordionSummary
+                expandIcon={<ExpandMore />}
+                aria-controls="panel1a-content"
+                id="panel1a-header"
+              >
+                <Typography>Properties</Typography>
+              </AccordionSummary>
+              <AccordionDetails>
+                <Stack spacing={1} flexWrap="wrap">
+                  {accessTokenPayload["dirac_properties"]?.map(
+                    (property: string, index: number) => (
+                      <Chip key={index} label={property} sx={{ m: 0.5 }} />
+                    ),
+                  )}
+                </Stack>
+              </AccordionDetails>
+            </Accordion>
+          </Stack>
         </MenuItem>
         <Divider />
+        <MenuItem
+          onClick={() => {
+            handleClose();
+          }}
+        >
+          <ListItemIcon>
+            <Info fontSize="small" />
+          </ListItemIcon>
+          About
+        </MenuItem>
         <MenuItem
           onClick={() => {
             handleClose();

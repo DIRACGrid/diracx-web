@@ -1,10 +1,10 @@
 "use client";
 import { Accordion, AccordionDetails, AccordionSummary } from "@mui/material";
-import { ExpandMore } from "@mui/icons-material";
+import { ExpandMore, Apps } from "@mui/icons-material";
 import React, { useEffect } from "react";
 import { dropTargetForElements } from "@atlaskit/pragmatic-drag-and-drop/element/adapter";
-import { UserSection } from "@/types/UserSection";
 import DrawerItem from "./DrawerItem";
+import { DashboardGroup } from "@/types/DashboardGroup";
 
 /**
  * Represents a group of items in a drawer.
@@ -15,13 +15,13 @@ import DrawerItem from "./DrawerItem";
  */
 export default function DrawerItemGroup({
   group: { title, extended: expanded, items },
-  setSections,
+  setUserDashboard,
   handleContextMenu,
 }: {
   /** The group object containing the title, expanded state, and items. */
-  group: UserSection;
-  /** The function to set the sections state. */
-  setSections: React.Dispatch<React.SetStateAction<UserSection[]>>;
+  group: DashboardGroup;
+  /** The function to set the user dashboard state. */
+  setUserDashboard: React.Dispatch<React.SetStateAction<DashboardGroup[]>>;
   /** The function to handle the context menu. */
   handleContextMenu: (
     type: "group" | "item" | null,
@@ -44,7 +44,7 @@ export default function DrawerItemGroup({
       onDragStart: () => setHovered(true),
       onDrop: () => {
         setHovered(false);
-        handleChange(title)(null, true);
+        handleChange(title)({} as React.ChangeEvent<unknown>, true);
       },
       onDragEnter: () => setHovered(true),
       onDragLeave: () => setHovered(false),
@@ -52,16 +52,15 @@ export default function DrawerItemGroup({
   });
 
   // Handles expansion of the accordion group
-  const handleChange = (title: string) => (event: any, isExpanded: any) => {
-    // Set the extended state of the accordion group.
-    setSections((sections) =>
-      sections.map((section) =>
-        section.title === title
-          ? { ...section, extended: isExpanded }
-          : section,
-      ),
-    );
-  };
+  const handleChange =
+    (title: string) => (_: React.ChangeEvent<unknown>, isExpanded: boolean) => {
+      // Set the extended state of the accordion group.
+      setUserDashboard((groups) =>
+        groups.map((group) =>
+          group.title === title ? { ...group, extended: isExpanded } : group,
+        ),
+      );
+    };
   return (
     <Accordion
       sx={{
@@ -80,7 +79,7 @@ export default function DrawerItemGroup({
         {items.map(({ title: itemTitle, id, icon }, index) => (
           <div onContextMenu={handleContextMenu("item", id)} key={id}>
             <DrawerItem
-              item={{ title: itemTitle, id, icon }}
+              item={{ title: itemTitle, id, icon: icon || Apps }}
               index={index}
               groupTitle={title}
             />

@@ -11,7 +11,7 @@ import ApplicationHeader from "@/components/shared/ApplicationHeader";
 export default function JobMonitor({
   headerSize,
 }: {
-  /**  The size of the header, optional, will default to h4 */
+  /**  The size of the header, optional */
   headerSize?: "h1" | "h2" | "h3" | "h4" | "h5" | "h6";
 }) {
   return (

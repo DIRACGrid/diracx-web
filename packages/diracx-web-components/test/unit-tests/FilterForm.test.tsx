@@ -12,8 +12,8 @@ describe("FilterForm", () => {
     { id: "column5", label: "Column 5", type: "DateTime" },
   ];
   const filters = [
-    { id: 1, column: "column1", operator: "eq", value: "value1" },
-    { id: 2, column: "column2", operator: "neq", value: "value2" },
+    { id: 1, parameter: "column1", operator: "eq", value: "value1" },
+    { id: 2, parameter: "column2", operator: "neq", value: "value2" },
   ];
   const setFilters = jest.fn();
   const handleFilterChange = jest.fn();
@@ -31,13 +31,13 @@ describe("FilterForm", () => {
       />,
     );
 
-    const columnSelect = screen.getByTestId("filter-form-select-column");
+    const columnSelect = screen.getByTestId("filter-form-select-parameter");
     const operatorSelect = screen.getByTestId("filter-form-select-operator");
-    const valueInput = screen.getByLabelText("Value");
+    const valueInput = screen.getByLabelText("Value") as HTMLInputElement;
 
-    expect(columnSelect).not.toHaveTextContent();
+    expect(columnSelect).not.toHaveTextContent("Column");
     expect(operatorSelect).toHaveTextContent("equals to");
-    expect(valueInput.value).not.toBe();
+    expect(valueInput.value).not.toBe("value1");
   });
 
   it("renders the filter form with correct initial values when a filter is selected", () => {
@@ -52,9 +52,9 @@ describe("FilterForm", () => {
       />,
     );
 
-    const columnSelect = screen.getByTestId("filter-form-select-column");
+    const columnSelect = screen.getByTestId("filter-form-select-parameter");
     const operatorSelect = screen.getByTestId("filter-form-select-operator");
-    const valueInput = screen.getByLabelText("Value");
+    const valueInput = screen.getByLabelText("Value") as HTMLInputElement;
 
     expect(columnSelect).toHaveTextContent("Column 1");
     expect(operatorSelect).toHaveTextContent("equals to");
@@ -73,9 +73,9 @@ describe("FilterForm", () => {
       />,
     );
 
-    const columnSelect = screen.getByTestId("filter-form-select-column");
+    const columnSelect = screen.getByTestId("filter-form-select-parameter");
     const operatorSelect = screen.getByTestId("filter-form-select-operator");
-    const valueInput = screen.getByLabelText("Value");
+    const valueInput = screen.getByLabelText("Value") as HTMLInputElement;
 
     expect(columnSelect).toHaveTextContent("Column 2");
     expect(operatorSelect).toHaveTextContent("not equals to");
@@ -123,7 +123,7 @@ describe("FilterForm", () => {
 
     expect(setFilters).toHaveBeenCalledWith([
       ...filters,
-      { id: expect.any(Number), column: "", operator: "eq", value: "" },
+      { id: expect.any(Number), parameter: "", operator: "eq", value: "" },
     ]);
     expect(handleFilterChange).not.toHaveBeenCalled();
     expect(handleFilterMenuClose).toHaveBeenCalled();
@@ -144,7 +144,7 @@ describe("FilterForm", () => {
     const applyChangesButton = screen.getByLabelText("Finish editing filter");
 
     // Simulate a click event on the column Select element
-    const columnSelect = screen.getByTestId("filter-form-select-column");
+    const columnSelect = screen.getByTestId("filter-form-select-parameter");
     const columnButton = within(columnSelect).getByRole("combobox");
     fireEvent.mouseDown(columnButton);
 
@@ -157,7 +157,7 @@ describe("FilterForm", () => {
     expect(setFilters).toHaveBeenCalled();
     expect(handleFilterChange).toHaveBeenCalledWith(0, {
       id: 1,
-      column: "column3",
+      parameter: "column3",
       operator: "eq",
       value: "value1",
     });
@@ -176,7 +176,7 @@ describe("FilterForm", () => {
       />,
     );
 
-    const columnSelect = screen.getByTestId("filter-form-select-column");
+    const columnSelect = screen.getByTestId("filter-form-select-parameter");
     const columnButton = within(columnSelect).getByRole("combobox");
     fireEvent.mouseDown(columnButton);
     const columnOption = screen.getByText("Column 5");
@@ -212,7 +212,7 @@ describe("FilterForm", () => {
       />,
     );
 
-    const columnSelect = screen.getByTestId("filter-form-select-column");
+    const columnSelect = screen.getByTestId("filter-form-select-parameter");
     const columnButton = within(columnSelect).getByRole("combobox");
     fireEvent.mouseDown(columnButton);
     const columnOption = screen.getByText("Column 4");

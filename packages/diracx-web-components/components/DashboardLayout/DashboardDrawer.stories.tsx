@@ -8,6 +8,7 @@ import { useMUITheme } from "../../hooks/theme";
 import { useOidc, useOidcAccessToken } from "../../mocks/react-oidc.mock";
 import { ApplicationsContext } from "../../contexts/ApplicationsProvider";
 import { applicationList } from "../ApplicationList";
+import { DashboardGroup } from "../../types";
 import DashboardDrawer from "./DashboardDrawer";
 
 const meta = {
@@ -20,7 +21,9 @@ const meta = {
   decorators: [
     (Story) => {
       const theme = useMUITheme();
-      const [sections, setSections] = React.useState([
+      const [userDashboard, setUserDashboard] = React.useState<
+        DashboardGroup[]
+      >([
         {
           title: "Group Title",
           extended: true,
@@ -36,7 +39,7 @@ const meta = {
       ]);
       return (
         <ApplicationsContext.Provider
-          value={[sections, setSections, applicationList]}
+          value={[userDashboard, setUserDashboard, applicationList]}
         >
           <MUIThemeProvider theme={theme}>
             <Box sx={{ width: "240px", height: "50vh" }}>

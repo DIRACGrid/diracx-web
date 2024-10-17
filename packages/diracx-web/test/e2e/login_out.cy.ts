@@ -45,8 +45,16 @@ describe("Login and Logout", () => {
     cy.contains("Login").should("not.exist");
     cy.contains("Hello admin").should("exist");
 
-    // Logout
+    // Click on the user avatar
     cy.get(".MuiAvatar-root").click();
+    // Check the user details
+    cy.contains("admin").should("exist");
+    cy.contains("diracAdmin").should("exist");
+    // Check the Properties accordion
+    cy.contains("Properties").click();
+    cy.contains("NormalUser").should("exist");
+
+    // Logout
     cy.contains("Logout").click();
 
     // The user is redirected back to the /auth page

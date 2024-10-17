@@ -12,11 +12,11 @@ describe("FilterToolbar", () => {
     { id: "column3", label: "Column 3" },
   ];
   const filters = [
-    { id: 1, column: "column1", operator: "eq", value: "value1" },
-    { id: 2, column: "column2", operator: "neq", value: "value2" },
+    { id: 1, parameter: "column1", operator: "eq", value: "value1" },
+    { id: 2, parameter: "column2", operator: "neq", value: "value2" },
   ];
   const appliedFilters = [
-    { id: 1, column: "column1", operator: "eq", value: "value1" },
+    { id: 1, parameter: "column1", operator: "eq", value: "value1" },
   ];
   const setFilters = jest.fn();
   const handleApplyFilters = jest.fn();
@@ -64,7 +64,7 @@ describe("FilterToolbar", () => {
 
     appliedFilters.push({
       id: 2,
-      column: "column2",
+      parameter: "column2",
       operator: "neq",
       value: "value2",
     });

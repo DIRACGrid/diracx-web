@@ -6,9 +6,9 @@ import { useEffect, useState } from "react";
  * @param args - URL, access token, body and method
  * @returns a promise
  */
-export const fetcher = async (
-  args: [string, string?, string?, any?],
-): Promise<{ headers: Headers; data: any }> => {
+export async function fetcher<T>(
+  args: [string, string?, string?, unknown?],
+): Promise<{ headers: Headers; data: T }> {
   const [url, accessToken, method = "GET", body] = args;
   const headers = {
     "Content-Type": "application/json",
@@ -18,16 +18,16 @@ export const fetcher = async (
   const response = await fetch(url, {
     method: method,
     headers: headers,
-    ...(body && { body: JSON.stringify(body) }),
+    body: body ? JSON.stringify(body) : undefined,
   });
 
   if (!response.ok) throw new Error("Failed to fetch data");
 
-  const data = await response.json();
+  const data = (await response.json()) as T;
   const responseHeaders = response.headers;
 
   return { headers: responseHeaders, data };
-};
+}
 
 /**
  * Custom hook to get the diracx installation URL

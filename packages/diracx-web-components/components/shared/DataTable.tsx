@@ -28,11 +28,12 @@ import {
 } from "@mui/material";
 import { cyan } from "@mui/material/colors";
 import { TableComponents, TableVirtuoso } from "react-virtuoso";
-import { Filter } from "@/types/Filter";
+import { FilterToolbar } from "./FilterToolbar";
+import { InternalFilter } from "@/types/Filter";
 import { Column } from "@/types/Column";
 import { useSearchParamsUtils } from "@/hooks/searchParamsUtils";
 import { ApplicationsContext } from "@/contexts/ApplicationsProvider";
-import { FilterToolbar } from "./FilterToolbar";
+import { DashboardGroup, SearchBody } from "@/types";
 
 /**
  * Menu item
@@ -131,77 +132,6 @@ function DataTableToolbar(props: DataTableToolbarProps) {
   );
 }
 
-interface TableContextProps {
-  rowIdentifier: string;
-  handleClick: (event: React.MouseEvent, id: number) => void;
-  handleContextMenu: (event: React.MouseEvent, id: number) => void;
-  isSelected: (id: number) => boolean;
-  isMobile: boolean;
-}
-
-// Virtuoso table components: https://virtuoso.dev/
-// Used to render large tables with virtualization, which improves performance
-const VirtuosoTableComponents: TableComponents<Record<string, any>> = {
-  Scroller: React.forwardRef<HTMLDivElement>(function Scroller(props, ref) {
-    return <TableContainer component={Paper} {...props} ref={ref} />;
-  }),
-  Table: function VirtuosoTable(props) {
-    const { isMobile } = props.context as TableContextProps;
-    return (
-      <Table
-        {...props}
-        sx={{
-          borderCollapse: "separate",
-          tableLayout: "fixed",
-          minWidth: isMobile ? "undefined" : "50vw",
-        }}
-        aria-labelledby="tableTitle"
-        size={"small"}
-      />
-    );
-  },
-  TableHead: React.forwardRef<HTMLTableSectionElement>(
-    function VirtuosoTableHead(props, ref) {
-      return <TableHead {...props} ref={ref} />;
-    },
-  ),
-  TableRow: function VirtuosoTableRow({
-    item,
-    ...props
-  }: {
-    item: Record<string, any>;
-    [key: string]: any;
-  }) {
-    const { rowIdentifier, handleClick, handleContextMenu, isSelected } =
-      props.context as TableContextProps;
-
-    if (item) {
-      return (
-        <TableRow
-          {...props}
-          hover
-          onClick={(event) => handleClick(event, item[rowIdentifier])}
-          role="checkbox"
-          aria-checked={isSelected(item[rowIdentifier])}
-          tabIndex={-1}
-          key={item[rowIdentifier]}
-          selected={isSelected(item[rowIdentifier])}
-          onContextMenu={(event) =>
-            handleContextMenu(event, item[rowIdentifier])
-          }
-          style={{ cursor: "context-menu" }}
-        />
-      );
-    }
-    return <TableRow {...props} />;
-  },
-  TableBody: React.forwardRef<HTMLTableSectionElement>(
-    function VirtuosoTableBody(props, ref) {
-      return <TableBody {...props} ref={ref} />;
-    },
-  ),
-};
-
 /**
  * Data table props
  * @property {string} title - the title of the table
@@ -215,14 +145,14 @@ const VirtuosoTableComponents: TableComponents<Record<string, any>> = {
  * @property {function} setFilters - the function to call when the filters change
  * @property {function} setSearchBody - the function to call when the search body changes
  * @property {Column[]} columns - the columns of the table
- * @property {any[]} rows - the rows of the table
+ * @property {T[]} rows - the rows of the table
  * @property {string | null} error - the error message
  * @property {string} rowIdentifier - the identifier for the rows
  * @property {boolean} isMobile - whether the table is displayed on a mobile device
  * @property {JSX.Element} toolbarComponents - the components to display in the toolbar
  * @property {MenuItem[]} menuItems - the menu items
  */
-interface DataTableProps {
+interface DataTableProps<T extends Record<string, unknown>> {
   /** The title of the table */
   title: string;
   /** The current page */
@@ -248,15 +178,15 @@ interface DataTableProps {
   /** The function to call when the selected rows change */
   setSelected: React.Dispatch<React.SetStateAction<readonly number[]>>;
   /** The filters to apply */
-  filters: Filter[];
+  filters: InternalFilter[];
   /** The function to call when the filters change */
-  setFilters: React.Dispatch<React.SetStateAction<Filter[]>>;
+  setFilters: React.Dispatch<React.SetStateAction<InternalFilter[]>>;
   /** The function to call when the search body changes */
-  setSearchBody: (searchBody: any) => void;
+  setSearchBody: React.Dispatch<React.SetStateAction<SearchBody>>;
   /** The columns of the table */
   columns: Column[];
   /** The rows of the table */
-  rows: any[];
+  rows: T[];
   /** The error message */
   error: string | null;
   /** Whether the table is validating */
@@ -264,7 +194,7 @@ interface DataTableProps {
   /** Whether the table is loading */
   isLoading: boolean;
   /** The identifier for the rows */
-  rowIdentifier: string;
+  rowIdentifier: keyof T;
   /** Whether the table is displayed on a mobile device */
   isMobile: boolean;
   /** The components to display in the toolbar */
@@ -278,7 +208,9 @@ interface DataTableProps {
  *
  * @returns a DataTable component
  */
-export function DataTable(props: DataTableProps) {
+export function DataTable<T extends Record<string, unknown>>(
+  props: DataTableProps<T>,
+) {
   const {
     title,
     page,
@@ -311,56 +243,58 @@ export function DataTable(props: DataTableProps) {
     mouseY: number | null;
     id: number | null;
   }>({ mouseX: null, mouseY: null, id: null });
-  const { getAllParam, getParam, setParam } = useSearchParamsUtils();
+  const { getParam, setParam } = useSearchParamsUtils();
   const appId = getParam("appId");
 
-  const [appliedFilters, setAppliedFilters] = React.useState<Filter[]>(filters);
+  const [appliedFilters, setAppliedFilters] =
+    React.useState<InternalFilter[]>(filters);
 
   const updateFiltersAndUrl = React.useCallback(
-    (newFilters: Filter[]) => {
+    (newFilters: InternalFilter[]) => {
       // Update the filters in the URL using the setParam function
       setParam(
         "filter",
         newFilters.map(
           (filter) =>
-            `${filter.id}_${filter.column}_${filter.operator}_${filter.value}`,
+            `${filter.id}_${filter.parameter}_${filter.operator}_${filter.value}`,
         ),
       );
     },
     [setParam],
   );
 
-  const [sections, setSections] = React.useContext(ApplicationsContext);
-  const updateSectionFilters = React.useCallback(
-    (newFilters: Filter[]) => {
+  const [userDashboard, setUserDashboard] =
+    React.useContext(ApplicationsContext);
+  const updateGroupFilters = React.useCallback(
+    (newFilters: InternalFilter[]) => {
       const appId = getParam("appId");
 
-      const section = sections.find((section) =>
-        section.items.some((item) => item.id === appId),
+      const group = userDashboard.find((group) =>
+        group.items.some((item) => item.id === appId),
       );
-      if (section) {
-        const newSection = {
-          ...section,
-          items: section.items.map((item) => {
+      if (group) {
+        const newGroup = {
+          ...group,
+          items: group.items.map((item) => {
             if (item.id === appId) {
-              return { ...item, data: { filters: newFilters } };
+              return { ...item, data: newFilters };
             }
             return item;
           }),
         };
-        setSections((sections) =>
-          sections.map((s) => (s.title === section.title ? newSection : s)),
+        setUserDashboard((groups: DashboardGroup[]) =>
+          groups.map((s) => (s.title === group.title ? newGroup : s)),
         );
       }
     },
-    [getParam, sections, setSections],
+    [getParam, userDashboard, setUserDashboard],
   );
 
   // Handle the application of filters
   const handleApplyFilters = () => {
-    // Transform list of filters into a json object
+    // Transform list of internal filters into filters
     const jsonFilters = filters.map((filter) => ({
-      parameter: filter.column,
+      parameter: filter.parameter,
       operator: filter.operator,
       value: filter.value,
       values: filter.values,
@@ -371,24 +305,24 @@ export function DataTable(props: DataTableProps) {
 
     // Update the filters in the URL
     updateFiltersAndUrl(filters);
-    // Update the filters in the sections
-    updateSectionFilters(filters);
+    // Update the filters in the groups
+    updateGroupFilters(filters);
   };
 
-  const SectionItem = React.useMemo(
+  const DashboardItem = React.useMemo(
     () =>
-      sections
-        .find((section) => section.items.some((item) => item.id === appId))
+      userDashboard
+        .find((group) => group.items.some((item) => item.id === appId))
         ?.items.find((item) => item.id === appId),
-    [appId, sections],
+    [appId, userDashboard],
   );
 
   React.useEffect(() => {
-    if (SectionItem?.data?.filters) {
-      setFilters(SectionItem.data.filters);
-      setAppliedFilters(SectionItem.data.filters);
-      const jsonFilters = SectionItem.data.filters.map((filter: Filter) => ({
-        parameter: filter.column,
+    if (DashboardItem?.data) {
+      setFilters(DashboardItem.data);
+      setAppliedFilters(DashboardItem.data);
+      const jsonFilters = DashboardItem.data.map((filter: InternalFilter) => ({
+        parameter: filter.parameter,
         operator: filter.operator,
         value: filter.value,
         values: filter.values,
@@ -398,17 +332,17 @@ export function DataTable(props: DataTableProps) {
       setFilters([]);
       setSearchBody({ search: [] });
     }
-  }, [SectionItem?.data?.filters, setFilters, setSearchBody]);
+  }, [DashboardItem?.data, setFilters, setSearchBody]);
 
   // Manage sorting
   const handleRequestSort = (
     event: React.MouseEvent<unknown>,
-    property: string | number,
+    property: string,
   ) => {
     const isAsc = orderBy === property && order === "asc";
     setOrder(isAsc ? "desc" : "asc");
     setOrderBy(property);
-    setSearchBody((prevState: any) => ({
+    setSearchBody((prevState: SearchBody) => ({
       ...prevState,
       sort: [{ parameter: property, direction: isAsc ? "desc" : "asc" }],
     }));
@@ -417,7 +351,7 @@ export function DataTable(props: DataTableProps) {
   // Manage selection
   const handleSelectAllClick = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.checked) {
-      const newSelected = rows.map((n: any) => n[rowIdentifier]);
+      const newSelected = rows.map((n: T) => n[rowIdentifier] as number);
       setSelected(newSelected);
       return;
     }
@@ -470,6 +404,83 @@ export function DataTable(props: DataTableProps) {
 
   const handleCloseContextMenu = () => {
     setContextMenu({ mouseX: null, mouseY: null, id: null });
+  };
+
+  // Virtuoso table components: https://virtuoso.dev/
+  // Used to render large tables with virtualization, which improves performance
+  interface TableContextProps {
+    rowIdentifier: keyof T;
+    handleClick: (event: React.MouseEvent, id: number) => void;
+    handleContextMenu: (event: React.MouseEvent, id: number) => void;
+    isSelected: (id: number) => boolean;
+    isMobile: boolean;
+  }
+
+  interface TableRowProps {
+    item: T;
+    context?: TableContextProps;
+    "data-index"?: number;
+  }
+
+  const VirtuosoTableComponents: TableComponents<T, TableContextProps> = {
+    Scroller: React.forwardRef<HTMLDivElement>(function Scroller(props, ref) {
+      return <TableContainer component={Paper} {...props} ref={ref} />;
+    }),
+    Table: function VirtuosoTable(props) {
+      const { isMobile } = props.context as TableContextProps;
+      return (
+        <Table
+          {...props}
+          sx={{
+            borderCollapse: "separate",
+            tableLayout: "fixed",
+            minWidth: isMobile ? "undefined" : "50vw",
+          }}
+          aria-labelledby="tableTitle"
+          size={"small"}
+        />
+      );
+    },
+    TableHead: React.forwardRef<HTMLTableSectionElement>(
+      function VirtuosoTableHead(props, ref) {
+        return <TableHead {...props} ref={ref} />;
+      },
+    ),
+    TableRow: function VirtuosoTableRow(props: TableRowProps) {
+      const { item, context } = props;
+
+      if (!context) {
+        return <TableRow {...props} />;
+      }
+
+      const { rowIdentifier, handleClick, handleContextMenu, isSelected } =
+        context || {};
+
+      const itemId = item[rowIdentifier];
+      if (typeof itemId !== "number") {
+        return <TableRow {...props} />;
+      }
+
+      return (
+        <TableRow
+          {...props}
+          hover
+          onClick={(event) => handleClick(event, itemId)}
+          role="checkbox"
+          aria-checked={isSelected(itemId)}
+          tabIndex={-1}
+          key={itemId}
+          selected={isSelected(itemId)}
+          onContextMenu={(event) => handleContextMenu(event, itemId)}
+          style={{ cursor: "context-menu" }}
+        />
+      );
+    },
+    TableBody: React.forwardRef<HTMLTableSectionElement>(
+      function VirtuosoTableBody(props, ref) {
+        return <TableBody {...props} ref={ref} />;
+      },
+    ),
   };
 
   // Wait for the data to load
@@ -553,7 +564,7 @@ export function DataTable(props: DataTableProps) {
           toolbarComponents={toolbarComponents}
         />
         <TableContainer sx={{ height: "65vh", width: "100%" }}>
-          <TableVirtuoso
+          <TableVirtuoso<T, TableContextProps>
             data={rows}
             components={VirtuosoTableComponents}
             context={{
@@ -565,8 +576,7 @@ export function DataTable(props: DataTableProps) {
             }}
             fixedHeaderContent={() => {
               const createSortHandler =
-                (property: string | number) =>
-                (event: React.MouseEvent<unknown>) => {
+                (property: string) => (event: React.MouseEvent<unknown>) => {
                   handleRequestSort(event, property);
                 };
 
@@ -587,13 +597,13 @@ export function DataTable(props: DataTableProps) {
                   </TableCell>
                   {columns.map((headCell) => (
                     <TableCell
-                      key={headCell.id}
+                      key={String(headCell.id)}
                       sortDirection={orderBy === headCell.id ? order : false}
                     >
                       <TableSortLabel
                         active={orderBy === headCell.id}
                         direction={orderBy === headCell.id ? order : "asc"}
-                        onClick={createSortHandler(headCell.id)}
+                        onClick={createSortHandler(String(headCell.id))}
                       >
                         {headCell.label}
                         {orderBy === headCell.id ? (
@@ -609,8 +619,8 @@ export function DataTable(props: DataTableProps) {
                 </TableRow>
               );
             }}
-            itemContent={(index: number, row: Record<string, any>) => {
-              const isItemSelected = isSelected(row[rowIdentifier]);
+            itemContent={(index: number, row: T) => {
+              const isItemSelected = isSelected(row[rowIdentifier] as number);
               const labelId = `enhanced-table-checkbox-${index}`;
 
               return (
@@ -625,8 +635,10 @@ export function DataTable(props: DataTableProps) {
                   {columns.map((column) => {
                     const cellValue = row[column.id];
                     return (
-                      <TableCell key={column.id}>
-                        {column.render ? column.render(cellValue) : cellValue}
+                      <TableCell key={String(column.id)}>
+                        {column.render
+                          ? column.render(cellValue)
+                          : String(cellValue)}
                       </TableCell>
                     );
                   })}

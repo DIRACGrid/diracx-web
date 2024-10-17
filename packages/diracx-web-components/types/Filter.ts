@@ -6,9 +6,15 @@
  * @property {string[]} values - the values to filter by if there are multiple
  */
 export interface Filter {
-  id: number;
-  column: string;
+  parameter: string;
   operator: string;
   value?: string;
   values?: string[];
+}
+
+/** Internal Filter type
+ * @property {number} id - the id of the filter
+ */
+export interface InternalFilter extends Filter {
+  id: number;
 }

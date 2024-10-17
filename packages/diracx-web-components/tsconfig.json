@@ -17,7 +17,13 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "jsx": "react-jsx",
-    "types": ["react", "react-dom", "node"],
+    "types": [
+      "react",
+      "react-dom",
+      "node",
+      "jest",
+      "@testing-library/jest-dom"
+    ],
     "plugins": [
       {
         "name": "next"
@@ -36,6 +42,6 @@
     "tsup.config.ts",
     "jest.setup.ts",
     "**/*.stories.*",
-    "mocks",
+    "mocks"
   ]
 }

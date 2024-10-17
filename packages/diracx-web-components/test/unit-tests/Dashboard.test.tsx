@@ -1,11 +1,12 @@
 import React from "react";
 import { render, fireEvent } from "@testing-library/react";
 import { useOidc, useOidcAccessToken } from "@axa-fr/react-oidc";
+import { Dashboard as DashboardIcon } from "@mui/icons-material";
 import Dashboard from "@/components/DashboardLayout/Dashboard";
 import DashboardDrawer from "@/components/DashboardLayout/DashboardDrawer";
 import { ThemeProvider } from "@/contexts/ThemeProvider";
 import { ApplicationsContext } from "@/contexts/ApplicationsProvider";
-import { UserSection } from "@/types/UserSection";
+import { DashboardGroup } from "@/types/DashboardGroup";
 import { applicationList } from "@/components/ApplicationList";
 
 // Mock the module
@@ -19,7 +20,7 @@ jest.mock("jsoncrush", () => ({
   uncrush: jest.fn().mockImplementation((data) => data.replace("crushed-", "")),
 }));
 
-let mockSections: UserSection[] = [
+const mockSections: DashboardGroup[] = [
   {
     title: "Group 1",
     extended: true,
@@ -28,7 +29,7 @@ let mockSections: UserSection[] = [
         title: "App 1",
         id: "app1",
         type: "Dashboard",
-        icon: () => <div>App 1 Icon</div>,
+        icon: DashboardIcon,
       },
     ],
   },
@@ -38,13 +39,7 @@ const MockApplicationProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }): JSX.Element => (
   <ApplicationsContext.Provider
-    value={[
-      mockSections,
-      jest.fn((test) => {
-        mockSections = test();
-      }),
-      applicationList,
-    ]}
+    value={[mockSections, () => {}, applicationList]}
   >
     {children}
   </ApplicationsContext.Provider>
@@ -114,19 +109,33 @@ describe("<DashboardDrawer>", () => {
     const { getByText } = render(
       <ThemeProvider>
         <MockApplicationProvider>
-          <DashboardDrawer variant="permanent" />
+          <DashboardDrawer
+            variant="permanent"
+            mobileOpen={false}
+            width={100}
+            handleDrawerToggle={function (): void {
+              throw new Error("Function not implemented.");
+            }}
+          />
         </MockApplicationProvider>
       </ThemeProvider>,
     );
 
-    expect(getByText("App 1 Icon")).toBeInTheDocument();
+    expect(getByText("App 1")).toBeInTheDocument();
   });
 
   it("handles context menu", () => {
     const { getByText, getByTestId } = render(
       <ThemeProvider>
         <MockApplicationProvider>
-          <DashboardDrawer variant="permanent" />
+          <DashboardDrawer
+            variant="permanent"
+            mobileOpen={false}
+            width={100}
+            handleDrawerToggle={function (): void {
+              throw new Error("Function not implemented.");
+            }}
+          />
         </MockApplicationProvider>
       </ThemeProvider>,
     );

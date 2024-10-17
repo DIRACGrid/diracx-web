@@ -16,7 +16,7 @@ export interface ApplicationHeaderProps {
  */
 export default function ApplicationHeader({
   type,
-  size = "h4",
+  size = "h5",
 }: ApplicationHeaderProps) {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
