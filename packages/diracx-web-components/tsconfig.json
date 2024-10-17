@@ -33,7 +33,7 @@
       "@/*": ["./*"]
     }
   },
-  "include": ["**/*.ts", "**/*.tsx"],
+  "include": ["global.d.ts", "**/*.ts", "**/*.tsx"],
   "exclude": [
     "app",
     "node_modules",

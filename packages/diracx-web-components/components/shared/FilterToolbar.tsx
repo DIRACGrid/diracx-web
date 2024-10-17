@@ -1,20 +1,21 @@
 import React from "react";
-import { FilterList, Delete, Send } from "@mui/icons-material";
+import { grey } from "@mui/material/colors";
+import { FilterList, Delete, Send, Refresh } from "@mui/icons-material";
 import Chip from "@mui/material/Chip";
 import Button from "@mui/material/Button";
-import { Alert, Popover, Stack, Tooltip } from "@mui/material";
+import { Alert, Box, Popover, Stack, Tooltip } from "@mui/material";
+import { Column } from "@tanstack/react-table";
 import { FilterForm } from "./FilterForm";
 import { InternalFilter } from "@/types/Filter";
-import { Column } from "@/types/Column";
 import "@/hooks/theme";
 
 /**
  * Filter toolbar component
  * @param {FilterToolbarProps} props - the props for the component
  */
-interface FilterToolbarProps {
+export interface FilterToolbarProps<T extends Record<string, unknown>> {
   /** The columns of the data table */
-  columns: Column[];
+  columns: Column<T>[];
   /** The filters to apply */
   filters: InternalFilter[];
   /** The function to set the filters */
@@ -23,6 +24,8 @@ interface FilterToolbarProps {
   appliedFilters: InternalFilter[];
   /** The function to apply the filters */
   handleApplyFilters: () => void;
+  /** The function to remove all filters */
+  handleClearFilters: () => void;
 }
 
 /**
@@ -30,9 +33,17 @@ interface FilterToolbarProps {
  *
  * @returns a FilterToolbar component
  */
-export function FilterToolbar(props: FilterToolbarProps) {
-  const { columns, filters, setFilters, appliedFilters, handleApplyFilters } =
-    props;
+export function FilterToolbar<T extends Record<string, unknown>>(
+  props: FilterToolbarProps<T>,
+) {
+  const {
+    columns,
+    filters,
+    setFilters,
+    appliedFilters,
+    handleApplyFilters,
+    handleClearFilters,
+  } = props;
   const [anchorEl, setAnchorEl] = React.useState<HTMLElement | null>(null);
   const [selectedFilter, setSelectedFilter] =
     React.useState<InternalFilter | null>(null);
@@ -51,10 +62,6 @@ export function FilterToolbar(props: FilterToolbarProps) {
     setSelectedFilter(newFilter);
     setAnchorEl(addFilterButtonRef.current);
   }, [setSelectedFilter, setAnchorEl]);
-
-  const handleRemoveAllFilters = React.useCallback(() => {
-    setFilters([]);
-  }, [setFilters]);
 
   const handleFilterChange = (index: number, newFilter: InternalFilter) => {
     const updatedFilters = filters.map((filter, i) =>
@@ -126,7 +133,7 @@ export function FilterToolbar(props: FilterToolbarProps) {
           case "c":
             event.preventDefault();
             event.stopPropagation();
-            handleRemoveAllFilters();
+            handleClearFilters();
             break;
           default:
             break;
@@ -144,7 +151,7 @@ export function FilterToolbar(props: FilterToolbarProps) {
     return () => {
       window.removeEventListener("keydown", debouncedHandleKeyPress);
     };
-  }, [handleAddFilter, handleApplyFilters, handleRemoveAllFilters]);
+  }, [handleAddFilter, handleApplyFilters, handleClearFilters]);
 
   return (
     <>
@@ -165,11 +172,12 @@ export function FilterToolbar(props: FilterToolbarProps) {
           <span>
             <Button
               variant="text"
-              startIcon={<Send />}
+              startIcon={changesUnapplied() ? <Send /> : <Refresh />}
               onClick={() => handleApplyFilters()}
-              disabled={!changesUnapplied()}
             >
-              <span>Apply filters</span>
+              <span>
+                {changesUnapplied() ? "Apply filters" : "Refresh page"}
+              </span>
             </Button>
           </span>
         </Tooltip>
@@ -178,7 +186,7 @@ export function FilterToolbar(props: FilterToolbarProps) {
             <Button
               variant="text"
               startIcon={<Delete />}
-              onClick={handleRemoveAllFilters}
+              onClick={handleClearFilters}
               disabled={filters.length === 0}
             >
               <span>Clear all filters</span>
@@ -204,8 +212,15 @@ export function FilterToolbar(props: FilterToolbarProps) {
             onDelete={() => {
               handleRemoveFilter(index);
             }}
-            color={isApplied(filter) ? "chipColor" : "default"}
-            sx={{ m: 0.5 }}
+            sx={{
+              m: 0.5,
+              backgroundColor: isApplied(filter) ? "primary.main" : grey[500],
+            }}
+            className={
+              isApplied(filter)
+                ? "chip-filter-applied"
+                : "chip-filter-unapplied"
+            }
           />
         ))}
 
@@ -229,10 +244,12 @@ export function FilterToolbar(props: FilterToolbarProps) {
         </Popover>
       </Stack>
       {changesUnapplied() && (
-        <Alert severity="info">
-          Some filter changes have not been applied. Please click on &quot;Apply
-          filters&quot; to update your results.
-        </Alert>
+        <Box marginBottom={1}>
+          <Alert severity="info">
+            Some filter changes have not been applied. Please click on
+            &quot;Apply filters&quot; to update your results.
+          </Alert>
+        </Box>
       )}
     </>
   );

@@ -19,12 +19,11 @@ export default defineConfig([
     async onSuccess() {
       // recursively go through each js file in dist and add "use client" to the top
       const distDir = path.join(__dirname, "dist");
-      const files = await fs.readdir(distDir);
 
-      async function processFilesRecursively(dir: string): Promise<any[]> {
+      async function processFilesRecursively(dir: string): Promise<void> {
         // Read dirents of the current folder
         const dirents = await fs.readdir(dir, { withFileTypes: true });
-        const promises = dirents.map(async (dirent) => {
+        dirents.map(async (dirent) => {
           const filePath = dirent.path + "/" + dirent.name;
           if (dirent.isDirectory()) return processFilesRecursively(filePath);
 
@@ -39,7 +38,6 @@ export default defineConfig([
             await fs.writeFile(filePath, newFileContents);
           }
         });
-        return Promise.all(promises.flat());
       }
       await processFilesRecursively(distDir);
     },

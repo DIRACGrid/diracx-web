@@ -1,12 +1,11 @@
 import React from "react";
 import { StoryObj, Meta } from "@storybook/react";
-import { ThemeProvider as MUIThemeProvider } from "@mui/material/styles";
 import { Paper } from "@mui/material";
 import { Apps } from "@mui/icons-material";
 import { useOidcAccessToken } from "../../mocks/react-oidc.mock";
-import { useMUITheme } from "../../hooks/theme";
 import { ApplicationsContext } from "../../contexts/ApplicationsProvider";
 import { NavigationProvider } from "../../contexts/NavigationProvider";
+import { ThemeProvider } from "../../contexts/ThemeProvider";
 import BaseApp from "./BaseApp";
 
 const meta = {
@@ -16,18 +15,14 @@ const meta = {
     layout: "centered",
   },
   tags: ["autodocs"],
-  argTypes: {
-    headerSize: { control: "radio" },
-  },
   decorators: [
     (Story) => {
-      const theme = useMUITheme();
       return (
-        <MUIThemeProvider theme={theme}>
+        <ThemeProvider>
           <Paper sx={{ p: 2 }}>
             <Story />
           </Paper>
-        </MUIThemeProvider>
+        </ThemeProvider>
       );
     },
     (Story) => (
@@ -76,9 +71,7 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const LoggedIn: Story = {
-  args: {
-    headerSize: undefined,
-  },
+  args: {},
   render: (props) => {
     useOidcAccessToken.mockReturnValue({
       accessTokenPayload: { preferred_username: "John Doe" },
@@ -88,9 +81,7 @@ export const LoggedIn: Story = {
 };
 
 export const LoggedOff: Story = {
-  args: {
-    headerSize: undefined,
-  },
+  args: {},
   render: (props) => {
     useOidcAccessToken.mockReturnValue({
       accessTokenPayload: null,

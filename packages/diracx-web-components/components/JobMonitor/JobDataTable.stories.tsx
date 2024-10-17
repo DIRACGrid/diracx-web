@@ -1,9 +1,8 @@
 import React from "react";
 import { StoryObj, Meta } from "@storybook/react";
-import { ThemeProvider as MUIThemeProvider } from "@mui/material/styles";
-import { useMUITheme } from "../../hooks/theme";
 import { useJobs } from "../../mocks/JobDataService.mock";
 import { useOidcAccessToken } from "../../mocks/react-oidc.mock";
+import { ThemeProvider } from "../../contexts/ThemeProvider";
 import { JobDataTable } from "./JobDataTable";
 
 const meta = {
@@ -25,11 +24,10 @@ const meta = {
   },
   decorators: [
     (Story) => {
-      const theme = useMUITheme();
       return (
-        <MUIThemeProvider theme={theme}>
+        <ThemeProvider>
           <Story />
-        </MUIThemeProvider>
+        </ThemeProvider>
       );
     },
   ],

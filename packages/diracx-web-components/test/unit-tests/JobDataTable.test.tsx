@@ -29,7 +29,7 @@ describe("<JobDataTable />", () => {
     (useOidcAccessToken as jest.Mock).mockReturnValue("1234");
 
     const { getByTestId } = render(<JobDataTable />);
-    expect(getByTestId("skeleton")).toBeVisible();
+    expect(getByTestId("loading-skeleton")).toBeVisible();
   });
 
   it("displays loading state when data is being loaded", () => {
@@ -42,7 +42,7 @@ describe("<JobDataTable />", () => {
     (useOidcAccessToken as jest.Mock).mockReturnValue("1234");
 
     const { getByTestId } = render(<JobDataTable />);
-    expect(getByTestId("skeleton")).toBeVisible();
+    expect(getByTestId("loading-skeleton")).toBeVisible();
   });
 
   it("displays error state", () => {

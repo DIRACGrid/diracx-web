@@ -2,10 +2,9 @@ import React from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 
 import { Paper } from "@mui/material";
-import { ThemeProvider as MUIThemeProvider } from "@mui/material/styles";
 import { Dashboard } from "@mui/icons-material";
-import { useMUITheme } from "../../hooks/theme";
 import { useOidc, useOidcAccessToken } from "../../mocks/react-oidc.mock";
+import { ThemeProvider } from "../../contexts/ThemeProvider";
 import DrawerItem from "./DrawerItem";
 
 const meta = {
@@ -17,13 +16,12 @@ const meta = {
   tags: ["autodocs"],
   decorators: [
     (Story) => {
-      const theme = useMUITheme();
       return (
-        <MUIThemeProvider theme={theme}>
+        <ThemeProvider>
           <Paper sx={{ width: "240px" }}>
             <Story />
           </Paper>
-        </MUIThemeProvider>
+        </ThemeProvider>
       );
     },
   ],

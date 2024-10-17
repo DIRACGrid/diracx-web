@@ -1,40 +1,81 @@
 import React from "react";
 import { render, screen, fireEvent, cleanup } from "@testing-library/react";
-import { ThemeProvider as MUIThemeProvider } from "@mui/material";
+import {
+  createColumnHelper,
+  getCoreRowModel,
+  useReactTable,
+} from "@tanstack/react-table";
 import { FilterToolbar } from "@/components/shared/FilterToolbar";
 import { ThemeProvider } from "@/contexts/ThemeProvider";
-import { useMUITheme } from "@/hooks/theme";
+
+// Define the item type for the table
+interface SimpleItem extends Record<string, unknown> {
+  id: number;
+  name: string;
+  description: string;
+}
 
 describe("FilterToolbar", () => {
-  const columns = [
-    { id: "column1", label: "Column 1" },
-    { id: "column2", label: "Column 2" },
-    { id: "column3", label: "Column 3" },
+  // Define the columns for the table
+  const columnHelper = createColumnHelper<SimpleItem>();
+
+  const columnDefs = [
+    columnHelper.accessor("id", {
+      header: "ID",
+      meta: { type: "number" },
+    }),
+    columnHelper.accessor("name", {
+      header: "Name",
+      meta: { type: "string" },
+    }),
+    columnHelper.accessor("description", {
+      header: "Description",
+      meta: { type: "string" },
+    }),
   ];
+
+  // Create mock data for the table
+  const data: SimpleItem[] = [
+    { id: 1, name: "Item 1", description: "Description 1" },
+    { id: 2, name: "Item 2", description: "Description 2" },
+  ];
+
+  // Create mock filters
   const filters = [
-    { id: 1, parameter: "column1", operator: "eq", value: "value1" },
-    { id: 2, parameter: "column2", operator: "neq", value: "value2" },
+    { id: 1, parameter: "id", operator: "eq", value: "value1" },
+    { id: 2, parameter: "name", operator: "neq", value: "value2" },
   ];
   const appliedFilters = [
-    { id: 1, parameter: "column1", operator: "eq", value: "value1" },
+    { id: 1, parameter: "id", operator: "eq", value: "value1" },
   ];
   const setFilters = jest.fn();
   const handleApplyFilters = jest.fn();
+  const handleClearFilters = jest.fn();
+
+  // Wrapper component to initialize the table
+  const FilterToolbarWrapper: React.FC = () => {
+    const table = useReactTable<SimpleItem>({
+      data,
+      columns: columnDefs,
+      getCoreRowModel: getCoreRowModel(),
+    });
+
+    return (
+      <ThemeProvider>
+        <FilterToolbar<SimpleItem>
+          columns={table.getAllColumns()}
+          filters={filters}
+          setFilters={setFilters}
+          handleApplyFilters={handleApplyFilters}
+          handleClearFilters={handleClearFilters}
+          appliedFilters={appliedFilters}
+        />
+      </ThemeProvider>
+    );
+  };
 
   beforeEach(() => {
-    render(
-      <ThemeProvider>
-        <MUIProviders>
-          <FilterToolbar
-            columns={columns}
-            filters={filters}
-            setFilters={setFilters}
-            handleApplyFilters={handleApplyFilters}
-            appliedFilters={appliedFilters}
-          />
-        </MUIProviders>
-      </ThemeProvider>,
-    );
+    render(<FilterToolbarWrapper />);
   });
 
   it("renders the filter toolbar with correct buttons", () => {
@@ -45,14 +86,15 @@ describe("FilterToolbar", () => {
     expect(addFilterButton).toBeInTheDocument();
     expect(applyFiltersButton).toBeInTheDocument();
     expect(clearAllFiltersButton).toBeInTheDocument();
-  });
 
-  it("renders the chip with chipColor when the filter is applied", () => {
-    const chipApplied = screen.getByText("column1 eq value1").closest("div");
-    const chipUnapplied = screen.getByText("column2 neq value2").closest("div");
+    const idFilter = screen.getByText("id eq value1").closest("div");
+    const nameFilter = screen.getByText("name neq value2").closest("div");
 
-    expect(chipApplied).toHaveClass("MuiChip-colorChipColor");
-    expect(chipUnapplied).not.toHaveClass("MuiChip-colorChipColor");
+    expect(idFilter).toBeInTheDocument();
+    expect(nameFilter).toBeInTheDocument();
+
+    expect(idFilter).toHaveClass("chip-filter-applied");
+    expect(nameFilter).toHaveClass("chip-filter-unapplied");
   });
 
   it("renders the warning when there are unapplied filters", () => {
@@ -64,26 +106,14 @@ describe("FilterToolbar", () => {
 
     appliedFilters.push({
       id: 2,
-      parameter: "column2",
+      parameter: "name",
       operator: "neq",
       value: "value2",
     });
 
     cleanup();
 
-    render(
-      <ThemeProvider>
-        <MUIProviders>
-          <FilterToolbar
-            columns={columns}
-            filters={filters}
-            setFilters={setFilters}
-            handleApplyFilters={handleApplyFilters}
-            appliedFilters={appliedFilters}
-          />
-        </MUIProviders>
-      </ThemeProvider>,
-    );
+    render(<FilterToolbarWrapper />);
 
     expect(warningMessage).not.toBeInTheDocument();
     appliedFilters.pop();
@@ -99,20 +129,12 @@ describe("FilterToolbar", () => {
     expect(filterForm).toBeInTheDocument();
   });
 
-  it("applies filters when 'Apply filters' button is clicked", () => {
+  it("applies filters when 'Apply filters' button is clicked", async () => {
     const applyFiltersButton = screen.getByText("Apply filters");
 
     fireEvent.click(applyFiltersButton);
 
     expect(handleApplyFilters).toHaveBeenCalled();
-  });
-
-  it("clears all filters when 'Clear all filters' button is clicked", () => {
-    const clearAllFiltersButton = screen.getByText("Clear all filters");
-
-    fireEvent.click(clearAllFiltersButton);
-
-    expect(setFilters).toHaveBeenCalledWith([]);
   });
 
   it("removes a filter when the corresponding 'Delete' button is clicked", () => {
@@ -123,8 +145,3 @@ describe("FilterToolbar", () => {
     expect(setFilters).toHaveBeenCalledWith([filters[1]]);
   });
 });
-
-function MUIProviders({ children }: { children: React.ReactNode }) {
-  const theme = useMUITheme();
-  return <MUIThemeProvider theme={theme}>{children}</MUIThemeProvider>;
-}

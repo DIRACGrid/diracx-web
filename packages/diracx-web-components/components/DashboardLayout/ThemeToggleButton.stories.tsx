@@ -2,8 +2,7 @@ import React from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 
 import { Paper } from "@mui/material";
-import { ThemeProvider as MUIThemeProvider } from "@mui/material/styles";
-import { useMUITheme } from "../../hooks/theme";
+import { ThemeProvider } from "../../contexts/ThemeProvider";
 import { ThemeToggleButton } from "./ThemeToggleButton";
 
 const meta = {
@@ -15,13 +14,12 @@ const meta = {
   tags: ["autodocs"],
   decorators: [
     (Story) => {
-      const theme = useMUITheme();
       return (
-        <MUIThemeProvider theme={theme}>
+        <ThemeProvider>
           <Paper sx={{ width: "fit-content" }}>
             <Story />
           </Paper>
-        </MUIThemeProvider>
+        </ThemeProvider>
       );
     },
   ],
