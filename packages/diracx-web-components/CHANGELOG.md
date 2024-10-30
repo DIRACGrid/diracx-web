@@ -1,5 +1,23 @@
 # Changelog
 
+## [0.1.0-a3](https://github.com/DIRACGrid/diracx-web/compare/v0.1.0-a2...v0.1.0-a3) (2024-10-30)
+
+
+### Features
+
+* better filter ux ([e9c1599](https://github.com/DIRACGrid/diracx-web/commit/e9c1599511aa492b11afd7fa887180272d548598))
+* **datatable:** adapt input fields for filter values ([7b14979](https://github.com/DIRACGrid/diracx-web/commit/7b149798a68beff9873f4961ec1cbdc35e4bf21d))
+* **library:** add profile details (username, vo, group, properties) ([53e9574](https://github.com/DIRACGrid/diracx-web/commit/53e9574242339480df9000a0a69c0e0e3ff44ec2))
+
+
+### Bug Fixes
+
+* **e2e:** adapt cypress tests ([eeceb59](https://github.com/DIRACGrid/diracx-web/commit/eeceb59cd6cee1a772c92fcead48e229f67996c1))
+* filters not applied are cleared when changing the sections ([dda6abc](https://github.com/DIRACGrid/diracx-web/commit/dda6abc080d8ed70478165a4565cb7c7ebe8e117))
+* **tsc-files:** tsc-files does not recognize chipColor ([48818ff](https://github.com/DIRACGrid/diracx-web/commit/48818ffaf5c689edf4e420820c39cd9a03257038))
+* tsup and eslint errors ([32c3a83](https://github.com/DIRACGrid/diracx-web/commit/32c3a8343aef76ab079be9a2f341bc75249ddd32))
+* use MUI for personal details ([9a71c8e](https://github.com/DIRACGrid/diracx-web/commit/9a71c8e93543e593d625b715d5a99600ff4235fc))
+
 ## [0.1.0-a2](https://github.com/DIRACGrid/diracx-web/compare/v0.1.0-a1...v0.1.0-a2) (2024-08-26)
 
 
