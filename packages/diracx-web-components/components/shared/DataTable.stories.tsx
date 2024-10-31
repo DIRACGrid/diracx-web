@@ -1,122 +1,96 @@
 import React from "react";
-import { StoryObj, Meta } from "@storybook/react";
-import { useArgs } from "@storybook/core/preview-api";
-import { ThemeProvider as MUIThemeProvider } from "@mui/material/styles";
-import { useMUITheme } from "../../hooks/theme";
-import { DataTable } from "./DataTable";
+import { Meta, StoryObj } from "@storybook/react";
+import {
+  createColumnHelper,
+  getCoreRowModel,
+  useReactTable,
+} from "@tanstack/react-table";
+import { ThemeProvider } from "../../contexts/ThemeProvider";
+import { DataTable, DataTableProps } from "./DataTable";
 
-const meta = {
+interface SimpleItem extends Record<string, unknown> {
+  id: number;
+  name: string;
+  email: string;
+}
+
+const columnHelper = createColumnHelper<SimpleItem>();
+
+const columnDefs = [
+  columnHelper.accessor("id", {
+    header: "ID",
+    meta: { type: "number" },
+  }),
+  columnHelper.accessor("name", {
+    header: "Name",
+    meta: { type: "string" },
+  }),
+  columnHelper.accessor("email", {
+    header: "Email",
+    meta: { type: "string" },
+  }),
+];
+
+const data: SimpleItem[] = [
+  { id: 1, name: "John Doe", email: "john@example.com" },
+];
+
+// Wrapper component to initialize the table
+const DataTableWrapper: React.FC<Omit<DataTableProps<SimpleItem>, "table">> = (
+  props,
+) => {
+  const table = useReactTable<SimpleItem>({
+    data,
+    columns: columnDefs,
+    getCoreRowModel: getCoreRowModel(),
+  });
+
+  return <DataTable<SimpleItem> {...props} table={table} />;
+};
+
+const meta: Meta = {
   title: "shared/DataTable",
-  component: DataTable,
+  component: DataTableWrapper,
   parameters: {
     layout: "centered",
   },
   tags: ["autodocs"],
   argTypes: {
     title: { control: "text" },
-    page: { control: "number" },
-    setPage: { control: false },
-    rowsPerPage: { control: "number" },
-    setRowsPerPage: { control: false },
-    order: { control: "radio" },
-    setOrder: { control: false },
-    orderBy: { control: "text" },
-    setOrderBy: { control: false },
+    table: { control: false, description: "tan stack `Table`", required: true },
     totalRows: { control: "number" },
-    selected: { control: "object" },
-    setSelected: { control: false },
-    filters: { control: "object" },
-    setFilters: { control: false },
+    searchBody: { control: false },
     setSearchBody: { control: false },
-    columns: { control: "object" },
-    rows: { control: "object" },
     error: { control: "text" },
     isValidating: { control: "boolean" },
     isLoading: { control: "boolean" },
-    rowIdentifier: { control: "text" },
-    isMobile: { control: "boolean" },
     toolbarComponents: { control: false },
     menuItems: { control: "object" },
   },
-  args: {},
   decorators: [
-    (Story) => {
-      const theme = useMUITheme();
-      return (
-        <MUIThemeProvider theme={theme}>
+    (Story) => (
+      <ThemeProvider>
+        <div style={{ width: "900px" }}>
           <Story />
-        </MUIThemeProvider>
-      );
-    },
+        </div>
+      </ThemeProvider>
+    ),
   ],
-} satisfies Meta<typeof DataTable>;
+};
 
 export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {
-  decorators: [
-    (Story) => (
-      <div style={{ width: "900px" }}>
-        <Story />
-      </div>
-    ),
-  ],
   args: {
     title: "Data Table",
-    page: 0,
-    setPage: () => {},
-    rowsPerPage: 25,
-    setRowsPerPage: () => {},
-    order: "asc",
-    setOrder: () => {},
-    orderBy: "id",
-    setOrderBy: () => {},
-    totalRows: 1,
-    selected: [],
-    setSelected: () => {},
-    filters: [],
-    setFilters: () => {},
+    totalRows: data.length,
+    searchBody: { sort: [{ parameter: "id", direction: "asc" }] },
     setSearchBody: () => {},
-    columns: [
-      { id: "id", label: "ID" },
-      { id: "name", label: "Name" },
-      { id: "email", label: "Email" },
-    ],
-    rows: [{ id: 1, name: "John Doe", email: "john@example.com" }],
-    error: "",
+    error: null,
     isValidating: false,
     isLoading: false,
-    rowIdentifier: "id",
-    isMobile: false,
     toolbarComponents: <></>,
     menuItems: [{ label: "Edit", onClick: () => {} }],
-  },
-  render: (props) => {
-    const [, updateArgs] = useArgs();
-    props.setPage = (newPage) => {
-      if (typeof newPage === "function") newPage = newPage(props.page);
-      updateArgs({ page: newPage });
-    };
-    props.setRowsPerPage = (newRowsPerPage) => {
-      if (typeof newRowsPerPage === "function")
-        newRowsPerPage = newRowsPerPage(props.rowsPerPage);
-      updateArgs({ rowsPerPage: newRowsPerPage });
-    };
-    props.setOrder = (newOrder) => {
-      if (typeof newOrder === "function") newOrder = newOrder(props.order);
-      updateArgs({ order: newOrder });
-    };
-    props.setOrderBy = (newOrderBy) => {
-      if (typeof newOrderBy === "function")
-        newOrderBy = newOrderBy(props.orderBy);
-      updateArgs({ orderBy: newOrderBy });
-    };
-    props.setSelected = (newSelected) => {
-      if (typeof newSelected === "function")
-        newSelected = newSelected(props.selected);
-      updateArgs({ selected: newSelected });
-    };
-    return <DataTable {...props} />;
   },
 };

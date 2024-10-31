@@ -35,3 +35,25 @@ export function useApplicationTitle() {
     return app?.title;
   }, [userDashboard, appId]);
 }
+
+/**
+ * Custom hook to access the application title based on the application id
+ * @returns the application title
+ */
+export function useApplicationType() {
+  const [userDashboard] = useContext(ApplicationsContext);
+  const appId = useApplicationId();
+
+  return useMemo(() => {
+    if (!userDashboard || !appId) return null;
+
+    const app = userDashboard.reduce(
+      (acc, group) => {
+        if (acc) return acc;
+        return group.items.find((app) => app.id === appId);
+      },
+      undefined as { type: string } | undefined,
+    );
+    return app?.type;
+  }, [userDashboard, appId]);
+}

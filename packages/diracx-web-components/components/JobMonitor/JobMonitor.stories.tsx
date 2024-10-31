@@ -1,11 +1,11 @@
 import React from "react";
 import { StoryObj, Meta } from "@storybook/react";
-import { Paper, ThemeProvider } from "@mui/material";
+import { Paper } from "@mui/material";
 import { useJobs } from "../../mocks/JobDataService.mock";
 import { useOidcAccessToken } from "../../mocks/react-oidc.mock";
 import { ApplicationsContext } from "../../contexts/ApplicationsProvider";
 import { NavigationProvider } from "../../contexts/NavigationProvider";
-import { useMUITheme } from "../../hooks/theme";
+import { ThemeProvider } from "../../contexts/ThemeProvider";
 import JobMonitor from "./JobMonitor";
 
 const meta = {
@@ -15,14 +15,10 @@ const meta = {
     layout: "centered",
   },
   tags: ["autodocs"],
-  argTypes: {
-    headerSize: { control: "select" },
-  },
   decorators: [
     (Story) => {
-      const theme = useMUITheme();
       return (
-        <ThemeProvider theme={theme}>
+        <ThemeProvider>
           <Paper sx={{ p: 2 }} elevation={5}>
             <Story />
           </Paper>

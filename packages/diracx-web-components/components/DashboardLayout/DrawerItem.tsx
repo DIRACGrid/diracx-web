@@ -5,6 +5,8 @@ import {
   ListItemIcon,
   Icon,
   ListItemText,
+  useTheme,
+  TextField,
 } from "@mui/material";
 import { DragIndicator } from "@mui/icons-material";
 import { combine } from "@atlaskit/pragmatic-drag-and-drop/combine";
@@ -19,11 +21,10 @@ import {
   extractClosestEdge,
 } from "@atlaskit/pragmatic-drag-and-drop-hitbox/closest-edge";
 import { setCustomNativeDragPreview } from "@atlaskit/pragmatic-drag-and-drop/element/set-custom-native-drag-preview";
-import { ThemeProvider as MUIThemeProvider } from "@mui/material/styles";
 import { ThemeProvider } from "@/contexts/ThemeProvider";
-import { useMUITheme } from "@/hooks/theme";
 import { useSearchParamsUtils } from "@/hooks/searchParamsUtils";
 import { useApplicationId } from "@/hooks/application";
+import { DashboardGroup } from "@/types";
 
 /**
  * Represents a drawer item component.
@@ -34,6 +35,11 @@ export default function DrawerItem({
   item: { title, id, icon },
   index,
   groupTitle,
+  renamingItemId,
+  setRenamingItemId,
+  renameValue,
+  setRenameValue,
+  setUserDashboard,
 }: {
   /** The item object containing the title, id, and icon. */
   item: { title: string; id: string; icon: React.ComponentType };
@@ -41,12 +47,22 @@ export default function DrawerItem({
   index: number;
   /** The title of the group. */
   groupTitle: string;
+  /** The ID of the item being renamed. */
+  renamingItemId: string | null;
+  /** The function to set the renaming item ID. */
+  setRenamingItemId: React.Dispatch<React.SetStateAction<string | null>>;
+  /** The value of the rename input. */
+  renameValue: string;
+  /** The function to set the rename input value. */
+  setRenameValue: React.Dispatch<React.SetStateAction<string>>;
+  /** The function to set the user dashboard state. */
+  setUserDashboard: React.Dispatch<React.SetStateAction<DashboardGroup[]>>;
 }) {
   // Ref to use for the draggable element
   const dragRef = React.useRef(null);
   // Ref to use for the handle of the draggable element, must be a child of the draggable element
   const handleRef = React.useRef(null);
-  const theme = useMUITheme();
+  const theme = useTheme();
   const { setParam } = useSearchParamsUtils();
   // Represents the closest edge to the mouse cursor
   const [closestEdge, setClosestEdge] = useState<Edge | null>(null);
@@ -75,15 +91,13 @@ export default function DrawerItem({
                 // Wraps the preview in the theme provider to ensure the correct theme is applied
                 // This is necessary because the preview is rendered outside the main app
                 <ThemeProvider>
-                  <MUIThemeProvider theme={theme}>
-                    <div
-                      style={{
-                        width: source.element.getBoundingClientRect().width,
-                      }}
-                    >
-                      <ItemPreview title={title} icon={icon} />
-                    </div>
-                  </MUIThemeProvider>
+                  <div
+                    style={{
+                      width: source.element.getBoundingClientRect().width,
+                    }}
+                  >
+                    <ItemPreview title={title} icon={icon} />
+                  </div>
                 </ThemeProvider>,
               );
               return () => root.unmount();
@@ -143,6 +157,26 @@ export default function DrawerItem({
     );
   }, [index, groupTitle, icon, theme, title, id]);
 
+  // Handle renaming of the item
+  const handleItemRename = () => {
+    if (renameValue.trim() === "") return;
+    setUserDashboard((groups) =>
+      groups.map((group) => {
+        if (group.title === groupTitle) {
+          return {
+            ...group,
+            items: group.items.map((item) =>
+              item.id === id ? { ...item, title: renameValue } : item,
+            ),
+          };
+        }
+        return group;
+      }),
+    );
+    setRenamingItemId(null);
+    setRenameValue("");
+  };
+
   return (
     <>
       <ListItemButton
@@ -156,7 +190,31 @@ export default function DrawerItem({
         <ListItemIcon>
           <Icon component={icon} />
         </ListItemIcon>
-        <ListItemText primary={title} />
+        {renamingItemId === id ? (
+          <TextField
+            value={renameValue}
+            onChange={(e) => setRenameValue(e.target.value)}
+            onBlur={handleItemRename}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                handleItemRename();
+              } else if (e.key === "Escape") {
+                setRenamingItemId(null);
+              }
+            }}
+            autoFocus
+            size="small"
+          />
+        ) : (
+          <ListItemText
+            primary={title}
+            sx={{
+              whiteSpace: "nowrap",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+            }}
+          />
+        )}
         <ListItemIcon sx={{ minWidth: "24px" }}>
           <Icon
             component={DragIndicator}
@@ -201,7 +259,14 @@ function ItemPreview({
       <ListItemIcon>
         <Icon component={icon} />
       </ListItemIcon>
-      <ListItemText primary={title} />
+      <ListItemText
+        primary={title}
+        sx={{
+          whiteSpace: "nowrap",
+          overflow: "hidden",
+          textOverflow: "ellipsis",
+        }}
+      />
       <ListItemIcon sx={{ minWidth: "24px" }}>
         <Icon component={DragIndicator} sx={{ cursor: "grab" }} />
       </ListItemIcon>

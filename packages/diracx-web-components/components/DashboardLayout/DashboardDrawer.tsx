@@ -12,6 +12,7 @@ import {
   Popover,
   TextField,
   Toolbar,
+  useTheme,
 } from "@mui/material";
 import { MenuBook, Add, SvgIconComponent } from "@mui/icons-material";
 import React, {
@@ -25,7 +26,6 @@ import { extractClosestEdge } from "@atlaskit/pragmatic-drag-and-drop-hitbox/clo
 import DrawerItemGroup from "./DrawerItemGroup";
 import AppDialog from "./ApplicationDialog";
 import { ApplicationsContext } from "@/contexts/ApplicationsProvider";
-import { useMUITheme } from "@/hooks/theme";
 import { DashboardGroup } from "@/types";
 
 interface DashboardDrawerProps {
@@ -70,6 +70,8 @@ export default function DashboardDrawer(props: DashboardDrawerProps) {
   const [popAnchorEl, setPopAnchorEl] = React.useState<HTMLElement | null>(
     null,
   );
+  const [renamingItemId, setRenamingItemId] = useState<string | null>(null);
+  const [renamingGroupId, setRenamingGroupId] = useState<string | null>(null);
   const [renameValue, setRenameValue] = React.useState("");
 
   // Define the applications that are accessible to users.
@@ -78,7 +80,7 @@ export default function DashboardDrawer(props: DashboardDrawerProps) {
 
   const logoURL = props.logoURL || "/DIRAC-logo.png";
 
-  const theme = useMUITheme();
+  const theme = useTheme();
 
   useEffect(() => {
     // Handle changes to app instances when drag and drop occurs.
@@ -306,8 +308,14 @@ export default function DashboardDrawer(props: DashboardDrawerProps) {
     handleCloseContextMenu();
   };
 
-  const handleRenameClick = (event: React.MouseEvent<HTMLElement>) => {
-    setPopAnchorEl(event.currentTarget);
+  const handleRenameClick = () => {
+    if (contextState.type === "group") {
+      setRenamingGroupId(contextState.id);
+    } else if (contextState.type === "item") {
+      setRenamingItemId(contextState.id);
+    }
+    setRenameValue("");
+    handleCloseContextMenu();
   };
 
   const popClose = () => {
@@ -394,6 +402,12 @@ export default function DashboardDrawer(props: DashboardDrawerProps) {
                   group={group}
                   setUserDashboard={setUserDashboard}
                   handleContextMenu={handleContextMenu}
+                  renamingGroupId={renamingGroupId}
+                  setRenamingGroupId={setRenamingGroupId}
+                  renamingItemId={renamingItemId}
+                  setRenamingItemId={setRenamingItemId}
+                  renameValue={renameValue}
+                  setRenameValue={setRenameValue}
                 />
               </ListItem>
             ))}
@@ -443,8 +457,9 @@ export default function DashboardDrawer(props: DashboardDrawerProps) {
           {contextState.type && (
             <MenuItem onClick={handleDelete}>Delete</MenuItem>
           )}
-
-          <MenuItem onClick={handleNewGroup}>New Group</MenuItem>
+          {contextState.type === null && (
+            <MenuItem onClick={handleNewGroup}>New Group</MenuItem>
+          )}
         </Menu>
         <Popover
           open={Boolean(popAnchorEl)}

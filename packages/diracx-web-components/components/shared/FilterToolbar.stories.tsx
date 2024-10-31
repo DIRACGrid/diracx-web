@@ -1,60 +1,106 @@
 import React from "react";
-import { StoryObj, Meta } from "@storybook/react";
+import { StoryObj } from "@storybook/react";
 import { useArgs } from "@storybook/core/preview-api";
-import { ThemeProvider as MUIThemeProvider } from "@mui/material/styles";
 import { Paper } from "@mui/material";
-import { useMUITheme } from "../../hooks/theme";
-import { FilterToolbar } from "./FilterToolbar";
+import {
+  createColumnHelper,
+  getCoreRowModel,
+  useReactTable,
+} from "@tanstack/react-table";
+import { ThemeProvider } from "../../contexts/ThemeProvider";
+import { FilterToolbar, FilterToolbarProps } from "./FilterToolbar";
+
+interface SimpleItem extends Record<string, unknown> {
+  id: number;
+  name: string;
+  email: string;
+}
+
+const columnHelper = createColumnHelper<SimpleItem>();
+
+const columnDefs = [
+  columnHelper.accessor("id", {
+    header: "ID",
+    meta: { type: "number" },
+  }),
+  columnHelper.accessor("name", {
+    header: "Name",
+    meta: { type: "string" },
+  }),
+  columnHelper.accessor("email", {
+    header: "Email",
+    meta: { type: "string" },
+  }),
+];
+
+const data: SimpleItem[] = [
+  { id: 1, name: "John Doe", email: "john@example.com" },
+];
+
+// Wrapper component to initialize the table
+const FilterToolbarWrapper: React.FC<
+  Omit<FilterToolbarProps<SimpleItem>, "columns">
+> = (props) => {
+  const table = useReactTable<SimpleItem>({
+    data,
+    columns: columnDefs,
+    getCoreRowModel: getCoreRowModel(),
+  });
+
+  return (
+    <FilterToolbar<SimpleItem> {...props} columns={table.getAllColumns()} />
+  );
+};
 
 const meta = {
   title: "shared/FilterToolbar",
-  component: FilterToolbar,
+  component: FilterToolbarWrapper,
   parameters: {
     layout: "centered",
   },
   tags: ["autodocs"],
   argTypes: {
-    columns: { control: "object" },
+    columns: {
+      control: false,
+      description: "`array` of tan stack `Column`",
+      required: true,
+    },
     filters: { control: "object" },
     setFilters: { control: "object" },
     handleApplyFilters: { control: "object" },
+    handleClearFilters: { control: "object" },
   },
   decorators: [
     (Story) => {
-      const theme = useMUITheme();
       return (
-        <MUIThemeProvider theme={theme}>
+        <ThemeProvider>
           <Paper sx={{ p: 2 }}>
             <Story />
           </Paper>
-        </MUIThemeProvider>
+        </ThemeProvider>
       );
     },
   ],
-} satisfies Meta<typeof FilterToolbar>;
+};
 
 export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {
   args: {
-    columns: [
-      { id: "id", label: "ID" },
-      { id: "name", label: "Name" },
-      { id: "age", label: "Age" },
-    ],
     filters: [
-      { id: 0, column: "id", operator: "eq", value: "1" },
-      { id: 1, column: "id", operator: "neq", value: "2" },
+      { id: 0, parameter: "id", operator: "eq", value: "1" },
+      { id: 1, parameter: "id", operator: "neq", value: "2" },
     ],
     setFilters: () => {},
     handleApplyFilters: () => {},
-    appliedFilters: [{ id: 0, column: "id", operator: "eq", value: "1" }],
+    handleClearFilters: () => {},
+    appliedFilters: [{ id: 0, parameter: "id", operator: "eq", value: "1" }],
   },
   render: (props) => {
     const [{ filters }, updateArgs] = useArgs();
     props.setFilters = (filters) => updateArgs({ filters });
     props.handleApplyFilters = () => updateArgs({ appliedFilters: filters });
-    return <FilterToolbar {...props} />;
+    return <FilterToolbarWrapper {...props} />;
   },
 };

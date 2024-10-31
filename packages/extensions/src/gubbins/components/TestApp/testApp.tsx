@@ -1,7 +1,6 @@
 "use client";
 import * as React from "react";
 import { useOidcAccessToken } from "@axa-fr/react-oidc";
-import { ApplicationHeader } from "@dirac-grid/diracx-web-components/components";
 import { useOIDCContext } from "@dirac-grid/diracx-web-components/hooks";
 import { Box } from "@mui/material";
 
@@ -20,7 +19,6 @@ export default function UserDashboard() {
 
   return (
     <div>
-      <ApplicationHeader type="Test App" size="h5" />
       <h2>Hello {accessTokenPayload["preferred_username"]}👋</h2>
       <Box>
         <p>This is a test application</p>

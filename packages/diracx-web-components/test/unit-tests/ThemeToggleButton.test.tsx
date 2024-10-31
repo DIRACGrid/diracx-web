@@ -1,10 +1,11 @@
+// ThemeToggleButton.test.tsx
 import React from "react";
 import { render, fireEvent } from "@testing-library/react";
 import { ThemeToggleButton } from "@/components/DashboardLayout/ThemeToggleButton";
 import { useTheme } from "@/hooks/theme";
 
-// Mocking the useTheme hook
-jest.mock("../../hooks/theme", () => ({
+// Mock the useTheme hook
+jest.mock("@/hooks/theme", () => ({
   useTheme: jest.fn(),
 }));
 
@@ -13,6 +14,10 @@ describe("<ThemeToggleButton />", () => {
 
   beforeEach(() => {
     mockToggleTheme = jest.fn();
+    (useTheme as jest.Mock).mockReturnValue({
+      theme: "light",
+      toggleTheme: mockToggleTheme,
+    });
   });
 
   afterEach(() => {
@@ -20,11 +25,6 @@ describe("<ThemeToggleButton />", () => {
   });
 
   it('renders the DarkModeIcon when theme is "light"', () => {
-    (useTheme as jest.Mock).mockReturnValue({
-      theme: "light",
-      toggleTheme: mockToggleTheme,
-    });
-
     const { getByTestId, queryByTestId } = render(<ThemeToggleButton />);
     expect(getByTestId("dark-mode")).toBeInTheDocument();
     expect(queryByTestId("light-mode")).not.toBeInTheDocument();
@@ -42,15 +42,48 @@ describe("<ThemeToggleButton />", () => {
   });
 
   it("calls toggleTheme function when button is clicked", () => {
-    (useTheme as jest.Mock).mockReturnValue({
-      theme: "light",
-      toggleTheme: mockToggleTheme,
-    });
-
     const { getByRole } = render(<ThemeToggleButton />);
     const button = getByRole("button");
 
     fireEvent.click(button);
     expect(mockToggleTheme).toHaveBeenCalledTimes(1);
+  });
+
+  it("renders the correct icon based on theme from localStorage", () => {
+    // Simulate theme stored in localStorage
+    localStorage.setItem("theme", "dark");
+
+    // Mock useTheme to read from localStorage
+    (useTheme as jest.Mock).mockReturnValue({
+      theme: "dark",
+      toggleTheme: mockToggleTheme,
+    });
+
+    const { getByTestId } = render(<ThemeToggleButton />);
+    expect(getByTestId("light-mode")).toBeInTheDocument();
+  });
+
+  it("toggles theme and updates the icon accordingly", () => {
+    (useTheme as jest.Mock).mockReturnValue({
+      theme: "light",
+      toggleTheme: mockToggleTheme,
+    });
+
+    const { getByTestId, queryByTestId, rerender } = render(
+      <ThemeToggleButton />,
+    );
+    expect(getByTestId("dark-mode")).toBeInTheDocument();
+
+    fireEvent.click(getByTestId("dark-mode"));
+    expect(mockToggleTheme).toHaveBeenCalledTimes(1);
+
+    (useTheme as jest.Mock).mockReturnValue({
+      theme: "dark",
+      toggleTheme: mockToggleTheme,
+    });
+
+    rerender(<ThemeToggleButton />);
+    expect(getByTestId("light-mode")).toBeInTheDocument();
+    expect(queryByTestId("dark-mode")).not.toBeInTheDocument();
   });
 });

@@ -1,9 +1,9 @@
 import React from "react";
 import { StoryObj, Meta } from "@storybook/react";
-import { Paper, ThemeProvider } from "@mui/material";
+import { Paper } from "@mui/material";
 import { useMetadata } from "../../mocks/metadata.mock";
 import { useOidc } from "../../mocks/react-oidc.mock";
-import { useMUITheme } from "../../hooks/theme";
+import { ThemeProvider } from "../../contexts/ThemeProvider";
 import { LoginForm } from "./LoginForm";
 
 const meta = {
@@ -24,9 +24,8 @@ const meta = {
   },
   decorators: [
     (Story) => {
-      const theme = useMUITheme();
       return (
-        <ThemeProvider theme={theme}>
+        <ThemeProvider>
           <Paper sx={{ p: 2 }}>
             <Story />
           </Paper>
