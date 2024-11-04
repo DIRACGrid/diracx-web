@@ -5,7 +5,9 @@
 FROM node:alpine AS build
 WORKDIR /app
 # Copy the application to the working directory
-COPY . .
+COPY package*.json ./
+COPY packages/diracx-web ./packages/diracx-web
+COPY packages/diracx-web-components ./packages/diracx-web-components
 # Install the project dependencies
 RUN npm ci
 # Build the static export with telemetry disabled (https://nextjs.org/telemetry)
@@ -14,5 +16,5 @@ RUN NEXT_TELEMETRY_DISABLED=1 npm run build
 # Stage 2: Copy the website from the previous container to a Nginx container
 FROM nginxinc/nginx-unprivileged:alpine
 EXPOSE 8080
-COPY --from=build /app/out /usr/share/nginx/html
+COPY --from=build /app/packages/diracx-web/out /usr/share/nginx/html
 COPY ./config/nginx/default.conf /etc/nginx/conf.d/default.conf

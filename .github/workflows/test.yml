@@ -24,4 +24,4 @@ jobs:
         run: npm ci
               
       - name: Trigger tests
-        run: npm run test
+        run: npm --prefix packages/diracx-web-components run test

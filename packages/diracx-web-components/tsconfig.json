@@ -22,26 +22,18 @@
       "react-dom",
       "node",
       "jest",
+      "jest-environment-jsdom",
       "@testing-library/jest-dom"
-    ],
-    "plugins": [
-      {
-        "name": "next"
-      }
-    ],
-    "paths": {
-      "@/*": ["./*"]
-    }
+    ]
   },
-  "include": ["global.d.ts", "**/*.ts", "**/*.tsx"],
+  "include": ["src/global.d.ts", "**/*.ts", "**/*.tsx"],
   "exclude": [
     "app",
     "node_modules",
     "dist",
     "test",
+    "stories",
     "tsup.config.ts",
-    "jest.setup.ts",
-    "**/*.stories.*",
-    "mocks"
+    "jest.setup.ts"
   ]
 }

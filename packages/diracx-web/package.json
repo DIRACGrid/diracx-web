@@ -4,9 +4,11 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build && rm -rf ../../out && mv out ../..",
+    "build": "next build",
+    "test": "cypress open --config baseUrl=$DIRACX_URL",
     "start": "next start",
     "lint": "next lint",
+    "lint-staged": "lint-staged",
     "ts-lint": "tsc -noEmit -incremental",
     "postinstall": "node ../../node_modules/@axa-fr/react-oidc/bin/copy-service-worker-files.mjs public"
   },
@@ -45,6 +47,6 @@
   "lint-staged": {
     "*.{js,ts,jsx,tsx}": "eslint --cache --fix",
     "*.{js,ts,jsx,tsx,css,md}": "prettier --write",
-    "src/**/*.{ts,tsx}": "tsc-files --noEmit"
+    "src/**/*.{ts,tsx}": "tsc --noEmit"
   }
 }
