@@ -68,7 +68,7 @@ jobs:
           cache: 'npm'
           
       - name: Build documentation
-        run: npm ci && npm run build-storybook -w @dirac-grid/diracx-web-components
+        run: npm ci && npm --prefix packages/diracx-web-components run build-storybook
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3

@@ -24,7 +24,7 @@ jobs:
         run: npm ci
 
       - name: Build Library
-        run: npm run build-lib
+        run: npm run build:diracx-web-components
               
       - name: Check formatting rules
         run: npx prettier . --check
