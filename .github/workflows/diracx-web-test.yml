@@ -1,7 +1,9 @@
-name: Integration Tests
+name: DiracX-Web Integration Tests
 
 on:
   push:
+    paths-ignore:
+      - 'packages/extensions/**'
     branches-ignore:
       - dependabot/**
       - release-please-**
@@ -58,3 +60,4 @@ jobs:
       with:
         browser: chrome
         config: baseUrl=${{ env.DIRACX_URL }}
+        project: packages/diracx-web

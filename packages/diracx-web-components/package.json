@@ -59,7 +59,6 @@
     "@testing-library/react": "^14.2.2",
     "@testing-library/user-event": "^14.5.1",
     "@types/jest": "^29.5.12",
-    "@types/testing-library__jest-dom": "^6.0.0",
     "@typescript-eslint/eslint-plugin": "^8.8.1",
     "babel-jest": "^29.7.0",
     "babel-plugin-module-resolver": "^5.0.2",
@@ -82,7 +81,26 @@
   },
   "main": "dist/index.js",
   "module": "dist/index.js",
-  "types": "dist/src/index.d.ts",
+  "types": "dist/index.d.ts",
+  "exports": {
+    "./package.json": "./package.json",
+    "./components": {
+      "import": "./dist/components/index.js",
+      "types": "./dist/components/index.d.ts"
+    },
+    "./contexts": {
+      "import": "./dist/contexts/index.js",
+      "types": "./dist/contexts/index.d.ts"
+    },
+    "./hooks": {
+      "import": "./dist/hooks/index.js",
+      "types": "./dist/hooks/index.d.ts"
+    },
+    "./types": {
+      "import": "./dist/types/index.js",
+      "types": "./dist/types/index.d.ts"
+    }
+  },
   "files": [
     "dist",
     "public"

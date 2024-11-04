@@ -8,5 +8,6 @@ export default defineConfig([
     target: "es6",
     bundle: false,
     sourcemap: true,
+    clean: true,
   },
 ]);

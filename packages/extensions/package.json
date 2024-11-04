@@ -1,5 +1,5 @@
 {
-  "name": "diracx-web-extension-example",
+  "name": "gubbins",
   "version": "0.1.0-a2",
   "private": true,
   "license": "GPL-3.0-only",
@@ -10,6 +10,7 @@
     "start": "next start",
     "lint": "next lint",
     "lint-staged": "lint-staged",
+    "ts-lint": "tsc -noEmit -incremental",
     "postinstall": "node ./node_modules/@axa-fr/react-oidc/bin/copy-service-worker-files.mjs public"
   },
   "dependencies": {
