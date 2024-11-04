@@ -1,6 +1,8 @@
-# Creating a Next.js DiracX Web Extension
+<p align="center">
+  <img alt="Extension Logo" src="public/robot.png" width="300" >
+</p>
 
-<img alt="Extension Logo" src="public/robot.png" width="300">
+# Creating a Next.js DiracX Web Extension
 
 This project aims to provide an example for creating a basic Next.js web extension for DiracX. It includes the necessary configuration and setup to get you started quickly.
 

@@ -1,6 +1,3 @@
-#!/bin/sh
-. "$(dirname "$0")/_/husky.sh"
-
 npm --prefix packages/diracx-web-components run lint-staged
 npm --prefix packages/diracx-web run lint-staged
 npm --prefix packages/extensions run lint-staged

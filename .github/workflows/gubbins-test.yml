@@ -1,0 +1,93 @@
+name: Gubbins extension tests
+
+on:
+  push:
+    paths-ignore:
+      - 'packages/diracx-web/**'
+    branches-ignore:
+      - dependabot/**
+      - release-please-**
+  pull_request:
+    branches-ignore:
+      - release-please-**
+
+jobs:
+  run-lint:
+    runs-on: ubuntu-latest
+    # Run the tests only if It's a PR or if the repo is DIRACGrid/diracx-web
+    if: github.event_name != 'push' || github.repository == 'DIRACGrid/diracx-web'
+    defaults:
+      run:
+        working-directory: packages/extensions
+    steps:
+      # Checkout the new source code
+      - uses: actions/checkout@v4
+      
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 'latest'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Check code-quality rules
+        run: npm run lint
+      - name: Check typescript type validity
+        run: npm run ts-lint
+
+  run-demo:
+    runs-on: ubuntu-latest
+    # Run the tests only if It's a PR or if the repo is DIRACGrid/diracx-web
+    if: github.event_name != 'push' || github.repository == 'DIRACGrid/diracx-web'
+    steps:
+    # Checkout the new source code
+    - uses: actions/checkout@v4 
+      
+    # Clone diracx-charts
+    - name: Clone source 
+      run: |
+        cd ..
+        git clone https://github.com/DIRACGrid/diracx-charts.git
+  
+    # Runs the demo with the extension source code
+    - name: Start demo 
+      run: |
+        cd ..
+        diracx-charts/run_demo.sh --exit-when-done diracx-web/packages/extensions/
+    
+    # Prints some debugging information in case something goes wrong
+    - name: Debugging information
+      run: |
+        cd ../diracx-charts
+        export KUBECONFIG=$PWD/.demo/kube.conf
+        .demo/kubectl get pods
+        for pod_name in $(.demo/kubectl get pods -o json | jq -r '.items[] | .metadata.name' | grep -vE '(dex|minio|mysql|rabbitmq|opensearch)'); do
+          echo "${pod_name}"
+          .demo/kubectl describe pod/"${pod_name}" || true
+          for container_name in $(.demo/kubectl get pods $pod_name -o jsonpath='{.spec.initContainers[*].name} {.spec.containers[*].name}'); do
+            echo $pod_name $container_name
+            .demo/kubectl logs "${pod_name}" -c "${container_name}" || true
+          done
+        done
+      
+    - name: Check for success
+      run: |
+        cd ../diracx-charts
+        if [ ! -f ".demo/.success" ]; then
+          echo "Demo failed"
+          cat ".demo/.failed"
+          exit 1
+        fi
+    
+    # Find the URL to be tested and put it in the github environment
+    - name: Set DIRACX_URL
+      run: echo "DIRACX_URL=https://$(ifconfig | grep 'inet ' | awk '{ print $2 }' | grep -v '^127' | head -n 1 | cut -d '/' -f 1).nip.io:8000" >> $GITHUB_ENV
+
+    # Run e2e tests with Cypress
+    - name: Start Cypress
+      uses: cypress-io/github-action@v6
+      with:
+        browser: chrome
+        config: baseUrl=${{ env.DIRACX_URL }}
+        project: diracx-web/packages/extensions

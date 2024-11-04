@@ -28,6 +28,9 @@ jobs:
           config-file: release-please-config.json
           manifest-file: .release-please-manifest.json
 
+  # Storybook is built and deployed to GitHub Pages
+  # -----------------------------------------------
+
   build-deploy-library-package:
     runs-on: ubuntu-latest
     needs: release-please
@@ -88,9 +91,11 @@ jobs:
         uses: actions/deploy-pages@v4
         with:
           token: ${{ github.token }}
-               
-          
-  build-deploy-dev-image:
+
+  # diracx-web is built and deployed to GitHub Container Registry
+  # -------------------------------------------------------------
+
+  build-deploy-diracx-web-dev-image:
     runs-on: ubuntu-latest
     if: ${{ github.event_name != 'push' || github.repository == 'DIRACGrid/diracx-web' }}
     steps:
@@ -116,7 +121,7 @@ jobs:
           tags: ghcr.io/diracgrid/diracx-web/static:dev
           platforms: linux/amd64,linux/arm64
 
-  build-deploy-release-image:
+  build-deploy-diracx-web-release-image:
     runs-on: ubuntu-latest
     if: ${{ github.event_name == 'push' && github.repository == 'DIRACGrid/diracx-web' }}
     needs: release-please
@@ -144,7 +149,10 @@ jobs:
           tags: ghcr.io/diracgrid/diracx-web/static:${{ needs.release-please.outputs.tag_name }}
           platforms: linux/amd64,linux/arm64
 
-  build-deploy-gubbins-image:
+  # gubbins is built and deployed to GitHub Container Registry
+  # -------------------------------------------------------------
+
+  build-deploy-gubbins-dev-image:
     runs-on: ubuntu-latest
     if: ${{ github.event_name == 'push' && github.repository == 'DIRACGrid/diracx-web' }}
     needs: build-deploy-library-package
@@ -168,5 +176,5 @@ jobs:
         with:
           context: ./packages/extensions
           push: ${{ github.event_name == 'push' && github.repository == 'DIRACGrid/diracx-web' && github.ref_name == 'main' }}
-          tags: ghcr.io/diracgrid/diracx-web/static:extension-example
+          tags: ghcr.io/diracgrid/diracx-web/gubbins:dev
           platforms: linux/amd64,linux/arm64
