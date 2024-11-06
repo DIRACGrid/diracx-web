@@ -2,9 +2,10 @@
   "name": "gubbins",
   "version": "0.1.0-a2",
   "private": true,
+  "type": "module",
   "license": "GPL-3.0-only",
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev --turbopack",
     "build": "next build",
     "test": "cypress open --config baseUrl=$DIRACX_URL",
     "start": "next start",
@@ -17,22 +18,23 @@
     "@axa-fr/react-oidc": "^7.22.6",
     "@dirac-grid/diracx-web-components": "0.1.0-a2",
     "autoprefixer": "10.4.19",
-    "next": "14.2.3",
+    "next": "15.0.2",
     "react": "^18",
     "react-dom": "^18"
   },
   "devDependencies": {
+    "@eslint/compat": "^1.2.2",
+    "@eslint/eslintrc": "^3.1.0",
+    "@eslint/js": "^9.14.0",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
+    "cypress": "^13.13.3",
     "eslint": "^9",
-    "eslint-config-next": "14.2.3",
+    "eslint-config-next": "15.0.2",
+    "eslint-config-prettier": "^9.1.0",
     "postcss": "^8",
+    "prettier": "^3.2.5",
     "typescript": "^5"
-  },
-  "lint-staged": {
-    "*.{js,ts,jsx,tsx}": "eslint --cache --fix",
-    "*.{js,ts,jsx,tsx,css,md}": "prettier --write",
-    "src/**/*.{ts,tsx}": "tsc --noEmit"
   }
 }

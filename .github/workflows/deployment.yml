@@ -28,8 +28,8 @@ jobs:
           config-file: release-please-config.json
           manifest-file: .release-please-manifest.json
 
-  # Storybook is built and deployed to GitHub Pages
-  # -----------------------------------------------
+  # Library is built and deployed to NPM
+  # ------------------------------------
 
   build-deploy-library-package:
     runs-on: ubuntu-latest
@@ -43,7 +43,7 @@ jobs:
 
     - uses: actions/setup-node@v4
       with:
-        node-version: 'latest'
+        node-version: 'lts/*'
         registry-url: 'https://registry.npmjs.org'
 
     - name: Install dependencies
@@ -56,6 +56,9 @@ jobs:
         NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
       run: npx lerna publish from-package --no-push --no-private --yes
 
+  # Storybook is built and deployed to GitHub Pages
+  # -----------------------------------------------
+
   build-storybook-docs:
     runs-on: ubuntu-latest
     permissions:
@@ -67,7 +70,7 @@ jobs:
  
       - uses: actions/setup-node@v4
         with:
-          node-version: 'latest'
+          node-version: 'lts/*'
           cache: 'npm'
           
       - name: Build documentation
@@ -154,8 +157,7 @@ jobs:
 
   build-deploy-gubbins-dev-image:
     runs-on: ubuntu-latest
-    if: ${{ github.event_name == 'push' && github.repository == 'DIRACGrid/diracx-web' }}
-    needs: build-deploy-library-package
+    if: ${{ github.event_name != 'push' || github.repository == 'DIRACGrid/diracx-web' }}
     steps:
       - uses: actions/checkout@v4
 
@@ -177,4 +179,32 @@ jobs:
           context: ./packages/extensions
           push: ${{ github.event_name == 'push' && github.repository == 'DIRACGrid/diracx-web' && github.ref_name == 'main' }}
           tags: ghcr.io/diracgrid/diracx-web/gubbins:dev
+          platforms: linux/amd64,linux/arm64
+
+  build-deploy-gubbins-release-image:
+    runs-on: ubuntu-latest
+    if: ${{ github.event_name == 'push' && github.repository == 'DIRACGrid/diracx-web' }}
+    needs: release-please
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to GitHub container registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build Docker image
+        if: ${{ needs.release-please.outputs.release_created == 'true' }}
+        uses: docker/build-push-action@v6
+        with:
+          context: ./packages/extensions
+          push: true
+          tags: ghcr.io/diracgrid/diracx-web/gubbins:${{ needs.release-please.outputs.tag_name }}
           platforms: linux/amd64,linux/arm64
