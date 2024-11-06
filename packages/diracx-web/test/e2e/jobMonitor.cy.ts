@@ -116,8 +116,9 @@ describe("Job Monitor", () => {
       .eq(1)
       .should("contain.text", "1");
 
-    cy.get('[data-testid="virtuoso-scroller"]').scrollTo("bottom");
-    cy.wait(500); // Wait for the items to load
+    cy.get('[data-testid="virtuoso-scroller"]')
+      .wait(100) // Wait for rendering
+      .scrollTo("bottom", { ensureScrollable: false });
     cy.get("table tbody tr")
       .last()
       .find("td")
@@ -151,8 +152,9 @@ describe("Job Monitor", () => {
       .eq(1)
       .should("contain.text", "26");
 
-    cy.get('[data-testid="virtuoso-scroller"]').scrollTo("bottom");
-    cy.wait(500); // Wait for the items to load
+    cy.get('[data-testid="virtuoso-scroller"]')
+      .wait(100) // Wait for rendering
+      .scrollTo("bottom", { ensureScrollable: false });
     cy.get("table tbody tr")
       .last()
       .find("td")
@@ -186,8 +188,9 @@ describe("Job Monitor", () => {
       .eq(1)
       .should("contain.text", "1");
 
-    cy.get('[data-testid="virtuoso-scroller"]').scrollTo("bottom");
-    cy.wait(500); // Wait for the items to load
+    cy.get('[data-testid="virtuoso-scroller"]')
+      .wait(100) // Wait for rendering
+      .scrollTo("bottom", { ensureScrollable: false });
     cy.get("table tbody tr")
       .last()
       .find("td")

@@ -12,6 +12,7 @@ const preview: Preview = {
       },
     },
   },
+
   decorators: [
     (Story) => (
       <ThemeProvider>
@@ -22,6 +23,8 @@ const preview: Preview = {
       </ThemeProvider>
     ),
   ],
+
+  tags: ["autodocs"],
 };
 
 export default preview;

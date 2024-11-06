@@ -27,7 +27,6 @@ This repository is organized as a monorepo, with the following key packages:
 
 ### Project Management
 
-- [**Lerna**](https://lerna.js.org/docs/introduction): Utilized for efficient monorepo management. Useful to run scripts or commands across all packages while handling errors correctly.
 - [**npm**](https://docs.npmjs.com/): Used for dependency management.
 - [**Release-Please**](https://github.com/googleapis/release-please): Automated release management for the project.
 

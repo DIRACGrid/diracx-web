@@ -25,7 +25,7 @@ jobs:
       
       - uses: actions/setup-node@v4
         with:
-          node-version: 'latest'
+          node-version: 'lts/*'
           cache: 'npm'
 
       - name: Install dependencies
@@ -48,7 +48,9 @@ jobs:
     - name: Clone source 
       run: |
         cd ..
-        git clone https://github.com/DIRACGrid/diracx-charts.git
+        git clone https://github.com/aldbr/diracx-charts.git
+        cd diracx-charts
+        git switch main_FEAT_npm-workspaces
   
     # Runs the demo with the extension source code
     - name: Start demo 
@@ -90,4 +92,4 @@ jobs:
       with:
         browser: chrome
         config: baseUrl=${{ env.DIRACX_URL }}
-        project: diracx-web/packages/extensions
+        project: packages/extensions
