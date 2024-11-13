@@ -11,7 +11,7 @@ import {
 } from "@dirac-grid/diracx-web-components/contexts";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { applicationList } from "@/gubbins/applicationList";
-import { defaultUserDashboard } from "@/gubbins/defaultUserDashboard";
+import { defaultSections } from "@/gubbins/defaultUserDashboard";
 
 // Layout for the dashboard: setup the providers and the dashboard for the applications
 export default function DashboardLayout({
@@ -37,7 +37,7 @@ export default function DashboardLayout({
       No need to use it if you don't want to customize the applications */}
       <ApplicationsProvider
         appList={applicationList}
-        defaultUserDashboard={defaultUserDashboard}
+        defaultSections={defaultSections}
       >
         {/* OIDCSecure is used to make sure the user is authenticated before accessing the dashboard */}
         <OIDCSecure>
@@ -45,8 +45,12 @@ export default function DashboardLayout({
           <Dashboard logoURL={customLogoURL} drawerWidth={250}>
             <Box
               sx={{
-                ml: "5%",
-                mr: "5%",
+                ml: "1%",
+                mr: "1%",
+                display: "flex",
+                flexDirection: "column",
+                flexGrow: 1,
+                overflow: "hidden",
               }}
             >
               {children}
