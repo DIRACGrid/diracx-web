@@ -14,7 +14,7 @@ interface OIDCProviderProps {
  * @param props - configuration of the OIDC provider
  * @returns the wrapper around OidcProvider
  */
-export function OIDCProvider(props: OIDCProviderProps) {
+export function OIDCProvider({ children }: OIDCProviderProps) {
   const { configuration, setConfiguration } = useOIDCContext();
   const diracxUrl = useDiracxUrl();
 
@@ -58,7 +58,7 @@ export function OIDCProvider(props: OIDCProviderProps) {
         configurationName={configuration.scope}
         withCustomHistory={withCustomHistory}
       >
-        <main>{props.children}</main>
+        <main>{children}</main>
       </OidcProvider>
     </>
   );

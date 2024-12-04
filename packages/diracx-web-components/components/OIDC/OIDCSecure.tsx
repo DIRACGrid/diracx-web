@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect } from "react";
+import React, { useContext, useEffect } from "react";
 import { useOidc } from "@axa-fr/react-oidc";
 import { useOIDCContext } from "@/hooks/oidcConfiguration";
 import { NavigationContext } from "@/contexts/NavigationProvider";
@@ -16,7 +16,7 @@ interface OIDCProps {
 export function OIDCSecure({ children }: OIDCProps) {
   const { configuration } = useOIDCContext();
   const { isAuthenticated } = useOidc(configuration?.scope);
-  const { setPath } = React.useContext(NavigationContext);
+  const { setPath } = useContext(NavigationContext);
 
   useEffect(() => {
     // Redirect to login page if not authenticated

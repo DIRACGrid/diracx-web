@@ -7,7 +7,7 @@ describe("DashboardDrawer", { retries: { runMode: 5, openMode: 3 } }, () => {
       cy.visit("/");
 
       //login
-      cy.contains("Login through your Identity Provider").click();
+      cy.get('[data-testid="button-login"]').click();
       cy.get("#login").type("admin@example.com");
       cy.get("#password").type("password");
 

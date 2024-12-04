@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import FormControl from "@mui/material/FormControl";
@@ -18,6 +18,11 @@ import { useOIDCContext } from "@/hooks/oidcConfiguration";
 import { useSearchParamsUtils } from "@/hooks/searchParamsUtils";
 import { NavigationContext } from "@/contexts/NavigationProvider";
 
+interface LoginFormProps {
+  /** The URL of the logo, optional */
+  logoURL?: string;
+}
+
 /**
  * Login form
  *
@@ -25,11 +30,8 @@ import { NavigationContext } from "@/contexts/NavigationProvider";
  */
 export function LoginForm({
   logoURL = "/DIRAC-logo-minimal.png",
-}: {
-  /** The URL of the logo, optional */
-  logoURL?: string;
-}) {
-  const { setPath } = React.useContext(NavigationContext);
+}: LoginFormProps) {
+  const { setPath } = useContext(NavigationContext);
   const { metadata, error, isLoading } = useMetadata();
   const [selectedVO, setSelectedVO] = useState<string | null>(null);
   const [selectedGroup, setSelectedGroup] = useState<string | null>(null);
@@ -159,7 +161,7 @@ export function LoginForm({
             renderInput={(params) => (
               <TextField
                 {...params}
-                label="Select Virtual Organization"
+                label="Select a Virtual Organization"
                 variant="outlined"
                 data-testid="autocomplete-vo-select"
               />
@@ -210,7 +212,7 @@ export function LoginForm({
                 onClick={handleConfigurationChanges}
                 data-testid="button-login"
               >
-                Login through your Identity Provider
+                Login via your Identity Provider
               </Button>
               <Button variant="outlined" onClick={() => {}}>
                 Advanced Options

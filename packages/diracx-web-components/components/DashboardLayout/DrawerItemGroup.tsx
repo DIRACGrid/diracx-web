@@ -6,29 +6,12 @@ import {
   TextField,
 } from "@mui/material";
 import { ExpandMore, Apps } from "@mui/icons-material";
-import React, { useEffect } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { dropTargetForElements } from "@atlaskit/pragmatic-drag-and-drop/element/adapter";
 import DrawerItem from "./DrawerItem";
 import { DashboardGroup } from "@/types/DashboardGroup";
 
-/**
- * Represents a group of items in a drawer.
- *
- * @component
- * @param {Object} props - The component props.
- * @returns {JSX.Element} The rendered DrawerItemGroup component.
- */
-export default function DrawerItemGroup({
-  group: { title, extended: expanded, items },
-  setUserDashboard,
-  handleContextMenu,
-  renamingGroupId,
-  setRenamingGroupId,
-  renamingItemId,
-  setRenamingItemId,
-  renameValue,
-  setRenameValue,
-}: {
+interface DrawerItemGroupProps {
   /** The group object containing the title, expanded state, and items. */
   group: DashboardGroup;
   /** The function to set the user dashboard state. */
@@ -50,11 +33,30 @@ export default function DrawerItemGroup({
   renameValue: string;
   /** The function to set the rename input value. */
   setRenameValue: React.Dispatch<React.SetStateAction<string>>;
-}) {
+}
+
+/**
+ * Represents a group of items in a drawer.
+ *
+ * @component
+ * @param {Object} props - The component props.
+ * @returns {JSX.Element} The rendered DrawerItemGroup component.
+ */
+export default function DrawerItemGroup({
+  group: { title, extended: expanded, items },
+  setUserDashboard,
+  handleContextMenu,
+  renamingGroupId,
+  setRenamingGroupId,
+  renamingItemId,
+  setRenamingItemId,
+  renameValue,
+  setRenameValue,
+}: DrawerItemGroupProps) {
   // Ref to use for the drag and drop target
-  const dropRef = React.useRef(null);
+  const dropRef = useRef(null);
   // State to track whether the user is hovering over the item during a drag operation
-  const [hovered, setHovered] = React.useState(false);
+  const [hovered, setHovered] = useState(false);
 
   useEffect(() => {
     if (!dropRef.current) return;

@@ -12,7 +12,7 @@ import {
   useTheme,
 } from "@mui/material";
 import { Close } from "@mui/icons-material";
-import React from "react";
+import React, { useMemo } from "react";
 import {
   useReactTable,
   createColumnHelper,
@@ -37,15 +37,19 @@ interface JobHistoryDialogProps {
  *
  * @returns The rendered JobHistoryDialog component.
  */
-export function JobHistoryDialog(props: JobHistoryDialogProps) {
-  const { open, onClose, historyData, jobId } = props;
+export function JobHistoryDialog({
+  open,
+  onClose,
+  historyData,
+  jobId,
+}: JobHistoryDialogProps) {
   const theme = useTheme();
 
   // Create column helper
   const columnHelper = createColumnHelper<JobHistory>();
 
   // Define columns
-  const columns = React.useMemo(
+  const columns = useMemo(
     () => [
       columnHelper.accessor("Status", {
         header: "Status",

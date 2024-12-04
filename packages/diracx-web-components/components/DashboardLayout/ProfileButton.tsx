@@ -27,7 +27,7 @@ import {
   Typography,
   useTheme,
 } from "@mui/material";
-import React from "react";
+import React, { useState } from "react";
 import { useOIDCContext } from "@/hooks/oidcConfiguration";
 
 /**
@@ -41,7 +41,7 @@ export function ProfileButton() {
   const { accessTokenPayload } = useOidcAccessToken(configuration?.scope);
   const { logout, isAuthenticated } = useOidc(configuration?.scope);
 
-  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
 
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {

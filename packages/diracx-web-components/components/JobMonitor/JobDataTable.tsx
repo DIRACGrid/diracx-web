@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import Box from "@mui/material/Box";
 import {
   blue,
@@ -60,48 +60,47 @@ export function JobDataTable() {
   const { accessToken } = useOidcAccessToken(configuration?.scope);
 
   // State for loading elements
-  const [backdropOpen, setBackdropOpen] = React.useState(false);
-  const [snackbarInfo, setSnackbarInfo] = React.useState({
+  const [backdropOpen, setBackdropOpen] = useState(false);
+  const [snackbarInfo, setSnackbarInfo] = useState({
     open: false,
     message: "",
     severity: "success",
   });
 
   // States for table settings
-  const [columnVisibility, setColumnVisibility] =
-    React.useState<VisibilityState>({
-      JobGroup: false,
-      JobType: false,
-      Owner: false,
-      OwnerGroup: false,
-      VO: false,
-      StartExecTime: false,
-      EndExecTime: false,
-      UserPriority: false,
-    });
-  const [columnPinning, setColumnPinning] = React.useState<ColumnPinningState>({
+  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({
+    JobGroup: false,
+    JobType: false,
+    Owner: false,
+    OwnerGroup: false,
+    VO: false,
+    StartExecTime: false,
+    EndExecTime: false,
+    UserPriority: false,
+  });
+  const [columnPinning, setColumnPinning] = useState<ColumnPinningState>({
     left: ["JobID"], // Pin JobID column by default
   });
-  const [rowSelection, setRowSelection] = React.useState<RowSelectionState>({});
-  const [pagination, setPagination] = React.useState({
+  const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
+  const [pagination, setPagination] = useState({
     pageIndex: 0,
     pageSize: 25,
   });
 
   // State for search body
-  const [searchBody, setSearchBody] = React.useState<SearchBody>({
+  const [searchBody, setSearchBody] = useState<SearchBody>({
     sort: [{ parameter: "JobID", direction: "asc" }],
   });
 
   // State for selected job
-  const [selectedJobId, setSelectedJobId] = React.useState<number | null>(null);
+  const [selectedJobId, setSelectedJobId] = useState<number | null>(null);
 
   // State for job history
-  const [isHistoryDialogOpen, setIsHistoryDialogOpen] = React.useState(false);
-  const [jobHistoryData, setJobHistoryData] = React.useState<JobHistory[]>([]);
+  const [isHistoryDialogOpen, setIsHistoryDialogOpen] = useState(false);
+  const [jobHistoryData, setJobHistoryData] = useState<JobHistory[]>([]);
 
   // Status colors
-  const statusColors: Record<string, string> = React.useMemo(
+  const statusColors: Record<string, string> = useMemo(
     () => ({
       Submitting: purple[500],
       Received: blueGrey[500],
@@ -125,7 +124,7 @@ export function JobDataTable() {
   /**
    * Renders the status cell with colors
    */
-  const renderStatusCell = React.useCallback(
+  const renderStatusCell = useCallback(
     (status: string) => {
       return (
         <Box
@@ -148,12 +147,12 @@ export function JobDataTable() {
     [theme, statusColors],
   );
 
-  const columnHelper = React.useMemo(() => createColumnHelper<Job>(), []);
+  const columnHelper = useMemo(() => createColumnHelper<Job>(), []);
 
   /**
    * The head cells for the data grid (desktop version)
    */
-  const columns = React.useMemo(
+  const columns = useMemo(
     () => [
       columnHelper.accessor("JobID", {
         header: "ID",
@@ -230,7 +229,7 @@ export function JobDataTable() {
   );
 
   const dataHeader = data?.headers;
-  const results = React.useMemo(() => data?.data || [], [data?.data]);
+  const results = useMemo(() => data?.data || [], [data?.data]);
 
   // Parse the headers to get the first item, last item and number of items
   const contentRange = dataHeader?.get("content-range");
@@ -250,7 +249,7 @@ export function JobDataTable() {
   /**
    * Handle the deletion of the selected jobs
    */
-  const handleDelete = React.useCallback(async () => {
+  const handleDelete = useCallback(async () => {
     setBackdropOpen(true);
     try {
       const selectedIds = Object.keys(rowSelection).map(Number);
@@ -293,7 +292,7 @@ export function JobDataTable() {
   /**
    * Handle the killing of the selected jobs
    */
-  const handleKill = React.useCallback(async () => {
+  const handleKill = useCallback(async () => {
     setBackdropOpen(true);
     try {
       const selectedIds = Object.keys(rowSelection).map(Number);
@@ -336,7 +335,7 @@ export function JobDataTable() {
   /**
    * Handle the rescheduling of the selected jobs
    */
-  const handleReschedule = React.useCallback(async () => {
+  const handleReschedule = useCallback(async () => {
     setBackdropOpen(true);
     try {
       const selectedIds = Object.keys(rowSelection).map(Number);
@@ -379,7 +378,7 @@ export function JobDataTable() {
   /**
    * Handle the history of the selected job
    */
-  const handleHistory = React.useCallback(
+  const handleHistory = useCallback(
     async (selectedId: number | null) => {
       if (!selectedId) return;
       setBackdropOpen(true);
@@ -415,7 +414,7 @@ export function JobDataTable() {
   /**
    * The toolbar components for the data grid
    */
-  const toolbarComponents = React.useMemo(
+  const toolbarComponents = useMemo(
     () => (
       <>
         <Tooltip title="Reschedule">
@@ -441,7 +440,7 @@ export function JobDataTable() {
   /**
    * The menu items
    */
-  const menuItems: MenuItem[] = React.useMemo(
+  const menuItems: MenuItem[] = useMemo(
     () => [
       {
         label: "Get history",

@@ -5,7 +5,7 @@ describe("Job Monitor", () => {
     cy.session("login", () => {
       cy.visit("/");
       //login
-      cy.contains("Login through your Identity Provider").click();
+      cy.get('[data-testid="button-login"]').click();
       cy.get("#login").type("admin@example.com");
       cy.get("#password").type("password");
 
@@ -52,7 +52,7 @@ describe("Job Monitor", () => {
         Cypress._.times(numberOfJobs, () => {
           cy.request({
             method: "POST",
-            url: "/api/jobs",
+            url: "/api/jobs/jdl",
             headers: {
               Authorization: `Bearer ${accessToken}`,
             },

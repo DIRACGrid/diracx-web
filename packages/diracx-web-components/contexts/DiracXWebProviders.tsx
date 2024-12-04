@@ -5,17 +5,19 @@ import {
   ApplicationsProvider,
 } from "./index";
 
+interface DiracXWebProvidersProps {
+  children: React.ReactNode;
+  getPath: () => string;
+  setPath: (path: string) => void;
+  getSearchParams: () => URLSearchParams;
+}
+
 export function DiracXWebProviders({
   children,
   getPath,
   setPath,
   getSearchParams,
-}: {
-  children: React.ReactNode;
-  getPath: () => string;
-  setPath: (path: string) => void;
-  getSearchParams: () => URLSearchParams;
-}) {
+}: DiracXWebProvidersProps) {
   return (
     <OIDCConfigurationProvider>
       <NavigationProvider

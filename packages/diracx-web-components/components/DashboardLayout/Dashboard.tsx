@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import { useState } from "react";
 import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
 import IconButton from "@mui/material/IconButton";
@@ -28,9 +28,11 @@ interface DashboardProps {
  * @param props - children, drawerWidth, logoURL
  * @return an dashboard layout
  */
-export default function Dashboard(props: DashboardProps) {
-  const { children, drawerWidth = 240, logoURL } = props;
-
+export default function Dashboard({
+  children,
+  drawerWidth = 240,
+  logoURL,
+}: DashboardProps) {
   const appTitle = useApplicationTitle();
   const appType = useApplicationType();
 
@@ -39,7 +41,7 @@ export default function Dashboard(props: DashboardProps) {
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
   /** State management for mobile drawer */
-  const [mobileOpen, setMobileOpen] = React.useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
   };

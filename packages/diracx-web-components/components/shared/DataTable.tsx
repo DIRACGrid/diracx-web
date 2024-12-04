@@ -1,5 +1,11 @@
 "use client";
-import React from "react";
+import React, {
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import { alpha } from "@mui/material/styles";
 import Box from "@mui/material/Box";
 import Table from "@mui/material/Table";
@@ -64,12 +70,15 @@ interface DataTableToolbarProps<T extends Record<string, unknown>> {
  * Data table toolbar component
  * @param {DataTableToolbarProps} props - the props for the component
  */
-function DataTableToolbar<T extends Record<string, unknown>>(
-  props: DataTableToolbarProps<T>,
-) {
-  const { title, table, numSelected, selectedIds, toolbarComponents } = props;
-  const [snackbarOpen, setSnackbarOpen] = React.useState(false);
-  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+function DataTableToolbar<T extends Record<string, unknown>>({
+  title,
+  table,
+  numSelected,
+  selectedIds,
+  toolbarComponents,
+}: DataTableToolbarProps<T>) {
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
   const handleVisibilityClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -232,26 +241,23 @@ export interface DataTableProps<T extends Record<string, unknown>> {
  *
  * @returns a DataTable component
  */
-export function DataTable<T extends Record<string, unknown>>(
-  props: DataTableProps<T>,
-) {
-  const {
-    title,
-    table,
-    totalRows,
-    searchBody,
-    setSearchBody,
-    error,
-    isLoading,
-    isValidating,
-    toolbarComponents,
-    menuItems,
-  } = props;
+export function DataTable<T extends Record<string, unknown>>({
+  title,
+  table,
+  totalRows,
+  searchBody,
+  setSearchBody,
+  error,
+  isLoading,
+  isValidating,
+  toolbarComponents,
+  menuItems,
+}: DataTableProps<T>) {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
   // State for the context menu
-  const [contextMenu, setContextMenu] = React.useState<{
+  const [contextMenu, setContextMenu] = useState<{
     mouseX: number | null;
     mouseY: number | null;
     id: number | null;
@@ -262,11 +268,11 @@ export function DataTable<T extends Record<string, unknown>>(
   const appId = getParam("appId");
 
   // State for filters
-  const [filters, setFilters] = React.useState<InternalFilter[]>([]);
+  const [filters, setFilters] = useState<InternalFilter[]>([]);
   const [appliedFilters, setAppliedFilters] =
-    React.useState<InternalFilter[]>(filters);
+    useState<InternalFilter[]>(filters);
 
-  const updateFiltersAndUrl = React.useCallback(
+  const updateFiltersAndUrl = useCallback(
     (newFilters: InternalFilter[]) => {
       // Update the filters in the URL using the setParam function
       setParam(
@@ -281,9 +287,8 @@ export function DataTable<T extends Record<string, unknown>>(
   );
 
   // State for the user dashboard
-  const [userDashboard, setUserDashboard] =
-    React.useContext(ApplicationsContext);
-  const updateGroupFilters = React.useCallback(
+  const [userDashboard, setUserDashboard] = useContext(ApplicationsContext);
+  const updateGroupFilters = useCallback(
     (newFilters: InternalFilter[]) => {
       const appId = getParam("appId");
 
@@ -328,7 +333,7 @@ export function DataTable<T extends Record<string, unknown>>(
     updateGroupFilters(filters);
   };
 
-  const handleRemoveAllFilters = React.useCallback(() => {
+  const handleRemoveAllFilters = useCallback(() => {
     setSearchBody((prevState) => ({
       ...prevState,
       search: [],
@@ -340,7 +345,7 @@ export function DataTable<T extends Record<string, unknown>>(
     updateGroupFilters([]);
   }, [setFilters]);
 
-  const DashboardItem = React.useMemo(
+  const DashboardItem = useMemo(
     () =>
       userDashboard
         .find((group) => group.items.some((item) => item.id === appId))
@@ -348,7 +353,7 @@ export function DataTable<T extends Record<string, unknown>>(
     [appId, userDashboard],
   );
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (DashboardItem?.data) {
       setFilters(DashboardItem.data);
       setAppliedFilters(DashboardItem.data);
@@ -372,7 +377,7 @@ export function DataTable<T extends Record<string, unknown>>(
   }, [DashboardItem?.data, setFilters, setSearchBody]);
 
   // Manage sorting
-  const handleRequestSort = React.useCallback(
+  const handleRequestSort = useCallback(
     (_event: React.MouseEvent<unknown>, property: string) => {
       const isAsc =
         searchBody.sort &&
@@ -387,14 +392,14 @@ export function DataTable<T extends Record<string, unknown>>(
   );
 
   // Manage pagination
-  const handleChangePage = React.useCallback(
+  const handleChangePage = useCallback(
     (_event: unknown, newPage: number) => {
       table.setPageIndex(newPage);
     },
     [table],
   );
 
-  const handleChangeRowsPerPage = React.useCallback(
+  const handleChangeRowsPerPage = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
       table.setPageSize(Number(event.target.value));
       table.setPageIndex(0);
@@ -403,7 +408,7 @@ export function DataTable<T extends Record<string, unknown>>(
   );
 
   // Manage context menu
-  const handleContextMenu = React.useCallback(
+  const handleContextMenu = useCallback(
     (event: React.MouseEvent, id: number) => {
       event.preventDefault();
       setContextMenu({
@@ -415,15 +420,12 @@ export function DataTable<T extends Record<string, unknown>>(
     [],
   );
 
-  const handleCloseContextMenu = React.useCallback(() => {
+  const handleCloseContextMenu = useCallback(() => {
     setContextMenu({ mouseX: null, mouseY: null, id: null });
   }, []);
 
   // Virtualizer
-  const VirtuosoTableComponents: TableComponents<
-    Row<T>,
-    unknown
-  > = React.useMemo(
+  const VirtuosoTableComponents: TableComponents<Row<T>, unknown> = useMemo(
     () => ({
       Scroller: React.forwardRef<HTMLDivElement>(function Scroller(props, ref) {
         return <TableContainer {...props} ref={ref} />;

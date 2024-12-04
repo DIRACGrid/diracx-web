@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   Button,
   FormControl,
@@ -44,25 +44,20 @@ export interface FilterFormProps<T extends Record<string, unknown>> {
  *
  * @returns a FilterForm component
  */
-export function FilterForm<T extends Record<string, unknown>>(
-  props: FilterFormProps<T>,
-) {
-  const {
-    columns,
-    filters,
-    setFilters,
-    handleFilterChange,
-    handleFilterMenuClose,
-    selectedFilterId,
-  } = props;
-  const [tempFilter, setTempFilter] = React.useState<InternalFilter | null>(
-    null,
-  );
+export function FilterForm<T extends Record<string, unknown>>({
+  columns,
+  filters,
+  setFilters,
+  handleFilterChange,
+  handleFilterMenuClose,
+  selectedFilterId,
+}: FilterFormProps<T>) {
+  const [tempFilter, setTempFilter] = useState<InternalFilter | null>(null);
   // Find the index using the filter ID
   const filterIndex = filters.findIndex((f) => f.id === selectedFilterId);
 
   // Set the temp filter
-  React.useEffect(() => {
+  useEffect(() => {
     if (filterIndex !== -1) {
       setTempFilter(filters[filterIndex]);
     } else {

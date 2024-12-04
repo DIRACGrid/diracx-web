@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 
 import { Box } from "@mui/material";
@@ -19,9 +19,7 @@ const meta = {
   tags: ["autodocs"],
   decorators: [
     (Story) => {
-      const [userDashboard, setUserDashboard] = React.useState<
-        DashboardGroup[]
-      >([
+      const [userDashboard, setUserDashboard] = useState<DashboardGroup[]>([
         {
           title: "Group Title",
           extended: true,

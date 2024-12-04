@@ -12,17 +12,19 @@ export const NavigationContext = React.createContext<NavigationContextType>({
   getSearchParams: () => new URLSearchParams(),
 });
 
+interface NavigationProviderProps {
+  children: React.ReactNode;
+  getPath: () => string;
+  setPath: (path: string) => void;
+  getSearchParams: () => URLSearchParams;
+}
+
 export const NavigationProvider = ({
   children,
   getPath,
   setPath,
   getSearchParams,
-}: {
-  children: React.ReactNode;
-  getPath: () => string;
-  setPath: (path: string) => void;
-  getSearchParams: () => URLSearchParams;
-}) => {
+}: NavigationProviderProps) => {
   return (
     <NavigationContext.Provider value={{ getPath, setPath, getSearchParams }}>
       {children}

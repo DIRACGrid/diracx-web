@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
 import {
   ListItemButton,
@@ -26,21 +26,7 @@ import { useSearchParamsUtils } from "@/hooks/searchParamsUtils";
 import { useApplicationId } from "@/hooks/application";
 import { DashboardGroup } from "@/types";
 
-/**
- * Represents a drawer item component.
- *
- * @returns The rendered JSX for the drawer item.
- */
-export default function DrawerItem({
-  item: { title, id, icon },
-  index,
-  groupTitle,
-  renamingItemId,
-  setRenamingItemId,
-  renameValue,
-  setRenameValue,
-  setUserDashboard,
-}: {
+interface DrawerItemProps {
   /** The item object containing the title, id, and icon. */
   item: { title: string; id: string; icon: React.ComponentType };
   /** The index of the item. */
@@ -57,11 +43,27 @@ export default function DrawerItem({
   setRenameValue: React.Dispatch<React.SetStateAction<string>>;
   /** The function to set the user dashboard state. */
   setUserDashboard: React.Dispatch<React.SetStateAction<DashboardGroup[]>>;
-}) {
+}
+
+/**
+ * Represents a drawer item component.
+ *
+ * @returns The rendered JSX for the drawer item.
+ */
+export default function DrawerItem({
+  item: { title, id, icon },
+  index,
+  groupTitle,
+  renamingItemId,
+  setRenamingItemId,
+  renameValue,
+  setRenameValue,
+  setUserDashboard,
+}: DrawerItemProps) {
   // Ref to use for the draggable element
-  const dragRef = React.useRef(null);
+  const dragRef = useRef(null);
   // Ref to use for the handle of the draggable element, must be a child of the draggable element
-  const handleRef = React.useRef(null);
+  const handleRef = useRef(null);
   const theme = useTheme();
   const { setParam } = useSearchParamsUtils();
   // Represents the closest edge to the mouse cursor

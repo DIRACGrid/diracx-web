@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { grey } from "@mui/material/colors";
 import { FilterList, Delete, Send, Refresh } from "@mui/icons-material";
 import Chip from "@mui/material/Chip";
@@ -33,24 +33,22 @@ export interface FilterToolbarProps<T extends Record<string, unknown>> {
  *
  * @returns a FilterToolbar component
  */
-export function FilterToolbar<T extends Record<string, unknown>>(
-  props: FilterToolbarProps<T>,
-) {
-  const {
-    columns,
-    filters,
-    setFilters,
-    appliedFilters,
-    handleApplyFilters,
-    handleClearFilters,
-  } = props;
-  const [anchorEl, setAnchorEl] = React.useState<HTMLElement | null>(null);
-  const [selectedFilter, setSelectedFilter] =
-    React.useState<InternalFilter | null>(null);
-  const addFilterButtonRef = React.useRef<HTMLButtonElement>(null);
+export function FilterToolbar<T extends Record<string, unknown>>({
+  columns,
+  filters,
+  setFilters,
+  appliedFilters,
+  handleApplyFilters,
+  handleClearFilters,
+}: FilterToolbarProps<T>) {
+  const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
+  const [selectedFilter, setSelectedFilter] = useState<InternalFilter | null>(
+    null,
+  );
+  const addFilterButtonRef = useRef<HTMLButtonElement>(null);
 
   // Filter actions
-  const handleAddFilter = React.useCallback(() => {
+  const handleAddFilter = useCallback(() => {
     // Create a new filter: it will not be used
     // It is just a placeholder to open the filter form
     const newFilter = {
@@ -92,11 +90,11 @@ export function FilterToolbar<T extends Record<string, unknown>>(
     setFilters(filters.filter((_, i) => i !== index));
   };
 
-  const changesUnapplied = React.useCallback(() => {
+  const changesUnapplied = useCallback(() => {
     return JSON.stringify(filters) !== JSON.stringify(appliedFilters);
   }, [filters, appliedFilters]);
 
-  const isApplied = React.useCallback(
+  const isApplied = useCallback(
     (filter: InternalFilter) => {
       return appliedFilters.some((f) => f.id == filter.id);
     },
@@ -116,7 +114,7 @@ export function FilterToolbar<T extends Record<string, unknown>>(
   }
 
   // Keyboard shortcuts
-  React.useEffect(() => {
+  useEffect(() => {
     const handleKeyPress = (event: KeyboardEvent) => {
       if (event.altKey && event.shiftKey) {
         switch (event.key.toLowerCase()) {
