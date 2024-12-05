@@ -22,6 +22,12 @@ export const ApplicationsContext = createContext<
   ]
 >([[], () => {}, []]);
 
+interface ApplicationsProviderProps {
+  children: React.ReactNode;
+  appList?: ApplicationMetadata[];
+  defaultUserDashboard?: DashboardGroup[];
+}
+
 /**
  * Provides the applications context to its children components.
  *
@@ -34,11 +40,7 @@ export const ApplicationsProvider = ({
   children,
   appList = applicationList,
   defaultUserDashboard,
-}: {
-  children: React.ReactNode;
-  appList?: ApplicationMetadata[];
-  defaultUserDashboard?: DashboardGroup[];
-}) => {
+}: ApplicationsProviderProps) => {
   const [userDashboard, setUserDashboard] = useState<DashboardGroup[]>([]);
 
   const { getParam, setParam } = useSearchParamsUtils();

@@ -1,4 +1,4 @@
-import React from "react";
+import { useState, useContext } from "react";
 import {
   Dialog,
   DialogTitle,
@@ -12,6 +12,15 @@ import {
 import { Close, SvgIconComponent } from "@mui/icons-material";
 import { ApplicationsContext } from "@/contexts/ApplicationsProvider";
 
+interface AppDialogProps {
+  /** Determines whether the dialog is open or not. */
+  appDialogOpen: boolean;
+  /** Function to set the open state of the dialog. */
+  setAppDialogOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  /** Function to handle the creation of a new application. */
+  handleCreateApp: (name: string, icon: SvgIconComponent) => void;
+}
+
 /**
  * Renders a dialog component for creating a new application.
  *
@@ -22,16 +31,9 @@ export default function AppDialog({
   appDialogOpen,
   setAppDialogOpen,
   handleCreateApp,
-}: {
-  /** Determines whether the dialog is open or not. */
-  appDialogOpen: boolean;
-  /** Function to set the open state of the dialog. */
-  setAppDialogOpen: React.Dispatch<React.SetStateAction<boolean>>;
-  /** Function to handle the creation of a new application. */
-  handleCreateApp: (name: string, icon: SvgIconComponent) => void;
-}) {
-  const [appType, setAppType] = React.useState("");
-  const applicationList = React.useContext(ApplicationsContext)[2];
+}: AppDialogProps) {
+  const [appType, setAppType] = useState("");
+  const applicationList = useContext(ApplicationsContext)[2];
   return (
     <Dialog
       open={appDialogOpen}

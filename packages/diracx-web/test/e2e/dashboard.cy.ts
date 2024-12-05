@@ -7,7 +7,7 @@ describe("DashboardDrawer", { retries: { runMode: 5, openMode: 3 } }, () => {
       cy.visit("/");
 
       //login
-      cy.contains("Login through your Identity Provider").click();
+      cy.get('[data-testid="button-login"]').click();
       cy.get("#login").type("admin@example.com");
       cy.get("#password").type("password");
 
@@ -18,19 +18,19 @@ describe("DashboardDrawer", { retries: { runMode: 5, openMode: 3 } }, () => {
       cy.url().should("include", "/auth");
     });
     cy.visit(
-      "/?appId=Dashboard0&dashboard=E-4tru2-93-96-0%27A1316Job70%275AOther4fals2.3.6B80%2755*%28%27title%21%27-Dashboard.B+891Job+792e~items%21E3type%21%2749extended%215%29%5D6id%21%277Monitor8Catalog9%27~A%29%2C*BFileE%5B*%01EBA987654321.-*_",
+      "/?appId=Base+Application+11&dashboard=%5B4dashboard-*2%27~id.+11%27~type.%27%29%2C4Jobs%27~type5Job+3%27~id5Job30%27%29%5D%29%2C*Others-%5D%29%5D*%28%27title5-%27~extended%21true~items%21%5B.52lication2Base+App3Monitor4*My+5%21%27%015432.-*_",
     );
   });
 
   it("should render the drawer", () => {
     // Check if the drawer is rendered
-    cy.contains("Job Monitor").should("be.visible");
+    cy.contains("My Jobs").should("be.visible");
   });
 
   it("should toggle the group on button click", () => {
-    cy.contains("Dashboard").click();
+    cy.contains("My dashboard").click();
     // Check if the drawer is not visible after clicking the toggle button
-    cy.contains("Job Monitor").should("not.be.visible");
+    cy.contains("My Jobs").should("not.be.visible");
   });
 
   it("should handle application addition", () => {
@@ -38,25 +38,25 @@ describe("DashboardDrawer", { retries: { runMode: 5, openMode: 3 } }, () => {
 
     cy.get("button").contains("Base Application").click().click();
 
-    cy.contains("Other").click();
+    cy.contains("Others").click();
     // Check if the application is added
-    cy.contains("Base Application 1").should("be.visible");
+    cy.contains("Base Application 2").should("be.visible");
   });
 
   it("should handle application deletion", () => {
-    cy.get(".MuiListItemButton-root").contains("Dashboard").rightclick();
+    cy.get(".MuiListItemButton-root").contains("Base App").rightclick();
     cy.contains("Delete").click();
 
     // Check if the application is deleted
-    cy.get(".MuiListItemButton-root").contains("Dashboard").should("not.exist");
+    cy.get(".MuiListItemButton-root").contains("Base App").should("not.exist");
   });
 
   it("should handle application renaming", () => {
-    cy.get(".MuiListItemButton-root").contains("Dashboard").rightclick();
+    cy.get(".MuiListItemButton-root").contains("Base App").rightclick();
     cy.contains("Rename").click();
 
     cy.get("input").type("Base App1");
-    cy.get("button").contains("Rename").click();
+    cy.get("input").type("{enter}");
 
     // Check if the application is renamed
     cy.get(".MuiListItemButton-root")
@@ -65,35 +65,35 @@ describe("DashboardDrawer", { retries: { runMode: 5, openMode: 3 } }, () => {
   });
 
   it("should handle group creation", () => {
-    cy.contains("Dashboard").rightclick();
+    cy.get('[data-testid="drawer-permanent"]').rightclick({ force: true });
     cy.contains("New Group").click();
 
     cy.contains("Group 3").should("be.visible");
   });
 
   it("should handle group deletion", () => {
-    cy.contains("Other").rightclick();
+    cy.contains("Others").rightclick();
     cy.contains("Delete").click();
 
     // Check if the group is deleted
-    cy.contains("Other").should("not.exist");
+    cy.contains("Others").should("not.exist");
   });
 
   it("should handle group renaming", () => {
-    cy.contains("Other").rightclick();
+    cy.contains("Others").rightclick();
     cy.contains("Rename").click();
 
     cy.get("input").type("Other 1");
-    cy.get("button").contains("Rename").click();
+    cy.get("input").type("{enter}");
 
     // Check if the group is renamed
     cy.contains("Other 1").should("be.visible");
   });
 
   it("should create a the app in a new group if there is no group", () => {
-    cy.contains("Dashboard").rightclick();
+    cy.contains("My dashboard").rightclick();
     cy.contains("Delete").click();
-    cy.contains("Other").rightclick();
+    cy.contains("Others").rightclick();
     cy.contains("Delete").click();
 
     cy.contains("Add application").click();
@@ -107,16 +107,16 @@ describe("DashboardDrawer", { retries: { runMode: 5, openMode: 3 } }, () => {
   });
 
   it("should persist the state of the drawer", () => {
-    cy.contains("Dashboard").click();
+    cy.contains("My dashboard").click();
 
     // Check if the drawer is not visible before reloading
-    cy.contains("Job Monitor").should("not.be.visible");
+    cy.contains("My Jobs").should("not.be.visible");
     cy.wait(500);
     cy.url().should("include", "dashboard=");
 
     cy.reload();
     // Check if the drawer is still not visible after reloading
-    cy.contains("Job Monitor").should("not.be.visible");
+    cy.contains("My Jobs").should("not.be.visible");
   });
 
   it("should load the state of the drawer from url", () => {
@@ -129,7 +129,7 @@ describe("DashboardDrawer", { retries: { runMode: 5, openMode: 3 } }, () => {
   });
 
   it("should navigate to the application on click", () => {
-    cy.contains("Job Monitor").click();
+    cy.contains("My Jobs").click();
 
     // Check if the application is navigated to
     cy.url().should("include", "JobMonitor0");
@@ -137,14 +137,14 @@ describe("DashboardDrawer", { retries: { runMode: 5, openMode: 3 } }, () => {
 
   it("should handle drag and drop for items", () => {
     dragAndDrop(
-      cy.contains("[draggable=true]", "Job Monitor").first(),
-      cy.contains("[data-drop-target-for-element=true]", "Other").first(),
+      cy.contains("[draggable=true]", "My Jobs").first(),
+      cy.contains("[data-drop-target-for-element=true]", "Others").first(),
       cy.get('[data-testid="drag-handle"]').eq(1),
     );
 
     // Check if the application is dropped
     cy.get(":nth-child(2) > .MuiPaper-root")
-      .contains("Job Monitor")
+      .contains("My Jobs")
       .should("be.visible");
   });
 });

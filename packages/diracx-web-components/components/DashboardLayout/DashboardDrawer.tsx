@@ -12,20 +12,15 @@ import {
   Popover,
   TextField,
   Toolbar,
+  useTheme,
 } from "@mui/material";
 import { MenuBook, Add, SvgIconComponent } from "@mui/icons-material";
-import React, {
-  ReactEventHandler,
-  useContext,
-  useEffect,
-  useState,
-} from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { monitorForElements } from "@atlaskit/pragmatic-drag-and-drop/element/adapter";
 import { extractClosestEdge } from "@atlaskit/pragmatic-drag-and-drop-hitbox/closest-edge";
 import DrawerItemGroup from "./DrawerItemGroup";
 import AppDialog from "./ApplicationDialog";
 import { ApplicationsContext } from "@/contexts/ApplicationsProvider";
-import { useMUITheme } from "@/hooks/theme";
 import { DashboardGroup } from "@/types";
 
 interface DashboardDrawerProps {
@@ -36,7 +31,7 @@ interface DashboardDrawerProps {
   /** The width of the drawer. */
   width: number;
   /** The function to handle the drawer toggle. */
-  handleDrawerToggle: ReactEventHandler;
+  handleDrawerToggle: React.ReactEventHandler;
   /** The URL for the logo image. */
   logoURL?: string;
 }
@@ -48,16 +43,22 @@ interface DashboardDrawerProps {
  * @param {DashboardDrawerProps} props - The props for the DashboardDrawer component.
  * @returns {JSX.Element} The rendered DashboardDrawer component.
  */
-export default function DashboardDrawer(props: DashboardDrawerProps) {
+export default function DashboardDrawer({
+  variant,
+  mobileOpen,
+  width,
+  handleDrawerToggle,
+  logoURL = "/DIRAC-logo.png",
+}: DashboardDrawerProps) {
   // Determine the container for the Drawer based on whether the window object exists.
   const container =
     window !== undefined ? () => window.document.body : undefined;
   // Check if the drawer is in "temporary" mode.
-  const isTemporary = props.variant === "temporary";
+  const isTemporary = variant === "temporary";
   // Whether the modal for Application Creation is open
   const [appDialogOpen, setAppDialogOpen] = useState(false);
 
-  const [contextMenu, setContextMenu] = React.useState<{
+  const [contextMenu, setContextMenu] = useState<{
     mouseX: number;
     mouseY: number;
   } | null>(null);
@@ -67,18 +68,16 @@ export default function DashboardDrawer(props: DashboardDrawerProps) {
     id: string | null;
   }>({ type: null, id: null });
 
-  const [popAnchorEl, setPopAnchorEl] = React.useState<HTMLElement | null>(
-    null,
-  );
-  const [renameValue, setRenameValue] = React.useState("");
+  const [popAnchorEl, setPopAnchorEl] = useState<HTMLElement | null>(null);
+  const [renamingItemId, setRenamingItemId] = useState<string | null>(null);
+  const [renamingGroupId, setRenamingGroupId] = useState<string | null>(null);
+  const [renameValue, setRenameValue] = useState("");
 
   // Define the applications that are accessible to users.
   // Each application has an associated icon and path.
   const [userDashboard, setUserDashboard] = useContext(ApplicationsContext);
 
-  const logoURL = props.logoURL || "/DIRAC-logo.png";
-
-  const theme = useMUITheme();
+  const theme = useTheme();
 
   useEffect(() => {
     // Handle changes to app instances when drag and drop occurs.
@@ -306,8 +305,14 @@ export default function DashboardDrawer(props: DashboardDrawerProps) {
     handleCloseContextMenu();
   };
 
-  const handleRenameClick = (event: React.MouseEvent<HTMLElement>) => {
-    setPopAnchorEl(event.currentTarget);
+  const handleRenameClick = () => {
+    if (contextState.type === "group") {
+      setRenamingGroupId(contextState.id);
+    } else if (contextState.type === "item") {
+      setRenamingItemId(contextState.id);
+    }
+    setRenameValue("");
+    handleCloseContextMenu();
   };
 
   const popClose = () => {
@@ -352,9 +357,9 @@ export default function DashboardDrawer(props: DashboardDrawerProps) {
     <>
       <Drawer
         container={isTemporary ? container : undefined}
-        variant={props.variant}
-        open={isTemporary ? props.mobileOpen : true}
-        onClose={props.handleDrawerToggle}
+        variant={variant}
+        open={isTemporary ? mobileOpen : true}
+        onClose={handleDrawerToggle}
         sx={{
           display: {
             xs: isTemporary ? "block" : "none",
@@ -362,10 +367,10 @@ export default function DashboardDrawer(props: DashboardDrawerProps) {
           },
           "& .MuiDrawer-paper": {
             boxSizing: "border-box",
-            width: props.width,
+            width: width,
           },
         }}
-        data-testid={`drawer-${props.variant}`}
+        data-testid={`drawer-${variant}`}
         onContextMenu={handleContextMenu()}
       >
         <div
@@ -394,6 +399,12 @@ export default function DashboardDrawer(props: DashboardDrawerProps) {
                   group={group}
                   setUserDashboard={setUserDashboard}
                   handleContextMenu={handleContextMenu}
+                  renamingGroupId={renamingGroupId}
+                  setRenamingGroupId={setRenamingGroupId}
+                  renamingItemId={renamingItemId}
+                  setRenamingItemId={setRenamingItemId}
+                  renameValue={renameValue}
+                  setRenameValue={setRenameValue}
                 />
               </ListItem>
             ))}
@@ -443,8 +454,9 @@ export default function DashboardDrawer(props: DashboardDrawerProps) {
           {contextState.type && (
             <MenuItem onClick={handleDelete}>Delete</MenuItem>
           )}
-
-          <MenuItem onClick={handleNewGroup}>New Group</MenuItem>
+          {contextState.type === null && (
+            <MenuItem onClick={handleNewGroup}>New Group</MenuItem>
+          )}
         </Menu>
         <Popover
           open={Boolean(popAnchorEl)}

@@ -12,6 +12,45 @@
   "rules": {
     "import/order": ["error"],
     "import/no-unused-modules": ["error"],
-    "import/no-useless-path-segments": ["error"]
+    "import/no-useless-path-segments": ["error"],
+    "react/destructuring-assignment": ["error", "always"],
+    "no-restricted-properties": [
+      "error",
+      {
+        "object": "React",
+        "property": "useCallback",
+        "message": "Please import 'useCallback' directly from 'react' instead of 'React.useCallback'."
+      },
+      {
+        "object": "React",
+        "property": "useContext",
+        "message": "Please import 'useContext' directly from 'react' instead of 'React.useContext'."
+      },
+      {
+        "object": "React",
+        "property": "useEffect",
+        "message": "Please import 'useEffect' directly from 'react' instead of 'React.useEffect'."
+      },
+      {
+        "object": "React",
+        "property": "useMemo",
+        "message": "Please import 'useMemo' directly from 'react' instead of 'React.useMemo'."
+      },
+      {
+        "object": "React",
+        "property": "useReducer",
+        "message": "Please import 'useReducer' directly from 'react' instead of 'React.useReducer'."
+      },
+      {
+        "object": "React",
+        "property": "useRef",
+        "message": "Please import 'useRef' directly from 'react' instead of 'React.useRef'."
+      },
+      {
+        "object": "React",
+        "property": "useState",
+        "message": "Please import 'useState' directly from 'react' instead of 'React.useState'."
+      }
+    ]
   }
 }

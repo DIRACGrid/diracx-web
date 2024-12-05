@@ -1,8 +1,7 @@
 import React from "react";
 import { StoryObj, Meta } from "@storybook/react";
 import { useArgs } from "@storybook/core/preview-api";
-import { ThemeProvider } from "@mui/material";
-import { useMUITheme } from "../../hooks/theme";
+import { ThemeProvider } from "../../contexts/ThemeProvider";
 import { JobHistoryDialog } from "./JobHistoryDialog";
 
 const meta = {
@@ -19,9 +18,8 @@ const meta = {
   },
   decorators: [
     (Story) => {
-      const theme = useMUITheme();
       return (
-        <ThemeProvider theme={theme}>
+        <ThemeProvider>
           <Story />
         </ThemeProvider>
       );
@@ -45,6 +43,7 @@ export const Default: Story = {
     ],
     open: true,
     onClose: () => {},
+    jobId: 1234,
   },
   render: (props) => {
     const [, updateArgs] = useArgs();

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 
 import { Dashboard as DashboardIcon } from "@mui/icons-material";
@@ -23,9 +23,7 @@ const meta = {
   },
   decorators: [
     (Story) => {
-      const [userDashboard, setUserDashboard] = React.useState<
-        DashboardGroup[]
-      >([
+      const [userDashboard, setUserDashboard] = useState<DashboardGroup[]>([
         {
           title: "Group Title",
           extended: true,

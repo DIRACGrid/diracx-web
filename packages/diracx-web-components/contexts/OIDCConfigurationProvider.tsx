@@ -18,6 +18,10 @@ export const OIDCConfigurationContext = createContext<{
   setConfiguration: () => {},
 });
 
+interface OIDCConfigurationProviderProps {
+  children: React.ReactNode;
+}
+
 /**
  * OIDC configuration provider
  * @param children - the children of the provider
@@ -25,9 +29,7 @@ export const OIDCConfigurationContext = createContext<{
  */
 export const OIDCConfigurationProvider = ({
   children,
-}: {
-  children: React.ReactNode;
-}) => {
+}: OIDCConfigurationProviderProps) => {
   const [configuration, setConfiguration] = useState<OidcConfiguration | null>(
     null,
   );

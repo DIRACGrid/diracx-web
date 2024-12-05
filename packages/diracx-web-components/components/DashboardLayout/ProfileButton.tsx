@@ -25,9 +25,9 @@ import {
   Stack,
   Tooltip,
   Typography,
+  useTheme,
 } from "@mui/material";
-import { cyan } from "@mui/material/colors";
-import React from "react";
+import React, { useState } from "react";
 import { useOIDCContext } from "@/hooks/oidcConfiguration";
 
 /**
@@ -35,11 +35,13 @@ import { useOIDCContext } from "@/hooks/oidcConfiguration";
  * @returns a Button
  */
 export function ProfileButton() {
+  const theme = useTheme();
+
   const { configuration, setConfiguration } = useOIDCContext();
   const { accessTokenPayload } = useOidcAccessToken(configuration?.scope);
   const { logout, isAuthenticated } = useOidc(configuration?.scope);
 
-  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
 
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
@@ -76,7 +78,7 @@ export function ProfileButton() {
           aria-haspopup="true"
           aria-expanded={open ? "true" : undefined}
         >
-          <Avatar sx={{ bgcolor: cyan[500] }}>
+          <Avatar sx={{ bgcolor: theme.palette.secondary.main }}>
             {accessTokenPayload["preferred_username"][0]}
           </Avatar>
         </IconButton>
