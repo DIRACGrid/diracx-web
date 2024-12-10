@@ -15,7 +15,36 @@ This repository is organized as a monorepo, with the following key packages:
 - [diracx-web-components](packages/diracx-web-components)
 - [extensions](packages/extensions)
 
-![Architecture diagram](docs/architecture_overview.png)
+```mermaid
+---
+config:
+  layout: elk
+---
+flowchart TD
+ subgraph monorep["Monorepo"]
+        monorep1["diracx-web-components"]
+        monorep2["diracx-web"]
+        monorep3["extension[gubbins]"]
+  end
+    monorep2 -- images deployed in --> docker[" "]
+    monorep3 -- images deployed in --> docker
+    monorep2 -. uses .-> monorep1
+    monorep3 -. uses .-> monorep1
+    monorep1 -- documented on --> storybook[" "]
+    monorep1 -- published on --> npm[" "]
+    extension["diracx-community-extension"] -. uses .-> npm
+    docker@{ img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQLQKd_MRed_mZQlgrzQuUXVA3P39ssOVX8_g&s", h: 100, w: 100}
+    storybook@{ img: "https://miro.medium.com/v2/resize:fit:900/1*ZuBTYHXl6l3XzTb8d9Oi5Q.png", h: 100, w: 150, pos: "b"}
+    npm@{ img: "https://upload.wikimedia.org/wikipedia/commons/thumb/d/db/Npm-logo.svg/2560px-Npm-logo.svg.png", h: 40, w: 100}
+     monorep1:::Ash
+     monorep1:::Cyan
+     monorep2:::Green
+     monorep3:::Green
+     extension:::Ash
+    classDef Cyan stroke-width:1px, stroke-dasharray:none, stroke:#00FFFF, fill:#9CFFFF
+    classDef Green stroke-width:1px, stroke-dasharray:none, stroke:#5BFF00, fill:#A4FF8E, color:#374D7C
+    classDef Ash stroke-width:1px, stroke-dasharray:none, stroke:#999999, fill:#EEEEEE, color:#000000
+```
 
 ### Packages
 
