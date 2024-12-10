@@ -5,7 +5,9 @@
 FROM node:alpine AS build
 WORKDIR /app
 # Copy the application to the working directory
-COPY . .
+COPY package*.json ./
+COPY packages/diracx-web ./packages/diracx-web
+COPY packages/diracx-web-components ./packages/diracx-web-components
 # Install the project dependencies
 RUN npm ci
 # Build the static export with telemetry disabled (https://nextjs.org/telemetry)

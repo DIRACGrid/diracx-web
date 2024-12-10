@@ -1,5 +1,5 @@
 "use client";
-import * as React from "react";
+import React from "react";
 import { useOidcAccessToken } from "@axa-fr/react-oidc";
 import { useOIDCContext } from "@dirac-grid/diracx-web-components/hooks";
 import { Box } from "@mui/material";
