@@ -16,7 +16,7 @@ describe("Login and Logout", () => {
     cy.url().should("include", "/auth");
 
     // Continue with the default parameters
-    cy.contains("Login through your Identity Provider").click();
+    cy.get('[data-testid="button-login"]').click();
 
     // Extract name from baseUrl (remove http:// and port number)
     const domain = Cypress.config()
@@ -42,11 +42,17 @@ describe("Login and Logout", () => {
 
     // From now on the user is logged in
     // The login buttton should not be present anymore
-    cy.contains("Login").should("not.exist");
+    cy.get('[data-testid="button-login"]').should("not.exist");
     cy.contains("Hello admin").should("exist");
 
     // Click on the user avatar
     cy.get(".MuiAvatar-root").click();
+    // Check the user details
+    cy.contains("admin").should("exist");
+    cy.contains("diracAdmin").should("exist");
+    // Check the Properties accordion
+    cy.contains("Properties").click();
+    cy.contains("NormalUser").should("exist");
 
     // Logout
     cy.contains("Logout").click();
@@ -56,7 +62,7 @@ describe("Login and Logout", () => {
 
     // The user is logged out
     // The login button should be present
-    cy.contains("Login through your Identity Provider").should("exist");
+    cy.get('[data-testid="button-login"]').should("exist");
 
     // The user tries to access the dashboard page without being connected
     // The user is redirected to the /auth page

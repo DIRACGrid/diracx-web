@@ -37,7 +37,7 @@ export default function DashboardLayout({
       No need to use it if you don't want to customize the applications */}
       <ApplicationsProvider
         appList={applicationList}
-        defaultSections={defaultSections}
+        defaultUserDashboard={defaultSections}
       >
         {/* OIDCSecure is used to make sure the user is authenticated before accessing the dashboard */}
         <OIDCSecure>

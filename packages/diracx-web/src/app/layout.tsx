@@ -5,7 +5,7 @@ const inter = Inter({ subsets: ["latin"] });
 
 export const metadata = {
   title: "DiracX",
-  description: "Distributed Infrastructure with Remote Agent Controller",
+  description: "DiracX Web Interface",
 };
 
 // Force an error if any components use dynamic functions or uncached data

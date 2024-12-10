@@ -13,6 +13,9 @@
     ".": {
       "component": "root"
     },
+    "packages/extensions": {
+      "component": "extensions"
+    },
     "packages/diracx-web": {
       "component": "diracx-web"
     },
@@ -28,24 +31,7 @@
     {
       "type": "linked-versions",
       "groupName": "DiracX-Web",
-      "components": ["root", "diracx-web", "diracx-web-components"]
-    }
-  ],
-  "extra-files": [
-    {
-      "type": "json",
-      "path": "packages/extensions/package.json",
-      "jsonpath": "$.version"
-    },
-    {
-      "type": "json",
-      "path": "packages/extensions/package-lock.json",
-      "jsonpath": "$.version"
-    },
-    {
-      "type": "json",
-      "path": "packages/extensions/package-lock.json",
-      "jsonpath": "$.packages[''].version"
+      "components": ["root", "diracx-web", "diracx-web-components", "extensions"]
     }
   ],
   "$schema": "https://raw.githubusercontent.com/googleapis/release-please/main/schemas/config.json"

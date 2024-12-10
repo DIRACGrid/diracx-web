@@ -27,7 +27,6 @@ flowchart TD
         monorep3["extension[gubbins]"]
   end
     monorep2 -- images deployed in --> docker[" "]
-    monorep3 -- images deployed in --> docker
     monorep2 -. uses .-> monorep1
     monorep3 -. uses .-> monorep1
     monorep1 -- documented on --> storybook[" "]

@@ -1,9 +1,9 @@
-import { UserSection } from "@dirac-grid/diracx-web-components/types";
+import { DashboardGroup } from "@dirac-grid/diracx-web-components/types";
 import { BugReport } from "@mui/icons-material";
 import { applicationList } from "@/gubbins/applicationList";
 
 // New default user sections
-export const defaultSections: UserSection[] = [
+export const defaultSections: DashboardGroup[] = [
   {
     title: "Default Applications",
     extended: true,

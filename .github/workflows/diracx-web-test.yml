@@ -25,9 +25,8 @@ jobs:
     - name: Clone source
       run: |
         cd ..
-        git clone https://github.com/aldbr/diracx-charts.git
-        cd diracx-charts
-        git switch main_FEAT_npm-workspaces
+        git clone https://github.com/DIRACGrid/diracx-charts.git
+
     - name: Start demo
       run: |
         cd ..

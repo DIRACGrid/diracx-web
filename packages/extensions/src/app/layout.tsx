@@ -4,8 +4,8 @@ import { Suspense } from "react";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata = {
-  title: "DiracX",
-  description: "Distributed Infrastructure with Remote Agent Controller",
+  title: "Gubbins",
+  description: "Example of a DiracX Web Extension",
 };
 
 // Force an error if any components use dynamic functions or uncached data

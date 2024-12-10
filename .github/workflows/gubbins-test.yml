@@ -12,15 +12,11 @@ on:
       - release-please-**
 
 jobs:
+  # Run lint and type checks
   run-lint:
     runs-on: ubuntu-latest
-    # Run the tests only if It's a PR or if the repo is DIRACGrid/diracx-web
     if: github.event_name != 'push' || github.repository == 'DIRACGrid/diracx-web'
-    defaults:
-      run:
-        working-directory: packages/extensions
     steps:
-      # Checkout the new source code
       - uses: actions/checkout@v4
       
       - uses: actions/setup-node@v4
@@ -30,35 +26,141 @@ jobs:
 
       - name: Install dependencies
         run: npm ci
+
+      # ========================================================================#
+      # WARNING: In your CI/CD pipeline, you should remove the following step   #
+      # ------------------------------------------------------------------------#
+      - name: Build Library
+        run: npm run build:diracx-web-components
+      # ------------------------------------------------------------------------#
+      # ========================================================================#
       
       - name: Check code-quality rules
-        run: npm run lint
+        run: npm --prefix packages/extensions run lint
       - name: Check typescript type validity
-        run: npm run ts-lint
+        run: npm --prefix packages/extensions run ts-lint
 
+  # ============================================================================#
+  # WARNING: In your CI/CD pipeline, you should remove the following job        #
+  # ----------------------------------------------------------------------------#
+  prepare-gubbins-as-a-standalone:
+    runs-on: ubuntu-latest
+    if: ${{ github.event_name != 'push' || github.repository == 'DIRACGrid/diracx-web' }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 'lts/*'
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build diracx-web-components
+        working-directory: packages/diracx-web-components
+        run: |
+          npm pack
+
+      - name: Where the magic happens (Move extensions to a temporary directory)
+        run: |
+          # Move the library package to the extensions directory
+          mv packages/diracx-web-components/*.tgz packages/extensions/diracx-web-components.tgz
+          # Move the extensions to the temporary directory
+          mv packages/extensions /tmp/extensions
+          # Update the package.json to point to the local diracx-web-components
+          jq '.dependencies["@dirac-grid/diracx-web-components"] = "file:./diracx-web-components.tgz"' /tmp/extensions/package.json > /tmp/extensions/package.temp.json
+          mv /tmp/extensions/package.temp.json /tmp/extensions/package.json
+          # Update the package.json to point to the correct postinstall script
+          jq '.scripts.postinstall = "node ./node_modules/@axa-fr/react-oidc/bin/copy-service-worker-files.mjs public"' /tmp/extensions/package.json > /tmp/extensions/package.temp.json
+          mv /tmp/extensions/package.temp.json /tmp/extensions/package.json
+
+      - name: Install extensions dependencies
+        working-directory: /tmp/extensions
+        run: npm install
+
+      - name: Upload the extensions directory
+        uses: actions/upload-artifact@v4
+        with:
+          name: gubbins
+          path: /tmp/extensions
+          retention-days: 1
+  # ----------------------------------------------------------------------------#
+  # In the following jobs, you should:                                          #
+  # - Replace /tmp/extensions with the path to your extension source code       #
+  # - Remove the `needs: prepare-gubbins-as-a-standalone` line                  #
+  # ============================================================================#
+
+  # Build the extension image
+  build-gubbins-dev-image:
+    runs-on: ubuntu-latest
+    needs: prepare-gubbins-as-a-standalone
+    if: ${{ github.event_name != 'push' || github.repository == 'DIRACGrid/diracx-web' }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to GitHub container registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      # ========================================================================#
+      # WARNING: In your CI/CD pipeline, you should remove the following steps  #
+      # ------------------------------------------------------------------------#
+      - name: Download the extensions directory
+        uses: actions/download-artifact@v4
+        with:
+          name: gubbins
+          path: /tmp/extensions
+      # ------------------------------------------------------------------------#
+      # ========================================================================#
+
+      # In your extension, you have to push the image to the registry (check deployment.yml)
+      - name: Build Docker image (extension example)
+        uses: docker/build-push-action@v6
+        with:
+          context: /tmp/extensions
+          push: false
+          tags: ghcr.io/diracgrid/diracx-web/gubbins:dev
+          platforms: linux/amd64,linux/arm64
+
+  # Run the demo with the extension source code
   run-demo:
     runs-on: ubuntu-latest
-    # Run the tests only if It's a PR or if the repo is DIRACGrid/diracx-web
+    needs: prepare-gubbins-as-a-standalone
     if: github.event_name != 'push' || github.repository == 'DIRACGrid/diracx-web'
     steps:
-    # Checkout the new source code
     - uses: actions/checkout@v4 
       
-    # Clone diracx-charts
     - name: Clone source 
       run: |
         cd ..
-        git clone https://github.com/aldbr/diracx-charts.git
-        cd diracx-charts
-        git switch main_FEAT_npm-workspaces
+        git clone https://github.com/DIRACGrid/diracx-charts.git
+
+    # ========================================================================#
+    # WARNING: In your CI/CD pipeline, you should remove the following steps  #
+    # ------------------------------------------------------------------------#
+    - name: Download the extensions directory
+      uses: actions/download-artifact@v4
+      with:
+        name: gubbins
+        path: /tmp/extensions
+    # ------------------------------------------------------------------------#
+    # ========================================================================#
   
     # Runs the demo with the extension source code
     - name: Start demo 
       run: |
         cd ..
-        diracx-charts/run_demo.sh --exit-when-done diracx-web/packages/extensions/
+        diracx-charts/run_demo.sh --exit-when-done /tmp/extensions/
     
-    # Prints some debugging information in case something goes wrong
     - name: Debugging information
       run: |
         cd ../diracx-charts
@@ -82,7 +184,7 @@ jobs:
           exit 1
         fi
     
-    # Find the URL to be tested and put it in the github environment
+    # Find the URL to be tested and put it in the github environment for the next step
     - name: Set DIRACX_URL
       run: echo "DIRACX_URL=https://$(ifconfig | grep 'inet ' | awk '{ print $2 }' | grep -v '^127' | head -n 1 | cut -d '/' -f 1).nip.io:8000" >> $GITHUB_ENV
 
@@ -92,4 +194,4 @@ jobs:
       with:
         browser: chrome
         config: baseUrl=${{ env.DIRACX_URL }}
-        project: packages/extensions
+        project: /tmp/extensions
