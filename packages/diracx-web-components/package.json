@@ -14,8 +14,8 @@
     "lint-staged": "lint-staged",
     "ts-lint": "tsc -noEmit -incremental",
     "prepack": "rm -rf dist && npm run build",
-    "storybook": "storybook dev -p 6006",
-    "build-storybook": "storybook build"
+    "doc": "storybook dev -p 6006",
+    "build-doc": "storybook build"
   },
   "license": "GPL-3.0",
   "type": "module",

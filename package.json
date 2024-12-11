@@ -15,6 +15,7 @@
     "build": "npm --prefix packages/diracx-web-components run build && npm --prefix packages/diracx-web run build && mv -f packages/diracx-web/out ./out",
     "test:diracx-web-components": "npm --prefix packages/diracx-web-components run test",
     "build:diracx-web-components": "npm --prefix packages/diracx-web-components run build",
+    "doc:diracx-web-components": "npm --prefix packages/diracx-web-components run doc",
     "lint": "npm --prefix packages/diracx-web-components run lint && npm --prefix packages/diracx-web run lint",
     "ts-lint": "npm --prefix packages/diracx-web-components run ts-lint && npm --prefix packages/diracx-web run ts-lint",
     "prepare": "husky"
