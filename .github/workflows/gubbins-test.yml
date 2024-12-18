@@ -54,12 +54,17 @@ jobs:
   prepare-gubbins-backend:
     runs-on: ubuntu-latest
     if: ${{ github.event_name != 'push' || github.repository == 'DIRACGrid/diracx-web' }}
+    defaults:
+      run:
+        # We need extglob for REFERENCE_BRANCH substitution
+        shell: bash -l -O extglob {0}
     steps:
       - name: Clone source
         run: |
           cd ..
           git clone https://github.com/DIRACGrid/diracx.git
 
+      # Prepare the gubbins extension
       - name: Where the magic happens (Move extensions to a temporary directory)
         run: |
           # We have to copy the code to another directory
@@ -69,14 +74,61 @@ jobs:
           cp -r ../diracx/extensions/gubbins /tmp/
           sed -i 's@../..@.@g' /tmp/gubbins/pyproject.toml
           sed -i 's@../../@@g' /tmp/gubbins/gubbins-*/pyproject.toml
-          git init /tmp/gubbins/
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: gubbins
           path: /tmp/gubbins
+          include-hidden-files: true
 
+      # Prepare the gubbins image
+      # - Build the gubbins wheels
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Installing dependencies
+        run: |
+          cd ../diracx
+          python -m pip install \
+              build \
+              python-dateutil \
+              pytz \
+              readme_renderer[md] \
+              requests \
+              setuptools_scm
+      - name: Build distributions
+        run: |
+          cd ../diracx
+          for pkg_dir in $PWD/diracx-*; do
+            echo "Building $pkg_dir"
+            python -m build --outdir $PWD/dist $pkg_dir
+          done
+          # Also build the diracx metapackage
+          python -m build --outdir $PWD/dist .
+          # And build the gubbins package
+          for pkg_dir in $PWD/extensions/gubbins/gubbins-*; do
+            # Skip the testing package
+            if [[ "${pkg_dir}" =~ .*testing.* ]];
+            then
+              echo "Do not build ${pkg_dir}";
+              continue;
+            fi
+            echo "Building $pkg_dir"
+            python -m build --outdir $PWD/dist $pkg_dir
+          done
+      - name: "Find wheels"
+        id: find_wheel
+        run: |
+          cd ../diracx/dist
+          # We need to copy them there to be able to access them in the RUN --mount
+          cp diracx*.whl gubbins*.whl ../extensions/containers/services/
+          for wheel_fn in *.whl; do
+            pkg_name=$(basename "${wheel_fn}" | cut -d '-' -f 1)
+            echo "${pkg_name}-wheel-name=$(ls "${pkg_name}"-*.whl)" >> $GITHUB_OUTPUT
+          done
+
+      # - Build the gubbins image using the wheels
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
       - name: Set up Docker Buildx
@@ -210,6 +262,10 @@ jobs:
         name: gubbins
         path: /tmp/gubbins
 
+    - name: Create a new git repository
+      run: |
+        git init /tmp/gubbins/
+
     - name: Clone diracx source 
       run: |
         cd ..
@@ -219,7 +275,7 @@ jobs:
       uses: actions/download-artifact@v4
       with:
         name: gubbins-services-img
-        path: /tmp/gubbins_services_image.tar
+        path: /tmp/
 
     - name: Load docker image
       run: docker load --input /tmp/gubbins_services_image.tar

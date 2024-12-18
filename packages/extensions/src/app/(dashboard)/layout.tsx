@@ -10,8 +10,8 @@ import {
   DiracXWebProviders,
 } from "@dirac-grid/diracx-web-components/contexts";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { applicationList } from "@/gubbins/applicationList";
-import { defaultSections } from "@/gubbins/defaultUserDashboard";
+import { applicationList } from "@/gubbins/ApplicationList";
+import { defaultSections } from "@/gubbins/DefaultUserDashboard";
 
 // Layout for the dashboard: setup the providers and the dashboard for the applications
 export default function DashboardLayout({

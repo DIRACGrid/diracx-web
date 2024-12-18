@@ -3,7 +3,7 @@ import React, { useContext, useMemo } from "react";
 import { useSearchParams } from "next/navigation";
 import { BaseApp } from "@dirac-grid/diracx-web-components/components";
 import { ApplicationsContext } from "@dirac-grid/diracx-web-components/contexts";
-import { applicationList } from "@/gubbins/applicationList";
+import { applicationList } from "@/gubbins/ApplicationList";
 
 export default function Page() {
   const searchParams = useSearchParams(); // Get and set the search params from the URL

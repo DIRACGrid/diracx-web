@@ -17,6 +17,11 @@
   "dependencies": {
     "@axa-fr/react-oidc": "^7.22.6",
     "@dirac-grid/diracx-web-components": "0.1.0-a2",
+    "@mui/icons-material": "^6.1.6",
+    "@mui/material": "^6.1.6",
+    "@mui/utils": "^6.1.6",
+    "@mui/x-date-pickers": "^7.14.0",
+    "@tanstack/react-table": "^8.20.5",
     "autoprefixer": "10.4.19",
     "next": "15.0.2",
     "react": "^18",
