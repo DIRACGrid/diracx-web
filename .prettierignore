@@ -1,9 +1,12 @@
-node_modules
-build
-dist
-public
 .github
+build
+CONTRIBUTING.md
+dist
+docs
 jest.config.mjs
+node_modules
+public
+README.md
 
 packages/*/node_modules
 packages/*/build

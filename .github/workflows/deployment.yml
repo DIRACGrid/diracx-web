@@ -28,6 +28,9 @@ jobs:
           config-file: release-please-config.json
           manifest-file: .release-please-manifest.json
 
+  # Library is built and deployed to NPM
+  # ------------------------------------
+
   build-deploy-library-package:
     runs-on: ubuntu-latest
     needs: release-please
@@ -40,7 +43,7 @@ jobs:
 
     - uses: actions/setup-node@v4
       with:
-        node-version: 'latest'
+        node-version: 'lts/*'
         registry-url: 'https://registry.npmjs.org'
 
     - name: Install dependencies
@@ -51,7 +54,10 @@ jobs:
     - name: Publish to NPM
       env:
         NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
-      run: npx lerna publish from-package --no-push --no-private --yes
+      run: npm publish from-package --no-push --no-private --yes
+
+  # Storybook is built and deployed to GitHub Pages
+  # -----------------------------------------------
 
   build-storybook-docs:
     runs-on: ubuntu-latest
@@ -64,11 +70,11 @@ jobs:
  
       - uses: actions/setup-node@v4
         with:
-          node-version: 'latest'
+          node-version: 'lts/*'
           cache: 'npm'
           
       - name: Build documentation
-        run: npm ci && npm run build-storybook -w @dirac-grid/diracx-web-components
+        run: npm ci && npm --prefix packages/diracx-web-components run build-doc
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
@@ -88,9 +94,11 @@ jobs:
         uses: actions/deploy-pages@v4
         with:
           token: ${{ github.token }}
-               
-          
-  build-deploy-dev-image:
+
+  # diracx-web is built and deployed to GitHub Container Registry
+  # -------------------------------------------------------------
+
+  build-deploy-diracx-web-dev-image:
     runs-on: ubuntu-latest
     if: ${{ github.event_name != 'push' || github.repository == 'DIRACGrid/diracx-web' }}
     steps:
@@ -116,7 +124,7 @@ jobs:
           tags: ghcr.io/diracgrid/diracx-web/static:dev
           platforms: linux/amd64,linux/arm64
 
-  build-deploy-release-image:
+  build-deploy-diracx-web-release-image:
     runs-on: ubuntu-latest
     if: ${{ github.event_name == 'push' && github.repository == 'DIRACGrid/diracx-web' }}
     needs: release-please
@@ -142,31 +150,4 @@ jobs:
           context: .
           push: true
           tags: ghcr.io/diracgrid/diracx-web/static:${{ needs.release-please.outputs.tag_name }}
-          platforms: linux/amd64,linux/arm64
-
-  build-deploy-gubbins-image:
-    runs-on: ubuntu-latest
-    if: ${{ github.event_name == 'push' && github.repository == 'DIRACGrid/diracx-web' }}
-    needs: build-deploy-library-package
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v3
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-
-      - name: Login to GitHub container registry
-        uses: docker/login-action@v3
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Build Docker image (extension example)
-        uses: docker/build-push-action@v6
-        with:
-          context: ./packages/extensions
-          push: ${{ github.event_name == 'push' && github.repository == 'DIRACGrid/diracx-web' && github.ref_name == 'main' }}
-          tags: ghcr.io/diracgrid/diracx-web/static:extension-example
           platforms: linux/amd64,linux/arm64

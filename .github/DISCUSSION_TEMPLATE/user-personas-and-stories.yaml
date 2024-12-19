@@ -4,7 +4,7 @@ body:
     attributes:
       value: >
         Develop a user persona and a story to capture the goals and tasks your users want to accomplish with diracx-web.
-        We are interested in understanding your needs and goals. Please focus on what you want to achieve rather than how you think it should be achieved.
+        We are interested in understanding your needs and goals. Please, first focus on what you want to achieve rather than how you think it should be achieved first.
         All ideas are welcome, and there are no wrong answers. We appreciate your honest feedback as it helps us improve the system to better meet your needs.
 
   - type: textarea
@@ -43,10 +43,27 @@ body:
     validations:
       required: true
 
-  - type: textarea
-    id: additional-comments
+  - type: markdown
     attributes:
-      label: Additional Comments or Suggestions
-      description: "Share any other feedback, ideas, or suggestions that can help us understand your needs better."
-    validations:
-      required: false
+      value: |
+        From this point, you can optionally propose ideas of how it should be conceived, even if you technically do not know whether it is achievable.
+
+  - type: textarea
+    id: design-solution
+    attributes:
+      label: Proposed Design Solution
+      description: |
+        Design proposal(s) can be submitted here.
+        Explain how your design solves the problem. Describe the design changes in details.
+      placeholder: "Describe your design solution..."
+
+  - type: markdown
+    attributes:
+      value: |
+        If possible, please attach an image representing a mockup or sketch of your design idea. Visual representations can help communicate your idea more clearly.
+
+  - type: markdown
+    attributes:
+      value: |
+        Once again, thank you for your contribution. Our team will review your design proposal(s) and provide feedback.
+
