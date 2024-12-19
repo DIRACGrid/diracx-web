@@ -297,7 +297,15 @@ export function JobDataTable() {
     setBackdropOpen(true);
     try {
       const selectedIds = Object.keys(rowSelection).map(Number);
-      await killJobs(selectedIds, accessToken);
+      const { data } = await killJobs(selectedIds, accessToken);
+
+      const failedJobs = Object.entries(data.failed).map(
+        ([jobId, error]) => `Job ${jobId}: ${error.detail}`,
+      );
+      const successfulJobs = Object.keys(data.success).map(
+        (jobId) => `Job ${jobId}`,
+      );
+
       setBackdropOpen(false);
       refreshJobs(
         accessToken,
@@ -306,11 +314,26 @@ export function JobDataTable() {
         pagination.pageSize,
       );
       clearSelected();
-      setSnackbarInfo({
-        open: true,
-        message: "Killed successfully",
-        severity: "success",
-      });
+      // Handle Snackbar Messaging
+      if (successfulJobs.length > 0 && failedJobs.length > 0) {
+        setSnackbarInfo({
+          open: true,
+          message: `Kill operation summary. Success: ${successfulJobs.join(", ")}. Failed: ${failedJobs.join("; ")}`,
+          severity: "warning",
+        });
+      } else if (successfulJobs.length > 0) {
+        setSnackbarInfo({
+          open: true,
+          message: `Kill operation summary. Success: ${successfulJobs.join(", ")}`,
+          severity: "success",
+        });
+      } else {
+        setSnackbarInfo({
+          open: true,
+          message: `Kill operation summary. Failed: ${failedJobs.join("; ")}`,
+          severity: "error",
+        });
+      }
     } catch (error: unknown) {
       let errorMessage = "An unknown error occurred";
 
@@ -319,7 +342,7 @@ export function JobDataTable() {
       }
       setSnackbarInfo({
         open: true,
-        message: "Kill failed: " + errorMessage,
+        message: "Kill operation failed: " + errorMessage,
         severity: "error",
       });
     } finally {
@@ -340,7 +363,15 @@ export function JobDataTable() {
     setBackdropOpen(true);
     try {
       const selectedIds = Object.keys(rowSelection).map(Number);
-      await rescheduleJobs(selectedIds, accessToken);
+      const { data } = await rescheduleJobs(selectedIds, accessToken);
+
+      const failedJobs = Object.entries(data.failed).map(
+        ([jobId, error]) => `Job ${jobId}: ${error.detail}`,
+      );
+      const successfulJobs = Object.keys(data.success).map(
+        (jobId) => `Job ${jobId}`,
+      );
+
       setBackdropOpen(false);
       refreshJobs(
         accessToken,
@@ -349,11 +380,26 @@ export function JobDataTable() {
         pagination.pageSize,
       );
       clearSelected();
-      setSnackbarInfo({
-        open: true,
-        message: "Rescheduled successfully",
-        severity: "success",
-      });
+      // Handle Snackbar Messaging
+      if (successfulJobs.length > 0 && failedJobs.length > 0) {
+        setSnackbarInfo({
+          open: true,
+          message: `Reschedule operation summary. Success: ${successfulJobs.join(", ")}. Failed: ${failedJobs.join("; ")}`,
+          severity: "warning",
+        });
+      } else if (successfulJobs.length > 0) {
+        setSnackbarInfo({
+          open: true,
+          message: `Reschedule operation summary. Success: ${successfulJobs.join(", ")}`,
+          severity: "success",
+        });
+      } else {
+        setSnackbarInfo({
+          open: true,
+          message: `Reschedule operation summary. Failed: ${failedJobs.join("; ")}`,
+          severity: "error",
+        });
+      }
     } catch (error: unknown) {
       let errorMessage = "An unknown error occurred";
 
@@ -362,7 +408,7 @@ export function JobDataTable() {
       }
       setSnackbarInfo({
         open: true,
-        message: "Reschedule failed: " + errorMessage,
+        message: "Reschedule operation failed: " + errorMessage,
         severity: "error",
       });
     } finally {
@@ -388,7 +434,7 @@ export function JobDataTable() {
         const { data } = await getJobHistory(selectedId, accessToken);
         setBackdropOpen(false);
         // Show the history
-        setJobHistoryData(data[selectedId]);
+        setJobHistoryData(data);
         setIsHistoryDialogOpen(true);
       } catch (error: unknown) {
         let errorMessage = "An unknown error occurred";
