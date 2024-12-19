@@ -2,6 +2,9 @@
 
 import useSWR, { mutate } from "swr";
 import dayjs from "dayjs";
+import utc from "dayjs/plugin/utc";
+
+dayjs.extend(utc);
 import { fetcher } from "../../hooks/utils";
 import { Filter, SearchBody, Job, JobHistory } from "../../types";
 
@@ -68,16 +71,34 @@ export const refreshJobs = (
  *
  * @param selectedIds - An array of job IDs to delete.
  * @param accessToken - The authentication token.
- * @returns A Promise that resolves to an object containing the response headers and data.
  */
 export function deleteJobs(
   selectedIds: readonly number[],
   accessToken: string,
-): Promise<{ headers: Headers; data: number[] }> {
+) {
   const queryString = selectedIds.map((id) => `job_ids=${id}`).join("&");
   const deleteUrl = `/api/jobs/?${queryString}`;
-  return fetcher([deleteUrl, accessToken, "DELETE"]);
+  fetcher([deleteUrl, accessToken, "DELETE"]);
 }
+
+type JobBulkResponse = {
+  failed: {
+    [jobId: number]: { detail: string };
+  };
+  success: {
+    [jobId: number]: { SucessContent: unknown };
+  };
+};
+
+type StatusBody = {
+  [jobId: number]: {
+    [timestamp: string]: {
+      Status: string;
+      MinorStatus: string;
+      Source: string;
+    };
+  };
+};
 
 /**
  * Kills the specified jobs.
@@ -89,10 +110,25 @@ export function deleteJobs(
 export function killJobs(
   selectedIds: readonly number[],
   accessToken: string,
-): Promise<{ headers: Headers; data: number[] }> {
-  const queryString = selectedIds.map((id) => `job_ids=${id}`).join("&");
-  const killUrl = `/api/jobs/kill?${queryString}`;
-  return fetcher([killUrl, accessToken, "POST"]);
+): Promise<{ headers: Headers; data: JobBulkResponse }> {
+  const killUrl = `/api/jobs/status`;
+
+  const currentDate = dayjs()
+    .utc()
+    .format("YYYY-MM-DDTHH:mm:ss.SSSSSS[Z]")
+    .toString();
+
+  const body = selectedIds.reduce((acc: StatusBody, jobId) => {
+    acc[jobId] = {
+      [currentDate]: {
+        Status: "Killed",
+        MinorStatus: "Marked for termination",
+        Source: "JobManager",
+      },
+    };
+    return acc;
+  }, {});
+  return fetcher([killUrl, accessToken, "PATCH", body]);
 }
 
 /**
@@ -105,7 +141,7 @@ export function killJobs(
 export function rescheduleJobs(
   selectedIds: readonly number[],
   accessToken: string,
-): Promise<{ headers: Headers; data: number[] }> {
+): Promise<{ headers: Headers; data: JobBulkResponse }> {
   const queryString = selectedIds.map((id) => `job_ids=${id}`).join("&");
   const rescheduleUrl = `/api/jobs/reschedule?${queryString}`;
   return fetcher([rescheduleUrl, accessToken, "POST"]);
@@ -117,10 +153,26 @@ export function rescheduleJobs(
  * @param token - The authentication token.
  * @returns A Promise that resolves to an object containing the headers and data of the job history.
  */
-export function getJobHistory(
+export async function getJobHistory(
   jobId: number,
   accessToken: string,
-): Promise<{ headers: Headers; data: { [key: number]: JobHistory[] } }> {
-  const historyUrl = `/api/jobs/${jobId}/status/history`;
-  return fetcher([historyUrl, accessToken]);
+): Promise<{ data: JobHistory[] }> {
+  const historyUrl = `/api/jobs/search`;
+
+  const body = {
+    parameters: ["LoggingInfo"],
+    search: [
+      {
+        parameter: "JobID",
+        operator: "eq",
+        value: jobId,
+      },
+    ],
+  };
+  // Expect the response to be an array of objects with JobID and LoggingInfo
+  const { data } = await fetcher<
+    Array<{ JobID: number; LoggingInfo: JobHistory[] }>
+  >([historyUrl, accessToken, "POST", body]);
+
+  return { data: data[0].LoggingInfo };
 }
