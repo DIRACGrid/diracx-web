@@ -1,5 +1,31 @@
 # Changelog
 
+## [0.1.0-a3](https://github.com/DIRACGrid/diracx-web/compare/v0.1.0-a2...v0.1.0-a3) (2024-12-20)
+
+
+### Features
+
+* better filter ux ([e9c1599](https://github.com/DIRACGrid/diracx-web/commit/e9c1599511aa492b11afd7fa887180272d548598))
+* **CI:** add extension tests within the CI ([b51fb3a](https://github.com/DIRACGrid/diracx-web/commit/b51fb3a403fa451f85a271cb23baaa69f16bb0eb))
+* **datatable:** adapt input fields for filter values ([7b14979](https://github.com/DIRACGrid/diracx-web/commit/7b149798a68beff9873f4961ec1cbdc35e4bf21d))
+* **DataTable:** resize, hide/show columns and more features... ([594b21a](https://github.com/DIRACGrid/diracx-web/commit/594b21ab92f3f859789c583b4442f9ce4c2bd325))
+* **dependencies:** upgrade to eslint9 (nextjs15 and mui6) ([0d456bf](https://github.com/DIRACGrid/diracx-web/commit/0d456bf512dc64e82a4efc66842205fdf04f1711))
+* **doc:** add user/dev/admin documentation ([cbaa472](https://github.com/DIRACGrid/diracx-web/commit/cbaa4729fcccdc81f48ca8c57466de559cd88b7f))
+* **extension:** use the local diracx-web-components ([dc93692](https://github.com/DIRACGrid/diracx-web/commit/dc936920f9e49a13e02060d796f6ab152be37126))
+* **library:** add profile details (username, vo, group, properties) ([53e9574](https://github.com/DIRACGrid/diracx-web/commit/53e9574242339480df9000a0a69c0e0e3ff44ec2))
+* **management:** drop lerna and restructure a bit the monorepo ([752af22](https://github.com/DIRACGrid/diracx-web/commit/752af227b2ad0a55208d600c2a7025fff6ed7ade))
+* **style:** make the code more consistent ([f3927ee](https://github.com/DIRACGrid/diracx-web/commit/f3927ee87a100f482e7cf93ce8b82e390c96e7fb))
+
+
+### Bug Fixes
+
+* **e2e:** adapt cypress tests ([eeceb59](https://github.com/DIRACGrid/diracx-web/commit/eeceb59cd6cee1a772c92fcead48e229f67996c1))
+* filters not applied are cleared when changing the sections ([dda6abc](https://github.com/DIRACGrid/diracx-web/commit/dda6abc080d8ed70478165a4565cb7c7ebe8e117))
+* **JobDataService:** api breaking changes ([7e91084](https://github.com/DIRACGrid/diracx-web/commit/7e91084d77f1a8f33d6943c431fa23faeb31b3e1))
+* **tsc-files:** tsc-files does not recognize chipColor ([48818ff](https://github.com/DIRACGrid/diracx-web/commit/48818ffaf5c689edf4e420820c39cd9a03257038))
+* tsup and eslint errors ([32c3a83](https://github.com/DIRACGrid/diracx-web/commit/32c3a8343aef76ab079be9a2f341bc75249ddd32))
+* use MUI for personal details ([9a71c8e](https://github.com/DIRACGrid/diracx-web/commit/9a71c8e93543e593d625b715d5a99600ff4235fc))
+
 ## [0.1.0-a2](https://github.com/DIRACGrid/diracx-web/compare/v0.1.0-a1...v0.1.0-a2) (2024-08-26)
 
 

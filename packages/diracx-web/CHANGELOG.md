@@ -1,5 +1,32 @@
 # Changelog
 
+## [0.1.0-a3](https://github.com/DIRACGrid/diracx-web/compare/v0.1.0-a2...v0.1.0-a3) (2024-12-20)
+
+
+### Features
+
+* **CI:** add extension tests within the CI ([b51fb3a](https://github.com/DIRACGrid/diracx-web/commit/b51fb3a403fa451f85a271cb23baaa69f16bb0eb))
+* **DataTable:** resize, hide/show columns and more features... ([594b21a](https://github.com/DIRACGrid/diracx-web/commit/594b21ab92f3f859789c583b4442f9ce4c2bd325))
+* **dependencies:** upgrade to eslint9 (nextjs15 and mui6) ([0d456bf](https://github.com/DIRACGrid/diracx-web/commit/0d456bf512dc64e82a4efc66842205fdf04f1711))
+* **extension:** add the OwnerMonitor component ([9c9dbe3](https://github.com/DIRACGrid/diracx-web/commit/9c9dbe33789cd3ff7ffdbe984b90c3afff5c5a3d))
+* **extension:** use the local diracx-web-components ([dc93692](https://github.com/DIRACGrid/diracx-web/commit/dc936920f9e49a13e02060d796f6ab152be37126))
+* **management:** drop lerna and restructure a bit the monorepo ([752af22](https://github.com/DIRACGrid/diracx-web/commit/752af227b2ad0a55208d600c2a7025fff6ed7ade))
+* **style:** make the code more consistent ([f3927ee](https://github.com/DIRACGrid/diracx-web/commit/f3927ee87a100f482e7cf93ce8b82e390c96e7fb))
+
+
+### Bug Fixes
+
+* **e2e:** adapt cypress tests ([eeceb59](https://github.com/DIRACGrid/diracx-web/commit/eeceb59cd6cee1a772c92fcead48e229f67996c1))
+* **JobDataService:** api breaking changes ([7e91084](https://github.com/DIRACGrid/diracx-web/commit/7e91084d77f1a8f33d6943c431fa23faeb31b3e1))
+* tsup and eslint errors ([32c3a83](https://github.com/DIRACGrid/diracx-web/commit/32c3a8343aef76ab079be9a2f341bc75249ddd32))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @dirac-grid/diracx-web-components bumped from ^0.1.0-a2 to ^0.1.0-a3
+
 ## [0.1.0-a2](https://github.com/DIRACGrid/diracx-web/compare/v0.1.0-a1...v0.1.0-a2) (2024-08-26)
 
 
