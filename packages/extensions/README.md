@@ -1,6 +1,8 @@
-# Creating a Next.js DiracX Web Extension
+<p align="center">
+  <img alt="Extension Logo" src="public/robot.png" width="300" >
+</p>
 
-<img alt="Extension Logo" src="public/robot.png" width="300">
+# Creating a DiracX Web Extension
 
 This project aims to provide an example for creating a basic Next.js web extension for DiracX. It includes the necessary configuration and setup to get you started quickly.
 
@@ -20,20 +22,34 @@ And ensure you have basic knowledge of:
 
 ## Getting Started
 
-You can either create a new repository or fork this repository to build your DiracX extension. Follow one of the methods below:
+You can either create a new repository or start from this one to build your DiracX extension. Follow one of the methods below:
 
 ### Method 1: Fork the Repository
 
-1. **Fork this repository** on GitHub.
-2. **Clone the forked repository** to your local machine:
+1. **Clone this repository** on GitHub, move and rename the `diracx-web/packages/extensions` directory:
 
    ```bash
-   git clone https://github.com/YOUR_USERNAME/diracx-web.git
-   cd diracx-web/packages/extensions
-   npm install
+   git clone https://github.com/DIRACGrid/diracx-web.git
+   mv diracx-web/packages/extensions </path/to/different/location>
+   cd </path/to/different/location>
    ```
 
-3. **Modify the app pages** to use components from the `diracx-components` library (e.g., providers, apps).
+2. **Slightly modify the `package.json` file**
+
+   From `</path/to/different/location>`, execute the following command:
+
+   ```bash
+   # Adapt the path of the copy-service-worker-files script
+   jq '.scripts.postinstall = "node ./node_modules/@axa-fr/react-oidc/bin/copy-service-worker-files.mjs public"' ./package.json > ./package.temp.json
+   mv ./package.temp.json ./package.json
+   # Adapt the package name and version
+   jq '.name = "<YOUR EXTENSION NAME>"' ./package.json > ./package.temp.json
+   mv ./package.temp.json ./package.json
+   jq '.version = "0.1.0-a0"' ./package.json > ./package.temp.json
+   mv ./package.temp.json ./package.json
+   ```
+
+3. **Remove `CHANGELOG.md`**
 
 ### Method 2: Create a New Next.js Project
 
@@ -121,7 +137,7 @@ We strongly recommend following the directory structure below to keep your proje
 
 ### Running the Extension with DiracX Charts
 
-To start your DiracX extension follow these steps:
+To start your DiracX extension in development mode follow these steps:
 
 1. **Clone the `diracx-charts` repository** in a parent directory:
 
@@ -135,7 +151,12 @@ To start your DiracX extension follow these steps:
    ./diracx-charts/run_demo.sh path/to/your-extension
    ```
 
-This will run the DiracX Demo with your extension.
+To run your extension in a production environment, you need to customize the [`diracx` Helm Chart](https://github.com/DIRACGrid/diracx-charts) values, such as:
+
+```yaml
+global.images.web.tag: <your extension version, docker tag>
+global.images.web.repository: <your extension docker image>
+```
 
 ## Customizing the Extension
 

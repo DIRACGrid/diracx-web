@@ -4,15 +4,4 @@ module.exports = {
     ["@babel/preset-react", { runtime: "automatic" }],
     "@babel/preset-typescript",
   ],
-  plugins: [
-    [
-      "module-resolver",
-      {
-        root: ["."],
-        alias: {
-          "@/(.+)$": "./\\1",
-        },
-      },
-    ],
-  ],
 };

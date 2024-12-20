@@ -116,8 +116,9 @@ describe("Job Monitor", () => {
       .eq(1)
       .should("contain.text", "1");
 
-    cy.get('[data-testid="virtuoso-scroller"]').scrollTo("bottom");
-    cy.wait(500); // Wait for the items to load
+    cy.get('[data-testid="virtuoso-scroller"]')
+      .wait(100) // Wait for rendering
+      .scrollTo("bottom", { ensureScrollable: false });
     cy.get("table tbody tr")
       .last()
       .find("td")
@@ -151,8 +152,9 @@ describe("Job Monitor", () => {
       .eq(1)
       .should("contain.text", "26");
 
-    cy.get('[data-testid="virtuoso-scroller"]').scrollTo("bottom");
-    cy.wait(500); // Wait for the items to load
+    cy.get('[data-testid="virtuoso-scroller"]')
+      .wait(100) // Wait for rendering
+      .scrollTo("bottom", { ensureScrollable: false });
     cy.get("table tbody tr")
       .last()
       .find("td")
@@ -186,8 +188,9 @@ describe("Job Monitor", () => {
       .eq(1)
       .should("contain.text", "1");
 
-    cy.get('[data-testid="virtuoso-scroller"]').scrollTo("bottom");
-    cy.wait(500); // Wait for the items to load
+    cy.get('[data-testid="virtuoso-scroller"]')
+      .wait(100) // Wait for rendering
+      .scrollTo("bottom", { ensureScrollable: false });
     cy.get("table tbody tr")
       .last()
       .find("td")
@@ -222,16 +225,20 @@ describe("Job Monitor", () => {
   });
 
   it("should delete jobs", () => {
-    cy.get("[data-index=1]").click();
-    cy.get("[data-index=2]").click();
-    cy.get("[data-index=3]").click();
+    cy.get("[data-index=1]").as("jobItem1");
+    cy.get("[data-index=2]").as("jobItem2");
+    cy.get("[data-index=3]").as("jobItem3");
+    cy.get("@jobItem1").click();
+    cy.get("@jobItem2").click();
+    cy.get("@jobItem3").click();
 
     cy.get('[data-testid="delete-jobs-button"] > path').click();
 
-    // Make sure the job status is "Deleted"
-    cy.get("[data-index=1]").find("td").eq(2).should("contain", "Deleted");
-    cy.get("[data-index=1]").find("td").eq(2).should("contain", "Deleted");
-    cy.get("[data-index=1]").find("td").eq(2).should("contain", "Deleted");
+    // Make sure the jobs disappeared from the table
+    cy.get("table").should("be.visible");
+    cy.get("@jobItem1").should("not.exist");
+    cy.get("@jobItem2").should("not.exist");
+    cy.get("@jobItem3").should("not.exist");
   });
 
   it("should reschedule jobs", () => {
