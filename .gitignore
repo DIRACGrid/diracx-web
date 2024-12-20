@@ -4,6 +4,8 @@
 /node_modules
 /.pnp
 .pnp.js
+packages/*/public/OidcServiceWorker.js
+packages/*/public/OidcTrustedDomains.js
 
 # testing
 /coverage
