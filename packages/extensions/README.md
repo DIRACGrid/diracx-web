@@ -4,6 +4,8 @@
 
 # Creating a DiracX Web Extension
 
+![CI](https://github.com/DIRACGrid/diracx-web/actions/workflows/gubbins-test.yml/badge.svg?branch=main)
+
 This project aims to provide an example for creating a basic Next.js web extension for DiracX. It includes the necessary configuration and setup to get you started quickly.
 
 ## Prerequisites
