@@ -4,8 +4,8 @@
 
 # DiracX-Web
 ![Basic tests](https://github.com/DIRACGrid/diracx-web/actions/workflows/basic.yml/badge.svg?branch=main)
-![Unit tests](https://github.com/DIRACGrid/diracx-web/actions/workflows/test.yml/badge.svg?branch=main)
-![Integration tests](https://github.com/DIRACGrid/diracx-web/actions/workflows/integration-test.yml/badge.svg?branch=main)
+![Unit tests](https://github.com/DIRACGrid/diracx-web/actions/workflows/diracx-web-components-test.yml/badge.svg?branch=main)
+![Integration tests](https://github.com/DIRACGrid/diracx-web/actions/workflows/diracx-web-test.yml/badge.svg?branch=main)
 ![Deployment](https://github.com/DIRACGrid/diracx-web/actions/workflows/deployment.yml/badge.svg?branch=main)
 
 
