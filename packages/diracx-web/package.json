@@ -14,7 +14,7 @@
     "postinstall": "node ../../node_modules/@axa-fr/react-oidc/bin/copy-service-worker-files.mjs public"
   },
   "dependencies": {
-    "@axa-fr/react-oidc": "^7.22.6",
+    "@axa-fr/react-oidc": "^7.23.1",
     "@dirac-grid/diracx-web-components": "^0.1.0-a3",
     "@emotion/react": "^11.11.4",
     "@emotion/styled": "^11.11.5",
