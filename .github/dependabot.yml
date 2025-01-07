@@ -9,10 +9,10 @@ updates:
   - package-ecosystem: "npm"
     directories:
       # Update the package.json and lock file at the root as well as the ones in
-      # /packages/diracx-web and /packages/diracx-web-extensions
+      # - /packages/diracx-web-components
+      # - /packages/diracx-web
+      # - /packages/extensions
       - "/"
-      # Update the package.json and lock file in /packages/extensions
-      - "/packages/extensions"
     schedule:
       interval: "weekly"
     versioning-strategy: increase
