@@ -18,7 +18,7 @@
     "@dirac-grid/diracx-web-components": "^0.1.0-a3",
     "@emotion/react": "^11.11.4",
     "@emotion/styled": "^11.11.5",
-    "@mui/icons-material": "^6.1.6",
+    "@mui/icons-material": "^6.3.1",
     "@mui/material": "^6.1.6",
     "@types/node": "20.17.6",
     "@types/react": "18.3.12",
