@@ -24,6 +24,7 @@
     "@tanstack/react-table": "^8.20.5",
     "autoprefixer": "10.4.19",
     "next": "15.0.2",
+    "postcss": "8.4.38",
     "react": "^18",
     "react-dom": "^18"
   },
@@ -38,7 +39,7 @@
     "eslint": "^9",
     "eslint-config-next": "15.0.2",
     "eslint-config-prettier": "^9.1.0",
-    "postcss": "^8",
+    "lint-staged": "^15.2.2",
     "prettier": "^3.2.5",
     "typescript": "^5"
   }
