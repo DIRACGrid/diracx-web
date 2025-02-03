@@ -8,6 +8,8 @@
     "packages/extensions"
   ],
   "devDependencies": {
+    "@commitlint/cli": "^19.3.0",
+    "@commitlint/config-conventional": "^19.2.2",
     "husky": "^9.0.11"
   },
   "scripts": {
