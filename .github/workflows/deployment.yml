@@ -54,7 +54,7 @@ jobs:
     - name: Publish to NPM
       env:
         NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
-      run: npm publish from-package --no-push --no-private --yes
+      run: npm --workspace packages/diracx-web-components publish
 
   # Storybook is built and deployed to GitHub Pages
   # -----------------------------------------------
