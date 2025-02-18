@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.1.0-a4](https://github.com/DIRACGrid/diracx-web/compare/v0.1.0-a3...v0.1.0-a4) (2025-02-18)
+
+
+### Bug Fixes
+
+* **docs:** remove old diagram ([1f5abff](https://github.com/DIRACGrid/diracx-web/commit/1f5abff007381018682092c080e37b04f9d5d7ce))
+* **github action:** npm publish ([df160c2](https://github.com/DIRACGrid/diracx-web/commit/df160c2d662deeddf312a227c0acc581af8f69ba))
+
 ## [0.1.0-a3](https://github.com/DIRACGrid/diracx-web/compare/v0.1.0-a2...v0.1.0-a3) (2024-12-20)
 
 
