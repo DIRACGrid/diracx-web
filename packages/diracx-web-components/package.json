@@ -45,7 +45,7 @@
     "@babel/preset-env": "^7.26.9",
     "@babel/preset-react": "^7.24.7",
     "@babel/preset-typescript": "^7.24.7",
-    "@chromatic-com/storybook": "^1.5.0",
+    "@chromatic-com/storybook": "^3.2.4",
     "@eslint/compat": "^1.2.2",
     "@eslint/eslintrc": "^3.1.0",
     "@eslint/js": "^9.14.0",
