@@ -28,14 +28,14 @@ export interface Metadata {
  * Fetches the metadata from the /.well-known/dirac-metadata endpoint
  * @returns the metadata
  */
-export function useMetadata() {
-  const url = `/.well-known/dirac-metadata`;
+export function useMetadata(diracxUrl: string | null) {
+  const url = diracxUrl ? `${diracxUrl}/.well-known/dirac-metadata` : null;
 
   const {
     data,
     error,
   }: SWRResponse<{ headers: Headers; data: Metadata }, Error> = useSWRImmutable(
-    [url],
+    url ? [url] : null,
     (args) => fetcher<Metadata>(args),
   );
 
@@ -44,6 +44,6 @@ export function useMetadata() {
   return {
     metadata,
     error,
-    isLoading: !data && !error,
+    isLoading: !data && !error && !!diracxUrl,
   };
 }

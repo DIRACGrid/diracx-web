@@ -17,6 +17,7 @@ import { useOIDCContext } from "../../hooks/oidcConfiguration";
 
 import { useSearchParamsUtils } from "../../hooks/searchParamsUtils";
 import { NavigationContext } from "../../contexts/NavigationProvider";
+import { useDiracxUrl } from "../../hooks";
 
 interface LoginFormProps {
   /** The URL of the logo, optional */
@@ -32,7 +33,8 @@ export function LoginForm({
   logoURL = "/DIRAC-logo-minimal.png",
 }: LoginFormProps) {
   const { setPath } = useContext(NavigationContext);
-  const { metadata, error, isLoading } = useMetadata();
+  const diracxUrl = useDiracxUrl();
+  const { metadata, error, isLoading } = useMetadata(diracxUrl);
   const [selectedVO, setSelectedVO] = useState<string | null>(null);
   const [selectedGroup, setSelectedGroup] = useState<string | null>(null);
   const { configuration, setConfiguration } = useOIDCContext();
@@ -52,6 +54,7 @@ export function LoginForm({
     // Redirect to dashboard if already authenticated
     if (isAuthenticated) {
       const redirect = getParam("redirect");
+      console.log("Redirecting to:", redirect);
       if (redirect) {
         setPath(redirect);
       } else {
@@ -62,7 +65,7 @@ export function LoginForm({
 
   // Get default group
   const getDefaultGroup = (
-    metadata: Metadata | undefined,
+    metadata: Metadata | undefined | null,
     vo: string,
   ): string => {
     if (!metadata) {

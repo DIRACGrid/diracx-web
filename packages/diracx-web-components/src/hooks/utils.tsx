@@ -22,7 +22,23 @@ export async function fetcher<T>(
     body: body ? JSON.stringify(body) : undefined,
   });
 
-  if (!response.ok) throw new Error("Failed to fetch data");
+  if (!response.ok) {
+    // Try to parse a more specific error message
+    let errorMessage = `HTTP ${response.status}`;
+    try {
+      const errorJson = await response.json();
+      if (errorJson?.detail) {
+        errorMessage += `: ${errorJson.detail}`;
+      } else {
+        errorMessage += `: ${JSON.stringify(errorJson)}`;
+      }
+    } catch {
+      // fallback if the server doesn't return JSON
+      const text = await response.text();
+      errorMessage += `: ${text}`;
+    }
+    throw new Error(errorMessage);
+  }
 
   const data = (await response.json()) as T;
   const responseHeaders = response.headers;
@@ -38,7 +54,10 @@ export function useDiracxUrl() {
   const [diracxUrl, setDiracxUrl] = useState<string | null>(null);
 
   useEffect(() => {
-    setDiracxUrl(`${window.location.protocol}//${window.location.host}`);
+    const backendUrl =
+      process.env.NEXT_PUBLIC_DIRACX_URL ||
+      `${window.location.protocol}//${window.location.host}`;
+    setDiracxUrl(backendUrl);
   }, []);
 
   return diracxUrl;

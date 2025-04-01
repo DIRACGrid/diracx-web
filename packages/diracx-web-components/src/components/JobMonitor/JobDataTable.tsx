@@ -40,6 +40,7 @@ import {
 import { useOIDCContext } from "../../hooks/oidcConfiguration";
 import { DataTable, MenuItem } from "../shared/DataTable";
 import { Job, JobHistory, SearchBody } from "../../types";
+import { useDiracxUrl } from "../../hooks/utils";
 import { JobHistoryDialog } from "./JobHistoryDialog";
 import {
   deleteJobs,
@@ -59,6 +60,8 @@ export function JobDataTable() {
   // Authentication
   const { configuration } = useOIDCContext();
   const { accessToken } = useOidcAccessToken(configuration?.scope);
+
+  const diracxUrl = useDiracxUrl();
 
   // State for loading elements
   const [backdropOpen, setBackdropOpen] = useState(false);
@@ -90,7 +93,7 @@ export function JobDataTable() {
 
   // State for search body
   const [searchBody, setSearchBody] = useState<SearchBody>({
-    sort: [{ parameter: "JobID", direction: "asc" }],
+    sort: [{ parameter: "JobID", direction: "desc" }],
   });
 
   // State for selected job
@@ -223,6 +226,7 @@ export function JobDataTable() {
    * Fetches the jobs from the /api/jobs/search endpoint
    */
   const { data, error, isLoading, isValidating } = useJobs(
+    diracxUrl,
     accessToken,
     searchBody,
     pagination.pageIndex,
@@ -254,9 +258,10 @@ export function JobDataTable() {
     setBackdropOpen(true);
     try {
       const selectedIds = Object.keys(rowSelection).map(Number);
-      await deleteJobs(selectedIds, accessToken);
+      await deleteJobs(diracxUrl, selectedIds, accessToken);
       setBackdropOpen(false);
       refreshJobs(
+        diracxUrl,
         accessToken,
         searchBody,
         pagination.pageIndex,
@@ -284,6 +289,7 @@ export function JobDataTable() {
     }
   }, [
     accessToken,
+    diracxUrl,
     rowSelection,
     searchBody,
     pagination.pageIndex,
@@ -297,7 +303,7 @@ export function JobDataTable() {
     setBackdropOpen(true);
     try {
       const selectedIds = Object.keys(rowSelection).map(Number);
-      const { data } = await killJobs(selectedIds, accessToken);
+      const { data } = await killJobs(diracxUrl, selectedIds, accessToken);
 
       const failedJobs = Object.entries(data.failed).map(
         ([jobId, error]) => `Job ${jobId}: ${error.detail}`,
@@ -308,6 +314,7 @@ export function JobDataTable() {
 
       setBackdropOpen(false);
       refreshJobs(
+        diracxUrl,
         accessToken,
         searchBody,
         pagination.pageIndex,
@@ -350,6 +357,7 @@ export function JobDataTable() {
     }
   }, [
     accessToken,
+    diracxUrl,
     rowSelection,
     searchBody,
     pagination.pageIndex,
@@ -363,7 +371,11 @@ export function JobDataTable() {
     setBackdropOpen(true);
     try {
       const selectedIds = Object.keys(rowSelection).map(Number);
-      const { data } = await rescheduleJobs(selectedIds, accessToken);
+      const { data } = await rescheduleJobs(
+        diracxUrl,
+        selectedIds,
+        accessToken,
+      );
 
       const failedJobs = Object.entries(data.failed).map(
         ([jobId, error]) => `Job ${jobId}: ${error.detail}`,
@@ -374,6 +386,7 @@ export function JobDataTable() {
 
       setBackdropOpen(false);
       refreshJobs(
+        diracxUrl,
         accessToken,
         searchBody,
         pagination.pageIndex,
@@ -416,6 +429,7 @@ export function JobDataTable() {
     }
   }, [
     accessToken,
+    diracxUrl,
     rowSelection,
     searchBody,
     pagination.pageIndex,
@@ -430,8 +444,13 @@ export function JobDataTable() {
       if (!selectedId) return;
       setBackdropOpen(true);
       setSelectedJobId(selectedId);
+      console.log("Selected job ID:", diracxUrl);
       try {
-        const { data } = await getJobHistory(selectedId, accessToken);
+        const { data } = await getJobHistory(
+          diracxUrl,
+          selectedId,
+          accessToken,
+        );
         setBackdropOpen(false);
         // Show the history
         setJobHistoryData(data);
@@ -451,7 +470,7 @@ export function JobDataTable() {
         setBackdropOpen(false);
       }
     },
-    [accessToken],
+    [accessToken, diracxUrl],
   );
 
   const handleHistoryClose = () => {

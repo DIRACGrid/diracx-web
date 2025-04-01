@@ -34,16 +34,24 @@ function processSearchBody(searchBody: SearchBody) {
  * @returns The response from the API call.
  */
 export const useJobs = (
+  diracxUrl: string | null,
   accessToken: string,
   searchBody: SearchBody,
   page: number,
   rowsPerPage: number,
 ) => {
-  processSearchBody(searchBody);
-  const urlGetJobs = `/api/jobs/search?page=${page + 1}&per_page=${rowsPerPage}`;
+  const urlGetJobs = diracxUrl
+    ? `${diracxUrl}/api/jobs/search?page=${page + 1}&per_page=${rowsPerPage}`
+    : null;
 
-  return useSWR([urlGetJobs, accessToken, "POST", searchBody], (args) =>
-    fetcher<Job[]>(args),
+  processSearchBody(searchBody);
+
+  return useSWR(
+    urlGetJobs ? [urlGetJobs, accessToken, "POST", searchBody] : null,
+    (args) => fetcher<Job[]>(args),
+    {
+      revalidateOnFocus: false,
+    },
   );
 };
 
@@ -56,13 +64,18 @@ export const useJobs = (
  * @param rowsPerPage - The number of rows per page for pagination.
  */
 export const refreshJobs = (
+  diracxUrl: string | null,
   accessToken: string,
   searchBody: SearchBody,
   page: number,
   rowsPerPage: number,
 ) => {
+  if (!diracxUrl) {
+    throw new Error("Invalid URL generated for refreshing jobs.");
+  }
+
+  const urlGetJobs = `${diracxUrl}/api/jobs/search?page=${page + 1}&per_page=${rowsPerPage}`;
   processSearchBody(searchBody);
-  const urlGetJobs = `/api/jobs/search?page=${page + 1}&per_page=${rowsPerPage}`;
   mutate([urlGetJobs, accessToken, "POST", searchBody]);
 };
 
@@ -73,12 +86,16 @@ export const refreshJobs = (
  * @param accessToken - The authentication token.
  */
 export function deleteJobs(
+  diracxUrl: string | null,
   selectedIds: readonly number[],
   accessToken: string,
 ) {
+  if (!diracxUrl) {
+    throw new Error("Invalid URL generated for deleting jobs.");
+  }
   const queryString = selectedIds.map((id) => `job_ids=${id}`).join("&");
-  const deleteUrl = `/api/jobs/?${queryString}`;
-  fetcher([deleteUrl, accessToken, "DELETE"]);
+  const deleteUrl = `${diracxUrl}/api/jobs/?${queryString}`;
+  return fetcher([deleteUrl, accessToken, "DELETE"]);
 }
 
 type JobBulkResponse = {
@@ -108,11 +125,14 @@ type StatusBody = {
  * @returns A Promise that resolves to an object containing the response headers and data.
  */
 export function killJobs(
+  diracxUrl: string | null,
   selectedIds: readonly number[],
   accessToken: string,
 ): Promise<{ headers: Headers; data: JobBulkResponse }> {
-  const killUrl = `/api/jobs/status`;
-
+  if (!diracxUrl) {
+    throw new Error("Invalid URL generated for killing jobs.");
+  }
+  const killUrl = `${diracxUrl}/api/jobs/status`;
   const currentDate = dayjs()
     .utc()
     .format("YYYY-MM-DDTHH:mm:ss.SSSSSS[Z]")
@@ -139,11 +159,15 @@ export function killJobs(
  * @returns A Promise that resolves to an object containing the response headers and data.
  */
 export function rescheduleJobs(
+  diracxUrl: string | null,
   selectedIds: readonly number[],
   accessToken: string,
 ): Promise<{ headers: Headers; data: JobBulkResponse }> {
+  if (!diracxUrl) {
+    throw new Error("Invalid URL generated for rescheduling jobs.");
+  }
   const queryString = selectedIds.map((id) => `job_ids=${id}`).join("&");
-  const rescheduleUrl = `/api/jobs/reschedule?${queryString}`;
+  const rescheduleUrl = `${diracxUrl}/api/jobs/reschedule?${queryString}`;
   return fetcher([rescheduleUrl, accessToken, "POST"]);
 }
 
@@ -154,11 +178,14 @@ export function rescheduleJobs(
  * @returns A Promise that resolves to an object containing the headers and data of the job history.
  */
 export async function getJobHistory(
+  diracxUrl: string | null,
   jobId: number,
   accessToken: string,
 ): Promise<{ data: JobHistory[] }> {
-  const historyUrl = `/api/jobs/search`;
-
+  if (!diracxUrl) {
+    throw new Error("Invalid URL generated for fetching job history.");
+  }
+  const historyUrl = `${diracxUrl}/api/jobs/search`;
   const body = {
     parameters: ["LoggingInfo"],
     search: [

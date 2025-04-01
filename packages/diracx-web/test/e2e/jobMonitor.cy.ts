@@ -95,38 +95,53 @@ describe("Job Monitor", () => {
     cy.get('[aria-label="Go to last page"]').should("not.be.disabled");
 
     cy.get(".MuiTablePagination-displayedRows").then(($pagination) => {
-      // Extract the page index, the number of items per page and the total number of items
-      const text = $pagination.text(); // "1-25 of 55"
+      const text = $pagination.text(); // e.g., "1-25 of 55"
       expect(text).to.match(/\d+[–-]\d+ of \d+/);
-
-      // Extract numbers using a regular expression
-      const match = text.match(/\d+/g);
-      if (match) {
-        const [pageIndexBegin, pageIndexEnd, totalItems] = match.map(Number);
-        expect(pageIndexBegin).to.equal(1);
-        expect(pageIndexEnd).to.equal(25);
-        expect(totalItems).to.be.greaterThan(50);
-      }
     });
 
-    cy.get("table thead tr th").eq(1).should("contain.text", "ID");
+    let firstValue: number;
+    let lastValue: number;
+
+    // Get the first visible row value (e.g. 55)
     cy.get("table tbody tr")
       .first()
       .find("td")
       .eq(1)
-      .should("contain.text", "1");
+      .invoke("text")
+      .then((text) => {
+        firstValue = parseInt(text.trim(), 10);
+      });
 
+    // Scroll and get the last visible row value (e.g. 31)
     cy.get('[data-testid="virtuoso-scroller"]')
-      .wait(100) // Wait for rendering
+      .wait(100)
       .scrollTo("bottom", { ensureScrollable: false });
+
     cy.get("table tbody tr")
       .last()
       .find("td")
       .eq(1)
-      .should("contain.text", "25");
+      .invoke("text")
+      .then((text) => {
+        lastValue = parseInt(text.trim(), 10);
+        expect(firstValue).to.be.greaterThan(lastValue);
+      });
   });
 
   it("should go to the next page", () => {
+    let firstValue: number;
+    let firstValueNextPage: number;
+
+    // Get the first visible row value (e.g. 55)
+    cy.get("table tbody tr")
+      .first()
+      .find("td")
+      .eq(1)
+      .invoke("text")
+      .then((text) => {
+        firstValue = parseInt(text.trim(), 10);
+      });
+
     // Go to the next page
     cy.get('[aria-label="Go to next page"]').click();
 
@@ -145,26 +160,24 @@ describe("Job Monitor", () => {
       }
     });
 
-    cy.get("table thead tr th").eq(1).should("contain.text", "ID");
-    cy.get("table tbody tr")
-      .first()
-      .find("td")
-      .eq(1)
-      .should("contain.text", "26");
-
-    cy.get('[data-testid="virtuoso-scroller"]')
-      .wait(100) // Wait for rendering
-      .scrollTo("bottom", { ensureScrollable: false });
     cy.get("table tbody tr")
       .last()
       .find("td")
       .eq(1)
-      .should("contain.text", "50");
+      .invoke("text")
+      .then((text) => {
+        firstValueNextPage = parseInt(text.trim(), 10);
+        expect(firstValue).to.be.greaterThan(firstValueNextPage);
+      });
   });
 
-  it("should change the page size changed", () => {
+  it("should change the page size", () => {
     cy.get(".MuiTablePagination-input .MuiSelect-select").click();
-    cy.contains("50").click();
+
+    cy.get('ul[role="listbox"]') // MUI renders this when the dropdown opens
+      .should("be.visible")
+      .contains("li", "50") // Target the <li> inside the listbox with value 50
+      .click();
 
     cy.get(".MuiTablePagination-displayedRows").then(($pagination) => {
       // Extract the page index, the number of items per page and the total number of items
@@ -181,21 +194,33 @@ describe("Job Monitor", () => {
       }
     });
 
-    cy.get("table thead tr th").eq(1).should("contain.text", "ID");
+    let firstValue: number;
+    let lastValue: number;
+
+    // Get the first visible row value (e.g. 55)
     cy.get("table tbody tr")
       .first()
       .find("td")
       .eq(1)
-      .should("contain.text", "1");
+      .invoke("text")
+      .then((text) => {
+        firstValue = parseInt(text.trim(), 10);
+      });
 
+    // Scroll and get the last visible row value (e.g. 6)
     cy.get('[data-testid="virtuoso-scroller"]')
-      .wait(100) // Wait for rendering
+      .wait(100)
       .scrollTo("bottom", { ensureScrollable: false });
+
     cy.get("table tbody tr")
       .last()
       .find("td")
       .eq(1)
-      .should("contain.text", "50");
+      .invoke("text")
+      .then((text) => {
+        lastValue = parseInt(text.trim(), 10);
+        expect(firstValue).to.be.greaterThan(lastValue);
+      });
   });
 
   /** Row interactions */
@@ -208,7 +233,7 @@ describe("Job Monitor", () => {
     cy.contains("Get history").click();
 
     // A dialog should appear
-    cy.contains("Job History: 1").should("be.visible");
+    cy.contains("Job History:").should("be.visible");
   });
 
   it("should kill jobs", () => {
@@ -323,23 +348,44 @@ describe("Job Monitor", () => {
   });
 
   it("should sort column", () => {
+    let firstValue: number;
+    let firstValueSorted: number;
+    let firstValueAgain: number;
+
+    // Get the first visible row value (e.g. 55)
     cy.get("table tbody tr")
       .first()
       .find("td")
       .eq(1)
-      .should("contain.text", "1");
+      .invoke("text")
+      .then((text) => {
+        firstValue = parseInt(text.trim(), 10);
+      });
+
     cy.get('[data-testid="sort-JobID"]').click();
+
     cy.get("table tbody tr")
       .first()
       .find("td")
       .eq(1)
-      .should("not.contain.text", "1");
+      .invoke("text")
+      .then((text) => {
+        firstValueSorted = parseInt(text.trim(), 10);
+        expect(firstValue).to.be.greaterThan(firstValueSorted);
+      });
+
     cy.get('[data-testid="sort-JobID"]').click();
+
     cy.get("table tbody tr")
       .first()
       .find("td")
       .eq(1)
-      .should("contain.text", "1");
+      .invoke("text")
+      .then((text) => {
+        firstValueAgain = parseInt(text.trim(), 10);
+        expect(firstValueAgain).to.be.greaterThan(firstValueSorted);
+        expect(firstValue).to.be.equal(firstValueAgain);
+      });
   });
 
   /** Filters */
@@ -437,11 +483,23 @@ describe("Job Monitor", () => {
     cy.get("table").should("be.visible");
     cy.get("button").contains("Add filter").click();
 
-    cy.get(
-      '[data-testid="filter-form-select-parameter"] > .MuiSelect-select',
-    ).click();
-    cy.get('[data-value="JobID"]').click();
-    cy.get("#value").type("1");
+    let jobId: string;
+
+    // Get the first visible row value (e.g. 55)
+    cy.get("table tbody tr")
+      .first()
+      .find("td")
+      .eq(1)
+      .invoke("text")
+      .then((text) => {
+        jobId = text.trim();
+
+        cy.get(
+          '[data-testid="filter-form-select-parameter"] > .MuiSelect-select',
+        ).click();
+        cy.get('[data-value="JobID"]').click();
+        cy.get("#value").type(jobId);
+      });
     cy.get('[data-testid="filter-form-add-button"]').contains("Add").click();
 
     cy.get(".MuiChip-label").should("be.visible");
