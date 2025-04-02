@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.1.0-a4](https://github.com/DIRACGrid/diracx-web/compare/v0.1.0-a3...v0.1.0-a4) (2025-04-02)
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @dirac-grid/diracx-web-components bumped from 0.1.0-a3 to 0.1.0-a4
+
 ## [0.1.0-a3](https://github.com/DIRACGrid/diracx-web/compare/v0.1.0-a2...v0.1.0-a3) (2024-12-20)
 
 
