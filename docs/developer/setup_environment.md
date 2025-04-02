@@ -99,29 +99,45 @@ flowchart TD
 
 ## Running DiracX-Web in development mode
 
-_Requirements: docker, internet, node_
+_Requirements: node, npm_
 
-This will allow you to run a demo setup:
-
-```bash
-# Clone the diracx-chart repository
-git clone git@github.com:DIRACGrid/diracx-charts.git
-
-# Run the demo
-diracx-charts/run_demo.sh
-```
-
-You can also start the demo setup in development mode - code changes will be reflected in the demo in real time:
+You can start `DiracX-Web` as an `npm` application connecting to a remote backend server - code changes will be reflected in the demo in real time.
 
 ```bash
 # Clone the diracx-web repository
 git clone git@github.com:DIRACGrid/diracx-web.git
 
+cd diracx-web
+
+# Install it
+npm ci
+
+# Set the DiracX backend URL you are targeting
+export NEXT_PUBLIC_DIRACX_URL=<backend url>
+
+# Run it
+npm run dev
+```
+
+## Running DiracX-Web in development mode along DiracX
+
+_Requirements: docker, internet, node_
+
+If you need to modify `DiracX` in parallel, or if you do not have access to the remote backend logs,
+then you can also start the full demo setup in development mode:
+
+```bash
+# Clone the diracx-web repository
+git clone git@github.com:DIRACGrid/diracx-web.git
+
+# [Optional] Clone the diracx repository
+git clone git@github.com:DIRACGrid/diracx.git
+
 # Clone the diracx-chart repository
 git clone git@github.com:DIRACGrid/diracx-charts.git
 
 # Run the demo
-diracx-charts/run_demo.sh ./diracx-web
+diracx-charts/run_demo.sh ./diracx-web [./diracx]
 ```
 
 :bulb: Any change made in `diracx-web-components` are automatically reflected into the development environment. We rely on the [NextJS transpile option](https://nextjs.org/docs/app/api-reference/config/next-config-js/transpilePackages). Further details are available in the [`diracx-web` NextJS configuration](../../packages/diracx-web/next.config.js)

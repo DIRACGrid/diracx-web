@@ -28,12 +28,14 @@ export function OIDCProvider({ children }: OIDCProviderProps) {
         scope = scope.replace(/^"|"$/g, "");
       }
 
+      const originUri = `${window.location.protocol}//${window.location.host}`;
+
       // Set the OIDC configuration
       setConfiguration({
         authority: diracxUrl,
         client_id: "myDIRACClientID",
         scope: scope,
-        redirect_uri: `${diracxUrl}/#authentication-callback`,
+        redirect_uri: `${originUri}/#authentication-callback`,
       });
     }
   }, [diracxUrl, configuration, setConfiguration]);
