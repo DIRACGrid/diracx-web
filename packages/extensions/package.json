@@ -1,6 +1,6 @@
 {
   "name": "gubbins",
-  "version": "0.1.0-a3",
+  "version": "0.1.0-a4",
   "private": true,
   "type": "module",
   "license": "GPL-3.0-only",
@@ -16,7 +16,7 @@
   },
   "dependencies": {
     "@axa-fr/react-oidc": "^7.24.0",
-    "@dirac-grid/diracx-web-components": "0.1.0-a3",
+    "@dirac-grid/diracx-web-components": "0.1.0-a4",
     "@mui/icons-material": "^6.4.2",
     "@mui/material": "^6.1.6",
     "@mui/utils": "^6.1.6",

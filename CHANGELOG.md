@@ -1,5 +1,21 @@
 # Changelog
 
+## [0.1.0-a4](https://github.com/DIRACGrid/diracx-web/compare/v0.1.0-a3...v0.1.0-a4) (2025-04-02)
+
+
+### Features
+
+* enable remote backend connection ([e842821](https://github.com/DIRACGrid/diracx-web/commit/e842821260917a88fd569679cd578179d65794e3))
+* enable remote backend connection ([c083d9a](https://github.com/DIRACGrid/diracx-web/commit/c083d9aeca398295860f9212b0401fbe73172ae2))
+
+
+### Bug Fixes
+
+* **docs:** remove old diagram ([99f979f](https://github.com/DIRACGrid/diracx-web/commit/99f979fa77f3fb87171bda0a73c243395e4ec860))
+* **docs:** remove old diagram ([1f5abff](https://github.com/DIRACGrid/diracx-web/commit/1f5abff007381018682092c080e37b04f9d5d7ce))
+* **github action:** npm publish ([2caa7cf](https://github.com/DIRACGrid/diracx-web/commit/2caa7cf65f6f6940e067fb50292e1d647f65e5c5))
+* **github action:** npm publish ([df160c2](https://github.com/DIRACGrid/diracx-web/commit/df160c2d662deeddf312a227c0acc581af8f69ba))
+
 ## [0.1.0-a3](https://github.com/DIRACGrid/diracx-web/compare/v0.1.0-a2...v0.1.0-a3) (2024-12-20)
 
 

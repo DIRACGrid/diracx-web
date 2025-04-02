@@ -1,5 +1,20 @@
 # Changelog
 
+## [0.1.0-a4](https://github.com/DIRACGrid/diracx-web/compare/v0.1.0-a3...v0.1.0-a4) (2025-04-02)
+
+
+### Features
+
+* enable remote backend connection ([e842821](https://github.com/DIRACGrid/diracx-web/commit/e842821260917a88fd569679cd578179d65794e3))
+* enable remote backend connection ([c083d9a](https://github.com/DIRACGrid/diracx-web/commit/c083d9aeca398295860f9212b0401fbe73172ae2))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @dirac-grid/diracx-web-components bumped from ^0.1.0-a3 to ^0.1.0-a4
+
 ## [0.1.0-a3](https://github.com/DIRACGrid/diracx-web/compare/v0.1.0-a2...v0.1.0-a3) (2024-12-20)
 
 
