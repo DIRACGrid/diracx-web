@@ -4,6 +4,9 @@ import { fixupConfigRules, fixupPluginRules } from "@eslint/compat";
 import _import from "eslint-plugin-import";
 import js from "@eslint/js";
 import { FlatCompat } from "@eslint/eslintrc";
+import tsPlugin from "@typescript-eslint/eslint-plugin";
+import tsParser from "@typescript-eslint/parser";
+import eslintPluginUnusedImports from "eslint-plugin-unused-imports";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -25,19 +28,46 @@ export default [
   {
     plugins: {
       import: fixupPluginRules(_import),
+      "@typescript-eslint": tsPlugin,
+      "unused-imports": eslintPluginUnusedImports,
     },
 
     languageOptions: {
+      parser: tsParser,
       globals: {
         JSX: "readonly",
       },
     },
 
     rules: {
+      // Import rules
       "import/order": ["error"],
       "import/no-unused-modules": ["error"],
+      "import/no-namespace": ["error"],
+      "unused-imports/no-unused-imports": ["error"],
+
       "import/no-useless-path-segments": ["error"],
       "react/destructuring-assignment": ["error", "always"],
+
+      // Coding style rules
+      "comma-dangle": ["error", "always-multiline"],
+      "no-unreachable": ["error"],
+      "prefer-const": ["error"],
+      "no-unused-vars": [
+        "error",
+        {
+          vars: "all",
+          varsIgnorePattern: "^_",
+          args: "after-used",
+          argsIgnorePattern: "^_",
+        },
+      ],
+      "@typescript-eslint/no-explicit-any": ["error"],
+      semi: ["error", "always"],
+
+      // Identation rules
+      indent: ["error", 2],
+
       "no-restricted-properties": [
         "error",
         {
