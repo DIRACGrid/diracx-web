@@ -1,6 +1,7 @@
 "use client";
 
-// Error fallback
+import { ErrorBox } from "@dirac-grid/diracx-web-components/components";
+
 export default function GlobalError({
   error,
   reset,
@@ -8,12 +9,5 @@ export default function GlobalError({
   error: Error;
   reset: () => void;
 }) {
-  return (
-    <html>
-      <body>
-        <h2>Something went wrong!</h2>
-        <button onClick={() => reset()}>Try again</button>
-      </body>
-    </html>
-  );
+  return <ErrorBox msg={error.message} reset={reset} />;
 }

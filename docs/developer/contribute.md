@@ -18,7 +18,9 @@
   - Updating or creating Storybook documentation if you are contributing to the `diracx-web-components` library.
 - **Writing/Updating Tests:** When you change or add new code, make sure to write or update tests accordingly. This helps maintain the reliability and stability of the codebase.
 
-**Note:** Don't forget to update the `extensions` code if you integrate breaking changes in the `diracx-web-components` library. See [Managing the extension](manage_extension.md) for further details.
+**Good to know:** If you create an export function or component in `diracx-web-components`, you must add it to the `index.ts` file and run `npm run build` inside `packages/diracx-web-components` to ensure the pre-commit hook passes.
+
+**Note:** Don't forget to update the `packages/extensions` code if you integrate breaking changes in the `diracx-web-components` library. See [Managing the extension](manage_extension.md) for further details. 
 
 ### 3. Commit
 

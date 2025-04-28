@@ -1,16 +1,13 @@
 "use client";
 
-export default function Error({
-  _error,
+import { ErrorBox } from "@dirac-grid/diracx-web-components/components";
+
+export default function GlobalError({
+  error,
   reset,
 }: {
-  _error: Error;
+  error: Error;
   reset: () => void;
 }) {
-  return (
-    <div>
-      <h2>Something went wrong!</h2>
-      <button onClick={() => reset()}>Try again</button>
-    </div>
-  );
+  return <ErrorBox msg={error.message} reset={reset} />;
 }
