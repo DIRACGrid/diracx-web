@@ -1,18 +1,11 @@
 "use client";
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useMemo, useState } from "react";
 import { useOidcAccessToken } from "@axa-fr/react-oidc";
 import {
   fetcher,
   useOIDCContext,
 } from "@dirac-grid/diracx-web-components/hooks";
-import {
-  Alert,
-  Box,
-  Button,
-  Snackbar,
-  TextField,
-  Typography,
-} from "@mui/material";
+import { Alert, Box, Button, Snackbar, TextField } from "@mui/material";
 import {
   createColumnHelper,
   getCoreRowModel,
@@ -55,16 +48,12 @@ export default function OwnerMonitor() {
         name, // Set the name
       }));
       setOwners(transformedData);
-    } catch (err) {
+    } catch {
       setError("Failed to fetch owners");
     } finally {
       setIsLoading(false);
     }
   };
-
-  useEffect(() => {
-    fetchOwners();
-  }, [accessToken]);
 
   // Handle adding a new owner
   const handleAddOwner = async () => {
@@ -78,7 +67,7 @@ export default function OwnerMonitor() {
       setSuccess(`Owner "${ownerName}" added successfully.`);
       setOwnerName("");
       fetchOwners(); // Refresh the owners list
-    } catch (err) {
+    } catch {
       setError("Failed to add owner.");
     }
   };
