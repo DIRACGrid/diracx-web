@@ -14,6 +14,21 @@ import {
 import { cyan, grey, lightGreen } from "@mui/material/colors";
 import { createContext, useEffect, useMemo, useState } from "react";
 
+declare module "@mui/material/styles" {
+  interface Palette {
+    tableRow: {
+      even: string;
+      odd: string;
+    };
+  }
+  interface PaletteOptions {
+    tableRow: {
+      even: string;
+      odd: string;
+    };
+  }
+}
+
 /**
  * Theme context type
  * @property theme - the current theme mode
@@ -69,6 +84,10 @@ export const ThemeProvider = ({ children }: ThemeProviderProps) => {
 
     const primaryColor = lightGreen[700];
     const secondaryColor = cyan[500];
+
+    const tableRowEvenColor = grey[200];
+    const tableRowOddColor = grey[50];
+
     const primary =
       theme === "light"
         ? lighten(primaryColor, 0.2)
@@ -77,6 +96,15 @@ export const ThemeProvider = ({ children }: ThemeProviderProps) => {
       theme === "light"
         ? lighten(secondaryColor, 0.2)
         : darken(secondaryColor, 0.2);
+
+    const tableRowEven =
+      theme === "light"
+        ? lighten(tableRowEvenColor, 0.2)
+        : darken(tableRowEvenColor, 0.9);
+    const tableRowOdd =
+      theme === "light"
+        ? lighten(tableRowOddColor, 0.2)
+        : darken(tableRowOddColor, 0.8);
 
     // Create a Material-UI theme based on the current mode
     const muiTheme = createTheme({
@@ -87,6 +115,10 @@ export const ThemeProvider = ({ children }: ThemeProviderProps) => {
         },
         secondary: {
           main: secondary,
+        },
+        tableRow: {
+          even: tableRowEven,
+          odd: tableRowOdd,
         },
       },
     });
@@ -266,6 +298,18 @@ export const ThemeProvider = ({ children }: ThemeProviderProps) => {
             "&:hover": {
               backgroundColor: secondary,
               color: getContrastRatio(secondary, "#fff") > 1 ? "#fff" : "#111",
+            },
+          },
+        },
+      },
+      MuiTable: {
+        styleOverrides: {
+          root: {
+            "& .MuiTableRow-root:nth-of-type(odd)": {
+              backgroundColor: muiTheme.palette.tableRow.odd,
+            },
+            "& .MuiTableRow-root:nth-of-type(even)": {
+              backgroundColor: muiTheme.palette.tableRow.even,
             },
           },
         },
