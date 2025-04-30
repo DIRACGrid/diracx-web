@@ -650,9 +650,11 @@ export function DataTable<T extends Record<string, unknown>>({
                   zIndex: 1,
                   width: checkboxWidth,
                   backgroundColor:
-                    index % 2 === 0
-                      ? theme.palette.tableRow.odd
-                      : theme.palette.tableRow.even,
+                    theme.palette.tableRow !== undefined
+                      ? index % 2 === 0
+                        ? theme.palette.tableRow.odd
+                        : theme.palette.tableRow.even
+                      : theme.palette.background.default,
                   textOverflow: "ellipsis",
                   whiteSpace: "nowrap",
                 }}
@@ -678,9 +680,11 @@ export function DataTable<T extends Record<string, unknown>>({
                     zIndex: cell.column.getIsPinned() ? 1 : 0,
                     width: cell.column.getSize(),
                     backgroundColor: cell.column.getIsPinned()
-                      ? index % 2 === 0
-                        ? theme.palette.tableRow.odd
-                        : theme.palette.tableRow.even
+                      ? theme.palette.tableRow !== undefined
+                        ? index % 2 === 0
+                          ? theme.palette.tableRow.odd
+                          : theme.palette.tableRow.even
+                        : theme.palette.background.default
                       : undefined,
                     overflow: "hidden",
                     textOverflow: "ellipsis",
