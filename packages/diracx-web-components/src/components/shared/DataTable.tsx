@@ -640,7 +640,7 @@ export function DataTable<T extends Record<string, unknown>>({
               ))}
             </>
           )}
-          itemContent={(_index, row: Row<T>) => (
+          itemContent={(index, row: Row<T>) => (
             <>
               <TableCell
                 padding="checkbox"
@@ -649,7 +649,10 @@ export function DataTable<T extends Record<string, unknown>>({
                   left: 0,
                   zIndex: 1,
                   width: checkboxWidth,
-                  backgroundColor: theme.palette.background.default,
+                  backgroundColor:
+                    index % 2 === 0
+                      ? theme.palette.tableRow.odd
+                      : theme.palette.tableRow.even,
                   textOverflow: "ellipsis",
                   whiteSpace: "nowrap",
                 }}
@@ -675,7 +678,9 @@ export function DataTable<T extends Record<string, unknown>>({
                     zIndex: cell.column.getIsPinned() ? 1 : 0,
                     width: cell.column.getSize(),
                     backgroundColor: cell.column.getIsPinned()
-                      ? theme.palette.background.default
+                      ? index % 2 === 0
+                        ? theme.palette.tableRow.odd
+                        : theme.palette.tableRow.even
                       : undefined,
                     overflow: "hidden",
                     textOverflow: "ellipsis",
