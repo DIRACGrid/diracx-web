@@ -15,6 +15,8 @@ import {
 import { ProfileButton } from "./ProfileButton";
 import { ThemeToggleButton } from "./ThemeToggleButton";
 import DashboardDrawer from "./DashboardDrawer";
+import { ShareButton } from "./ShareButton";
+import { ImportButton } from "./ImportButton";
 
 interface DashboardProps {
   /** The content to be displayed in the main area */
@@ -121,6 +123,8 @@ export default function Dashboard({
             }}
           >
             <Stack direction="row" spacing={1} alignItems="center">
+              <ImportButton />
+              <ShareButton />
               <ThemeToggleButton />
               <ProfileButton />
             </Stack>

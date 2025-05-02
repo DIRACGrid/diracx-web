@@ -291,10 +291,21 @@ export default function DashboardDrawer({
 
   const handleDelete = () => {
     if (contextState.type === "group") {
+      const group = userDashboard.find(
+        (group) => group.title === contextState.id,
+      );
+      if (group) {
+        group.items.forEach((item) => {
+          sessionStorage.removeItem(`${item.id}_State`);
+        });
+      }
+
       setUserDashboard((userDashboard) =>
         userDashboard.filter((group) => group.title !== contextState.id),
       );
     } else if (contextState.type === "item") {
+      sessionStorage.removeItem(`${contextState.id}_State`);
+
       setUserDashboard((userDashboard) =>
         userDashboard.map((group) => {
           const newItems = group.items.filter(
