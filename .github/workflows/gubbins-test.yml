@@ -194,6 +194,8 @@ jobs:
           name: gubbins-web
           path: /tmp/gubbins-web
           retention-days: 1
+          include-hidden-files: true
+
   # ----------------------------------------------------------------------------#
   # In the following jobs, you should:                                          #
   # - Replace /tmp/gubbins-web with the path to your extension source code      #
