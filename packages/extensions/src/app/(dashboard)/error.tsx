@@ -2,10 +2,10 @@
 
 //Error fallback component
 export default function Error({
-  error,
+  _error,
   reset,
 }: {
-  error: Error;
+  _error: Error;
   reset: () => void;
 }) {
   return (
