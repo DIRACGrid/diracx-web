@@ -1,5 +1,20 @@
 # Changelog
 
+## [0.1.0-a5](https://github.com/DIRACGrid/diracx-web/compare/v0.1.0-a4...v0.1.0-a5) (2025-05-09)
+
+
+### Features
+
+* better cache the intermediate layers in the docker build stage ([f2f2a55](https://github.com/DIRACGrid/diracx-web/commit/f2f2a5598c2a1cf1ed986f1e26a6b51e0837ec7a))
+* create the  error component ([d3a3235](https://github.com/DIRACGrid/diracx-web/commit/d3a32355989eed0a104a9d2435f89b682b9cc686))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @dirac-grid/diracx-web-components bumped from 0.1.0-a4 to 0.1.0-a5
+
 ## [0.1.0-a4](https://github.com/DIRACGrid/diracx-web/compare/v0.1.0-a3...v0.1.0-a4) (2025-04-02)
 
 
