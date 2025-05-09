@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import Box from "@mui/material/Box";
 import {
   blue,
@@ -41,7 +41,9 @@ import { useOIDCContext } from "../../hooks/oidcConfiguration";
 import { DataTable, MenuItem } from "../shared/DataTable";
 import { Job, JobHistory, SearchBody } from "../../types";
 import { useDiracxUrl } from "../../hooks/utils";
+import { useApplicationId } from "../../hooks/application";
 import { JobHistoryDialog } from "./JobHistoryDialog";
+
 import {
   deleteJobs,
   getJobHistory,
@@ -57,6 +59,12 @@ import {
 export function JobDataTable() {
   const theme = useTheme();
 
+  // Id of the application
+  const appId = useApplicationId();
+
+  // Load the initial state from local storage
+  const initialState = sessionStorage.getItem(`${appId}_State`);
+
   // Authentication
   const { configuration } = useOIDCContext();
   const { accessToken } = useOidcAccessToken(configuration?.scope);
@@ -71,25 +79,41 @@ export function JobDataTable() {
     severity: "success",
   });
 
-  // States for table settings
-  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({
-    JobGroup: false,
-    JobType: false,
-    Owner: false,
-    OwnerGroup: false,
-    VO: false,
-    StartExecTime: false,
-    EndExecTime: false,
-    UserPriority: false,
-  });
-  const [columnPinning, setColumnPinning] = useState<ColumnPinningState>({
-    left: ["JobID"], // Pin JobID column by default
-  });
-  const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
-  const [pagination, setPagination] = useState({
-    pageIndex: 0,
-    pageSize: 25,
-  });
+  const parsedInitialState =
+    typeof initialState === "string" ? JSON.parse(initialState) : null;
+
+  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>(
+    parsedInitialState
+      ? parsedInitialState.columnVisibility
+      : {
+          JobGroup: false,
+          JobType: false,
+          Owner: false,
+          OwnerGroup: false,
+          VO: false,
+          StartExecTime: false,
+          EndExecTime: false,
+          UserPriority: false,
+        },
+  );
+  const [columnPinning, setColumnPinning] = useState<ColumnPinningState>(
+    parsedInitialState
+      ? parsedInitialState.columnPinning
+      : {
+          left: ["JobID"], // Pin JobID column by default
+        },
+  );
+  const [rowSelection, setRowSelection] = useState<RowSelectionState>(
+    parsedInitialState ? parsedInitialState.rowSelection : {},
+  );
+  const [pagination, setPagination] = useState(
+    parsedInitialState
+      ? parsedInitialState.pagination
+      : {
+          pageIndex: 0,
+          pageSize: 25,
+        },
+  );
 
   // State for search body
   const [searchBody, setSearchBody] = useState<SearchBody>({
@@ -102,6 +126,24 @@ export function JobDataTable() {
   // State for job history
   const [isHistoryDialogOpen, setIsHistoryDialogOpen] = useState(false);
   const [jobHistoryData, setJobHistoryData] = useState<JobHistory[]>([]);
+
+  // Save the state of the table in local storage
+  useEffect(() => {
+    const state = {
+      columnVisibility: { ...columnVisibility },
+      columnPinning: {
+        left: [...(columnPinning.left || [])],
+        right: [...(columnPinning.right || [])],
+      },
+      rowSelection: { ...rowSelection },
+      pagination: {
+        pageIndex: pagination.pageIndex,
+        pageSize: pagination.pageSize,
+      },
+    };
+
+    sessionStorage.setItem(`${appId}_State`, JSON.stringify(state));
+  }, [columnVisibility, columnPinning, rowSelection, pagination]);
 
   // Status colors
   const statusColors: Record<string, string> = useMemo(
@@ -444,7 +486,6 @@ export function JobDataTable() {
       if (!selectedId) return;
       setBackdropOpen(true);
       setSelectedJobId(selectedId);
-      console.log("Selected job ID:", diracxUrl);
       try {
         const { data } = await getJobHistory(
           diracxUrl,

@@ -91,11 +91,16 @@ export default function DrawerItemGroup({
   // Handle renaming of the group
   const handleGroupRename = () => {
     if (renameValue.trim() === "") return;
-    setUserDashboard((groups) =>
-      groups.map((group) =>
-        group.title === title ? { ...group, title: renameValue } : group,
-      ),
-    );
+    setUserDashboard((groups) => {
+      const count = groups.reduce(
+        (sum, group) => (group.title.startsWith(renameValue) ? sum + 1 : sum),
+        0,
+      );
+      const newTitle = count > 0 ? `${renameValue} (${count})` : renameValue;
+      return groups.map((group) =>
+        group.title === title ? { ...group, title: newTitle } : group,
+      );
+    });
     setRenamingGroupId(null);
     setRenameValue("");
   };
