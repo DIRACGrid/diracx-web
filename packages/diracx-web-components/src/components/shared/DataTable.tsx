@@ -640,62 +640,59 @@ export function DataTable<T extends Record<string, unknown>>({
               ))}
             </>
           )}
-          itemContent={(index, row: Row<T>) => (
-            <>
-              <TableCell
-                padding="checkbox"
-                style={{
-                  position: "sticky",
-                  left: 0,
-                  zIndex: 1,
-                  width: checkboxWidth,
-                  backgroundColor:
-                    theme.palette.tableRow !== undefined
-                      ? index % 2 === 0
-                        ? theme.palette.tableRow.odd
-                        : theme.palette.tableRow.even
-                      : theme.palette.background.default,
-                  textOverflow: "ellipsis",
-                  whiteSpace: "nowrap",
-                }}
-              >
-                <Checkbox
-                  name={`select-row-${row.id}`}
-                  checked={row.getIsSelected()}
-                  disabled={!row.getCanSelect()}
-                  onChange={row.getToggleSelectedHandler()}
-                />
-              </TableCell>
-              {row.getVisibleCells().map((cell) => (
+          itemContent={(index, row: Row<T>) => {
+            const rowColor =
+              theme.palette.tableRow !== undefined
+                ? index % 2 === 0
+                  ? theme.palette.tableRow.even
+                  : theme.palette.tableRow.odd
+                : theme.palette.background.default;
+            return (
+              <>
                 <TableCell
-                  key={cell.id}
+                  padding="checkbox"
                   style={{
-                    position: cell.column.getIsPinned() ? "sticky" : "static",
-                    left:
-                      cell.column.getIsPinned() === "left"
-                        ? checkboxWidth
-                        : undefined,
-                    right:
-                      cell.column.getIsPinned() === "right" ? 0 : undefined,
-                    zIndex: cell.column.getIsPinned() ? 1 : 0,
-                    width: cell.column.getSize(),
-                    backgroundColor: cell.column.getIsPinned()
-                      ? theme.palette.tableRow !== undefined
-                        ? index % 2 === 0
-                          ? theme.palette.tableRow.odd
-                          : theme.palette.tableRow.even
-                        : theme.palette.background.default
-                      : undefined,
-                    overflow: "hidden",
+                    position: "sticky",
+                    left: 0,
+                    zIndex: 1,
+                    width: checkboxWidth,
+                    backgroundColor: rowColor,
                     textOverflow: "ellipsis",
                     whiteSpace: "nowrap",
                   }}
                 >
-                  {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                  <Checkbox
+                    name={`select-row-${row.id}`}
+                    checked={row.getIsSelected()}
+                    disabled={!row.getCanSelect()}
+                    onChange={row.getToggleSelectedHandler()}
+                  />
                 </TableCell>
-              ))}
-            </>
-          )}
+                {row.getVisibleCells().map((cell) => (
+                  <TableCell
+                    key={cell.id}
+                    style={{
+                      position: cell.column.getIsPinned() ? "sticky" : "static",
+                      left:
+                        cell.column.getIsPinned() === "left"
+                          ? checkboxWidth
+                          : undefined,
+                      right:
+                        cell.column.getIsPinned() === "right" ? 0 : undefined,
+                      zIndex: cell.column.getIsPinned() ? 1 : 0,
+                      width: cell.column.getSize(),
+                      backgroundColor: rowColor,
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                      whiteSpace: "nowrap",
+                    }}
+                  >
+                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                  </TableCell>
+                ))}
+              </>
+            );
+          }}
         />
         <TablePagination
           component="div"
