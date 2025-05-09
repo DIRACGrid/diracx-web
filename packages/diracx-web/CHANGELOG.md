@@ -1,5 +1,20 @@
 # Changelog
 
+## [0.1.0-a5](https://github.com/DIRACGrid/diracx-web/compare/v0.1.0-a4...v0.1.0-a5) (2025-05-09)
+
+
+### Features
+
+* create the  error component ([d3a3235](https://github.com/DIRACGrid/diracx-web/commit/d3a32355989eed0a104a9d2435f89b682b9cc686))
+* new rules in lint config and fix ([d22f74d](https://github.com/DIRACGrid/diracx-web/commit/d22f74d70f4f58284f176637d3c740511b2512fb))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @dirac-grid/diracx-web-components bumped from ^0.1.0-a4 to ^0.1.0-a5
+
 ## [0.1.0-a4](https://github.com/DIRACGrid/diracx-web/compare/v0.1.0-a3...v0.1.0-a4) (2025-04-02)
 
 
