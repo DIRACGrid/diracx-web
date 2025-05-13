@@ -1,7 +1,6 @@
 "use client";
 
 import React, { createContext, useEffect, useState } from "react";
-import { Monitor } from "@mui/icons-material";
 import { applicationList } from "../components/ApplicationList";
 import { DashboardGroup } from "../types/DashboardGroup";
 import ApplicationMetadata from "../types/ApplicationMetadata";
@@ -36,7 +35,14 @@ export const ApplicationsProvider = ({
   appList = applicationList,
   defaultUserDashboard,
 }: ApplicationsProviderProps) => {
-  const [userDashboard, setUserDashboard] = useState<DashboardGroup[]>([]);
+  const loadedDashboard = sessionStorage.getItem("savedDashboard");
+  const parsedDashboard: DashboardGroup[] = loadedDashboard
+    ? JSON.parse(loadedDashboard)
+    : null;
+
+  const [userDashboard, setUserDashboard] = useState<DashboardGroup[]>(
+    parsedDashboard || [],
+  );
 
   const [currentAppId, setCurrentAppId] = useState<string>("");
 
@@ -53,13 +59,17 @@ export const ApplicationsProvider = ({
               title: "My Jobs",
               type: "Job Monitor",
               id: "JobMonitor0",
-              icon: Monitor,
             },
           ],
         },
       ],
     );
   }, [appList, defaultUserDashboard]);
+
+  // Save the dashboard in session storage
+  useEffect(() => {
+    sessionStorage.setItem("savedDashboard", JSON.stringify(userDashboard));
+  }, [userDashboard]);
 
   return (
     <ApplicationsContext.Provider

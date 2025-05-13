@@ -10,7 +10,7 @@ import {
   useTheme,
   TextField,
 } from "@mui/material";
-import { DragIndicator } from "@mui/icons-material";
+import { DragIndicator, Apps } from "@mui/icons-material";
 import { combine } from "@atlaskit/pragmatic-drag-and-drop/combine";
 import {
   draggable,
@@ -28,8 +28,8 @@ import { ApplicationsContext } from "../../contexts/ApplicationsProvider";
 import { DashboardGroup } from "../../types";
 
 interface DrawerItemProps {
-  /** The item object containing the title, id, and icon. */
-  item: { title: string; id: string; icon: React.ComponentType };
+  /** The item object containing the title, id, and the appType. */
+  item: { title: string; id: string; type: string };
   /** The index of the item. */
   index: number;
   /** The title of the group. */
@@ -52,7 +52,7 @@ interface DrawerItemProps {
  * @returns The rendered JSX for the drawer item.
  */
 export default function DrawerItem({
-  item: { title, id, icon },
+  item: { title, id, type },
   index,
   groupTitle,
   renamingItemId,
@@ -69,7 +69,10 @@ export default function DrawerItem({
   // Represents the closest edge to the mouse cursor
   const [closestEdge, setClosestEdge] = useState<Edge | null>(null);
 
-  const [, , , appId, setCurrentAppId] = useContext(ApplicationsContext);
+  const [, , appList, appId, setCurrentAppId] = useContext(ApplicationsContext);
+  const { icon } = appList.find((app) => app.name === type) || {
+    icon: Apps,
+  };
 
   useEffect(() => {
     if (!dragRef.current || !handleRef.current) return;
@@ -184,7 +187,7 @@ export default function DrawerItem({
       <ListItemButton
         disableGutters
         key={title}
-        onClick={() => setCurrentAppId(id)} //setParam("appId", id)}
+        onClick={() => setCurrentAppId(id)}
         sx={{ pl: 2, borderRadius: 2, pr: 1 }}
         ref={dragRef}
         selected={appId === id}
