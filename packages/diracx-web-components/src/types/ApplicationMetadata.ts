@@ -8,3 +8,5 @@ export default interface ApplicationMetadata {
   component: ElementType;
   icon: SvgIconComponent;
 }
+
+export type ApplicationState = string;
