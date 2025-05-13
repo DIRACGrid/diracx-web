@@ -1,7 +1,6 @@
 "use client";
 
 import { Box } from "@mui/material";
-import { ApplicationState } from "../../types/ApplicationMetadata";
 import { useApplicationId } from "../../hooks/application";
 import { JobDataTable } from "./JobDataTable";
 /**
@@ -24,14 +23,4 @@ export default function JobMonitor() {
       <JobDataTable key={appId} />
     </Box>
   );
-}
-
-export function exportState(appId: string): ApplicationState {
-  const state = sessionStorage.getItem(`${appId}_State`);
-  return state ? state : "null";
-}
-
-export function setState(appId: string, state: ApplicationState) {
-  // Set the state in local storage
-  sessionStorage.setItem(`${appId}_State`, state);
 }

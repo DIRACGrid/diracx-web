@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState, useContext } from "react";
+import { useState, useContext } from "react";
 
 import {
   IconButton,
@@ -79,12 +79,7 @@ export function ShareButton() {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedApps, setSelectedApps] = useState<string[]>([]);
   const [selectedState, setSelectedState] = useState("");
-  const [groups, , appList] = useContext(ApplicationsContext);
-
-  const availableApps: string[] = useMemo(
-    () => appList.map((app) => (app.getState ? app.name : "")),
-    [groups],
-  );
+  const [groups, ,] = useContext(ApplicationsContext);
 
   // Function to handle the click event on the share button
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
@@ -113,11 +108,11 @@ export function ShareButton() {
       const app = groups.flatMap((g) => g.items).find((a) => a.id === appId);
       if (!app) return null;
 
-      const appMetadata = appList.find((meta) => meta.name === app.type);
-
+      const appState = sessionStorage.getItem(`${appId}_State`);
       return {
         appType: app.type,
-        state: appMetadata!.getState ? appMetadata!.getState(app.id) : "null",
+        appName: app.title,
+        state: typeof appState === "string" ? appState : "null",
       };
     });
 
@@ -143,7 +138,7 @@ export function ShareButton() {
       >
         {groups.map(
           (group) =>
-            group.items.some((app) => availableApps.includes(app.type)) && (
+            group.items.length > 0 && (
               <div key={group.title}>
                 <FormControlLabel
                   label={group.title}
@@ -184,7 +179,6 @@ export function ShareButton() {
                   group={group}
                   selectedApps={selectedApps}
                   handleAppToggle={handleAppToggle}
-                  availableApps={availableApps}
                 />
               </div>
             ),
@@ -223,32 +217,27 @@ function GroupCheckboxSection({
   group,
   selectedApps,
   handleAppToggle,
-  availableApps,
 }: {
   group: DashboardGroup;
   selectedApps: string[];
   handleAppToggle: (appId: string) => void;
-  availableApps: string[];
 }) {
   return (
     <Box sx={{ display: "flex", flexDirection: "column", ml: 2 }}>
-      {group.items.map(
-        (app) =>
-          availableApps.includes(app.type) && (
-            <FormControlLabel
-              key={app.id}
-              label={app.title}
-              control={
-                <Checkbox
-                  checked={selectedApps.includes(app.id)}
-                  onChange={() => handleAppToggle(app.id)}
-                  size="small"
-                  data-testid={`checkbox-${app.id}`}
-                />
-              }
+      {group.items.map((app) => (
+        <FormControlLabel
+          key={app.id}
+          label={app.title}
+          control={
+            <Checkbox
+              checked={selectedApps.includes(app.id)}
+              onChange={() => handleAppToggle(app.id)}
+              size="small"
+              data-testid={`checkbox-${app.id}`}
             />
-          ),
-      )}
+          }
+        />
+      ))}
     </Box>
   );
 }

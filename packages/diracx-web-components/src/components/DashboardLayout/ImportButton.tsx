@@ -97,22 +97,22 @@ export function ImportButton() {
       items: [],
     };
 
-    userDashboard.push(newGroup);
+    // Create a group only if there are valid states to import
+    if (states.some((state) => state.state !== "null"))
+      userDashboard.push(newGroup);
 
     states.forEach((state) => {
-      const appMetadata = appList.find((meta) => meta.name === state.appType);
-      if (state.state !== "null" && appMetadata?.setState) {
+      if (state.state !== "null") {
         const appId = handleAppCreation(
           state.appType,
+          state.appName,
           appList,
           userDashboard,
           setUserDashboard,
         );
-        appMetadata.setState(appId, state.state);
+        sessionStorage.setItem(`${appId}_State`, state.state);
       } else {
-        if (state.state === "null")
-          console.warn(`No state to import for app type: ${state.appType}`);
-        else console.warn(`No setState handler for app type: ${state.appType}`);
+        console.warn(`No state to import for app type: ${state.appType}`);
       }
     });
   };
@@ -142,28 +142,28 @@ export function ImportButton() {
  */
 function handleAppCreation(
   appType: string,
+  appTitle: string,
   appList: ApplicationMetadata[],
   userDashboard: DashboardGroup[],
   setUserDashboard: React.Dispatch<SetStateAction<DashboardGroup[]>>,
 ): string {
   const group = userDashboard[userDashboard.length - 1];
 
-  let title = `${appType} ${userDashboard.reduce(
+  const count = userDashboard.reduce(
     (sum, group) =>
-      sum + group.items.filter((item) => item.type === appType).length,
-    1,
-  )}`;
-  while (group.items.some((item) => item.title === title)) {
-    title = `${appType} ${parseInt(title.split(" ")[1]) + 1}`;
-  }
+      sum +
+      group.items.filter((item) => item.title.startsWith(appTitle)).length,
+    0,
+  );
 
+  const title = count > 0 ? `${appTitle} (${count + 1})` : appTitle;
   const appId = `${title}${userDashboard.reduce(
     (sum, group) => sum + group.items.length,
     0,
   )}`;
 
   const newApp = {
-    title,
+    title: title,
     id: appId,
     type: appType,
     icon: appList.find((app) => app.name === appType)?.icon || null,
