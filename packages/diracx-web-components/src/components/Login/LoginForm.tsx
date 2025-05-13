@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect } from "react";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import FormControl from "@mui/material/FormControl";
@@ -15,8 +15,6 @@ import { useOidc } from "@axa-fr/react-oidc";
 import { useMetadata, Metadata } from "../../hooks/metadata";
 import { useOIDCContext } from "../../hooks/oidcConfiguration";
 
-import { useSearchParamsUtils } from "../../hooks/searchParamsUtils";
-import { NavigationContext } from "../../contexts/NavigationProvider";
 import { useDiracxUrl } from "../../hooks";
 
 interface LoginFormProps {
@@ -32,15 +30,12 @@ interface LoginFormProps {
 export function LoginForm({
   logoURL = "/DIRAC-logo-minimal.png",
 }: LoginFormProps) {
-  const { setPath } = useContext(NavigationContext);
   const diracxUrl = useDiracxUrl();
   const { metadata, error, isLoading } = useMetadata(diracxUrl);
   const [selectedVO, setSelectedVO] = useState<string | null>(null);
   const [selectedGroup, setSelectedGroup] = useState<string | null>(null);
   const { configuration, setConfiguration } = useOIDCContext();
   const { isAuthenticated, login } = useOidc(configuration?.scope);
-
-  const { getParam } = useSearchParamsUtils();
 
   // Login if not authenticated
   useEffect(() => {
@@ -50,18 +45,18 @@ export function LoginForm({
     }
   }, [configuration, isAuthenticated, login]);
 
-  useEffect(() => {
-    // Redirect to dashboard if already authenticated
-    if (isAuthenticated) {
-      const redirect = getParam("redirect");
-      console.log("Redirecting to:", redirect);
-      if (redirect) {
-        setPath(redirect);
-      } else {
-        setPath("/");
-      }
-    }
-  }, [getParam, isAuthenticated, setPath]);
+  // useEffect(() => {
+  //   // Redirect to dashboard if already authenticated
+  //   if (isAuthenticated) {
+  //     const redirect = getParam("redirect");
+  //     console.log("Redirecting to:", redirect);
+  //     if (redirect) {
+  //       setPath(redirect);
+  //     } else {
+  //       setPath("/");
+  //     }
+  //   }
+  // }, [getParam, isAuthenticated, setPath]);
 
   // Get default group
   const getDefaultGroup = (

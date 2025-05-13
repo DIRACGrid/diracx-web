@@ -77,7 +77,8 @@ export default function DashboardDrawer({
 
   // Define the applications that are accessible to users.
   // Each application has an associated icon and path.
-  const [userDashboard, setUserDashboard] = useContext(ApplicationsContext);
+  const [userDashboard, setUserDashboard, , , setCurrentAppId] =
+    useContext(ApplicationsContext);
 
   const theme = useTheme();
 
@@ -247,6 +248,7 @@ export default function DashboardDrawer({
         userDashboard.map((g) => (g.title === group.title ? group : g)),
       );
     }
+    setCurrentAppId(newApp.id);
   };
 
   let isContextStateStable = true;

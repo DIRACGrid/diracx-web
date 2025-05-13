@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useRef, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
 import {
   ListItemButton,
@@ -24,8 +24,7 @@ import {
 } from "@atlaskit/pragmatic-drag-and-drop-hitbox/closest-edge";
 import { setCustomNativeDragPreview } from "@atlaskit/pragmatic-drag-and-drop/element/set-custom-native-drag-preview";
 import { ThemeProvider } from "../../contexts/ThemeProvider";
-import { useSearchParamsUtils } from "../../hooks/searchParamsUtils";
-import { useApplicationId } from "../../hooks/application";
+import { ApplicationsContext } from "../../contexts/ApplicationsProvider";
 import { DashboardGroup } from "../../types";
 
 interface DrawerItemProps {
@@ -67,11 +66,10 @@ export default function DrawerItem({
   // Ref to use for the handle of the draggable element, must be a child of the draggable element
   const handleRef = useRef(null);
   const theme = useTheme();
-  const { setParam } = useSearchParamsUtils();
   // Represents the closest edge to the mouse cursor
   const [closestEdge, setClosestEdge] = useState<Edge | null>(null);
 
-  const appId = useApplicationId();
+  const [, , , appId, setCurrentAppId] = useContext(ApplicationsContext);
 
   useEffect(() => {
     if (!dragRef.current || !handleRef.current) return;
@@ -186,7 +184,7 @@ export default function DrawerItem({
       <ListItemButton
         disableGutters
         key={title}
-        onClick={() => setParam("appId", id)}
+        onClick={() => setCurrentAppId(id)} //setParam("appId", id)}
         sx={{ pl: 2, borderRadius: 2, pr: 1 }}
         ref={dragRef}
         selected={appId === id}

@@ -1,6 +1,5 @@
 "use client";
 import { useContext, useMemo } from "react";
-import { useSearchParams } from "next/navigation";
 import {
   BaseApp,
   applicationList,
@@ -8,9 +7,7 @@ import {
 import { ApplicationsContext } from "@dirac-grid/diracx-web-components/contexts";
 
 export default function Page() {
-  const searchParams = useSearchParams();
-  const appId = searchParams.get("appId");
-  const [userDashboard] = useContext(ApplicationsContext);
+  const [userDashboard, , , appId] = useContext(ApplicationsContext);
 
   const appType = useMemo(() => {
     const group = userDashboard.find((group) =>
@@ -23,5 +20,5 @@ export default function Page() {
     return applicationList.find((app) => app.name === appType)?.component;
   }, [appType]);
 
-  return Component ? <Component /> : <BaseApp />;
+  return Component ? <Component key={appId} /> : <BaseApp />;
 }
