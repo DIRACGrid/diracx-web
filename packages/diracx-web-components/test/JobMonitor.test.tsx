@@ -12,11 +12,6 @@ import * as stories from "../stories/JobMonitor.stories";
 // Compose Storybook stories (includes all decorators/args)
 const { Default, Loading, Empty, Error } = composeStories(stories);
 
-jest.mock("jsoncrush", () => ({
-  crush: jest.fn().mockImplementation((data) => `crushed-${data}`),
-  uncrush: jest.fn().mockImplementation((data) => data.replace("crushed-", "")),
-}));
-
 describe("JobMonitor", () => {
   it("renders the job monitor component", async () => {
     const { getByTestId, getByText } = render(<Default />);

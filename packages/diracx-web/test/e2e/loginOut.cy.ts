@@ -43,7 +43,7 @@ describe("Login and Logout", () => {
     // From now on the user is logged in
     // The login buttton should not be present anymore
     cy.get('[data-testid="button-login"]').should("not.exist");
-    cy.contains("Hello admin").should("exist");
+    cy.contains("My Jobs").should("exist");
 
     // Click on the user avatar
     cy.get(".MuiAvatar-root").click();

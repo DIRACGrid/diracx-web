@@ -43,7 +43,6 @@ const meta = {
                   {
                     id: "example",
                     title: "App Name",
-                    icon: null,
                     type: "test",
                   },
                 ],
@@ -51,6 +50,8 @@ const meta = {
             ],
             () => {},
             [],
+            "",
+            () => {},
           ]}
         >
           <Story />

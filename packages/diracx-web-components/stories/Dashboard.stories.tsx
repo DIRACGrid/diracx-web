@@ -1,7 +1,5 @@
 import { useState } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
-
-import { Dashboard as DashboardIcon } from "@mui/icons-material";
 import { Box } from "@mui/material";
 import { ApplicationsContext } from "../src/contexts/ApplicationsProvider";
 import { NavigationProvider } from "../src/contexts/NavigationProvider";
@@ -31,12 +29,12 @@ const meta = {
             {
               id: "example",
               title: "App Name",
-              icon: DashboardIcon,
               type: "test",
             },
           ],
         },
       ]);
+      const [currentAppId, setCurrentAppId] = useState<string>("example");
       return (
         <NavigationProvider
           getPath={() => "/"}
@@ -48,7 +46,13 @@ const meta = {
           }}
         >
           <ApplicationsContext.Provider
-            value={[userDashboard, setUserDashboard, applicationList]}
+            value={[
+              userDashboard,
+              setUserDashboard,
+              applicationList,
+              currentAppId,
+              setCurrentAppId,
+            ]}
           >
             <ThemeProvider>
               <Box sx={{ height: "50vh" }}>

@@ -144,7 +144,11 @@ export function ImportButton() {
  * Handles the creation of a new app in the dashboard drawer.
  *
  * @param appType - The type of the app to be created.
- * @param icon - The icon component for the app.
+ * @param appTitle - The title of the app to be created.
+ * @param appList - The list of applications with their metadata.
+ * @param userDashboard - The current state of the user's dashboard.
+ * @param setUserDashboard - The function to update the user's dashboard state.
+ * @returns The ID of the newly created app.
  */
 function handleAppCreation(
   appType: string,
@@ -172,7 +176,6 @@ function handleAppCreation(
     title: title,
     id: appId,
     type: appType,
-    icon: appList.find((app) => app.name === appType)?.icon || null,
   };
   group.items.push(newApp);
   setUserDashboard((userDashboard) =>
