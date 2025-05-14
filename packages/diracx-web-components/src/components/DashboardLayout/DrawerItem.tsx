@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useRef, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
 import {
   ListItemButton,
@@ -10,7 +10,7 @@ import {
   useTheme,
   TextField,
 } from "@mui/material";
-import { DragIndicator } from "@mui/icons-material";
+import { DragIndicator, Apps } from "@mui/icons-material";
 import { combine } from "@atlaskit/pragmatic-drag-and-drop/combine";
 import {
   draggable,
@@ -24,13 +24,12 @@ import {
 } from "@atlaskit/pragmatic-drag-and-drop-hitbox/closest-edge";
 import { setCustomNativeDragPreview } from "@atlaskit/pragmatic-drag-and-drop/element/set-custom-native-drag-preview";
 import { ThemeProvider } from "../../contexts/ThemeProvider";
-import { useSearchParamsUtils } from "../../hooks/searchParamsUtils";
-import { useApplicationId } from "../../hooks/application";
+import { ApplicationsContext } from "../../contexts/ApplicationsProvider";
 import { DashboardGroup } from "../../types";
 
 interface DrawerItemProps {
-  /** The item object containing the title, id, and icon. */
-  item: { title: string; id: string; icon: React.ComponentType };
+  /** The item object containing the title, id, and the appType. */
+  item: { title: string; id: string; type: string };
   /** The index of the item. */
   index: number;
   /** The title of the group. */
@@ -53,7 +52,7 @@ interface DrawerItemProps {
  * @returns The rendered JSX for the drawer item.
  */
 export default function DrawerItem({
-  item: { title, id, icon },
+  item: { title, id, type },
   index,
   groupTitle,
   renamingItemId,
@@ -67,11 +66,13 @@ export default function DrawerItem({
   // Ref to use for the handle of the draggable element, must be a child of the draggable element
   const handleRef = useRef(null);
   const theme = useTheme();
-  const { setParam } = useSearchParamsUtils();
   // Represents the closest edge to the mouse cursor
   const [closestEdge, setClosestEdge] = useState<Edge | null>(null);
 
-  const appId = useApplicationId();
+  const [, , appList, appId, setCurrentAppId] = useContext(ApplicationsContext);
+  const { icon } = appList.find((app) => app.name === type) || {
+    icon: Apps,
+  };
 
   useEffect(() => {
     if (!dragRef.current || !handleRef.current) return;
@@ -186,7 +187,7 @@ export default function DrawerItem({
       <ListItemButton
         disableGutters
         key={title}
-        onClick={() => setParam("appId", id)}
+        onClick={() => setCurrentAppId(id)}
         sx={{ pl: 2, borderRadius: 2, pr: 1 }}
         ref={dragRef}
         selected={appId === id}

@@ -32,7 +32,6 @@ interface LoginFormProps {
 export function LoginForm({
   logoURL = "/DIRAC-logo-minimal.png",
 }: LoginFormProps) {
-  const { setPath } = useContext(NavigationContext);
   const diracxUrl = useDiracxUrl();
   const { metadata, error, isLoading } = useMetadata(diracxUrl);
   const [selectedVO, setSelectedVO] = useState<string | null>(null);
@@ -41,6 +40,7 @@ export function LoginForm({
   const { isAuthenticated, login } = useOidc(configuration?.scope);
 
   const { getParam } = useSearchParamsUtils();
+  const { setPath } = useContext(NavigationContext);
 
   // Login if not authenticated
   useEffect(() => {
