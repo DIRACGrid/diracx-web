@@ -23,5 +23,5 @@ export default function Page() {
     return applicationList.find((app) => app.name === appType)?.component;
   }, [appType]);
 
-  return Component ? <Component /> : <BaseApp />;
+  return Component ? <Component key={appId} /> : <BaseApp />;
 }

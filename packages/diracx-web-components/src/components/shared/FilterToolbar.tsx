@@ -6,7 +6,7 @@ import { FilterList, Delete, Send, Refresh } from "@mui/icons-material";
 import Chip from "@mui/material/Chip";
 import Button from "@mui/material/Button";
 import { Alert, Box, Popover, Stack, Tooltip } from "@mui/material";
-import { Column } from "@tanstack/react-table";
+import { ColumnDef } from "@tanstack/react-table";
 import { InternalFilter } from "../../types/Filter";
 import { FilterForm } from "./FilterForm";
 import "../../hooks/theme";
@@ -17,13 +17,12 @@ import "../../hooks/theme";
  */
 export interface FilterToolbarProps<T extends Record<string, unknown>> {
   /** The columns of the data table */
-  columns: Column<T>[];
-  /** The filters to apply */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  columns: ColumnDef<T, any>[];
+  /** The filters */
   filters: InternalFilter[];
   /** The function to set the filters */
   setFilters: React.Dispatch<React.SetStateAction<InternalFilter[]>>;
-  /** The applied filters */
-  appliedFilters: InternalFilter[];
   /** The function to apply the filters */
   handleApplyFilters: () => void;
   /** The function to remove all filters */
@@ -39,7 +38,6 @@ export function FilterToolbar<T extends Record<string, unknown>>({
   columns,
   filters,
   setFilters,
-  appliedFilters,
   handleApplyFilters,
   handleClearFilters,
 }: FilterToolbarProps<T>) {
@@ -58,6 +56,7 @@ export function FilterToolbar<T extends Record<string, unknown>>({
       parameter: "",
       operator: "eq",
       value: "",
+      isApplied: false,
     };
     setSelectedFilter(newFilter);
     setAnchorEl(addFilterButtonRef.current);
@@ -93,15 +92,8 @@ export function FilterToolbar<T extends Record<string, unknown>>({
   };
 
   const changesUnapplied = useCallback(() => {
-    return JSON.stringify(filters) !== JSON.stringify(appliedFilters);
-  }, [filters, appliedFilters]);
-
-  const isApplied = useCallback(
-    (filter: InternalFilter) => {
-      return appliedFilters.some((f) => f.id == filter.id);
-    },
-    [appliedFilters],
-  );
+    return filters.some((filter) => !filter.isApplied);
+  }, [filters]);
 
   function debounce<T extends (event: KeyboardEvent) => void>(
     func: T,
@@ -214,12 +206,10 @@ export function FilterToolbar<T extends Record<string, unknown>>({
             }}
             sx={{
               m: 0.5,
-              backgroundColor: isApplied(filter) ? "primary.main" : grey[500],
+              backgroundColor: filter.isApplied ? "primary.main" : grey[500],
             }}
             className={
-              isApplied(filter)
-                ? "chip-filter-applied"
-                : "chip-filter-unapplied"
+              filter.isApplied ? "chip-filter-applied" : "chip-filter-unapplied"
             }
           />
         ))}

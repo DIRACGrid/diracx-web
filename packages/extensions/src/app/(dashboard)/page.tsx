@@ -26,5 +26,5 @@ export default function Page() {
   }, [appType]);
 
   // Render the component if it exists, otherwise render the UserDashboard
-  return Component ? <Component /> : <BaseApp />;
+  return Component ? <Component key={appId} /> : <BaseApp />;
 }

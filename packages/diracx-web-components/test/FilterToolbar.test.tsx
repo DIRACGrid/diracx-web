@@ -42,12 +42,22 @@ describe("FilterToolbar", () => {
 
   // Create mock filters
   const filters = [
-    { id: 1, parameter: "id", operator: "eq", value: "value1" },
-    { id: 2, parameter: "name", operator: "neq", value: "value2" },
+    {
+      id: 1,
+      parameter: "id",
+      operator: "eq",
+      value: "value1",
+      isApplied: true,
+    },
+    {
+      id: 2,
+      parameter: "name",
+      operator: "neq",
+      value: "value2",
+      isApplied: false,
+    },
   ];
-  const appliedFilters = [
-    { id: 1, parameter: "id", operator: "eq", value: "value1" },
-  ];
+
   const setFilters = jest.fn();
   const handleApplyFilters = jest.fn();
   const handleClearFilters = jest.fn();
@@ -68,7 +78,6 @@ describe("FilterToolbar", () => {
           setFilters={setFilters}
           handleApplyFilters={handleApplyFilters}
           handleClearFilters={handleClearFilters}
-          appliedFilters={appliedFilters}
         />
       </ThemeProvider>
     );
@@ -104,19 +113,14 @@ describe("FilterToolbar", () => {
 
     expect(warningMessage).toBeInTheDocument();
 
-    appliedFilters.push({
-      id: 2,
-      parameter: "name",
-      operator: "neq",
-      value: "value2",
-    });
+    filters[1].isApplied = true;
 
     cleanup();
 
     render(<FilterToolbarWrapper />);
 
     expect(warningMessage).not.toBeInTheDocument();
-    appliedFilters.pop();
+    filters[1].isApplied = false;
   });
 
   it("opens the filter form when 'Add filter' button is clicked", () => {

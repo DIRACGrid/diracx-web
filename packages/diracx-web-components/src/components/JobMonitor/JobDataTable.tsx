@@ -1,20 +1,7 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import Box from "@mui/material/Box";
-import {
-  blue,
-  orange,
-  grey,
-  green,
-  red,
-  lightBlue,
-  purple,
-  teal,
-  blueGrey,
-  lime,
-  amber,
-} from "@mui/material/colors";
 import {
   Alert,
   AlertColor,
@@ -23,25 +10,22 @@ import {
   Backdrop,
   CircularProgress,
   Snackbar,
-  lighten,
-  darken,
-  useTheme,
 } from "@mui/material";
 import { useOidcAccessToken } from "@axa-fr/react-oidc";
 import { Delete, Clear, Replay } from "@mui/icons-material";
 import {
-  createColumnHelper,
-  ColumnPinningState,
-  RowSelectionState,
   useReactTable,
   getCoreRowModel,
+  ColumnDef,
+  ColumnPinningState,
+  RowSelectionState,
   VisibilityState,
+  PaginationState,
 } from "@tanstack/react-table";
 import { useOIDCContext } from "../../hooks/oidcConfiguration";
 import { DataTable, MenuItem } from "../shared/DataTable";
 import { Job, JobHistory, SearchBody } from "../../types";
 import { useDiracxUrl } from "../../hooks/utils";
-import { useApplicationId } from "../../hooks/application";
 import { JobHistoryDialog } from "./JobHistoryDialog";
 
 import {
@@ -54,17 +38,52 @@ import {
 } from "./JobDataService";
 
 /**
+ * Job Data Table props
+ * @property {number} searchBody - the search body to send along with the request
+ * @property {function} setSearchBody - the function to call when the search body changes
+ */
+interface JobDataTableProps {
+  /** The search body to send along with the request */
+  searchBody: SearchBody;
+  /** The function to call when the search body changes */
+  setSearchBody: React.Dispatch<React.SetStateAction<SearchBody>>;
+  /** Columns */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  columns: ColumnDef<Job, any>[];
+  /** Pagination */
+  pagination: PaginationState;
+  /** Set pagination */
+  setPagination: React.Dispatch<React.SetStateAction<PaginationState>>;
+  /** Row selection */
+  rowSelection: RowSelectionState;
+  /** Set row selection */
+  setRowSelection: React.Dispatch<React.SetStateAction<RowSelectionState>>;
+  /** Column Visibility */
+  columnVisibility: VisibilityState;
+  /** Set column visibility */
+  setColumnVisibility: React.Dispatch<React.SetStateAction<VisibilityState>>;
+  /** Column Pinning */
+  columnPinning: ColumnPinningState;
+  /** Set column pinning */
+  setColumnPinning: React.Dispatch<React.SetStateAction<ColumnPinningState>>;
+}
+
+/**
  * The data grid for the jobs
  */
-export function JobDataTable() {
-  const theme = useTheme();
-
-  // Id of the application
-  const appId = useApplicationId();
-
-  // Load the initial state from local storage
-  const initialState = sessionStorage.getItem(`${appId}_State`);
-
+export function JobDataTable({
+  searchBody,
+  setSearchBody,
+  columns,
+  pagination,
+  setPagination,
+  rowSelection,
+  setRowSelection,
+  columnVisibility,
+  setColumnVisibility,
+  columnPinning,
+  setColumnPinning,
+}: JobDataTableProps) {
   // Authentication
   const { configuration } = useOIDCContext();
   const { accessToken } = useOidcAccessToken(configuration?.scope);
@@ -79,190 +98,12 @@ export function JobDataTable() {
     severity: "success",
   });
 
-  const parsedInitialState =
-    typeof initialState === "string" ? JSON.parse(initialState) : null;
-
-  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>(
-    parsedInitialState
-      ? parsedInitialState.columnVisibility
-      : {
-          JobGroup: false,
-          JobType: false,
-          Owner: false,
-          OwnerGroup: false,
-          VO: false,
-          StartExecTime: false,
-          EndExecTime: false,
-          UserPriority: false,
-        },
-  );
-  const [columnPinning, setColumnPinning] = useState<ColumnPinningState>(
-    parsedInitialState
-      ? parsedInitialState.columnPinning
-      : {
-          left: ["JobID"], // Pin JobID column by default
-        },
-  );
-  const [rowSelection, setRowSelection] = useState<RowSelectionState>(
-    parsedInitialState ? parsedInitialState.rowSelection : {},
-  );
-  const [pagination, setPagination] = useState(
-    parsedInitialState
-      ? parsedInitialState.pagination
-      : {
-          pageIndex: 0,
-          pageSize: 25,
-        },
-  );
-
-  // State for search body
-  const [searchBody, setSearchBody] = useState<SearchBody>({
-    sort: [{ parameter: "JobID", direction: "desc" }],
-  });
-
   // State for selected job
   const [selectedJobId, setSelectedJobId] = useState<number | null>(null);
 
   // State for job history
   const [isHistoryDialogOpen, setIsHistoryDialogOpen] = useState(false);
   const [jobHistoryData, setJobHistoryData] = useState<JobHistory[]>([]);
-
-  // Save the state of the table in local storage
-  useEffect(() => {
-    const state = {
-      columnVisibility: { ...columnVisibility },
-      columnPinning: {
-        left: [...(columnPinning.left || [])],
-        right: [...(columnPinning.right || [])],
-      },
-      rowSelection: { ...rowSelection },
-      pagination: {
-        pageIndex: pagination.pageIndex,
-        pageSize: pagination.pageSize,
-      },
-    };
-
-    sessionStorage.setItem(`${appId}_State`, JSON.stringify(state));
-  }, [columnVisibility, columnPinning, rowSelection, pagination]);
-
-  // Status colors
-  const statusColors: Record<string, string> = useMemo(
-    () => ({
-      Submitting: purple[500],
-      Received: blueGrey[500],
-      Checking: teal[500],
-      Staging: lightBlue[500],
-      Waiting: amber[600],
-      Matched: blue[300],
-      Running: blue[900],
-      Rescheduled: lime[700],
-      Completing: orange[500],
-      Completed: green[300],
-      Done: green[500],
-      Failed: red[500],
-      Stalled: amber[900],
-      Killed: red[900],
-      Deleted: grey[500],
-    }),
-    [],
-  );
-
-  /**
-   * Renders the status cell with colors
-   */
-  const renderStatusCell = useCallback(
-    (status: string) => {
-      return (
-        <Box
-          sx={{
-            display: "inline-block",
-            borderRadius: "10px",
-            padding: "3px 10px",
-            backgroundColor:
-              theme.palette.mode === "light"
-                ? lighten(statusColors[status] ?? "default", 0.1)
-                : darken(statusColors[status] ?? "default", 0.3),
-            color: "white",
-            fontWeight: "bold",
-          }}
-        >
-          {status}
-        </Box>
-      );
-    },
-    [theme, statusColors],
-  );
-
-  const columnHelper = useMemo(() => createColumnHelper<Job>(), []);
-
-  /**
-   * The head cells for the data grid (desktop version)
-   */
-  const columns = useMemo(
-    () => [
-      columnHelper.accessor("JobID", {
-        header: "ID",
-        meta: { type: "number" },
-      }),
-      columnHelper.accessor("Status", {
-        header: "Status",
-        cell: (info) => renderStatusCell(info.getValue()),
-        meta: { type: "category", values: Object.keys(statusColors).sort() },
-      }),
-      columnHelper.accessor("MinorStatus", {
-        header: "Minor Status",
-      }),
-      columnHelper.accessor("ApplicationStatus", {
-        header: "Application Status",
-      }),
-      columnHelper.accessor("Site", {
-        header: "Site",
-      }),
-      columnHelper.accessor("JobName", {
-        header: "Name",
-      }),
-      columnHelper.accessor("JobGroup", {
-        header: "Job Group",
-      }),
-      columnHelper.accessor("JobType", {
-        header: "Type",
-      }),
-      columnHelper.accessor("LastUpdateTime", {
-        header: "Last Update Time",
-        meta: { type: "date" },
-      }),
-      columnHelper.accessor("HeartBeatTime", {
-        header: "Last Sign of Life",
-        meta: { type: "date" },
-      }),
-      columnHelper.accessor("SubmissionTime", {
-        header: "Submission Time",
-        meta: { type: "date" },
-      }),
-      columnHelper.accessor("Owner", {
-        header: "Owner",
-      }),
-      columnHelper.accessor("OwnerGroup", {
-        header: "Owner Group",
-      }),
-      columnHelper.accessor("VO", {
-        header: "VO",
-      }),
-      columnHelper.accessor("StartExecTime", {
-        header: "Start Execution Time",
-        meta: { type: "date" },
-      }),
-      columnHelper.accessor("EndExecTime", {
-        header: "End Execution Time",
-        meta: { type: "date" },
-      }),
-      columnHelper.accessor("UserPriority", {
-        header: "User Priority",
-        meta: { type: "number" },
-      }),
-    ],
-    [columnHelper, renderStatusCell, statusColors],
-  );
 
   /**
    * Fetches the jobs from the /api/jobs/search endpoint
