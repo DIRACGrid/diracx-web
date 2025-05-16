@@ -1,4 +1,3 @@
-import React from "react";
 import { Meta, StoryObj } from "@storybook/react";
 import {
   createColumnHelper,
@@ -35,22 +34,9 @@ const data: SimpleItem[] = [
   { id: 1, name: "John Doe", email: "john@example.com" },
 ];
 
-// Wrapper component to initialize the table
-const DataTableWrapper: React.FC<Omit<DataTableProps<SimpleItem>, "table">> = (
-  props,
-) => {
-  const table = useReactTable<SimpleItem>({
-    data,
-    columns: columnDefs,
-    getCoreRowModel: getCoreRowModel(),
-  });
-
-  return <DataTable<SimpleItem> {...props} table={table} />;
-};
-
-const meta: Meta = {
+const meta: Meta<DataTableProps<SimpleItem>> = {
   title: "shared/DataTable",
-  component: DataTableWrapper,
+  component: DataTable,
   parameters: {
     layout: "centered",
   },
@@ -70,7 +56,7 @@ const meta: Meta = {
   decorators: [
     (Story) => (
       <ThemeProvider>
-        <div style={{ width: "900px" }}>
+        <div style={{ width: "900px", height: "500px" }}>
           <Story />
         </div>
       </ThemeProvider>
@@ -79,7 +65,7 @@ const meta: Meta = {
 };
 
 export default meta;
-type Story = StoryObj<typeof meta>;
+type Story = StoryObj<DataTableProps<SimpleItem>>;
 
 export const Default: Story = {
   args: {
@@ -92,5 +78,19 @@ export const Default: Story = {
     isLoading: false,
     toolbarComponents: <></>,
     menuItems: [{ label: "Edit", onClick: () => {} }],
+  },
+  render: (args) => {
+    const table = useReactTable<SimpleItem>({
+      data,
+      columns: columnDefs,
+      getCoreRowModel: getCoreRowModel(),
+      state: {
+        pagination: {
+          pageIndex: 0,
+          pageSize: 25,
+        },
+      },
+    });
+    return <DataTable<SimpleItem> {...args} table={table} />;
   },
 };

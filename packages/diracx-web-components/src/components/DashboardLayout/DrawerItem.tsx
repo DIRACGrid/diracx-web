@@ -10,7 +10,7 @@ import {
   useTheme,
   TextField,
 } from "@mui/material";
-import { DragIndicator } from "@mui/icons-material";
+import { DragIndicator, SvgIconComponent } from "@mui/icons-material";
 import { combine } from "@atlaskit/pragmatic-drag-and-drop/combine";
 import {
   draggable,
@@ -23,14 +23,15 @@ import {
   extractClosestEdge,
 } from "@atlaskit/pragmatic-drag-and-drop-hitbox/closest-edge";
 import { setCustomNativeDragPreview } from "@atlaskit/pragmatic-drag-and-drop/element/set-custom-native-drag-preview";
+import EggIcon from "@mui/icons-material/Egg";
 import { ThemeProvider } from "../../contexts/ThemeProvider";
 import { useSearchParamsUtils } from "../../hooks/searchParamsUtils";
 import { useApplicationId } from "../../hooks/application";
-import { DashboardGroup } from "../../types";
+import { DashboardGroup, DashboardItem } from "../../types";
 
 interface DrawerItemProps {
   /** The item object containing the title, id, and icon. */
-  item: { title: string; id: string; icon: React.ComponentType };
+  item: DashboardItem;
   /** The index of the item. */
   index: number;
   /** The title of the group. */
@@ -53,7 +54,7 @@ interface DrawerItemProps {
  * @returns The rendered JSX for the drawer item.
  */
 export default function DrawerItem({
-  item: { title, id, icon },
+  item,
   index,
   groupTitle,
   renamingItemId,
@@ -100,7 +101,7 @@ export default function DrawerItem({
                       width: source.element.getBoundingClientRect().width,
                     }}
                   >
-                    <ItemPreview title={title} icon={icon} />
+                    <ItemPreview title={item.title} icon={item.icon} />
                   </div>
                 </ThemeProvider>,
               );
@@ -136,9 +137,9 @@ export default function DrawerItem({
           const sourceIndex = source.data.index;
           if (typeof sourceIndex === "number") {
             const isItemBeforeSource =
-              index === sourceIndex - 1 && source.data.title === title;
+              index === sourceIndex - 1 && source.data.title === item.title;
             const isItemAfterSource =
-              index === sourceIndex + 1 && source.data.title === title;
+              index === sourceIndex + 1 && source.data.title === item.title;
 
             const isDropIndicatorHidden =
               (isItemBeforeSource && closestEdge === "bottom") ||
@@ -159,7 +160,7 @@ export default function DrawerItem({
         },
       }),
     );
-  }, [index, groupTitle, icon, theme, title, id]);
+  }, [index, groupTitle, item, theme]);
 
   // Handle renaming of the item
   const handleItemRename = () => {
@@ -169,8 +170,8 @@ export default function DrawerItem({
         if (group.title === groupTitle) {
           return {
             ...group,
-            items: group.items.map((item) =>
-              item.id === id ? { ...item, title: renameValue } : item,
+            items: group.items.map((i) =>
+              i.id === item.id ? { ...item, title: renameValue } : i,
             ),
           };
         }
@@ -185,16 +186,16 @@ export default function DrawerItem({
     <>
       <ListItemButton
         disableGutters
-        key={title}
-        onClick={() => setParam("appId", id)}
+        key={item.title}
+        onClick={() => setParam("appId", item.id)}
         sx={{ pl: 2, borderRadius: 2, pr: 1 }}
         ref={dragRef}
-        selected={appId === id}
+        selected={appId === item.id}
       >
         <ListItemIcon>
-          <Icon component={icon} />
+          <Icon component={item.icon ?? EggIcon} />
         </ListItemIcon>
-        {renamingItemId === id ? (
+        {renamingItemId === item.id ? (
           <TextField
             value={renameValue}
             onChange={(e) => setRenameValue(e.target.value)}
@@ -211,7 +212,7 @@ export default function DrawerItem({
           />
         ) : (
           <ListItemText
-            primary={title}
+            primary={item.title}
             sx={{
               whiteSpace: "nowrap",
               overflow: "hidden",
@@ -239,7 +240,7 @@ export default function DrawerItem({
  *
  * @param {Object} props - The component props.
  * @param {string} props.title - The title of the item.
- * @param {React.ComponentType} props.icon - The icon component for the item.
+ * @param {SvgIconComponent} props.icon - The icon component for the item.
  * @returns {JSX.Element} The rendered item preview.
  */
 function ItemPreview({
@@ -247,7 +248,7 @@ function ItemPreview({
   icon,
 }: {
   title: string;
-  icon: React.ComponentType;
+  icon: SvgIconComponent | null;
 }) {
   return (
     <ListItemButton
@@ -261,7 +262,7 @@ function ItemPreview({
       }}
     >
       <ListItemIcon>
-        <Icon component={icon} />
+        <Icon component={icon ?? EggIcon} />
       </ListItemIcon>
       <ListItemText
         primary={title}
