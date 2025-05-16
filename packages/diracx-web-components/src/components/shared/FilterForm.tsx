@@ -13,14 +13,14 @@ import {
 } from "@mui/material";
 import { DateTimePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import { Column } from "@tanstack/react-table";
+import { ColumnDef } from "@tanstack/react-table";
 import dayjs from "dayjs";
 import { InternalFilter } from "../../types/Filter";
 import "dayjs/locale/en-gb"; // needed by LocalizationProvider to format Dates to dd-mm-yyyy
 
 /**
  * Filter form props
- * @property {AccessorKeyColumnDef[]} columns - the columns on which to filter
+ * @property {ColumnDef[]} columns - the columns on which to filter
  * @property {function} handleFilterChange - the function to call when a filter is changed
  * @property {function} handleFilterMenuClose - the function to call when the filter menu is closed
  * @property {InternalFilter[]} filters - the filters for the table
@@ -28,7 +28,8 @@ import "dayjs/locale/en-gb"; // needed by LocalizationProvider to format Dates t
  */
 export interface FilterFormProps<T extends Record<string, unknown>> {
   /** The columns of the data table */
-  columns: Column<T>[];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  columns: ColumnDef<T, any>[];
   /** The function to call when a filter is changed */
   handleFilterChange: (index: number, tempFilter: InternalFilter) => void;
   /** The function to call when the filter menu is closed */
@@ -68,6 +69,7 @@ export function FilterForm<T extends Record<string, unknown>>({
         parameter: "",
         operator: "eq",
         value: "",
+        isApplied: false,
       });
     }
   }, [filters, filterIndex]);
@@ -99,8 +101,8 @@ export function FilterForm<T extends Record<string, unknown>>({
 
   const selectedColumn = columns.find((c) => c.id == tempFilter.parameter);
 
-  const columnType = selectedColumn?.columnDef.meta?.type || "default";
-  const isCategory = Array.isArray(selectedColumn?.columnDef.meta?.values);
+  const columnType = selectedColumn?.meta?.type || "default";
+  const isCategory = Array.isArray(selectedColumn?.meta?.values);
   const isDateTime = columnType === "date";
   const isNumber = columnType === "number";
 
@@ -237,7 +239,7 @@ export function FilterForm<T extends Record<string, unknown>>({
             multiple={isMultiple}
             sx={{ minWidth: 100 }}
           >
-            {selectedColumn?.columnDef.meta?.values?.map((val: string) => (
+            {selectedColumn?.meta?.values?.map((val: string) => (
               <MenuItem key={val} value={val}>
                 {val}
               </MenuItem>
@@ -300,7 +302,7 @@ export function FilterForm<T extends Record<string, unknown>>({
             onChange("parameter", parameter);
 
             const column = columns.find((v) => v.id === parameter);
-            const colType = column?.columnDef.meta?.type || "default";
+            const colType = column?.meta?.type || "default";
             const typeKey =
               colType === "date"
                 ? "date"
@@ -320,10 +322,10 @@ export function FilterForm<T extends Record<string, unknown>>({
         >
           {columns.map((column) => (
             <MenuItem
-              key={column.id.toString()}
+              key={(column.id ?? "undefined").toString()}
               value={column.id as string | number}
             >
-              {column.columnDef.header?.toString()}
+              {column.header?.toString()}
             </MenuItem>
           ))}
         </Select>

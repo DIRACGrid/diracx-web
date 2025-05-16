@@ -1,10 +1,6 @@
 import React from "react";
 import { render, screen, fireEvent, within } from "@testing-library/react";
-import {
-  createColumnHelper,
-  getCoreRowModel,
-  useReactTable,
-} from "@tanstack/react-table";
+import { createColumnHelper } from "@tanstack/react-table";
 import { FilterForm } from "../src/components/shared/FilterForm";
 import { ThemeProvider } from "../src/contexts/ThemeProvider";
 
@@ -22,33 +18,37 @@ describe("FilterForm", () => {
 
   const columnDefs = [
     columnHelper.accessor("id", {
+      id: "id",
       header: "ID",
       meta: { type: "number" },
     }),
     columnHelper.accessor("name", {
+      id: "name",
       header: "Name",
       meta: { type: "string" },
     }),
     columnHelper.accessor("category", {
+      id: "category",
       header: "Category",
       meta: { type: "category", values: ["A", "B", "C"] }, // Example of a category column
     }),
     columnHelper.accessor("date", {
+      id: "date",
       header: "Date",
       meta: { type: "date" }, // Example of a DateTime column
     }),
   ];
 
-  // Create mock data for the table
-  const data: SimpleItem[] = [
-    { id: 1, name: "Item 1", category: "A", date: new Date() },
-    { id: 2, name: "Item 2", category: "B", date: new Date() },
-  ];
-
   // Mock filters
   const filters = [
-    { id: 1, parameter: "id", operator: "eq", value: "4" },
-    { id: 2, parameter: "name", operator: "neq", value: "value2" },
+    { id: 1, parameter: "id", operator: "eq", value: "4", isApplied: false },
+    {
+      id: 2,
+      parameter: "name",
+      operator: "neq",
+      value: "value2",
+      isApplied: false,
+    },
   ];
   const setFilters = jest.fn();
   const handleFilterChange = jest.fn();
@@ -62,16 +62,10 @@ describe("FilterForm", () => {
   const FilterFormWrapper: React.FC<FilterFormWrapperProps> = ({
     selectedFilterId,
   }) => {
-    const table = useReactTable<SimpleItem>({
-      data,
-      columns: columnDefs,
-      getCoreRowModel: getCoreRowModel(),
-    });
-
     return (
       <ThemeProvider>
         <FilterForm<SimpleItem>
-          columns={table.getAllColumns()}
+          columns={columnDefs}
           filters={filters}
           setFilters={setFilters}
           handleFilterChange={handleFilterChange}
@@ -150,7 +144,13 @@ describe("FilterForm", () => {
 
     expect(setFilters).toHaveBeenCalledWith([
       ...filters,
-      { id: expect.any(Number), parameter: "", operator: "eq", value: "" },
+      {
+        id: expect.any(Number),
+        parameter: "",
+        operator: "eq",
+        value: "",
+        isApplied: false,
+      },
     ]);
     expect(handleFilterChange).not.toHaveBeenCalled();
     expect(handleFilterMenuClose).toHaveBeenCalled();
@@ -178,6 +178,7 @@ describe("FilterForm", () => {
       parameter: "category",
       operator: "eq",
       value: "",
+      isApplied: false,
     });
     expect(handleFilterMenuClose).toHaveBeenCalled();
   });

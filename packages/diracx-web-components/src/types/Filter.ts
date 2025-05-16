@@ -19,4 +19,5 @@ export interface Filter {
  */
 export interface InternalFilter extends Filter {
   id: number;
+  isApplied: boolean;
 }

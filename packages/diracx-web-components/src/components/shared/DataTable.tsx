@@ -1,11 +1,5 @@
 "use client";
-import React, {
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-  useState,
-} from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import { alpha } from "@mui/material/styles";
 import Box from "@mui/material/Box";
 import Table from "@mui/material/Table";
@@ -37,11 +31,7 @@ import {
 } from "@mui/material";
 import { flexRender, Row, Table as TanstackTable } from "@tanstack/react-table";
 import { TableComponents, TableVirtuoso } from "react-virtuoso";
-import { InternalFilter } from "../../types/Filter";
-import { useSearchParamsUtils } from "../../hooks/searchParamsUtils";
-import { ApplicationsContext } from "../../contexts/ApplicationsProvider";
-import { DashboardGroup, SearchBody } from "../../types";
-import { FilterToolbar } from "./FilterToolbar";
+import { SearchBody } from "../../types";
 
 /**
  * Menu item
@@ -263,119 +253,6 @@ export function DataTable<T extends Record<string, unknown>>({
     id: number | null;
   }>({ mouseX: null, mouseY: null, id: null });
 
-  // State for the search parameters
-  const { getParam, setParam } = useSearchParamsUtils();
-  const appId = getParam("appId");
-
-  // State for filters
-  const [filters, setFilters] = useState<InternalFilter[]>([]);
-  const [appliedFilters, setAppliedFilters] =
-    useState<InternalFilter[]>(filters);
-
-  const updateFiltersAndUrl = useCallback(
-    (newFilters: InternalFilter[]) => {
-      // Update the filters in the URL using the setParam function
-      setParam(
-        "filter",
-        newFilters.map(
-          (filter) =>
-            `${filter.id}_${filter.parameter}_${filter.operator}_${filter.value}`,
-        ),
-      );
-    },
-    [setParam],
-  );
-
-  // State for the user dashboard
-  const [userDashboard, setUserDashboard] = useContext(ApplicationsContext);
-  const updateGroupFilters = useCallback(
-    (newFilters: InternalFilter[]) => {
-      const appId = getParam("appId");
-
-      const group = userDashboard.find((group) =>
-        group.items.some((item) => item.id === appId),
-      );
-      if (group) {
-        const newGroup = {
-          ...group,
-          items: group.items.map((item) => {
-            if (item.id === appId) {
-              return { ...item, data: newFilters };
-            }
-            return item;
-          }),
-        };
-        setUserDashboard((groups: DashboardGroup[]) =>
-          groups.map((s) => (s.title === group.title ? newGroup : s)),
-        );
-      }
-    },
-    [getParam, userDashboard, setUserDashboard],
-  );
-
-  // Handle the application of filters
-  const handleApplyFilters = () => {
-    // Transform list of internal filters into filters
-    const jsonFilters = filters.map((filter) => ({
-      parameter: filter.parameter,
-      operator: filter.operator,
-      value: filter.value,
-      values: filter.values,
-    }));
-    setSearchBody((prevState) => ({
-      ...prevState,
-      search: jsonFilters,
-    }));
-    table.setPageIndex(0);
-    setAppliedFilters(filters);
-
-    updateFiltersAndUrl(filters);
-    updateGroupFilters(filters);
-  };
-
-  const handleRemoveAllFilters = useCallback(() => {
-    setSearchBody((prevState) => ({
-      ...prevState,
-      search: [],
-    }));
-    table.setPageIndex(0);
-    setAppliedFilters([]);
-
-    updateFiltersAndUrl([]);
-    updateGroupFilters([]);
-  }, [setFilters]);
-
-  const DashboardItem = useMemo(
-    () =>
-      userDashboard
-        .find((group) => group.items.some((item) => item.id === appId))
-        ?.items.find((item) => item.id === appId),
-    [appId, userDashboard],
-  );
-
-  useEffect(() => {
-    if (DashboardItem?.data) {
-      setFilters(DashboardItem.data);
-      setAppliedFilters(DashboardItem.data);
-      const jsonFilters = DashboardItem.data.map((filter: InternalFilter) => ({
-        parameter: filter.parameter,
-        operator: filter.operator,
-        value: filter.value,
-        values: filter.values,
-      }));
-      setSearchBody((prevState) => ({
-        ...prevState,
-        search: jsonFilters,
-      }));
-    } else {
-      setFilters([]);
-      setSearchBody((prevState) => ({
-        ...prevState,
-        search: [],
-      }));
-    }
-  }, [DashboardItem?.data, setFilters, setSearchBody]);
-
   // Manage sorting
   const handleRequestSort = useCallback(
     (_event: React.MouseEvent<unknown>, property: string) => {
@@ -473,35 +350,25 @@ export function DataTable<T extends Record<string, unknown>>({
 
   if (isValidating || isLoading || error || noData) {
     return (
-      <>
-        <FilterToolbar
-          columns={table.getAllColumns()}
-          filters={filters}
-          setFilters={setFilters}
-          appliedFilters={appliedFilters}
-          handleApplyFilters={handleApplyFilters}
-          handleClearFilters={handleRemoveAllFilters}
-        />
-        <Box sx={{ width: "100%", marginTop: 2 }}>
-          {isValidating || isLoading ? (
-            <Skeleton
-              variant="rectangular"
-              animation="pulse"
-              height={500}
-              width="100%"
-              data-testid="loading-skeleton"
-            />
-          ) : error ? (
-            <Alert severity="error">
-              An error occurred while fetching data. Reload the page.
-            </Alert>
-          ) : (
-            <Alert severity="info">
-              No data or no results match your filters.
-            </Alert>
-          )}
-        </Box>
-      </>
+      <Box sx={{ width: "100%", marginTop: 2 }}>
+        {isValidating || isLoading ? (
+          <Skeleton
+            variant="rectangular"
+            animation="pulse"
+            height={500}
+            width="100%"
+            data-testid="loading-skeleton"
+          />
+        ) : error ? (
+          <Alert severity="error">
+            An error occurred while fetching data. Reload the page.
+          </Alert>
+        ) : (
+          <Alert severity="info">
+            No data or no results match your filters.
+          </Alert>
+        )}
+      </Box>
     );
   }
 
@@ -516,15 +383,6 @@ export function DataTable<T extends Record<string, unknown>>({
         overflow: "hidden",
       }}
     >
-      <FilterToolbar
-        columns={table.getAllColumns()}
-        filters={filters}
-        setFilters={setFilters}
-        appliedFilters={appliedFilters}
-        handleApplyFilters={handleApplyFilters}
-        handleClearFilters={handleRemoveAllFilters}
-      />
-
       <Paper
         sx={{
           flexGrow: 1,
