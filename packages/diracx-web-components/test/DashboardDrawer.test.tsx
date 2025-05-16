@@ -1,80 +1,23 @@
-import React from "react";
 import { render, fireEvent } from "@testing-library/react";
-import { Dashboard as DashboardIcon } from "@mui/icons-material";
-import DashboardDrawer from "../src/components/DashboardLayout/DashboardDrawer";
-import { ThemeProvider } from "../src/contexts/ThemeProvider";
-import { ApplicationsContext } from "../src/contexts/ApplicationsProvider";
-import { DashboardGroup } from "../src/types/DashboardGroup";
-import { applicationList } from "../src/components/ApplicationList";
+import { composeStories } from "@storybook/react";
+import * as stories from "../stories/DashboardDrawer.stories";
 
 jest.mock("jsoncrush", () => ({
   crush: jest.fn().mockImplementation((data) => `crushed-${data}`),
   uncrush: jest.fn().mockImplementation((data) => data.replace("crushed-", "")),
 }));
 
-const mockSections: DashboardGroup[] = [
-  {
-    title: "Group 1",
-    extended: true,
-    items: [
-      {
-        title: "App 1",
-        id: "app1",
-        type: "Dashboard",
-        icon: DashboardIcon,
-      },
-    ],
-  },
-];
+const { Default } = composeStories(stories);
 
-const MockApplicationProvider: React.FC<{ children: React.ReactNode }> = ({
-  children,
-}): JSX.Element => (
-  <ApplicationsContext.Provider
-    value={[mockSections, () => {}, applicationList]}
-  >
-    {children}
-  </ApplicationsContext.Provider>
-);
-
-describe("<DashboardDrawer>", () => {
-  it("renders correctly", () => {
-    const { getByText } = render(
-      <ThemeProvider>
-        <MockApplicationProvider>
-          <DashboardDrawer
-            variant="permanent"
-            mobileOpen={false}
-            width={100}
-            handleDrawerToggle={function (): void {
-              throw new Error("Function not implemented.");
-            }}
-          />
-        </MockApplicationProvider>
-      </ThemeProvider>,
-    );
-
-    expect(getByText("App 1")).toBeInTheDocument();
+describe("DashboardDrawer", () => {
+  it("renders the app title from the context", () => {
+    const { getByText } = render(<Default />);
+    expect(getByText("App Name")).toBeInTheDocument();
   });
 
-  it("handles context menu", () => {
-    const { getByText, getByTestId } = render(
-      <ThemeProvider>
-        <MockApplicationProvider>
-          <DashboardDrawer
-            variant="permanent"
-            mobileOpen={false}
-            width={100}
-            handleDrawerToggle={function (): void {
-              throw new Error("Function not implemented.");
-            }}
-          />
-        </MockApplicationProvider>
-      </ThemeProvider>,
-    );
-
-    fireEvent.contextMenu(getByText("App 1"));
-
+  it("shows the context menu when right-clicking on an app item", () => {
+    const { getByText, getByTestId } = render(<Default />);
+    fireEvent.contextMenu(getByText("App Name"));
     expect(getByTestId("context-menu")).toBeInTheDocument();
   });
 });

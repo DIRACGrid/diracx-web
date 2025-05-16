@@ -37,13 +37,10 @@ const config: StorybookConfig = {
     config.resolve.alias = {
       ...config.resolve.alias,
       "@axa-fr/react-oidc": require.resolve(
-        "../stories/mocks/react-oidc.mock.ts",
+        "../stories/mocks/react-oidc.mock.tsx",
       ),
-      "@actual/react-oidc": require.resolve("@axa-fr/react-oidc"),
-
-      "@actual/hooks/metadata$": require.resolve("../src/hooks/metadata"),
       "../../hooks/metadata": require.resolve(
-        "../stories/mocks/metadata.mock.ts",
+        "../stories/mocks/metadata.mock.tsx",
       ),
 
       "@actual/components/JobMonitor/JobDataService$": require.resolve(

@@ -1,4 +1,3 @@
-import React from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 
 import { useArgs } from "@storybook/core/preview-api";
@@ -7,7 +6,6 @@ import { ApplicationsContext } from "../src/contexts/ApplicationsProvider";
 import { applicationList } from "../src/components/ApplicationList";
 import { ThemeProvider } from "../src/contexts/ThemeProvider";
 import ApplicationDialog from "../src/components/DashboardLayout/ApplicationDialog";
-import { useOidcAccessToken } from "./mocks/react-oidc.mock";
 
 const meta = {
   title: "Dashboard Layout/ApplicationDialog",
@@ -37,13 +35,7 @@ const meta = {
       );
     },
   ],
-  async beforeEach() {
-    useOidcAccessToken.mockReturnValue({
-      accessToken: "123456789",
-      accessTokenPayload: { preferred_username: "John Doe" },
-    });
-    return () => useOidcAccessToken.mockReset();
-  },
+  async beforeEach() {},
 } satisfies Meta<typeof ApplicationDialog>;
 
 export default meta;

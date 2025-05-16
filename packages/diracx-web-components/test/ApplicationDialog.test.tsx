@@ -1,8 +1,8 @@
 import { render, screen } from "@testing-library/react";
 import { composeStories } from "@storybook/react";
-import * as stories from "../stories/BaseApp.stories";
+import * as stories from "../stories/ApplicationDialog.stories";
 
-// Compose all the stories
+// Compose all stories
 const { Default } = composeStories(stories);
 
 jest.mock("jsoncrush", () => ({
@@ -10,9 +10,10 @@ jest.mock("jsoncrush", () => ({
   uncrush: jest.fn().mockImplementation((data) => data.replace("crushed-", "")),
 }));
 
-describe("BaseApp", () => {
-  it("renders the LoggedIn story", () => {
+describe("ApplicationDialog", () => {
+  it("renders the Default story with the dialog open", () => {
     render(<Default />);
-    expect(screen.getByText("Hello John Doe")).toBeInTheDocument();
+    expect(screen.getByRole("dialog")).toBeInTheDocument();
+    expect(screen.getByText("Available applications")).toBeInTheDocument();
   });
 });

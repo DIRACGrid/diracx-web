@@ -5,7 +5,6 @@ import { Paper } from "@mui/material";
 import { Dashboard } from "@mui/icons-material";
 import { ThemeProvider } from "../src/contexts/ThemeProvider";
 import DrawerItem from "../src/components/DashboardLayout/DrawerItem";
-import { useOidc, useOidcAccessToken } from "./mocks/react-oidc.mock";
 
 const meta = {
   title: "Dashboard Layout/DrawerItem",
@@ -25,17 +24,7 @@ const meta = {
       );
     },
   ],
-  async beforeEach() {
-    useOidcAccessToken.mockReturnValue({
-      accessToken: "123456789",
-      accessTokenPayload: { preferred_username: "John Doe" },
-    });
-    useOidc.mockReturnValue({
-      login: () => {},
-      isAuthenticated: true,
-    });
-    return () => useOidcAccessToken.mockReset();
-  },
+  async beforeEach() {},
 } satisfies Meta<typeof DrawerItem>;
 
 export default meta;
@@ -48,8 +37,14 @@ export const Default: Story = {
     index: 0,
     item: {
       title: "Dashboard",
+      type: "dashboard",
       id: "Dashboard 1",
       icon: Dashboard,
     },
+    renamingItemId: null,
+    setRenamingItemId: () => {},
+    renameValue: "",
+    setRenameValue: () => {},
+    setUserDashboard: () => {},
   },
 };

@@ -43,6 +43,12 @@ const DataTableWrapper: React.FC<Omit<DataTableProps<SimpleItem>, "table">> = (
     data,
     columns: columnDefs,
     getCoreRowModel: getCoreRowModel(),
+    state: {
+      pagination: {
+        pageIndex: 0,
+        pageSize: 25,
+      },
+    },
   });
 
   return <DataTable<SimpleItem> {...props} table={table} />;
@@ -70,7 +76,7 @@ const meta: Meta = {
   decorators: [
     (Story) => (
       <ThemeProvider>
-        <div style={{ width: "900px" }}>
+        <div style={{ width: "900px", height: "500px" }}>
           <Story />
         </div>
       </ThemeProvider>

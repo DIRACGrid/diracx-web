@@ -1,11 +1,7 @@
 import React from "react";
 import { StoryObj } from "@storybook/react";
 import { Paper } from "@mui/material";
-import {
-  createColumnHelper,
-  getCoreRowModel,
-  useReactTable,
-} from "@tanstack/react-table";
+import { createColumnHelper } from "@tanstack/react-table";
 import { ThemeProvider } from "../src/contexts/ThemeProvider";
 import {
   FilterForm,
@@ -23,33 +19,26 @@ const columnHelper = createColumnHelper<SimpleItem>();
 const columnDefs = [
   columnHelper.accessor("id", {
     header: "ID",
+    id: "id",
     meta: { type: "number" },
   }),
   columnHelper.accessor("name", {
     header: "Name",
+    id: "name",
     meta: { type: "string" },
   }),
   columnHelper.accessor("email", {
     header: "Email",
+    id: "email",
     meta: { type: "string" },
   }),
-];
-
-const data: SimpleItem[] = [
-  { id: 1, name: "John Doe", email: "john@example.com" },
 ];
 
 // Wrapper component to initialize the table
 const FilterFormWrapper: React.FC<
   Omit<FilterFormProps<SimpleItem>, "columns">
 > = (props) => {
-  const table = useReactTable<SimpleItem>({
-    data,
-    columns: columnDefs,
-    getCoreRowModel: getCoreRowModel(),
-  });
-
-  return <FilterForm<SimpleItem> {...props} columns={table.getAllColumns()} />;
+  return <FilterForm<SimpleItem> {...props} columns={columnDefs} />;
 };
 
 const meta = {
@@ -89,7 +78,9 @@ type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {
   args: {
-    filters: [{ id: 0, parameter: "id", operator: "eq", value: "1" }],
+    filters: [
+      { id: 0, parameter: "id", operator: "eq", value: "1", isApplied: false },
+    ],
     setFilters: () => {},
     handleFilterChange: () => {},
     handleFilterMenuClose: () => {},
