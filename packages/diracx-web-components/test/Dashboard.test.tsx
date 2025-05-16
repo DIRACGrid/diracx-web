@@ -1,17 +1,17 @@
-import React from "react";
 import { render, fireEvent } from "@testing-library/react";
+import { composeStories } from "@storybook/react";
 import { useOidc, useOidcAccessToken } from "@axa-fr/react-oidc";
 import { useMediaQuery } from "@mui/material";
-import Dashboard from "../src/components/DashboardLayout/Dashboard";
-import { ThemeProvider } from "../src/contexts/ThemeProvider";
+import * as stories from "../stories/Dashboard.stories";
 
-// Mock the useOidcAccessToken and useOidc hooks
+// Compose your Storybook stories (this will include all decorators/args)
+const { Default } = composeStories(stories);
+
 jest.mock("@axa-fr/react-oidc", () => ({
-  useOidcAccessToken: jest.fn(),
   useOidc: jest.fn(),
+  useOidcAccessToken: jest.fn(),
 }));
 
-// Mock the useMediaQuery hook to control the return value
 jest.mock("@mui/material", () => ({
   ...jest.requireActual("@mui/material"),
   useMediaQuery: jest.fn(),
@@ -22,13 +22,11 @@ jest.mock("jsoncrush", () => ({
   uncrush: jest.fn().mockImplementation((data) => data.replace("crushed-", "")),
 }));
 
-describe("<Dashboard>", () => {
+describe("Dashboard", () => {
   beforeEach(() => {
-    // Mock the return value for each test
+    // Typical authenticated state (adapt to your needs)
     (useOidcAccessToken as jest.Mock).mockReturnValue({
-      accessTokenPayload: {
-        test: "test",
-      },
+      accessTokenPayload: { test: "test" },
     });
     (useOidc as jest.Mock).mockReturnValue({
       isAuthenticated: false,
@@ -39,45 +37,31 @@ describe("<Dashboard>", () => {
     jest.clearAllMocks();
   });
 
-  // Normal case
-  it("renders on desktop screen", () => {
-    (useMediaQuery as jest.Mock).mockReturnValue(false); // e.g., desktop screen
+  it("renders in desktop mode", () => {
+    (useMediaQuery as jest.Mock).mockReturnValue(false); // desktop
 
-    const { getByTestId } = render(
-      <ThemeProvider>
-        <Dashboard>
-          <h1>Test</h1>
-        </Dashboard>
-      </ThemeProvider>,
-    );
+    const { getByTestId } = render(<Default />);
 
-    // `drawer-temporary` should not even be in the DOM for desktop screen sizes
-    expect(() => getByTestId("drawer-temporary")).toThrow();
-    // Expect `drawer-permanent` to now be visible
+    // On desktop, the permanent drawer should be visible
     expect(getByTestId("drawer-permanent")).toBeVisible();
+
+    // The temporary drawer (for mobile) should not be rendered
+    expect(() => getByTestId("drawer-temporary")).toThrow();
   });
 
-  // Testing a hypothetical toggle button for the drawer
-  it("renders on mobile screen", () => {
-    (useMediaQuery as jest.Mock).mockReturnValue(true); // e.g., mobile screen
+  it("renders in mobile mode and opens drawer after toggle", () => {
+    (useMediaQuery as jest.Mock).mockReturnValue(true); // mobile
 
-    const { getByTestId } = render(
-      <ThemeProvider>
-        <Dashboard>
-          <h1>Test</h1>
-        </Dashboard>
-      </ThemeProvider>,
-    );
+    const { getByTestId } = render(<Default />);
     const toggleButton = getByTestId("drawer-toggle-button");
 
-    // Assuming the drawer is initially closed
-    // `drawer-temporary` should not even be in the DOM initially
+    // Initially, the temporary drawer is not visible
     expect(() => getByTestId("drawer-temporary")).toThrow();
 
-    // Simulate a button click
+    // Simulate user opening the drawer
     fireEvent.click(toggleButton);
 
-    // Expect the drawer to now be visible
+    // Now, the temporary drawer should be visible
     expect(getByTestId("drawer-temporary")).toBeVisible();
   });
 });

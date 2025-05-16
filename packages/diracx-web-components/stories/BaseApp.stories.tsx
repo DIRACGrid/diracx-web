@@ -6,7 +6,6 @@ import { ApplicationsContext } from "../src/contexts/ApplicationsProvider";
 import { NavigationProvider } from "../src/contexts/NavigationProvider";
 import { ThemeProvider } from "../src/contexts/ThemeProvider";
 import BaseApp from "../src/components/BaseApp/BaseApp";
-import { useOidcAccessToken } from "./mocks/react-oidc.mock";
 
 const meta = {
   title: "Base Application",
@@ -60,32 +59,15 @@ const meta = {
       </NavigationProvider>
     ),
   ],
-  async beforeEach() {
-    return () => {
-      useOidcAccessToken.mockRestore();
-    };
-  },
+  async beforeEach() {},
 } satisfies Meta<typeof BaseApp>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const LoggedIn: Story = {
+export const Default: Story = {
   args: {},
   render: (props) => {
-    useOidcAccessToken.mockReturnValue({
-      accessTokenPayload: { preferred_username: "John Doe" },
-    });
-    return <BaseApp {...props} />;
-  },
-};
-
-export const LoggedOff: Story = {
-  args: {},
-  render: (props) => {
-    useOidcAccessToken.mockReturnValue({
-      accessTokenPayload: null,
-    });
     return <BaseApp {...props} />;
   },
 };

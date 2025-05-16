@@ -8,7 +8,6 @@ import { applicationList } from "../src/components/ApplicationList";
 import { DashboardGroup } from "../src/types";
 import { ThemeProvider } from "../src/contexts/ThemeProvider";
 import DashboardDrawer from "../src/components/DashboardLayout/DashboardDrawer";
-import { useOidc, useOidcAccessToken } from "./mocks/react-oidc.mock";
 
 const meta = {
   title: "Dashboard Layout/DashboardDrawer",
@@ -46,17 +45,7 @@ const meta = {
       );
     },
   ],
-  async beforeEach() {
-    useOidcAccessToken.mockReturnValue({
-      accessToken: "123456789",
-      accessTokenPayload: { preferred_username: "John Doe" },
-    });
-    useOidc.mockReturnValue({
-      login: () => {},
-      isAuthenticated: true,
-    });
-    return () => useOidcAccessToken.mockReset();
-  },
+  async beforeEach() {},
 } satisfies Meta<typeof DashboardDrawer>;
 
 export default meta;

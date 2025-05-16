@@ -1,6 +1,6 @@
 "use client";
 
-import { useOidcAccessToken } from "@axa-fr/react-oidc/";
+import { useOidcAccessToken } from "@axa-fr/react-oidc";
 import { useOIDCContext } from "../../hooks/oidcConfiguration";
 
 /**
