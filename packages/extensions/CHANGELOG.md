@@ -1,5 +1,20 @@
 # Changelog
 
+## [0.1.0-a6](https://github.com/DIRACGrid/diracx-web/compare/v0.1.0-a5...v0.1.0-a6) (2025-05-16)
+
+
+### Features
+
+* move FilterToolbar from DataTable to JobMonitor + remove filters from URL ([9d208cd](https://github.com/DIRACGrid/diracx-web/commit/9d208cde8d33b0e7b3f8ea055c3ce2aa2930204d))
+* use FilterToolbar from JobMonitor instead of from DataTable ([2e9618e](https://github.com/DIRACGrid/diracx-web/commit/2e9618e485077edfc5b0a39dc2d5e0867e93940e))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @dirac-grid/diracx-web-components bumped from 0.1.0-a5 to 0.1.0-a6
+
 ## [0.1.0-a5](https://github.com/DIRACGrid/diracx-web/compare/v0.1.0-a4...v0.1.0-a5) (2025-05-09)
 
 

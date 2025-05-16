@@ -1,6 +1,6 @@
 {
   "name": "diracx-web-root",
-  "version": "0.1.0-a5",
+  "version": "0.1.0-a6",
   "private": true,
   "workspaces": [
     "packages/diracx-web-components",
