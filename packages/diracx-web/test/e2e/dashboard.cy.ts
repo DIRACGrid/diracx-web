@@ -45,7 +45,7 @@ describe("DashboardDrawer", { retries: { runMode: 5, openMode: 3 } }, () => {
 
     cy.contains("Others").click();
     // Check if the application is added
-    cy.contains("Job Monitor 2").should("be.visible");
+    cy.contains("Job Monitor").should("be.visible");
   });
 
   it("should handle application deletion", () => {

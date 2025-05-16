@@ -10,7 +10,7 @@ import {
   useTheme,
   TextField,
 } from "@mui/material";
-import { DragIndicator, SvgIconComponent, Apps } from "@mui/icons-material";
+import { DragIndicator, SvgIconComponent } from "@mui/icons-material";
 import { combine } from "@atlaskit/pragmatic-drag-and-drop/combine";
 import {
   draggable,
@@ -72,7 +72,7 @@ export default function DrawerItem({
 
   const [, , appList, appId, setCurrentAppId] = useContext(ApplicationsContext);
   const { icon } = appList.find((app) => app.name === item.type) || {
-    icon: Apps,
+    icon: EggIcon,
   };
 
   useEffect(() => {
@@ -194,7 +194,7 @@ export default function DrawerItem({
         selected={appId === item.id}
       >
         <ListItemIcon>
-          <Icon component={icon ?? EggIcon} />
+          <Icon component={icon} />
         </ListItemIcon>
         {renamingItemId === item.id ? (
           <TextField

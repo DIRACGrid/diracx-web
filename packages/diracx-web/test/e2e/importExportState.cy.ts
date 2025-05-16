@@ -37,7 +37,7 @@ describe("Export and import app state", () => {
     // Select 2 items to share
     cy.get('[data-testid="export-menu"]').should("be.visible");
     cy.get('[data-testid="checkbox-JobMonitor0"]').click();
-    cy.get('[data-testid="checkbox-Job Monitor 21"]').click();
+    cy.get('[data-testid="checkbox-Job Monitor 0"]').click();
 
     // Share and cancel the export
     cy.contains("Export 2 selected").should("be.visible").click();
@@ -59,7 +59,7 @@ describe("Export and import app state", () => {
       .should("be.visible")
       .click();
     cy.get('[data-testid="export-menu"]').should("be.visible");
-    cy.get('[data-testid="checkbox-Job Monitor 21"]').click();
+    cy.get('[data-testid="checkbox-Job Monitor 0"]').click();
     cy.contains("Export 1 selected").should("be.visible").click();
 
     // Copy and assert the state
@@ -71,7 +71,7 @@ describe("Export and import app state", () => {
 
     cy.get("@writeTextStub").should(
       "have.been.calledOnceWithExactly",
-      '[\n  {\n    "appType": "Job Monitor",\n    "appName": "Job Monitor 2",\n    "state": "{\\"filters\\":[],\\"columnVisibility\\":{\\"JobGroup\\":false,\\"JobType\\":false,\\"Owner\\":false,\\"OwnerGroup\\":false,\\"VO\\":false,\\"StartExecTime\\":false,\\"EndExecTime\\":false,\\"UserPriority\\":false},\\"columnPinning\\":{\\"left\\":[\\"JobID\\"],\\"right\\":[]},\\"rowSelection\\":{},\\"pagination\\":{\\"pageIndex\\":0,\\"pageSize\\":25}}"\n  }\n]',
+      '[{\"appType\":\"Job Monitor\",\"appName\":\"Job Monitor \",\"state\":\"{\\"filters\\":[],\\"columnVisibility\\":{\\"JobGroup\\":false,\\"JobType\\":false,\\"Owner\\":false,\\"OwnerGroup\\":false,\\"VO\\":false,\\"StartExecTime\\":false,\\"EndExecTime\\":false,\\"UserPriority\\":false},\\"columnPinning\\":{\\"left\\":[\\"JobID\\"],\\"right\\":[]},\\"rowSelection\\":{},\\"pagination\\":{\\"pageIndex\\":0,\\"pageSize\\":25}}\"}]',
     );
   });
 
@@ -84,11 +84,11 @@ describe("Export and import app state", () => {
       .click();
     cy.get('[data-testid="export-menu"]').should("be.visible");
     cy.get('[data-testid="checkbox-JobMonitor0"]').click();
-    cy.get('[data-testid="checkbox-Job Monitor 21"]').click();
-    cy.get('[data-testid="checkbox-Job Monitor 32"]').click();
+    cy.get('[data-testid="checkbox-Job Monitor 0"]').click();
+    cy.get('[data-testid="checkbox-Job Monitor 1"]').click();
     cy.contains("Export 3 selected").should("be.visible").click();
 
-    cy.contains('"appType": "Job Monitor"');
+    cy.contains('"appType":"Job Monitor"');
   });
 
   it("should the import button be visible", () => {
@@ -120,7 +120,7 @@ describe("Export and import app state", () => {
     cy.get('[data-testid="import-menu"]').should("be.visible");
     cy.get('[data-testid="import-menu"]').should("be.visible");
     cy.get('[datatype="import-menu-field"]').type(
-      '[\n  {\n    "appType": "Job Monitor",\n    "state": "null"\n  }\n]',
+      '[\n  {\n    "appType": "Job Monitor",\n    "appName": "Empty App",\n    "state": "null"\n  }\n]',
     );
     cy.get("button").contains("Import").click();
     cy.contains("Imported Applications").should("not.exist");
