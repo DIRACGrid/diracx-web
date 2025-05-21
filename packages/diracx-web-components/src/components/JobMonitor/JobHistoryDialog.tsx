@@ -1,91 +1,100 @@
-"use client";
-
 import {
   Dialog,
   DialogContent,
   DialogTitle,
   IconButton,
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableRow,
-  TableContainer,
+  Stepper,
+  Step,
+  StepLabel,
+  StepContent,
+  Typography,
   useTheme,
 } from "@mui/material";
 import { Close } from "@mui/icons-material";
-import React, { useMemo } from "react";
-import {
-  useReactTable,
-  createColumnHelper,
-  getCoreRowModel,
-  flexRender,
-} from "@tanstack/react-table";
 import { JobHistory } from "../../types/JobHistory";
 
 interface JobHistoryDialogProps {
-  /** Whether the Dialog is open */
+  /** Whether the dialog is open or not */
   open: boolean;
-  /** The function to close the dialog */
+  /** Function to close the dialog */
   onClose: () => void;
-  /** The data for the job history dialog */
+  /** Job history data */
   historyData: JobHistory[];
-  /** The job ID */
+  /** Job ID */
   jobId: number;
+  /** Status colors */
+  statusColors: Record<string, string>;
 }
 
-/**
- * Renders a dialog component that displays the job history.
- *
- * @returns The rendered JobHistoryDialog component.
- */
+// Helper to group consecutive entries by Status
+function groupByConsecutiveStatus(history: JobHistory[]) {
+  const groups: { status: string; entries: JobHistory[] }[] = [];
+  let lastStatus: string | null = null;
+  let currentGroup: JobHistory[] = [];
+  for (const entry of history) {
+    if (entry.Status !== lastStatus) {
+      if (currentGroup.length > 0) {
+        groups.push({ status: lastStatus!, entries: currentGroup });
+      }
+      lastStatus = entry.Status;
+      currentGroup = [entry];
+    } else {
+      currentGroup.push(entry);
+    }
+  }
+  if (currentGroup.length > 0) {
+    groups.push({ status: lastStatus!, entries: currentGroup });
+  }
+  return groups;
+}
+
 export function JobHistoryDialog({
   open,
   onClose,
   historyData,
   jobId,
+  statusColors,
 }: JobHistoryDialogProps) {
   const theme = useTheme();
 
-  // Create column helper
-  const columnHelper = createColumnHelper<JobHistory>();
+  // Reverse the history so the most recent is first
+  const reversedHistory = [...historyData].reverse();
 
-  // Define columns
-  const columns = useMemo(
-    () => [
-      columnHelper.accessor("Status", {
-        header: "Status",
-      }),
-      columnHelper.accessor("MinorStatus", {
-        header: "Minor Status",
-      }),
-      columnHelper.accessor("ApplicationStatus", {
-        header: "Application Status",
-      }),
-      columnHelper.accessor("StatusTime", {
-        header: "Status Time",
-      }),
-      columnHelper.accessor("Source", {
-        header: "Source",
-      }),
-    ],
-    [columnHelper],
-  );
+  // Group consecutive entries by Status
+  const grouped = groupByConsecutiveStatus(reversedHistory);
 
-  // Create table instance
-  const table = useReactTable({
-    data: historyData,
-    columns,
-    getCoreRowModel: getCoreRowModel(),
-    state: {},
-    enableColumnResizing: true, // Enable column resizing
-    columnResizeMode: "onChange", // Column resize mode
-  });
+  // Custom StepIcon for color logic
+  const CustomStepIcon = (props: {
+    active?: boolean;
+    completed?: boolean;
+    className?: string;
+  }) => {
+    const { active, completed, className } = props;
+    let color = theme.palette.grey[400];
+    if (active) {
+      color = statusColors[grouped[0].status] || theme.palette.primary.main;
+    } else if (completed) {
+      color = theme.palette.grey[400];
+    }
+    return (
+      <span
+        className={className}
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          width: 24,
+          height: 24,
+          borderRadius: "50%",
+          background: color,
+        }}
+      />
+    );
+  };
 
   return (
     <Dialog open={open} onClose={onClose} aria-labelledby="job-history-title">
       <DialogTitle id="job-history-title">Job History: {jobId}</DialogTitle>
-
       <IconButton
         aria-label="close"
         onClick={onClose}
@@ -93,70 +102,56 @@ export function JobHistoryDialog({
           position: "absolute",
           right: 8,
           top: 8,
-          color: theme.palette.grey[500],
         }}
       >
         <Close />
       </IconButton>
+      <DialogContent sx={{ padding: 2 }}>
+        <Stepper orientation="vertical" nonLinear activeStep={0}>
+          {grouped.map((group, idx) => {
+            const isActive = idx === 0;
 
-      <DialogContent sx={{ padding: 0 }}>
-        <TableContainer>
-          <Table stickyHeader>
-            <TableHead>
-              {table.getHeaderGroups().map((headerGroup) => (
-                <TableRow key={headerGroup.id}>
-                  {headerGroup.headers.map((header) => (
-                    <TableCell
-                      key={header.id}
-                      sx={{
-                        position: "relative",
-                        width: header.getSize(),
-                      }}
-                    >
-                      {header.isPlaceholder ? null : (
-                        <>
-                          {flexRender(
-                            header.column.columnDef.header,
-                            header.getContext(),
-                          )}
-                          {header.column.getCanResize() && (
-                            <div
-                              onMouseDown={header.getResizeHandler()}
-                              onTouchStart={header.getResizeHandler()}
-                              style={{
-                                position: "absolute",
-                                right: 0,
-                                top: 0,
-                                height: "100%",
-                                width: "5px",
-                                cursor: "col-resize",
-                                zIndex: 1,
-                              }}
-                            />
-                          )}
-                        </>
-                      )}
-                    </TableCell>
+            let labelColor: string = theme.palette.grey[400];
+            if (isActive) {
+              labelColor =
+                statusColors[group.status] || theme.palette.primary.main;
+            }
+
+            return (
+              <Step key={idx} expanded completed={!isActive}>
+                <StepLabel slots={{ stepIcon: CustomStepIcon }}>
+                  <Typography fontWeight="bold" color={labelColor}>
+                    {group.status}
+                  </Typography>
+                </StepLabel>
+                <StepContent>
+                  {group.entries.map((entry, i) => (
+                    <div key={i} style={{ marginBottom: 12 }}>
+                      <Typography variant="body2" fontWeight="bold">
+                        {entry.MinorStatus}
+                      </Typography>
+                      <Typography variant="body2" sx={{ fontStyle: "italic" }}>
+                        {entry.ApplicationStatus}
+                      </Typography>
+                      <Typography
+                        variant="caption"
+                        display="block"
+                        sx={{ mt: 1 }}
+                      >
+                        {new Date(entry.StatusTime).toLocaleString("en-GB", {
+                          timeZone: "UTC",
+                        })}{" "}
+                        UTC
+                        <br />
+                        {entry.Source}
+                      </Typography>
+                    </div>
                   ))}
-                </TableRow>
-              ))}
-            </TableHead>
-            <TableBody>
-              {table.getRowModel().rows.map((row) => (
-                <TableRow key={row.id}>
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext(),
-                      )}
-                    </TableCell>
-                  ))}
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
+                </StepContent>
+              </Step>
+            );
+          })}
+        </Stepper>
       </DialogContent>
     </Dialog>
   );

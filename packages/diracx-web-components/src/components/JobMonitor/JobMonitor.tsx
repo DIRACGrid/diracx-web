@@ -318,6 +318,7 @@ export default function JobMonitor() {
         setColumnPinning={setColumnPinning}
         rowSelection={rowSelection}
         setRowSelection={setRowSelection}
+        statusColors={statusColors}
       />
     </Box>
   );

@@ -130,8 +130,15 @@ const jobHistory = [
   },
   {
     Status: "Running",
+    MinorStatus: "Job initializing",
+    ApplicationStatus: "Unknown",
+    StatusTime: "2024-07-04T13:00:10",
+    Source: "Storybook",
+  },
+  {
+    Status: "Running",
     MinorStatus: "Job running",
-    ApplicationStatus: "Running",
+    ApplicationStatus: "Unknown",
     StatusTime: "2024-07-04T13:00:10",
     Source: "Storybook",
   },
