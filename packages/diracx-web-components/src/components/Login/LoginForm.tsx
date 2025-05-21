@@ -41,18 +41,26 @@ export function LoginForm({
   const { isAuthenticated, login } = useOidc(configuration?.scope);
 
   const { getParam } = useSearchParamsUtils();
+  const OIDC_LOGIN_ATTEMPTED_KEY = "oidcLoginAttempted";
 
   // Login if not authenticated
   useEffect(() => {
     if (configuration && configuration.scope && isAuthenticated === false) {
-      sessionStorage.setItem("oidcScope", JSON.stringify(configuration.scope));
-      login();
+      if (!sessionStorage.getItem(OIDC_LOGIN_ATTEMPTED_KEY)) {
+        sessionStorage.setItem(
+          "oidcScope",
+          JSON.stringify(configuration.scope),
+        );
+        sessionStorage.setItem(OIDC_LOGIN_ATTEMPTED_KEY, "true");
+        login();
+      }
     }
   }, [configuration, isAuthenticated, login]);
 
   useEffect(() => {
     // Redirect to dashboard if already authenticated
     if (isAuthenticated) {
+      sessionStorage.removeItem(OIDC_LOGIN_ATTEMPTED_KEY);
       const redirect = getParam("redirect");
       console.log("Redirecting to:", redirect);
       if (redirect) {
@@ -101,6 +109,7 @@ export function LoginForm({
   // Update OIDC configuration
   const handleConfigurationChanges = () => {
     if (selectedVO && selectedGroup && configuration) {
+      sessionStorage.removeItem(OIDC_LOGIN_ATTEMPTED_KEY);
       const newScope = `vo:${selectedVO} group:${selectedGroup}`;
       setConfiguration({
         ...configuration,
