@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 
 import { Dashboard as DashboardIcon } from "@mui/icons-material";
@@ -8,7 +8,7 @@ import { NavigationProvider } from "../src/contexts/NavigationProvider";
 import { applicationList } from "../src/components/ApplicationList";
 import { DashboardGroup } from "../src/types/DashboardGroup";
 import Dashboard from "../src/components/DashboardLayout/Dashboard";
-import { useOidc, useOidcAccessToken } from "./mocks/react-oidc.mock";
+import { ThemeProvider } from "../src/contexts/ThemeProvider";
 
 const meta = {
   title: "Dashboard Layout/Dashboard",
@@ -50,21 +50,17 @@ const meta = {
           <ApplicationsContext.Provider
             value={[userDashboard, setUserDashboard, applicationList]}
           >
-            <Box sx={{ height: "50vh" }}>
-              <Story />
-            </Box>
+            <ThemeProvider>
+              <Box sx={{ height: "50vh" }}>
+                <Story />
+              </Box>
+            </ThemeProvider>
           </ApplicationsContext.Provider>
         </NavigationProvider>
       );
     },
   ],
-  async beforeEach() {
-    useOidcAccessToken.mockReturnValue({
-      accessToken: "123456789",
-      accessTokenPayload: { preferred_username: "John Doe" },
-    });
-    return () => useOidcAccessToken.mockReset();
-  },
+  async beforeEach() {},
 } satisfies Meta<typeof Dashboard>;
 
 export default meta;
@@ -76,13 +72,11 @@ export const Default: Story = {
     children: <div></div>,
     logoURL: process.env.STORYBOOK_DEV
       ? undefined
-      : "/diracx-web/DIRAC-logo.png", // we need to add "/diracx-web" at the start of the url in production because of the repo name in the github pages url
+      : // we need to add "/diracx-web" at the start of the url in production
+        // because of the repo name in the github pages url
+        "/diracx-web/DIRAC-logo.png",
   },
   render: (props) => {
-    useOidc.mockReturnValue({
-      login: () => {},
-      isAuthenticated: true,
-    });
     return <Dashboard {...props} />;
   },
 };

@@ -1,12 +1,7 @@
-import React from "react";
-import { StoryObj } from "@storybook/react";
+import { Meta, StoryObj } from "@storybook/react";
 import { useArgs } from "@storybook/core/preview-api";
 import { Paper } from "@mui/material";
-import {
-  createColumnHelper,
-  getCoreRowModel,
-  useReactTable,
-} from "@tanstack/react-table";
+import { createColumnHelper } from "@tanstack/react-table";
 import { ThemeProvider } from "../src/contexts/ThemeProvider";
 import {
   FilterToolbar,
@@ -23,55 +18,39 @@ const columnHelper = createColumnHelper<SimpleItem>();
 
 const columnDefs = [
   columnHelper.accessor("id", {
+    id: "id",
     header: "ID",
     meta: { type: "number" },
   }),
   columnHelper.accessor("name", {
+    id: "name",
     header: "Name",
     meta: { type: "string" },
   }),
   columnHelper.accessor("email", {
+    id: "email",
     header: "Email",
     meta: { type: "string" },
   }),
 ];
 
-const data: SimpleItem[] = [
-  { id: 1, name: "John Doe", email: "john@example.com" },
-];
-
-// Wrapper component to initialize the table
-const FilterToolbarWrapper: React.FC<
-  Omit<FilterToolbarProps<SimpleItem>, "columns">
-> = (props) => {
-  const table = useReactTable<SimpleItem>({
-    data,
-    columns: columnDefs,
-    getCoreRowModel: getCoreRowModel(),
-  });
-
-  return (
-    <FilterToolbar<SimpleItem> {...props} columns={table.getAllColumns()} />
-  );
-};
-
-const meta = {
+const meta: Meta<FilterToolbarProps<SimpleItem>> = {
   title: "shared/FilterToolbar",
-  component: FilterToolbarWrapper,
+  component: FilterToolbar,
   parameters: {
     layout: "centered",
   },
   tags: ["autodocs"],
   argTypes: {
     columns: {
-      control: false,
+      control: { disable: true },
       description: "`array` of tan stack `Column`",
       required: true,
     },
-    filters: { control: "object" },
-    setFilters: { control: "object" },
-    handleApplyFilters: { control: "object" },
-    handleClearFilters: { control: "object" },
+    filters: { control: { disable: true } },
+    setFilters: { control: { disable: true } },
+    handleApplyFilters: { control: { disable: true } },
+    handleClearFilters: { control: { disable: true } },
   },
   decorators: [
     (Story) => {
@@ -87,23 +66,23 @@ const meta = {
 };
 
 export default meta;
-type Story = StoryObj<typeof meta>;
+type Story = StoryObj<FilterToolbarProps<SimpleItem>>;
 
 export const Default: Story = {
   args: {
+    columns: columnDefs,
     filters: [
-      { id: 0, parameter: "id", operator: "eq", value: "1" },
-      { id: 1, parameter: "id", operator: "neq", value: "2" },
+      { id: 0, parameter: "id", operator: "eq", value: "1", isApplied: true },
+      { id: 1, parameter: "id", operator: "neq", value: "2", isApplied: false },
     ],
     setFilters: () => {},
     handleApplyFilters: () => {},
     handleClearFilters: () => {},
-    appliedFilters: [{ id: 0, parameter: "id", operator: "eq", value: "1" }],
   },
   render: (props) => {
     const [{ filters }, updateArgs] = useArgs();
     props.setFilters = (filters) => updateArgs({ filters });
     props.handleApplyFilters = () => updateArgs({ appliedFilters: filters });
-    return <FilterToolbarWrapper {...props} />;
+    return <FilterToolbar<SimpleItem> {...props} />;
   },
 };

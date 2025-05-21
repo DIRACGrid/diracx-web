@@ -434,7 +434,10 @@ export default function DashboardDrawer({
             }}
           >
             <ListItem key={"Add application"}>
-              <ListItemButton onClick={() => setAppDialogOpen(true)}>
+              <ListItemButton
+                onClick={() => setAppDialogOpen(true)}
+                data-testid="add-application-button"
+              >
                 <ListItemIcon>{<Add />}</ListItemIcon>
                 <ListItemText primary={"Add application"} />
               </ListItemButton>

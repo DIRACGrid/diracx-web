@@ -58,11 +58,14 @@ function ImportDialog({ open, onClose, onImport }: ImportDialogProps) {
         />
       </DialogContent>
       <DialogActions>
-        <Button onClick={onClose}>Cancel</Button>
+        <Button onClick={onClose} data-testid="cancel-import-button">
+          Cancel
+        </Button>
         <Button
           onClick={handleImport}
           variant="contained"
           disabled={!stateText.trim()}
+          data-testid="validate-import-button"
         >
           Import
         </Button>
@@ -120,7 +123,10 @@ export function ImportButton() {
   return (
     <>
       <Tooltip title="Import application state">
-        <IconButton onClick={() => setDialogOpen(true)}>
+        <IconButton
+          onClick={() => setDialogOpen(true)}
+          data-testid="import-button"
+        >
           <InputIcon />
         </IconButton>
       </Tooltip>

@@ -61,20 +61,20 @@ export const ThemeProvider = ({ children }: ThemeProviderProps) => {
   const prefersDarkMode = useMediaQuery("(prefers-color-scheme: dark)");
 
   useEffect(() => {
-    const storedTheme = localStorage.getItem("theme");
+    const storedTheme = sessionStorage.getItem("theme");
     if (storedTheme) {
       setTheme(storedTheme);
     } else {
       const defaultTheme = prefersDarkMode ? "dark" : "light";
       setTheme(defaultTheme);
-      localStorage.setItem("theme", defaultTheme);
+      sessionStorage.setItem("theme", defaultTheme);
     }
   }, [prefersDarkMode]);
 
   const toggleTheme = () => {
     setTheme((prevTheme) => {
       const newTheme = prevTheme === "light" ? "dark" : "light";
-      localStorage.setItem("theme", newTheme);
+      sessionStorage.setItem("theme", newTheme);
       return newTheme;
     });
   };

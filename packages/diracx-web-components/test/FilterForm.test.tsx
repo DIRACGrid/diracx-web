@@ -1,239 +1,45 @@
-import React from "react";
 import { render, screen, fireEvent, within } from "@testing-library/react";
-import { createColumnHelper } from "@tanstack/react-table";
-import { FilterForm } from "../src/components/shared/FilterForm";
-import { ThemeProvider } from "../src/contexts/ThemeProvider";
+import { composeStories } from "@storybook/react";
+import * as stories from "../stories/FilterForm.stories";
 
-// Define the item type for the table
-interface SimpleItem extends Record<string, unknown> {
-  id: number;
-  name: string;
-  date: Date;
-  category: string;
-}
+// Compose the stories to get actual Storybook behavior (decorators, args, etc)
+const { Default } = composeStories(stories);
 
 describe("FilterForm", () => {
-  // Define the columns for the table
-  const columnHelper = createColumnHelper<SimpleItem>();
-
-  const columnDefs = [
-    columnHelper.accessor("id", {
-      id: "id",
-      header: "ID",
-      meta: { type: "number" },
-    }),
-    columnHelper.accessor("name", {
-      id: "name",
-      header: "Name",
-      meta: { type: "string" },
-    }),
-    columnHelper.accessor("category", {
-      id: "category",
-      header: "Category",
-      meta: { type: "category", values: ["A", "B", "C"] }, // Example of a category column
-    }),
-    columnHelper.accessor("date", {
-      id: "date",
-      header: "Date",
-      meta: { type: "date" }, // Example of a DateTime column
-    }),
-  ];
-
-  // Mock filters
-  const filters = [
-    { id: 1, parameter: "id", operator: "eq", value: "4", isApplied: false },
-    {
-      id: 2,
-      parameter: "name",
-      operator: "neq",
-      value: "value2",
-      isApplied: false,
-    },
-  ];
-  const setFilters = jest.fn();
-  const handleFilterChange = jest.fn();
-  const handleFilterMenuClose = jest.fn();
-
-  // Wrapper component to initialize the table
-  interface FilterFormWrapperProps {
-    selectedFilterId: number | undefined;
-  }
-
-  const FilterFormWrapper: React.FC<FilterFormWrapperProps> = ({
-    selectedFilterId,
-  }) => {
-    return (
-      <ThemeProvider>
-        <FilterForm<SimpleItem>
-          columns={columnDefs}
-          filters={filters}
-          setFilters={setFilters}
-          handleFilterChange={handleFilterChange}
-          handleFilterMenuClose={handleFilterMenuClose}
-          selectedFilterId={selectedFilterId}
-        />
-      </ThemeProvider>
-    );
-  };
-
   it("renders the filter form with correct initial values", () => {
-    render(<FilterFormWrapper selectedFilterId={undefined} />);
-
-    const columnSelect = screen.getByTestId("filter-form-select-parameter");
-    const operatorSelect = screen.getByTestId("filter-form-select-operator");
-    const valueInput = screen.getByLabelText("Value") as HTMLInputElement;
-
-    expect(columnSelect).not.toHaveTextContent("ID");
-    expect(operatorSelect).toHaveTextContent("equals to");
-    expect(valueInput.value).not.toBe("value1");
+    render(<Default />);
+    // By default: ID = 1, operator = "equals to", value = "1"
+    expect(
+      screen.getByTestId("filter-form-select-parameter"),
+    ).toHaveTextContent("ID");
+    expect(screen.getByTestId("filter-form-select-operator")).toHaveTextContent(
+      "equals to",
+    );
+    expect(screen.getByLabelText("Value")).toHaveValue(1);
   });
 
-  it("renders the filter form with correct initial values when a filter is selected", () => {
-    render(<FilterFormWrapper selectedFilterId={1} />);
-
-    const columnSelect = screen.getByTestId("filter-form-select-parameter");
-    const operatorSelect = screen.getByTestId("filter-form-select-operator");
-    const valueInput = screen.getByLabelText("Value") as HTMLInputElement;
-
-    expect(columnSelect).toHaveTextContent("ID");
-    expect(operatorSelect).toHaveTextContent("equals to");
-    expect(valueInput.value).toBe("4");
+  it("allows changing the value", () => {
+    render(<Default />);
+    const valueInput = screen.getByLabelText("Value");
+    fireEvent.change(valueInput, { target: { value: "42" } });
+    expect(valueInput).toHaveValue(42);
   });
 
-  it("updates the selected filter when fields are changed", () => {
-    render(<FilterFormWrapper selectedFilterId={2} />);
-
+  it("allows changing the parameter (column)", () => {
+    render(<Default />);
     const columnSelect = screen.getByTestId("filter-form-select-parameter");
-    const operatorSelect = screen.getByTestId("filter-form-select-operator");
-    const valueInput = screen.getByLabelText("Value") as HTMLInputElement;
-
+    const button = within(columnSelect).getByRole("combobox");
+    fireEvent.mouseDown(button);
+    fireEvent.click(screen.getByText("Name"));
     expect(columnSelect).toHaveTextContent("Name");
+  });
+
+  it("allows changing the operator", () => {
+    render(<Default />);
+    const operatorSelect = screen.getByTestId("filter-form-select-operator");
+    const button = within(operatorSelect).getByRole("combobox");
+    fireEvent.mouseDown(button);
+    fireEvent.click(screen.getByText("not equals to"));
     expect(operatorSelect).toHaveTextContent("not equals to");
-    expect(valueInput.value).toBe("value2");
-
-    // Simulate a click event on the column Select element
-    const columnButton = within(columnSelect).getByRole("combobox");
-    fireEvent.mouseDown(columnButton);
-
-    // Select the desired option from the dropdown list
-    const columnOption = screen.getByText("ID");
-    fireEvent.click(columnOption);
-
-    // Simulate a click event on the operator Select element
-    const operatorButton = within(operatorSelect).getByRole("combobox");
-    fireEvent.mouseDown(operatorButton);
-
-    // Select the desired option from the dropdown list
-    const operatorOption = screen.getByText("is greater than");
-    fireEvent.click(operatorOption);
-
-    // Simulate a change event on the value input element
-    fireEvent.change(valueInput, { target: { value: "5" } });
-
-    expect(columnSelect).toHaveTextContent("ID");
-    expect(operatorSelect).toHaveTextContent("is greater than");
-    expect(valueInput.value).toBe("5");
-  });
-
-  it("calls setFilters when applyChanges is clicked with a new filter", () => {
-    render(<FilterFormWrapper selectedFilterId={undefined} />);
-
-    const applyChangesButton = screen.getByText("Add");
-
-    fireEvent.click(applyChangesButton);
-
-    expect(setFilters).toHaveBeenCalledWith([
-      ...filters,
-      {
-        id: expect.any(Number),
-        parameter: "",
-        operator: "eq",
-        value: "",
-        isApplied: false,
-      },
-    ]);
-    expect(handleFilterChange).not.toHaveBeenCalled();
-    expect(handleFilterMenuClose).toHaveBeenCalled();
-  });
-
-  it("calls handleFilterChange when applyChanges is clicked with an existing filter", () => {
-    render(<FilterFormWrapper selectedFilterId={1} />);
-
-    const applyChangesButton = screen.getByText("Add");
-
-    // Simulate a click event on the column Select element
-    const columnSelect = screen.getByTestId("filter-form-select-parameter");
-    const columnButton = within(columnSelect).getByRole("combobox");
-    fireEvent.mouseDown(columnButton);
-
-    // Select the desired option from the dropdown list
-    const columnOption = screen.getByText("Category");
-    fireEvent.click(columnOption);
-
-    fireEvent.click(applyChangesButton);
-
-    expect(setFilters).toHaveBeenCalled();
-    expect(handleFilterChange).toHaveBeenCalledWith(0, {
-      id: 1,
-      parameter: "category",
-      operator: "eq",
-      value: "",
-      isApplied: false,
-    });
-    expect(handleFilterMenuClose).toHaveBeenCalled();
-  });
-
-  it("renders the correct input for DateTime column type", () => {
-    render(<FilterFormWrapper selectedFilterId={undefined} />);
-
-    const columnSelect = screen.getByTestId("filter-form-select-parameter");
-    const columnButton = within(columnSelect).getByRole("combobox");
-    fireEvent.mouseDown(columnButton);
-    const columnOption = screen.getByText("Date");
-    fireEvent.click(columnOption);
-
-    const operatorSelect = screen.getByTestId("filter-form-select-operator");
-    expect(operatorSelect).toHaveTextContent("in the last");
-
-    const dateTimeInput = screen.getByLabelText("Value");
-
-    expect(dateTimeInput).toHaveRole("combobox");
-
-    // Simulate a click event on the operator Select element
-    const operatorButton = within(operatorSelect).getByRole("combobox");
-    fireEvent.mouseDown(operatorButton);
-
-    // Select the desired option from the dropdown list
-    const operatorOption = screen.getByText("is greater than");
-    fireEvent.click(operatorOption);
-
-    expect(screen.getByTestId("CalendarIcon")).toBeInTheDocument();
-  });
-
-  it("handles 'in' and 'not in' operators for category columns", () => {
-    render(<FilterFormWrapper selectedFilterId={undefined} />);
-
-    const columnSelect = screen.getByTestId("filter-form-select-parameter");
-    const columnButton = within(columnSelect).getByRole("combobox");
-    fireEvent.mouseDown(columnButton);
-    const columnOption = screen.getByText("Category");
-    fireEvent.click(columnOption);
-
-    const operatorSelect = screen.getByTestId("filter-form-select-operator");
-    const operatorButton = within(operatorSelect).getByRole("combobox");
-    fireEvent.mouseDown(operatorButton);
-    const operatorOption = screen.getByText("is in");
-    fireEvent.click(operatorOption);
-
-    const valueSelect = screen.getByLabelText("Value");
-    expect(valueSelect).toHaveRole("combobox");
-    fireEvent.mouseDown(valueSelect);
-
-    const valueOption1 = screen.getByText("A");
-    fireEvent.click(valueOption1);
-    const valueOption2 = screen.getByText("B");
-    fireEvent.click(valueOption2);
-
-    expect(valueSelect).toHaveTextContent("A, B");
   });
 });

@@ -12,7 +12,7 @@ export function ThemeToggleButton() {
   const { theme, toggleTheme } = useTheme();
 
   return (
-    <IconButton onClick={toggleTheme}>
+    <IconButton onClick={toggleTheme} data-testid="theme-toggle-button">
       {theme === "light" ? (
         <DarkMode data-testid="dark-mode" />
       ) : (

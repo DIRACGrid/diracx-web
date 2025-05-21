@@ -66,6 +66,8 @@ interface JobDataTableProps {
   columnPinning: ColumnPinningState;
   /** Set column pinning */
   setColumnPinning: React.Dispatch<React.SetStateAction<ColumnPinningState>>;
+  /** Status Colors */
+  statusColors: Record<string, string>;
 }
 
 /**
@@ -83,6 +85,7 @@ export function JobDataTable({
   setColumnVisibility,
   columnPinning,
   setColumnPinning,
+  statusColors,
 }: JobDataTableProps) {
   // Authentication
   const { configuration } = useOIDCContext();
@@ -470,6 +473,7 @@ export function JobDataTable({
         onClose={handleHistoryClose}
         historyData={jobHistoryData}
         jobId={selectedJobId ?? 0}
+        statusColors={statusColors}
       />
     </Box>
   );

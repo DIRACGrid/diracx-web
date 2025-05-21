@@ -25,13 +25,13 @@ import { DashboardGroup } from "../../types/DashboardGroup";
 
 import { ApplicationsContext } from "../../contexts";
 
-interface ShareDialogProps {
+interface ExportDialogProps {
   open: boolean;
   onClose: () => void;
   state: string;
 }
 
-function ShareDialog({ open, onClose, state }: ShareDialogProps) {
+function ExportDialog({ open, onClose, state }: ExportDialogProps) {
   const theme = useTheme();
   const handleCopy = () => {
     navigator.clipboard.writeText(state);
@@ -57,11 +57,14 @@ function ShareDialog({ open, onClose, state }: ShareDialogProps) {
         </Typography>
       </DialogContent>
       <DialogActions>
-        <Button onClick={onClose}>Cancel</Button>
+        <Button onClick={onClose} data-testid="cancel-export-button">
+          Cancel
+        </Button>
         <Button
           onClick={handleCopy}
           startIcon={<ContentCopyIcon />}
           variant="contained"
+          data-testid="validate-export-button"
         >
           Copy to Clipboard
         </Button>
@@ -71,10 +74,10 @@ function ShareDialog({ open, onClose, state }: ShareDialogProps) {
 }
 
 /**
- * ShareButton component allows users to share the state of selected applications.
+ * ExportButton component allows users to share the state of selected applications.
  * It provides a menu with checkboxes for each application and a dialog to display the state.
  */
-export function ShareButton() {
+export function ExportButton() {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedApps, setSelectedApps] = useState<string[]>([]);
@@ -103,7 +106,7 @@ export function ShareButton() {
 
   // Function to handle the share action
   // It collects the state of selected applications and opens the dialog
-  const handleShare = () => {
+  const handleExport = () => {
     const states = selectedApps.map((appId) => {
       const app = groups.flatMap((g) => g.items).find((a) => a.id === appId);
       if (!app) return null;
@@ -123,8 +126,8 @@ export function ShareButton() {
 
   return (
     <>
-      <Tooltip title="Share application state">
-        <IconButton onClick={handleClick}>
+      <Tooltip title="Export application state">
+        <IconButton onClick={handleClick} data-testid="export-button">
           <OutputIcon />
         </IconButton>
       </Tooltip>
@@ -188,16 +191,16 @@ export function ShareButton() {
             <Button
               fullWidth
               variant="contained"
-              onClick={handleShare}
+              onClick={handleExport}
               startIcon={<OutputIcon />}
             >
-              Share {selectedApps.length} selected
+              Export {selectedApps.length} selected
             </Button>
           </Box>
         )}
       </Menu>
 
-      <ShareDialog
+      <ExportDialog
         open={dialogOpen}
         onClose={() => setDialogOpen(false)}
         state={selectedState}
