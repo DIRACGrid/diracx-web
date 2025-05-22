@@ -31,6 +31,8 @@ import { JobHistoryDialog } from "./JobHistoryDialog";
 import {
   deleteJobs,
   getJobHistory,
+  getJobSandbox,
+  getJobSandboxUrl,
   killJobs,
   rescheduleJobs,
   useJobs,
@@ -182,7 +184,6 @@ export function JobDataTable({
     diracxUrl,
     rowSelection,
     clearSelected,
-    setSearchBody,
     mutateJobs,
   ]);
 
@@ -251,7 +252,6 @@ export function JobDataTable({
     diracxUrl,
     rowSelection,
     clearSelected,
-    setSearchBody,
     mutateJobs,
   ]);
 
@@ -311,29 +311,19 @@ export function JobDataTable({
     } finally {
       setBackdropOpen(false);
     }
-  }, [
-    accessToken,
-    diracxUrl,
-    rowSelection,
-    clearSelected,
-    setSearchBody,
-    mutateJobs,
-  ]);
+  }, [accessToken, diracxUrl, rowSelection, clearSelected, mutateJobs]);
 
   /**
    * Handle the history of the selected job
    */
   const handleHistory = useCallback(
-    async (selectedId: number | null) => {
+    async (selectedId: string | null) => {
       if (!selectedId) return;
+      const jobId = Number(selectedId);
       setBackdropOpen(true);
-      setSelectedJobId(selectedId);
+      setSelectedJobId(jobId);
       try {
-        const { data } = await getJobHistory(
-          diracxUrl,
-          selectedId,
-          accessToken,
-        );
+        const { data } = await getJobHistory(diracxUrl, jobId, accessToken);
         setBackdropOpen(false);
         // Show the history
         setJobHistoryData(data);
@@ -359,6 +349,61 @@ export function JobDataTable({
   const handleHistoryClose = () => {
     setIsHistoryDialogOpen(false);
   };
+
+  const handleSandboxDownload = useCallback(
+    async (selectedId: string | null, sbType: "input" | "output") => {
+      if (!selectedId) return;
+      const jobId = Number(selectedId);
+      setBackdropOpen(true);
+      try {
+        const { data: sandboxData } = await getJobSandbox(
+          diracxUrl,
+          jobId,
+          sbType,
+          accessToken,
+        );
+        if (sandboxData.length === 0)
+          throw new Error(`No ${sbType} sandbox found`);
+        const pfn = sandboxData[0];
+        if (pfn) {
+          const { data: urlData } = await getJobSandboxUrl(
+            diracxUrl,
+            pfn,
+            accessToken,
+          );
+          if (urlData?.url) {
+            const link = document.createElement("a");
+            link.href = urlData.url;
+            link.download = `${sbType}-sandbox-${jobId}.tar.gz`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            setSnackbarInfo({
+              open: true,
+              message: `Downloading ${sbType} sandbox of ${jobId}...`,
+              severity: "info",
+            });
+          } else
+            throw new Error(
+              "Could not retrieve a download URL for the sandbox",
+            );
+        } else throw new Error(`No ${sbType} sandbox found`);
+      } catch (error: unknown) {
+        let errorMessage = "An unknown error occurred";
+        if (error instanceof Error) {
+          errorMessage = error.message;
+        }
+        setSnackbarInfo({
+          open: true,
+          message: `Fetching sandbox of ${jobId} failed: ` + errorMessage,
+          severity: "error",
+        });
+      } finally {
+        setBackdropOpen(false);
+      }
+    },
+    [accessToken, diracxUrl],
+  );
 
   /**
    * The toolbar components for the data grid
@@ -405,10 +450,21 @@ export function JobDataTable({
     () => [
       {
         label: "Get history",
-        onClick: (id: string | null) => handleHistory(Number(id)),
+        onClick: (id: string | null) => handleHistory(id),
+        dataTestId: "get-history-button",
+      },
+      {
+        label: "Download input sandbox",
+        onClick: (id: string | null) => handleSandboxDownload(id, "input"),
+        dataTestId: "download-input-sandbox-button",
+      },
+      {
+        label: "Download output sandbox",
+        onClick: (id: string | null) => handleSandboxDownload(id, "output"),
+        dataTestId: "download-output-sandbox-button",
       },
     ],
-    [handleHistory],
+    [handleHistory, handleSandboxDownload],
   );
 
   /**
