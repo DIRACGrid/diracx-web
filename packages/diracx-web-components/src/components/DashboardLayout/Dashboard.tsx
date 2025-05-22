@@ -25,6 +25,8 @@ interface DashboardProps {
   drawerWidth?: number;
   /** The URL of the logo to be displayed in the drawer */
   logoURL?: string;
+  /** The URL for the documentation link in the drawer */
+  documentationURL?: string;
 }
 
 /**
@@ -38,6 +40,7 @@ export default function Dashboard({
   children,
   drawerWidth = 240,
   logoURL,
+  documentationURL,
 }: DashboardProps) {
   const appTitle = useApplicationTitle();
   const appType = useApplicationType();
@@ -142,6 +145,7 @@ export default function Dashboard({
           width={drawerWidth}
           handleDrawerToggle={handleDrawerToggle}
           logoURL={logoURL}
+          documentationURL={documentationURL}
         />
       </Box>
       <Box
