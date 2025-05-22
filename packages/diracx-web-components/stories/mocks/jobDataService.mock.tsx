@@ -1,5 +1,12 @@
 /* eslint-disable */
-import { Job, JobHistory, SearchBody, JobSummary } from "../../src/types";
+import {
+  Job,
+  JobHistory,
+  SearchBody,
+  JobSummary,
+  JobSandboxPFNResponse,
+  SandboxUrlResponse,
+} from "../../src/types";
 
 import { useJobMockContext } from "./contexts.mock";
 
@@ -67,7 +74,7 @@ export function useJobs(
   };
 }
 
-// Mock implementation of `getJobHistory`
+// Mock implementation of getJobHistory
 export const getJobHistory = async (
   _diracxUrl: string | null,
   _jobId: number,
@@ -78,6 +85,31 @@ export const getJobHistory = async (
   }
   return { data: mockJobHistoryResponse.jobHistory || [] };
 };
+
+// Mock implementation of getJobSandbox
+export function getJobSandbox(
+  diracxUrl: string | null,
+  jobId: number,
+  sbType: "input" | "output",
+  accessToken: string,
+): Promise<{ headers: Headers; data: JobSandboxPFNResponse }> {
+  return Promise.resolve({
+    headers: new Headers(),
+    data: [],
+  });
+}
+
+// Mock implementation of getJobSandboxUrl
+export function getJobSandboxUrl(
+  diracxUrl: string | null,
+  pfn: string,
+  accessToken: string,
+): Promise<{ headers: Headers; data: SandboxUrlResponse }> {
+  return Promise.resolve({
+    headers: new Headers(),
+    data: { url: "", expires_in: 0 },
+  });
+}
 
 // Mock implementation of refreshJobs
 export const refreshJobs = (
