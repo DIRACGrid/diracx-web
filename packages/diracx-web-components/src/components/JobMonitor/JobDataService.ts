@@ -6,7 +6,14 @@ import utc from "dayjs/plugin/utc";
 
 dayjs.extend(utc);
 import { fetcher } from "../../hooks/utils";
-import { Filter, SearchBody, Job, JobHistory } from "../../types";
+import {
+  Filter,
+  SearchBody,
+  Job,
+  JobHistory,
+  JobSandboxPFNResponse,
+  SandboxUrlResponse,
+} from "../../types";
 
 function processSearchBody(searchBody: SearchBody) {
   searchBody.search = searchBody.search?.map((filter: Filter) => {
@@ -202,4 +209,36 @@ export async function getJobHistory(
   >([historyUrl, accessToken, "POST", body]);
 
   return { data: data[0].LoggingInfo };
+}
+
+/**
+ * Retrieves the sandbox information for a given job ID and sandbox type.
+ * @param jobId - The ID of the job.
+ * @param sbType - The type of the sandbox (input or output).
+ * @param accessToken - The authentication token.
+ * @returns A Promise that resolves to an object containing the headers and data of the sandboxes.
+ */
+export function getJobSandbox(
+  diracxUrl: string | null,
+  jobId: number,
+  sbType: "input" | "output",
+  accessToken: string,
+): Promise<{ headers: Headers; data: JobSandboxPFNResponse }> {
+  const url = `${diracxUrl}/api/jobs/${jobId}/sandbox/${sbType}`;
+  return fetcher([url, accessToken]);
+}
+
+/**
+ * Retrieves the sandbox URL for a given PFN.
+ * @param pfn - The PFN of the job.
+ * @param accessToken - The authentication token.
+ * @returns A Promise that resolves to an object containing the headers and data of the sandbox URL.
+ */
+export function getJobSandboxUrl(
+  diracxUrl: string | null,
+  pfn: string,
+  accessToken: string,
+): Promise<{ headers: Headers; data: SandboxUrlResponse }> {
+  const url = `${diracxUrl}/api/jobs/sandbox?pfn=${pfn}`;
+  return fetcher([url, accessToken]);
 }
