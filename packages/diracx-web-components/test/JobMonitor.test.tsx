@@ -78,11 +78,9 @@ describe("JobDataTable", () => {
       expect(getByText("Job accepted")).toBeInTheDocument();
     });
   });
-});
 
-describe("JobHistoryDialog", () => {
-  it("renders the dialog with correct data", async () => {
-    const { getByText } = render(
+  it("displays the snackbar: no input sandbox", async () => {
+    const { getByText, getByTestId } = render(
       <VirtuosoMockContext.Provider
         value={{ viewportHeight: 300, itemHeight: 100 }}
       >
@@ -96,7 +94,61 @@ describe("JobHistoryDialog", () => {
 
     // Now wait for the context menu to appear and click Get history
     await act(async () => {
-      fireEvent.click(getByText("Get history"));
+      fireEvent.click(getByTestId("download-input-sandbox-button"));
+      // Allow time for state updates to complete
+      await new Promise((resolve) => setTimeout(resolve, 0));
+    });
+
+    // Now check for the dialog
+    await waitFor(() => {
+      expect(screen.getByText(/No input sandbox found/)).toBeInTheDocument();
+    });
+  });
+
+  it("displays the snackbar: no output sandbox", async () => {
+    const { getByText, getByTestId } = render(
+      <VirtuosoMockContext.Provider
+        value={{ viewportHeight: 300, itemHeight: 100 }}
+      >
+        <Default />
+      </VirtuosoMockContext.Provider>,
+    );
+
+    await act(async () => {
+      fireEvent.contextMenu(getByText("Job 1"));
+    });
+
+    // Now wait for the context menu to appear and click Get history
+    await act(async () => {
+      fireEvent.click(getByTestId("download-output-sandbox-button"));
+      // Allow time for state updates to complete
+      await new Promise((resolve) => setTimeout(resolve, 0));
+    });
+
+    // Now check for the dialog
+    await waitFor(() => {
+      expect(screen.getByText(/No output sandbox found/)).toBeInTheDocument();
+    });
+  });
+});
+
+describe("JobHistoryDialog", () => {
+  it("renders the dialog with correct data", async () => {
+    const { getByText, getByTestId } = render(
+      <VirtuosoMockContext.Provider
+        value={{ viewportHeight: 300, itemHeight: 100 }}
+      >
+        <Default />
+      </VirtuosoMockContext.Provider>,
+    );
+
+    await act(async () => {
+      fireEvent.contextMenu(getByText("Job 1"));
+    });
+
+    // Now wait for the context menu to appear and click Get history
+    await act(async () => {
+      fireEvent.click(getByTestId("get-history-button"));
       // Allow time for state updates to complete
       await new Promise((resolve) => setTimeout(resolve, 0));
     });

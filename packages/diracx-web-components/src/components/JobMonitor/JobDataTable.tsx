@@ -31,6 +31,8 @@ import { JobHistoryDialog } from "./JobHistoryDialog";
 import {
   deleteJobs,
   getJobHistory,
+  getJobSandbox,
+  getJobSandboxUrl,
   killJobs,
   refreshJobs,
   rescheduleJobs,
@@ -362,6 +364,53 @@ export function JobDataTable({
     setIsHistoryDialogOpen(false);
   };
 
+  const handleSandboxDownload = async (
+    jobId: number | null,
+    sbType: "input" | "output",
+  ) => {
+    if (!jobId) return;
+    setBackdropOpen(true);
+    try {
+      const { data } = await getJobSandbox(
+        diracxUrl,
+        jobId,
+        sbType,
+        accessToken,
+      );
+      if (!data) throw new Error(`No sandbox found`);
+      const pfn = data[0];
+      setBackdropOpen(false);
+      if (pfn) {
+        const { data } = await getJobSandboxUrl(diracxUrl, pfn, accessToken);
+        if (data?.url) {
+          const link = document.createElement("a");
+          link.href = data.url;
+          link.download = `${sbType}-sandbox-${jobId}.tar.gz`;
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+          setSnackbarInfo({
+            open: true,
+            message: `Downloading ${sbType} sandbox of ${jobId}...`,
+            severity: "info",
+          });
+        } else throw new Error(`Could not fetch the sandbox from ${data.url}`);
+      } else throw new Error(`No ${sbType} sandbox found`);
+    } catch (error: unknown) {
+      let errorMessage = "An unknown error occurred";
+      if (error instanceof Error) {
+        errorMessage = error.message;
+      }
+      setSnackbarInfo({
+        open: true,
+        message: `Fetching sandbox of ${jobId} failed: ` + errorMessage,
+        severity: "error",
+      });
+    } finally {
+      setBackdropOpen(false);
+    }
+  };
+
   /**
    * The toolbar components for the data grid
    */
@@ -396,6 +445,17 @@ export function JobDataTable({
       {
         label: "Get history",
         onClick: (id: number | null) => handleHistory(id),
+        dataTestId: "get-history-button",
+      },
+      {
+        label: "Download input sandbox",
+        onClick: (id: number | null) => handleSandboxDownload(id, "input"),
+        dataTestId: "download-input-sandbox-button",
+      },
+      {
+        label: "Download output sandbox",
+        onClick: (id: number | null) => handleSandboxDownload(id, "output"),
+        dataTestId: "download-output-sandbox-button",
       },
     ],
     [handleHistory],
