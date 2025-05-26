@@ -15,7 +15,7 @@ import {
 import { ProfileButton } from "./ProfileButton";
 import { ThemeToggleButton } from "./ThemeToggleButton";
 import DashboardDrawer from "./DashboardDrawer";
-import { ShareButton } from "./ShareButton";
+import { ExportButton } from "./ExportButton";
 import { ImportButton } from "./ImportButton";
 
 interface DashboardProps {
@@ -124,7 +124,7 @@ export default function Dashboard({
           >
             <Stack direction="row" spacing={1} alignItems="center">
               <ImportButton />
-              <ShareButton />
+              <ExportButton />
               <ThemeToggleButton />
               <ProfileButton />
             </Stack>

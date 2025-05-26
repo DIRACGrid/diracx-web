@@ -6,7 +6,7 @@ import {
   AccordionSummary,
   TextField,
 } from "@mui/material";
-import { ExpandMore, Apps } from "@mui/icons-material";
+import { ExpandMore } from "@mui/icons-material";
 import React, { useEffect, useRef, useState } from "react";
 import { dropTargetForElements } from "@atlaskit/pragmatic-drag-and-drop/element/adapter";
 import { DashboardGroup } from "../../types/DashboardGroup";
@@ -139,10 +139,10 @@ export default function DrawerItemGroup({
       </AccordionSummary>
       {/* Accordion details */}
       <AccordionDetails>
-        {items.map(({ title: itemTitle, id, icon }, index) => (
-          <div onContextMenu={handleContextMenu("item", id)} key={id}>
+        {items.map((item, index) => (
+          <div onContextMenu={handleContextMenu("item", item.id)} key={item.id}>
             <DrawerItem
-              item={{ title: itemTitle, id, icon: icon || Apps }}
+              item={item}
               index={index}
               groupTitle={title}
               renamingItemId={renamingItemId}

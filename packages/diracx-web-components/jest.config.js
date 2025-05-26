@@ -9,6 +9,12 @@ const config = {
 
   // The test environment that will be used for testing
   testEnvironment: "jest-environment-jsdom",
+
+  moduleNameMapper: {
+    "^@axa-fr/react-oidc$": "<rootDir>/stories/mocks/react-oidc.mock.tsx",
+    "^../../hooks/metadata$": "<rootDir>/stories/mocks/metadata.mock.tsx",
+    "^./JobDataService$": "<rootDir>/stories/mocks/JobDataService.mock.tsx",
+  },
 };
 
 export default config;

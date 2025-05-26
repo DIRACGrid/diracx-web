@@ -40,7 +40,7 @@ export function ProfileButton() {
 
   const { configuration, setConfiguration } = useOIDCContext();
   const { accessTokenPayload } = useOidcAccessToken(configuration?.scope);
-  const { logout, isAuthenticated } = useOidc(configuration?.scope);
+  const { logout } = useOidc(configuration?.scope);
 
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
@@ -62,9 +62,14 @@ export function ProfileButton() {
     logout();
   };
 
-  if (!isAuthenticated) {
+  if (!accessTokenPayload) {
     return (
-      <Button variant="contained" component={Link} href="/auth">
+      <Button
+        variant="contained"
+        component={Link}
+        href="/auth"
+        data-testid="login-button"
+      >
         Login
       </Button>
     );
@@ -78,6 +83,7 @@ export function ProfileButton() {
           aria-controls={open ? "account-menu" : undefined}
           aria-haspopup="true"
           aria-expanded={open ? "true" : undefined}
+          data-testid="profile-button"
         >
           <Avatar sx={{ bgcolor: theme.palette.secondary.main }}>
             {accessTokenPayload["preferred_username"][0]}
@@ -190,6 +196,7 @@ export function ProfileButton() {
             handleClose();
             handleLogout();
           }}
+          data-testid="logout-button"
         >
           <ListItemIcon>
             <Logout fontSize="small" />

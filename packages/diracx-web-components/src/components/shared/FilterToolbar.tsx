@@ -155,6 +155,7 @@ export function FilterToolbar<T extends Record<string, unknown>>({
               startIcon={<FilterList />}
               onClick={handleAddFilter}
               ref={addFilterButtonRef}
+              data-testid="add-filter-button"
             >
               <span>Add filter</span>
             </Button>
@@ -166,6 +167,7 @@ export function FilterToolbar<T extends Record<string, unknown>>({
               variant="text"
               startIcon={changesUnapplied() ? <Send /> : <Refresh />}
               onClick={() => handleApplyFilters()}
+              data-testid="apply-filters-button"
             >
               <span>
                 {changesUnapplied() ? "Apply filters" : "Refresh page"}
@@ -180,6 +182,7 @@ export function FilterToolbar<T extends Record<string, unknown>>({
               startIcon={<Delete />}
               onClick={handleClearFilters}
               disabled={filters.length === 0}
+              data-testid="clear-filters-button"
             >
               <span>Clear all filters</span>
             </Button>

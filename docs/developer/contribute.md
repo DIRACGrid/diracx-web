@@ -20,10 +20,9 @@
 
 - **Testing**:
 
-  - **Component Testing**: Write tests for your components to ensure they work as expected. Use [Jest](https://jestjs.io/) for unit testing and snapshot testing of your React components.
+  - **Component Testing**: Write tests for your stories to ensure they work as expected. Use [Jest](https://jestjs.io/) for unit testing and snapshot testing of your React components.
   - **Application Testing**: Use [Cypress](https://www.cypress.io/) for end-to-end testing to simulate real user interactions and ensure your application behaves correctly.
   - **Test Coverage**: Maintain good test coverage to ensure that your critical features are well-protected during updates. Tools like Jest provide [coverage reports](https://jestjs.io/docs/code-coverage) that help you identify untested parts of your code.
-
 
 - **Accessibility**: Make your application accessible to all users. Use semantic HTML, ARIA attributes, and test your application with different screen sizes and assistive technologies.
 
