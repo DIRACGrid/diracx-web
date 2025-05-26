@@ -445,14 +445,17 @@ export function JobDataTable({
       {
         label: "Get history",
         onClick: (id: number | null) => handleHistory(id),
+        dataTestId: "get-history-button",
       },
       {
         label: "Download input sandbox",
         onClick: (id: number | null) => handleSandboxDownload(id, "input"),
+        dataTestId: "download-input-sandbox-button",
       },
       {
         label: "Download output sandbox",
         onClick: (id: number | null) => handleSandboxDownload(id, "output"),
+        dataTestId: "download-output-sandbox-button",
       },
     ],
     [handleHistory],

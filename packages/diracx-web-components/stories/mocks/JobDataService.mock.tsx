@@ -155,3 +155,28 @@ export function rescheduleJobs(
     },
   });
 }
+
+// Mock implementation of getJobSandbox
+export function getJobSandbox(
+  diracxUrl: string | null,
+  jobId: number,
+  sbType: "input" | "output",
+  accessToken: string,
+): Promise<{ headers: Headers; data: any }> {
+  return Promise.resolve({
+    headers: new Headers(),
+    data: [],
+  });
+}
+
+// Mock implementation of getJobSandboxUrl
+export function getJobSandboxUrl(
+  diracxUrl: string | null,
+  pfn: string,
+  accessToken: string,
+): Promise<{ headers: Headers; data: any }> {
+  return Promise.resolve({
+    headers: new Headers(),
+    data: {},
+  });
+}
