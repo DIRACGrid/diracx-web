@@ -36,6 +36,8 @@ interface DashboardDrawerProps {
   handleDrawerToggle: React.ReactEventHandler;
   /** The URL for the logo image. */
   logoURL?: string;
+  /** The URL for the documentation link. */
+  documentationURL?: string;
 }
 
 /**
@@ -51,6 +53,7 @@ export default function DashboardDrawer({
   width,
   handleDrawerToggle,
   logoURL = "/DIRAC-logo.png",
+  documentationURL,
 }: DashboardDrawerProps) {
   // Determine the container for the Drawer based on whether the window object exists.
   const container =
@@ -366,6 +369,9 @@ export default function DashboardDrawer({
     handleCloseContextMenu();
   };
 
+  // Use provided documentationURL or fallback to default
+  const docURL = documentationURL || "https://diracx.io";
+
   return (
     <>
       <Drawer
@@ -443,10 +449,7 @@ export default function DashboardDrawer({
               </ListItemButton>
             </ListItem>
             <ListItem key={"Documentation"}>
-              <ListItemButton
-                target="_blank"
-                href="https://dirac.readthedocs.io/en/latest/"
-              >
+              <ListItemButton target="_blank" href={docURL}>
                 <ListItemIcon>{<MenuBook />}</ListItemIcon>
                 <ListItemText primary={"Documentation"} />
               </ListItemButton>
