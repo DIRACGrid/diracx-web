@@ -2,18 +2,14 @@
 
 import { useContext, useMemo } from "react";
 import { ApplicationsContext } from "../contexts/ApplicationsProvider";
-import { useSearchParamsUtils } from "./searchParamsUtils";
 
 /**
- * Custom hook to access the application id from the URL
+ * Custom hook to access the application id from the context
  * @returns the application id
  */
 export function useApplicationId() {
-  const { getParam } = useSearchParamsUtils();
-
-  return useMemo(() => {
-    return getParam("appId");
-  }, [getParam]);
+  const [, , , appId] = useContext(ApplicationsContext);
+  return appId;
 }
 
 /**
@@ -21,8 +17,7 @@ export function useApplicationId() {
  * @returns the application title
  */
 export function useApplicationTitle() {
-  const [userDashboard] = useContext(ApplicationsContext);
-  const appId = useApplicationId();
+  const [userDashboard, , , appId] = useContext(ApplicationsContext);
 
   return useMemo(() => {
     if (!userDashboard || !appId) return null;
@@ -40,7 +35,7 @@ export function useApplicationTitle() {
 
 /**
  * Custom hook to access the application title based on the application id
- * @returns the application title
+ * @returns the application type
  */
 export function useApplicationType() {
   const [userDashboard] = useContext(ApplicationsContext);

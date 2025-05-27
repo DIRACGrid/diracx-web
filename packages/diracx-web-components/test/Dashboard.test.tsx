@@ -12,11 +12,6 @@ jest.mock("@mui/material", () => ({
   useMediaQuery: jest.fn(),
 }));
 
-jest.mock("jsoncrush", () => ({
-  crush: jest.fn().mockImplementation((data) => `crushed-${data}`),
-  uncrush: jest.fn().mockImplementation((data) => data.replace("crushed-", "")),
-}));
-
 describe("Dashboard", () => {
   it("renders in desktop mode", () => {
     (useMediaQuery as jest.Mock).mockReturnValue(false); // desktop

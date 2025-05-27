@@ -16,7 +16,7 @@ import {
   Toolbar,
   useTheme,
 } from "@mui/material";
-import { MenuBook, Add, SvgIconComponent } from "@mui/icons-material";
+import { MenuBook, Add } from "@mui/icons-material";
 import React, { useContext, useEffect, useState } from "react";
 import { monitorForElements } from "@atlaskit/pragmatic-drag-and-drop/element/adapter";
 import { extractClosestEdge } from "@atlaskit/pragmatic-drag-and-drop-hitbox/closest-edge";
@@ -80,7 +80,8 @@ export default function DashboardDrawer({
 
   // Define the applications that are accessible to users.
   // Each application has an associated icon and path.
-  const [userDashboard, setUserDashboard] = useContext(ApplicationsContext);
+  const [userDashboard, setUserDashboard, , , setCurrentAppId] =
+    useContext(ApplicationsContext);
 
   const theme = useTheme();
 
@@ -210,9 +211,8 @@ export default function DashboardDrawer({
    * Handles the creation of a new app in the dashboard drawer.
    *
    * @param appType - The type of the app to be created.
-   * @param icon - The icon component for the app.
    */
-  const handleAppCreation = (appType: string, icon: SvgIconComponent) => {
+  const handleAppCreation = (appType: string) => {
     let group = userDashboard[userDashboard.length - 1];
     const empty = !group;
     if (empty) {
@@ -224,14 +224,13 @@ export default function DashboardDrawer({
       };
     }
 
-    let title = `${appType} ${userDashboard.reduce(
+    const count = userDashboard.reduce(
       (sum, group) =>
         sum + group.items.filter((item) => item.type === appType).length,
-      1,
-    )}`;
-    while (group.items.some((item) => item.title === title)) {
-      title = `${appType} ${parseInt(title.split(" ")[1]) + 1}`;
-    }
+      0,
+    );
+
+    const title = count > 0 ? `${appType} ${count + 1}` : `${appType}`;
 
     const newApp = {
       title,
@@ -240,7 +239,6 @@ export default function DashboardDrawer({
         0,
       )}`,
       type: appType,
-      icon: icon,
     };
     group.items.push(newApp);
     if (empty) {
@@ -250,6 +248,7 @@ export default function DashboardDrawer({
         userDashboard.map((g) => (g.title === group.title ? group : g)),
       );
     }
+    setCurrentAppId(newApp.id);
   };
 
   let isContextStateStable = true;

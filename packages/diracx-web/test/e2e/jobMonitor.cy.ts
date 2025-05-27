@@ -16,13 +16,19 @@ describe("Job Monitor", () => {
       cy.url().should("include", "/auth");
     });
 
+    cy.visit("/");
     // Visit the page where the Job Monitor is rendered
-    cy.visit(
-      "/?appId=JobMonitor0&dashboard=6%21%27My+dashboard%27~extended%21true~items%216*.~id430%27%29%2C-5%27~id51.%29%5D%29%5D*4+3-%28%27title.%27~type*%273Monitor4%21%27Job5*+26%5B-%016543.-*_&userDashboard=6%21%27Test+Group%27~extended%21true~items%216*.~id430%27%29%2C-5%27~id51.%29%5D%29%5D*4+3-%28%27title.%27~type*%273Monitor4%21%27Job5*+26%5B-%016543.-*_",
-    );
+    cy.window().then((win) => {
+      win.sessionStorage.setItem(
+        "savedDashboard",
+        '[{"title":"Group 2","extended":true,"items":[{"title":"Job Monitor","id":"Job Monitor0","type":"Job Monitor"},{"title":"Job Monitor 2","id":"Job Monitor 21","type":"Job Monitor"}]}]',
+      );
+    });
+
+    cy.contains("Job Monitor").click();
 
     // Is there a table with enough jobs? If not we should add some jobs
-    const checkAndAddJobs = (minNumberOfJobs) => {
+    const checkAndAddJobs = (minNumberOfJobs: number) => {
       cy.get(".MuiTablePagination-displayedRows").then(($pagination) => {
         const lastNumber = parseInt($pagination.text().split(" ").pop() || "0");
 
@@ -508,6 +514,7 @@ describe("Job Monitor", () => {
     cy.wait(500);
     cy.reload();
 
+    cy.contains("Job Monitor").click();
     cy.get(".MuiChip-label").should("be.visible");
     cy.get("table tbody tr").should("have.length", 1);
   });

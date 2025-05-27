@@ -32,14 +32,13 @@ interface LoginFormProps {
 export function LoginForm({
   logoURL = "/DIRAC-logo-minimal.png",
 }: LoginFormProps) {
-  const { setPath } = useContext(NavigationContext);
   const diracxUrl = useDiracxUrl();
   const { metadata, error, isLoading } = useMetadata(diracxUrl);
   const [selectedVO, setSelectedVO] = useState<string | null>(null);
   const [selectedGroup, setSelectedGroup] = useState<string | null>(null);
   const { configuration, setConfiguration } = useOIDCContext();
   const { isAuthenticated, login } = useOidc(configuration?.scope);
-
+  const { setPath } = useContext(NavigationContext);
   const { getParam } = useSearchParamsUtils();
   const OIDC_LOGIN_ATTEMPTED_KEY = "oidcLoginAttempted";
 

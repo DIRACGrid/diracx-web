@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useContext } from "react";
+import { useContext } from "react";
 import {
   Dialog,
   DialogTitle,
@@ -11,7 +11,7 @@ import {
   Icon,
   IconButton,
 } from "@mui/material";
-import { Close, SvgIconComponent } from "@mui/icons-material";
+import { Close } from "@mui/icons-material";
 import { ApplicationsContext } from "../../contexts/ApplicationsProvider";
 
 interface AppDialogProps {
@@ -20,7 +20,7 @@ interface AppDialogProps {
   /** Function to set the open state of the dialog. */
   setAppDialogOpen: React.Dispatch<React.SetStateAction<boolean>>;
   /** Function to handle the creation of a new application. */
-  handleCreateApp: (name: string, icon: SvgIconComponent) => void;
+  handleCreateApp: (name: string) => void;
 }
 
 /**
@@ -34,31 +34,12 @@ export default function AppDialog({
   setAppDialogOpen,
   handleCreateApp,
 }: AppDialogProps) {
-  const [appType, setAppType] = useState("");
   const applicationList = useContext(ApplicationsContext)[2];
   return (
     <Dialog
       open={appDialogOpen}
       onClose={() => setAppDialogOpen(false)}
       aria-labelledby="application-dialog-label"
-      PaperProps={{
-        component: "form",
-        onSubmit: (event: React.FormEvent<HTMLFormElement>) => {
-          event.preventDefault();
-
-          const icon = applicationList.find(
-            (app) => app.name === appType,
-          )?.icon;
-          if (!icon) {
-            console.error("Icon not found for application type", appType);
-            return;
-          }
-
-          handleCreateApp(appType, icon);
-
-          setAppDialogOpen(false);
-        },
-      }}
       fullWidth
       maxWidth="sm"
     >
@@ -90,9 +71,10 @@ export default function AppDialog({
                 fullWidth
                 variant="outlined"
                 onClick={() => {
-                  setAppType(app.name);
+                  handleCreateApp(app.name);
+                  setAppDialogOpen(false);
                 }}
-                type="submit"
+                data-testid="create-application-button"
               >
                 <Icon component={app.icon} sx={{ mr: 1 }} />
                 {app.name}

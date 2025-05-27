@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useRef, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
 import {
   ListItemButton,
@@ -10,7 +10,7 @@ import {
   useTheme,
   TextField,
 } from "@mui/material";
-import { DragIndicator, SvgIconComponent } from "@mui/icons-material";
+import { DragIndicator, SvgIconComponent, Apps } from "@mui/icons-material";
 import { combine } from "@atlaskit/pragmatic-drag-and-drop/combine";
 import {
   draggable,
@@ -25,8 +25,7 @@ import {
 import { setCustomNativeDragPreview } from "@atlaskit/pragmatic-drag-and-drop/element/set-custom-native-drag-preview";
 import EggIcon from "@mui/icons-material/Egg";
 import { ThemeProvider } from "../../contexts/ThemeProvider";
-import { useSearchParamsUtils } from "../../hooks/searchParamsUtils";
-import { useApplicationId } from "../../hooks/application";
+import { ApplicationsContext } from "../../contexts/ApplicationsProvider";
 import { DashboardGroup, DashboardItem } from "../../types";
 
 interface DrawerItemProps {
@@ -68,11 +67,13 @@ export default function DrawerItem({
   // Ref to use for the handle of the draggable element, must be a child of the draggable element
   const handleRef = useRef(null);
   const theme = useTheme();
-  const { setParam } = useSearchParamsUtils();
   // Represents the closest edge to the mouse cursor
   const [closestEdge, setClosestEdge] = useState<Edge | null>(null);
 
-  const appId = useApplicationId();
+  const [, , appList, appId, setCurrentAppId] = useContext(ApplicationsContext);
+  const { icon } = appList.find((app) => app.name === item.type) || {
+    icon: Apps,
+  };
 
   useEffect(() => {
     if (!dragRef.current || !handleRef.current) return;
@@ -101,7 +102,7 @@ export default function DrawerItem({
                       width: source.element.getBoundingClientRect().width,
                     }}
                   >
-                    <ItemPreview title={item.title} icon={item.icon} />
+                    <ItemPreview title={item.title} icon={icon} />
                   </div>
                 </ThemeProvider>,
               );
@@ -187,13 +188,13 @@ export default function DrawerItem({
       <ListItemButton
         disableGutters
         key={item.title}
-        onClick={() => setParam("appId", item.id)}
+        onClick={() => setCurrentAppId(item.id)}
         sx={{ pl: 2, borderRadius: 2, pr: 1 }}
         ref={dragRef}
         selected={appId === item.id}
       >
         <ListItemIcon>
-          <Icon component={item.icon ?? EggIcon} />
+          <Icon component={icon ?? EggIcon} />
         </ListItemIcon>
         {renamingItemId === item.id ? (
           <TextField
