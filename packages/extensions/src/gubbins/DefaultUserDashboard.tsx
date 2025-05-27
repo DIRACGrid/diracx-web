@@ -1,6 +1,4 @@
 import { DashboardGroup } from "@dirac-grid/diracx-web-components/types";
-import { BugReport } from "@mui/icons-material";
-import { applicationList } from "@/gubbins/ApplicationList";
 
 // New default user sections
 export const defaultSections: DashboardGroup[] = [

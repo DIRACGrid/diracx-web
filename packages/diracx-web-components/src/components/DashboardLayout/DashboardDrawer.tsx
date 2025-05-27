@@ -444,10 +444,7 @@ export default function DashboardDrawer({
                 data-testid="add-application-button"
               >
                 <ListItemIcon>{<Add />}</ListItemIcon>
-                <ListItemText
-                  primary={"Add application"}
-                  data-testid={"AddApplicationButton"}
-                />
+                <ListItemText primary={"Add application"} />
               </ListItemButton>
             </ListItem>
             <ListItem key={"Documentation"}>

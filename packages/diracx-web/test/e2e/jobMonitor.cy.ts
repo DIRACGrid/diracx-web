@@ -83,8 +83,7 @@ describe("Job Monitor", () => {
         addJobs(55);
       } else {
         cy.log("Data available, checking if enough jobs are present");
-        //pclhcb21:8000/__/#/specs
-        https: checkAndAddJobs(55);
+        checkAndAddJobs(55);
       }
     });
   });

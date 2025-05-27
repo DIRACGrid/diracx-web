@@ -19,11 +19,11 @@ describe("Export and import app state", () => {
     cy.visit("/");
 
     // Open 2 Job Monitor apps
-    cy.get('[data-testid="AddApplicationButton"]').click();
+    cy.get('[data-testid="add-application-button"]').click();
     cy.get('[data-testid="create-application-button"]')
       .contains("Job Monitor")
       .click();
-    cy.get('[data-testid="AddApplicationButton"]').click();
+    cy.get('[data-testid="add-application-button"]').click();
     cy.get('[data-testid="create-application-button"]')
       .contains("Job Monitor")
       .click();
