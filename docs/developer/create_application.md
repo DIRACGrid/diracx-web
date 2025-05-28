@@ -6,7 +6,15 @@ The applicatins created here will be available for DiracX-Web and for all the ex
 
 ### Declare the application
 
-In the file `packages/diracx-web-components/src/components/ApplicationList.ts` you can extend the `applicationList` with your new app. You must provide a name (explicit), the component representing the new app and an icon that will appear in the `Add application` menu. You can also give two functions, `setState` and `getState`, to configure the export and import of your app.
+In the file `packages/diracx-web-components/src/components/ApplicationList.ts` you can extend the `applicationList` with your new app. 
+
+You must provide: 
+- A clear and explicit name
+- The component representing the new app 
+- An icon that will appear in the `Add application` menu
+- An optional function, `validateAndConvertState`, which identifies and corrects the structure of a JSON pasted by the user during import. This function ensures compatibility between versions by transforming the pasted state into a valid, updated version. It should be reviewed and updated in any version that modifies the exported/imported state structure
+
+💡You can look at the type `ApplicationMetadata` for more details
 
 ### Code the application
 

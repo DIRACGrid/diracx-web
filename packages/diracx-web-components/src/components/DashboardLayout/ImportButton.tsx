@@ -11,24 +11,40 @@ import {
   TextField,
 } from "@mui/material";
 import InputIcon from "@mui/icons-material/Input";
-import React, { useState, useContext, SetStateAction } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import { ApplicationsContext } from "../../contexts";
-import { ApplicationMetadata, DashboardGroup } from "../../types";
+import {
+  ApplicationMetadata,
+  DashboardGroup,
+  ApplicationSettings,
+} from "../../types";
 import { ApplicationState } from "../../types/ApplicationMetadata";
 
 interface ImportDialogProps {
   open: boolean;
   onClose: () => void;
-  onImport: (state: string) => void;
+  onImport: (importedStates: ApplicationSettings[]) => void;
 }
 
+/**
+ * ImportDialog component allows users to import application states in JSON format.
+ * It provides a text area for pasting the state and a button to import it.
+ * @param open - Boolean indicating if the dialog is open.
+ * @param onClose - Function to close the dialog.
+ * @param onImport - Function to handle the import of the state.
+ */
 function ImportDialog({ open, onClose, onImport }: ImportDialogProps) {
   const [stateText, setStateText] = useState("");
   const [error, setError] = useState<string | null>(null);
 
+  useEffect(() => {
+    setStateText("");
+    setError(null);
+  }, [open]);
+
   const handleImport = () => {
     try {
-      const parsedState = JSON.parse(stateText);
+      const parsedState: ApplicationSettings[] = JSON.parse(stateText);
       onImport(parsedState);
       onClose();
       setStateText("");
@@ -75,27 +91,111 @@ function ImportDialog({ open, onClose, onImport }: ImportDialogProps) {
 }
 
 /**
+ * DeprecatedStateDialog component displays a dialog with a list of applications
+ * that have an outdated state format. It allows users to copy the updated state.
+ * @param open - Boolean indicating if the dialog is open.
+ * @param onClose - Function to close the dialog.
+ * @param correctStates - Array of objects containing the old and new state of the applications.
+ */
+function DeprecatedStateDialog({
+  open,
+  onClose,
+  correctStates,
+}: {
+  open: boolean;
+  onClose: () => void;
+  correctStates: {
+    oldSettings: ApplicationSettings;
+    newState: ApplicationState;
+  }[];
+}) {
+  const handleCopy = (app: {
+    oldSettings: ApplicationSettings;
+    newState: ApplicationState;
+  }) => {
+    const formatted = {
+      appType: app.oldSettings.appType,
+      appName: app.oldSettings.appName,
+      state: app.newState,
+    };
+    navigator.clipboard.writeText(JSON.stringify(formatted));
+  };
+
+  const handleCopyAll = () => {
+    const allFormatted = correctStates.map(({ oldSettings, newState }) => ({
+      appType: oldSettings.appType,
+      appName: oldSettings.appName,
+      state: newState,
+    }));
+    navigator.clipboard.writeText(JSON.stringify(allFormatted));
+  };
+
+  return (
+    <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
+      <DialogTitle>Outdated State Format Detected</DialogTitle>
+      <DialogContent>
+        <p>
+          Some imported applications use an outdated format that will soon no
+          longer be supported.
+          <br />
+          Please update them now by copying their updated version.
+        </p>
+
+        <ul>
+          {correctStates.map(({ oldSettings }, index) => (
+            <li key={index} style={{ marginTop: "0.5em" }}>
+              <b>{oldSettings.appName}</b> ({oldSettings.appType}){" "}
+              <Button
+                size="small"
+                onClick={() => handleCopy(correctStates[index])}
+                sx={{ ml: 1 }}
+              >
+                Copy
+              </Button>
+            </li>
+          ))}
+        </ul>
+      </DialogContent>
+      <DialogActions>
+        <Button onClick={onClose}>Cancel</Button>
+        <Button variant="contained" onClick={handleCopyAll}>
+          Copy All Updated JSON
+        </Button>
+      </DialogActions>
+    </Dialog>
+  );
+}
+
+/**
  * ImportButton component allows users to import the state of applications.
  * It provides a dialog to paste the state in JSON format.
  */
 export function ImportButton() {
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [correctStates, setCorrectStates] = useState<
+    { oldSettings: ApplicationSettings; newState: ApplicationState }[]
+  >([]);
   const [userDashboard, setUserDashboard, appList] =
     useContext(ApplicationsContext);
 
-  const handleImport = (importedState: ApplicationState) => {
-    const states = Array.isArray(importedState)
-      ? importedState
-      : [importedState];
+  const handleImport = (
+    importedStates: ApplicationSettings | ApplicationSettings[],
+  ) => {
+    const states = Array.isArray(importedStates)
+      ? importedStates
+      : [importedStates];
 
-    const id: number = userDashboard.reduce(
-      (acc, group) =>
-        group.title.startsWith("Imported Applications") ? acc + 1 : acc,
-      0,
-    );
+    const count = userDashboard.filter((group) =>
+      group.title.startsWith("Imported Applications"),
+    ).length;
+
+    let title = `Imported Applications${count > 0 ? ` ${count}` : ""}`;
+    while (userDashboard.some((group) => group.title === title)) {
+      title = `Imported Applications ${parseInt(title.split(" ")[2]) + 1}`;
+    }
 
     const newGroup = {
-      title: `Imported Applications${id > 0 ? ` (${id})` : ""}`,
+      title: title,
       extended: true,
       items: [],
     };
@@ -106,14 +206,23 @@ export function ImportButton() {
 
     states.forEach((state) => {
       if (state.state !== "null") {
+        const applicationMetadata = appList.find(
+          (app) => app.name === state.appType,
+        );
         const appId = handleAppCreation(
           state.appType,
           state.appName,
-          appList,
+          applicationMetadata,
           userDashboard,
           setUserDashboard,
         );
-        sessionStorage.setItem(`${appId}_State`, state.state);
+        const [appState, haveChangedState] =
+          applicationMetadata?.validateAndConvertState
+            ? applicationMetadata.validateAndConvertState(state.state)
+            : [state.state, false];
+        if (haveChangedState)
+          correctStates.push({ oldSettings: state, newState: appState });
+        sessionStorage.setItem(`${appId}_State`, appState);
       } else {
         console.warn(`No state to import for app type: ${state.appType}`);
       }
@@ -136,6 +245,12 @@ export function ImportButton() {
         onClose={() => setDialogOpen(false)}
         onImport={handleImport}
       />
+
+      <DeprecatedStateDialog
+        open={correctStates.length > 0}
+        onClose={() => setCorrectStates([])}
+        correctStates={correctStates}
+      />
     </>
   );
 }
@@ -153,24 +268,26 @@ export function ImportButton() {
 function handleAppCreation(
   appType: string,
   appTitle: string,
-  appList: ApplicationMetadata[],
+  applicationMetadata: ApplicationMetadata | undefined,
   userDashboard: DashboardGroup[],
-  setUserDashboard: React.Dispatch<SetStateAction<DashboardGroup[]>>,
+  setUserDashboard: React.Dispatch<React.SetStateAction<DashboardGroup[]>>,
 ): string {
   const group = userDashboard[userDashboard.length - 1];
 
-  const count = userDashboard.reduce(
-    (sum, group) =>
-      sum +
-      group.items.filter((item) => item.title.startsWith(appTitle)).length,
-    0,
-  );
+  const count = group.items.filter((item) =>
+    item.title.startsWith(appTitle),
+  ).length;
 
   const title = count > 0 ? `${appTitle} (${count + 1})` : appTitle;
-  const appId = `${title}${userDashboard.reduce(
-    (sum, group) => sum + group.items.length,
-    0,
-  )}`;
+
+  let appId = `${appType} 0`;
+  while (
+    userDashboard.some((group) => group.items.some((app) => app.id === appId))
+  ) {
+    const match = appId.match(/(\d+)$/);
+    const num = match ? parseInt(match[1], 10) + 1 : 0;
+    appId = `${appType} ${num}`;
+  }
 
   const newApp = {
     title: title,

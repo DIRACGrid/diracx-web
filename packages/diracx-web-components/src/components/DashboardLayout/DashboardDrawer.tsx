@@ -213,31 +213,40 @@ export default function DashboardDrawer({
    * @param appType - The type of the app to be created.
    */
   const handleAppCreation = (appType: string) => {
-    let group = userDashboard[userDashboard.length - 1];
-    const empty = !group;
-    if (empty) {
-      //create a new group if there is no group
-      group = {
-        title: `Group ${userDashboard.length + 1}`,
-        extended: false,
-        items: [],
-      };
+    const group =
+      userDashboard.length > 0
+        ? userDashboard[userDashboard.length - 1]
+        : {
+            // Create a new group if none exists
+            title: `Group 1`,
+            extended: false,
+            items: [],
+          };
+
+    const empty = userDashboard.length === 0;
+
+    const count = group.items.filter((item) =>
+      item.title.startsWith(appType),
+    ).length;
+
+    let title = `${appType} ${count > 0 ? `${count}` : ""}`;
+    while (group.items.some((app) => app.title === title)) {
+      const match = title.match(/(\d+)$/);
+      const num = match ? parseInt(match[1], 10) + 1 : undefined;
+      title = `${appType} ${num}`;
     }
 
-    const count = userDashboard.reduce(
-      (sum, group) =>
-        sum + group.items.filter((item) => item.type === appType).length,
-      0,
-    );
-
-    const title = count > 0 ? `${appType} ${count + 1}` : `${appType}`;
-
+    let appId = `${appType} 0`;
+    while (
+      userDashboard.some((group) => group.items.some((app) => app.id === appId))
+    ) {
+      const match = appId.match(/(\d+)$/);
+      const num = match ? parseInt(match[1], 10) + 1 : 0;
+      appId = `${appType} ${num}`;
+    }
     const newApp = {
       title,
-      id: `${title}${userDashboard.reduce(
-        (sum, group) => sum + group.items.length,
-        0,
-      )}`,
+      id: appId,
       type: appType,
     };
     group.items.push(newApp);
@@ -407,9 +416,9 @@ export default function DashboardDrawer({
           </Toolbar>
           {/* Map over user app instances and render them as list items in the drawer. */}
           <List>
-            {userDashboard.map((group) => (
+            {userDashboard.map((group, index) => (
               <ListItem
-                key={group.title}
+                key={index}
                 disablePadding
                 onContextMenu={handleContextMenu("group", group.title)}
               >

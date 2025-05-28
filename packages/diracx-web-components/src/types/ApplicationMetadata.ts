@@ -7,6 +7,9 @@ export default interface ApplicationMetadata {
   name: string;
   component: ElementType;
   icon: SvgIconComponent;
+  validateAndConvertState?: (
+    state: ApplicationState,
+  ) => [ApplicationState, boolean];
 }
 
 export type ApplicationState = string;
