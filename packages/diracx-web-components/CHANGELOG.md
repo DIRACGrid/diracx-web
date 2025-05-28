@@ -1,5 +1,30 @@
 # Changelog
 
+## [0.1.0-a6](https://github.com/DIRACGrid/diracx-web/compare/v0.1.0-a5...v0.1.0-a6) (2025-05-28)
+
+
+### Features
+
+* add share and import features ([51d243c](https://github.com/DIRACGrid/diracx-web/commit/51d243c5e866e0e245e2a0f502100eea05df9284))
+* add share and import features ([a909cde](https://github.com/DIRACGrid/diracx-web/commit/a909cded56ab32cb332c7afab8ef258b1d65add5))
+* handle outdated imported states with automatic structure update ([b0ba08c](https://github.com/DIRACGrid/diracx-web/commit/b0ba08cc8a1a7e76ceb520c391983cccd155b1ca))
+* handle outdated imported states with automatic structure update ([c4bf803](https://github.com/DIRACGrid/diracx-web/commit/c4bf803681207052fff81d0663ee0b53835d93dd))
+* move FilterToolbar from DataTable to JobMonitor + remove filters from URL ([9d208cd](https://github.com/DIRACGrid/diracx-web/commit/9d208cde8d33b0e7b3f8ea055c3ce2aa2930204d))
+* point to the new documentation and make it flexible ([aa12598](https://github.com/DIRACGrid/diracx-web/commit/aa12598d54cbd4388dd3bc34cf7c6c2885caa0bf))
+* point to the new documentation and make it flexible ([46de738](https://github.com/DIRACGrid/diracx-web/commit/46de73897d9113f46c18d9f51973783cef03b2bb))
+* the JobHistoryDialog component relies on Stepper instead of Table ([bfed3b8](https://github.com/DIRACGrid/diracx-web/commit/bfed3b8e4720cb591265775d85b16b6494d0461d))
+* use FilterToolbar from JobMonitor instead of from DataTable ([2e9618e](https://github.com/DIRACGrid/diracx-web/commit/2e9618e485077edfc5b0a39dc2d5e0867e93940e))
+
+
+### Bug Fixes
+
+* oidc issue forcing users to remove session storage ([5b75aa4](https://github.com/DIRACGrid/diracx-web/commit/5b75aa43af9423feea3c8582aba382e6d0730b16))
+* oidc issue forcing users to remove session storage ([2125136](https://github.com/DIRACGrid/diracx-web/commit/2125136f0e380dcc3edf0132c16bb42f5242c16a))
+* remove the dashboard from the url and remove the BaseApp ([e429b91](https://github.com/DIRACGrid/diracx-web/commit/e429b911fd74233c156ea9fc51daa0b5bbadb2c7))
+* remove the dashboard from the url and remove the BaseApp ([49fc56c](https://github.com/DIRACGrid/diracx-web/commit/49fc56c41abd51ad81710084dc7fad7f3765477a))
+* review suggestions ([2116630](https://github.com/DIRACGrid/diracx-web/commit/211663064539cc5311393a68f796c70a977713d5))
+* review suggestions ([502f543](https://github.com/DIRACGrid/diracx-web/commit/502f543bc626d8a26fd702d1504ebcf289df00b1))
+
 ## [0.1.0-a5](https://github.com/DIRACGrid/diracx-web/compare/v0.1.0-a4...v0.1.0-a5) (2025-05-09)
 
 
