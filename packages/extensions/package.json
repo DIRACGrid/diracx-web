@@ -17,7 +17,7 @@
   "dependencies": {
     "@axa-fr/react-oidc": "^7.24.0",
     "@dirac-grid/diracx-web-components": "0.1.0-a6",
-    "@mui/icons-material": "^6.4.2",
+    "@mui/icons-material": "^7.1.0",
     "@mui/material": "^6.1.6",
     "@mui/utils": "^6.1.6",
     "@mui/x-date-pickers": "^7.28.3",
