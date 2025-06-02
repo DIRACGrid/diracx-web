@@ -20,6 +20,7 @@ import {
 
 import OutputIcon from "@mui/icons-material/Output";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
+import SaveIcon from "@mui/icons-material/Save";
 
 import { DashboardGroup } from "../../types/DashboardGroup";
 
@@ -33,8 +34,14 @@ interface ExportDialogProps {
 
 function ExportDialog({ open, onClose, state }: ExportDialogProps) {
   const theme = useTheme();
+
   const handleCopy = () => {
     navigator.clipboard.writeText(state);
+    onClose();
+  };
+
+  const handleSave = () => {
+    localStorage.setItem("diracx-saved-states", state);
     onClose();
   };
 
@@ -59,6 +66,13 @@ function ExportDialog({ open, onClose, state }: ExportDialogProps) {
       <DialogActions>
         <Button onClick={onClose} data-testid="cancel-export-button">
           Cancel
+        </Button>
+        <Button
+          onClick={handleSave}
+          variant="contained"
+          startIcon={<SaveIcon />}
+        >
+          Save in the browser
         </Button>
         <Button
           onClick={handleCopy}
