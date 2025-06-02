@@ -78,6 +78,15 @@ function ImportDialog({ open, onClose, onImport }: ImportDialogProps) {
           Cancel
         </Button>
         <Button
+          onClick={() =>
+            setStateText(localStorage.getItem("diracx-saved-states") || "")
+          }
+          variant="contained"
+          disabled={localStorage.getItem("diracx-saved-states") === null}
+        >
+          Load from browser
+        </Button>
+        <Button
           onClick={handleImport}
           variant="contained"
           disabled={!stateText.trim()}
