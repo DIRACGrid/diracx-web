@@ -28,7 +28,7 @@
     "@emotion/styled": "^11.11.5",
     "@mui/icons-material": "^6.4.2",
     "@mui/material": "^6.1.6",
-    "@mui/utils": "^6.1.6",
+    "@mui/utils": "^7.1.1",
     "@mui/x-date-pickers": "^7.28.3",
     "@tanstack/react-table": "^8.20.5",
     "@types/node": "^20.17.6",
