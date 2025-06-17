@@ -1,4 +1,4 @@
-import * as React from "react";
+import React from "react";
 
 const jestFn =
   // Storybook runs in the browser – `jest` is not defined there

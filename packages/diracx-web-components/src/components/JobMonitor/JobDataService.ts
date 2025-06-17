@@ -7,18 +7,46 @@ import utc from "dayjs/plugin/utc";
 dayjs.extend(utc);
 import { fetcher } from "../../hooks/utils";
 import { Filter, SearchBody, Job, JobHistory } from "../../types";
+import type { JobSummary } from "../../types";
 
+/**
+ * Converts the search body to handle "last" operator filters.
+ * @param searchBody The search body containing filters and search criteria.
+ */
 function processSearchBody(searchBody: SearchBody) {
   searchBody.search = searchBody.search?.map((filter: Filter) => {
     if (filter.operator == "last") {
-      return {
-        parameter: filter.parameter,
-        operator: "gt",
-        value: dayjs()
-          .subtract(1, filter.value as "hour" | "day" | "month" | "year")
-          .toISOString(),
-        values: filter.values,
-      };
+      const valueStr = filter.value as string;
+      const match = valueStr.match(/^(\d+)\s*(minute|hour|day|month|year)s?$/i);
+
+      if (match) {
+        const amount = parseInt(match[1], 10);
+        const unit = match[2].toLowerCase() as
+          | "minute"
+          | "hour"
+          | "day"
+          | "month"
+          | "year";
+
+        return {
+          parameter: filter.parameter,
+          operator: "gt",
+          value: dayjs().subtract(amount, unit).toISOString(),
+          values: filter.values,
+        };
+      } else {
+        return {
+          parameter: filter.parameter,
+          operator: "gt",
+          value: dayjs()
+            .subtract(
+              1,
+              filter.value as "minute" | "hour" | "day" | "month" | "year",
+            )
+            .toISOString(),
+          values: filter.values,
+        };
+      }
     }
     return filter;
   });
@@ -26,7 +54,7 @@ function processSearchBody(searchBody: SearchBody) {
 
 /**
  * Custom hook for fetching jobs data.
- *
+ * @param diracxUrl - The base URL of the DiracX API.
  * @param accessToken - The access token for authentication.
  * @param searchBody - The search body for filtering jobs.
  * @param page - The page number for pagination.
@@ -57,7 +85,7 @@ export const useJobs = (
 
 /**
  * Refreshes the jobs by mutating the SWR cache with the search body and pagination values
- *
+ * @param diracxUrl - The base URL of the DiracX API.
  * @param accessToken - The access token for authentication.
  * @param searchBody - The search body containing the filters and search criteria.
  * @param page - The page number for pagination.
@@ -81,7 +109,7 @@ export const refreshJobs = (
 
 /**
  * Deletes jobs with the specified IDs.
- *
+ * @param diracxUrl - The base URL of the DiracX API.
  * @param selectedIds - An array of job IDs to delete.
  * @param accessToken - The authentication token.
  */
@@ -119,7 +147,7 @@ type StatusBody = {
 
 /**
  * Kills the specified jobs.
- *
+ * @param diracxUrl - The base URL of the DiracX API.
  * @param selectedIds - An array of job IDs to be killed.
  * @param token - The authentication token.
  * @returns A Promise that resolves to an object containing the response headers and data.
@@ -153,7 +181,7 @@ export function killJobs(
 
 /**
  * Reschedules the specified jobs.
- *
+ * @param diracxUrl - The base URL of the DiracX API.
  * @param selectedIds - An array of job IDs to be rescheduled.
  * @param token - The authentication token.
  * @returns A Promise that resolves to an object containing the response headers and data.
@@ -173,6 +201,7 @@ export function rescheduleJobs(
 
 /**
  * Retrieves the job history for a given job ID.
+ * @param diracxUrl - The base URL of the DiracX API.
  * @param jobId - The ID of the job.
  * @param token - The authentication token.
  * @returns A Promise that resolves to an object containing the headers and data of the job history.
@@ -202,4 +231,40 @@ export async function getJobHistory(
   >([historyUrl, accessToken, "POST", body]);
 
   return { data: data[0].LoggingInfo };
+}
+
+/**
+ * Gets a summary of jobs based on the specified grouping and search criteria.
+ * @param diracxUrl The base URL of the DiracX API.
+ * @param grouping The fields to group the job summary by.
+ * @param accessToken The access token for authentication.
+ * @param searchBody The search body containing filters and search criteria.
+ * @returns
+ */
+export async function getJobSummary(
+  diracxUrl: string | null,
+  grouping: string[],
+  accessToken: string,
+  searchBody?: SearchBody,
+): Promise<{ data: JobSummary[] }> {
+  if (!diracxUrl) {
+    throw new Error("Invalid URL generated for fetching job history.");
+  }
+
+  if (searchBody) processSearchBody(searchBody);
+
+  const summaryUrl = `${diracxUrl}/api/jobs/summary`;
+  const body = {
+    grouping: grouping,
+    search: searchBody?.search || [],
+  };
+  // Expect the response to be an array of objects with all the grouping fields
+  const { data } = await fetcher<Array<JobSummary>>([
+    summaryUrl,
+    accessToken,
+    "POST",
+    body,
+  ]);
+
+  return { data };
 }

@@ -277,7 +277,8 @@ describe("Job Monitor", () => {
     cy.get("[data-index=2]").click();
     cy.get("[data-index=3]").click();
 
-    cy.get('[data-testid="ReplayIcon"] > path').click();
+    // cy.get('[data-testid="ReplayIcon"] > path').click();
+    cy.get('[aria-label="Reschedule"]').click();
 
     // Make sure the job status is "Received"
     cy.get("[data-index=1]").find("td").eq(2).should("contain", "Received");
@@ -398,147 +399,88 @@ describe("Job Monitor", () => {
 
   it("should handle filter addition", () => {
     cy.get("table").should("be.visible");
-    cy.get("button").contains("Add filter").click();
+    cy.get("[data-testid=search-bar]");
 
-    // "Apply filters" button should not be visible (only the refresh button)
-    cy.get("button").contains("Refresh page").should("exist");
-    cy.get("button").contains("Apply filters").should("not.exist");
+    cy.get("[data-testid=search-field]").type("ID{enter}={enter}1{enter}");
 
-    cy.get(
-      '[data-testid="filter-form-select-parameter"] > .MuiSelect-select',
-    ).click();
-    cy.get('[data-value="JobID"]').click();
-    cy.get("#value").type("1");
-    cy.get('[data-testid="filter-form-add-button"]').contains("Add").click();
-
-    cy.get(".MuiChip-label").should("be.visible");
-    // Filters should not be applied yet
-    cy.get("table tbody tr").should("not.have.length", 1);
-
-    // "Apply filters" button should be visible (not the refresh button)
-    cy.get("button").contains("Apply filters").should("exist");
-    cy.get("button").contains("Refresh page").should("not.exist");
-  });
-
-  it("should handle filter deletion", () => {
-    cy.get("table").should("be.visible");
-    cy.get("button").contains("Add filter").click();
-
-    cy.get(
-      '[data-testid="filter-form-select-parameter"] > .MuiSelect-select',
-    ).click();
-    cy.get('[data-value="JobName"]').click();
-    cy.get("#value").type("test");
-    cy.get('[data-testid="filter-form-add-button"]').contains("Add").click();
-
-    cy.get(".MuiChip-label").should("be.visible");
-
-    cy.get('[data-testid="CancelIcon"]').click();
-    cy.get(".MuiChip-label").should("not.exist");
+    cy.get('[role="group"]').find("button").should("have.length", 3);
   });
 
   it("should handle filter editing", () => {
     cy.get("table").should("be.visible");
-    cy.get("button").contains("Add filter").click();
 
-    cy.get(
-      '[data-testid="filter-form-select-parameter"] > .MuiSelect-select',
-    ).click();
-    cy.get('[data-value="JobName"]').click();
-    cy.get("#value").type("test");
-    cy.get('[data-testid="filter-form-add-button"]').contains("Add").click();
+    cy.get("[data-testid=search-field]").type("Name{enter}={enter}test{enter}");
 
-    cy.get(".MuiChip-label").should("be.visible");
-
-    cy.get(".MuiChip-label").click();
-    cy.get("#value").clear().type("test2");
-    cy.get('[data-testid="filter-form-add-button"]').contains("Add").click();
-
-    cy.get(".MuiChip-label").contains("test2").should("be.visible");
+    cy.get("[data-testid=search-field]").type("{leftArrow}2{enter}");
+    cy.get('[role="group"]').find("button").contains("test2").should("exist");
   });
 
   it("should handle filter clear", () => {
     cy.get("table").should("be.visible");
-    cy.get("button").contains("Add filter").click();
 
-    cy.get(
-      '[data-testid="filter-form-select-parameter"] > .MuiSelect-select',
-    ).click();
-    cy.get('[data-value="JobName"]').click();
-    cy.get("#value").type("test");
-    cy.get('[data-testid="filter-form-add-button"]').contains("Add").click();
+    cy.get("[data-testid=search-field]").type("Name{enter}={enter}test{enter}");
 
-    cy.get(".MuiChip-label").should("be.visible");
+    cy.get("[data-testid=search-field]").type("ID{enter}={enter}1{enter}");
 
-    cy.get("button").contains("Add filter").click();
-    cy.get(
-      '[data-testid="filter-form-select-parameter"] > .MuiSelect-select',
-    ).click();
-    cy.get('[data-value="JobName"]').click();
-    cy.get("#value").type("test2");
-    cy.get('[data-testid="filter-form-add-button"]').contains("Add").click();
+    cy.get('[role="group"]').find("button").should("have.length", 6);
 
-    cy.get(".MuiChip-label").should("be.visible");
+    cy.get('[data-testid="DeleteIcon"]').click();
 
-    cy.get("button").contains("Clear all").click();
-
-    cy.get(".MuiChip-label").should("not.exist");
+    cy.get('[role="group"]').should("not.exist");
   });
 
   it("should handle filter apply and persist", () => {
     cy.get("table").should("be.visible");
-    cy.get("button").contains("Add filter").click();
 
-    let jobId: string;
-
-    // Get the first visible row value (e.g. 55)
+    let jobID: string;
     cy.get("table tbody tr")
       .first()
       .find("td")
       .eq(1)
       .invoke("text")
       .then((text) => {
-        jobId = text.trim();
+        jobID = text.trim();
 
-        cy.get(
-          '[data-testid="filter-form-select-parameter"] > .MuiSelect-select',
-        ).click();
-        cy.get('[data-value="JobID"]').click();
-        cy.get("#value").type(jobId);
+        cy.get("[data-testid=search-field]").type(
+          `ID{enter}={enter}${jobID}{enter}`,
+        );
       });
-    cy.get('[data-testid="filter-form-add-button"]').contains("Add").click();
+    cy.get('[role="group"]').find("button").should("have.length", 3);
+    cy.get('[role="group"]').find("button").contains("ID").should("exist");
 
-    cy.get(".MuiChip-label").should("be.visible");
+    cy.wait(1000);
 
-    cy.get("button").contains("Apply").click();
-    cy.wait(500);
-    cy.reload();
-
-    cy.contains("Job Monitor").click();
-    cy.get(".MuiChip-label").should("be.visible");
     cy.get("table tbody tr").should("have.length", 1);
   });
 
   it("should handle filter apply and save filters in dashboard", () => {
     cy.get("table").should("be.visible");
-    cy.get("button").contains("Add filter").click();
 
-    cy.get(
-      '[data-testid="filter-form-select-parameter"] > .MuiSelect-select',
-    ).click();
-    cy.get('[data-value="JobID"]').click();
-    cy.get("#value").type("5");
-    cy.get('[data-testid="filter-form-add-button"]').contains("Add").click();
+    cy.get("[data-testid=search-field]").type("ID{enter}={enter}5{enter}");
 
-    cy.get(".MuiChip-label").should("be.visible");
+    cy.wait(1000);
 
-    cy.get("button").contains("Apply").click();
-    cy.wait(500);
+    cy.get('[role="group"]').find("button").should("have.length", 3);
+
     cy.get(".MuiButtonBase-root").contains("Job Monitor 2").click();
 
-    cy.get(".MuiChip-label").should("not.exist");
+    cy.get('[role="group"]').should("not.exist");
 
     cy.get(".MuiButtonBase-root").contains("Job Monitor").click();
-    cy.get(".MuiChip-label").should("be.visible");
+
+    cy.get('[role="group"]').find("button").should("have.length", 3);
+  });
+
+  it("should control the in the last operator utilization", () => {
+    cy.get("table").should("be.visible");
+    cy.get("[data-testid=search-field]").type(
+      "Submission Time{enter}in the last{enter}4206942 years{enter}",
+    );
+
+    cy.wait(1000);
+
+    cy.get('[role="group"]').find("button").should("have.length", 3);
+
+    cy.get("table").should("be.visible");
   });
 });
