@@ -35,7 +35,7 @@ import {
   refreshJobs,
   rescheduleJobs,
   useJobs,
-} from "./JobDataService";
+} from "./jobDataService";
 
 /**
  * Job Data Table props

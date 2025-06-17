@@ -61,7 +61,6 @@ export function LoginForm({
     if (isAuthenticated) {
       sessionStorage.removeItem(OIDC_LOGIN_ATTEMPTED_KEY);
       const redirect = getParam("redirect");
-      console.log("Redirecting to:", redirect);
       if (redirect) {
         setPath(redirect);
       } else {

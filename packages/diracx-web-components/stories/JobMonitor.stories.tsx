@@ -1,10 +1,8 @@
 import { StoryObj, Meta } from "@storybook/react";
-import { Paper } from "@mui/material";
-import { ApplicationsContext } from "../src/contexts/ApplicationsProvider";
-import { NavigationProvider } from "../src/contexts/NavigationProvider";
+import { Box } from "@mui/material";
 import { ThemeProvider } from "../src/contexts/ThemeProvider";
 import JobMonitor from "../src/components/JobMonitor/JobMonitor";
-import { setJobsMock, setJobHistoryMock } from "./mocks/JobDataService.mock";
+import { setJobsMock, setJobHistoryMock } from "./mocks/jobDataService.mock";
 
 const meta = {
   title: "Job Monitor/JobMonitor",
@@ -14,49 +12,12 @@ const meta = {
   },
   tags: ["autodocs"],
   decorators: [
-    (Story) => {
-      return (
-        <ThemeProvider>
-          <Paper sx={{ p: 2 }} elevation={5}>
-            <Story />
-          </Paper>
-        </ThemeProvider>
-      );
-    },
     (Story) => (
-      <NavigationProvider
-        getPath={() => "/"}
-        setPath={() => {}}
-        getSearchParams={() => {
-          const url = new URLSearchParams();
-          url.append("appId", "example");
-          return url;
-        }}
-      >
-        <ApplicationsContext.Provider
-          value={[
-            [
-              {
-                title: "group",
-                extended: true,
-                items: [
-                  {
-                    id: "example",
-                    title: "App Name",
-                    type: "test",
-                  },
-                ],
-              },
-            ],
-            () => {},
-            [],
-            "",
-            () => {},
-          ]}
-        >
+      <ThemeProvider>
+        <Box sx={{ height: "50vh" }}>
           <Story />
-        </ApplicationsContext.Provider>
-      </NavigationProvider>
+        </Box>
+      </ThemeProvider>
     ),
   ],
   async beforeEach() {},

@@ -1,5 +1,5 @@
 /* eslint-disable */
-import { Job, JobHistory, SearchBody } from "../../src/types";
+import { Job, JobHistory, SearchBody, JobSummary } from "../../src/types";
 
 // Mock data store for jobs
 let mockJobsResponse: {
@@ -43,11 +43,11 @@ export function setJobHistoryMock(data: {
 
 // Mock implementation of `useJobs`
 export const useJobs = (
-  diracxUrl: string | null,
-  accessToken: string,
-  searchBody: any,
-  page: number,
-  rowsPerPage: number,
+  _diracxUrl: string | null,
+  _accessToken: string,
+  _searchBody: any,
+  _page: number,
+  _rowsPerPage: number,
 ) => {
   if (mockJobsResponse.error) {
     return {
@@ -80,9 +80,9 @@ export const useJobs = (
 
 // Mock implementation of `getJobHistory`
 export const getJobHistory = async (
-  diracxUrl: string | null,
-  jobId: number,
-  accessToken: string,
+  _diracxUrl: string | null,
+  _jobId: number,
+  _accessToken: string,
 ): Promise<{ data: JobHistory[] }> => {
   if (mockJobHistoryResponse.error) {
     throw mockJobHistoryResponse.error;
@@ -92,11 +92,11 @@ export const getJobHistory = async (
 
 // Mock implementation of refreshJobs
 export const refreshJobs = (
-  diracxUrl: string | null,
-  accessToken: string,
-  searchBody: SearchBody,
-  page: number,
-  rowsPerPage: number,
+  _diracxUrl: string | null,
+  _accessToken: string,
+  _searchBody: SearchBody,
+  _page: number,
+  _rowsPerPage: number,
 ) => {
   // Just a mock, doesn't need to do anything
   return Promise.resolve();
@@ -104,9 +104,9 @@ export const refreshJobs = (
 
 // Mock implementation of deleteJobs
 export function deleteJobs(
-  diracxUrl: string | null,
-  selectedIds: readonly number[],
-  accessToken: string,
+  _diracxUrl: string | null,
+  _selectedIds: readonly number[],
+  _accessToken: string,
 ): Promise<{ headers: Headers; data: any }> {
   return Promise.resolve({
     headers: new Headers(),
@@ -116,9 +116,9 @@ export function deleteJobs(
 
 // Mock implementation of killJobs
 export function killJobs(
-  diracxUrl: string | null,
+  _diracxUrl: string | null,
   selectedIds: readonly number[],
-  accessToken: string,
+  _accessToken: string,
 ): Promise<{ headers: Headers; data: any }> {
   return Promise.resolve({
     headers: new Headers(),
@@ -137,9 +137,9 @@ export function killJobs(
 
 // Mock implementation of rescheduleJobs
 export function rescheduleJobs(
-  diracxUrl: string | null,
+  _diracxUrl: string | null,
   selectedIds: readonly number[],
-  accessToken: string,
+  _accessToken: string,
 ): Promise<{ headers: Headers; data: any }> {
   return Promise.resolve({
     headers: new Headers(),
@@ -153,5 +153,59 @@ export function rescheduleJobs(
       ),
       failed: {},
     },
+  });
+}
+
+// Mock implementation of getJobSummary
+export async function getJobSummary(
+  _diracxUrl: string | null,
+  _grouping: string[],
+  _accessToken: string,
+): Promise<{ data: JobSummary[] }> {
+  return Promise.resolve({
+    data: [
+      {
+        Status: "Running",
+        MinorStatus: "None",
+        ApplicationStatus: "Accepted",
+        Site: "SiteA",
+        JobName: "Job 1",
+        JobType: "TypeA",
+        JobGroup: "GroupA",
+        Owner: "UserA",
+        OwnerGroup: "GroupA",
+        VO: "VOA",
+        UserPriority: 100,
+        RescheduleCounter: 0,
+      },
+      {
+        Status: "Completed",
+        MinorStatus: "None",
+        ApplicationStatus: "Finished",
+        Site: "SiteB",
+        JobName: "Job 2",
+        JobType: "TypeB",
+        JobGroup: "GroupB",
+        Owner: "UserB",
+        OwnerGroup: "GroupB",
+        VO: "VOB",
+        UserPriority: 200,
+        RescheduleCounter: 1,
+      },
+      {
+        Status: "Failed",
+        MinorStatus: "Error",
+        ApplicationStatus: "Failed",
+        Site: "SiteC",
+        JobName: "Job 3",
+        JobType: "TypeC",
+        JobGroup: "GroupC",
+        Owner: "UserC",
+        OwnerGroup: "GroupC",
+        VO: "VOC",
+        UserPriority: 300,
+        RescheduleCounter: 2,
+      },
+    ],
   });
 }
