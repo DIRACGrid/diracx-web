@@ -23,10 +23,10 @@ import {
 } from "@tanstack/react-table";
 
 import { useApplicationId } from "../../hooks/application";
-import { FilterToolbar } from "../shared/FilterToolbar";
 import { InternalFilter } from "../../types/Filter";
 import { Job, SearchBody } from "../../types";
 import { JobDataTable } from "./JobDataTable";
+import { JobSearchBar } from "./JobSearchBar";
 
 /**
  * Build the Job Monitor application
@@ -98,7 +98,7 @@ export default function JobMonitor() {
   // Save the state of the app in local storage
   useEffect(() => {
     const state = {
-      filters: [...filters.filter((filter) => filter.isApplied)],
+      filters: [...filters],
       columnVisibility: { ...columnVisibility },
       columnPinning: {
         left: [...(columnPinning.left || [])],
@@ -123,15 +123,10 @@ export default function JobMonitor() {
 
   // Handle the application of filters
   const handleApplyFilters = () => {
-    // Switch the applied state of the filters
-    setFilters((filters) =>
-      filters.map((filter) => ({ ...filter, isApplied: true })),
-    );
-
     setSearchBody((prev) => ({
       ...prev,
       search: filters.map(({ parameter, operator, value, values }) => ({
-        parameter,
+        parameter: fromHumanReadableText(parameter),
         operator,
         value,
         values,
@@ -142,18 +137,6 @@ export default function JobMonitor() {
       pageIndex: 0,
     }));
   };
-
-  const handleRemoveAllFilters = useCallback(() => {
-    setSearchBody((prevState) => ({
-      ...prevState,
-      search: [],
-    }));
-    setPagination((prevState) => ({
-      ...prevState,
-      pageIndex: 0,
-    }));
-    setFilters([]);
-  }, [setFilters]);
 
   // Status colors
   const statusColors: Record<string, string> = useMemo(
@@ -300,12 +283,11 @@ export default function JobMonitor() {
         overflow: "hidden",
       }}
     >
-      <FilterToolbar
-        columns={columns}
+      <JobSearchBar
         filters={filters}
         setFilters={setFilters}
+        searchBody={searchBody}
         handleApplyFilters={handleApplyFilters}
-        handleClearFilters={handleRemoveAllFilters}
       />
       <JobDataTable
         searchBody={searchBody}
@@ -369,4 +351,42 @@ export function validateAndConvertState(state: string): [string, boolean] {
   };
 
   return [JSON.stringify(newState), true];
+}
+
+/**
+ * Converts a human-readable job attribute name to its internal name.
+ * @param name - The human-readable name of the job attribute
+ * @returns The corresponding internal name of the job attribute
+ */
+export function fromHumanReadableText(name: string): string {
+  switch (name) {
+    case "ID":
+      return "JobID";
+    case "Minor Status":
+      return "MinorStatus";
+    case "Application Status":
+      return "ApplicationStatus";
+    case "Name":
+      return "JobName";
+    case "Job Group":
+      return "JobGroup";
+    case "Type":
+      return "JobType";
+    case "Last Update Time":
+      return "LastUpdateTime";
+    case "Last Sign of Life":
+      return "HeartBeatTime";
+    case "Submission Time":
+      return "SubmissionTime";
+    case "Owner Group":
+      return "OwnerGroup";
+    case "Start Execution Time":
+      return "StartExecTime";
+    case "End Execution Time":
+      return "EndExecTime";
+    case "User Priority":
+      return "UserPriority";
+    default:
+      return name; // Return the original name if no match found
+  }
 }
