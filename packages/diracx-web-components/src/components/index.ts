@@ -1,6 +1,9 @@
 // Application list
 export { applicationList } from "./ApplicationList";
 
+// User Documentation
+export { userDocumentation } from "./UserDocumentation";
+
 // Dashboard Layout
 export * from "./DashboardLayout";
 
