@@ -52,6 +52,7 @@ const meta = {
               applicationList,
               currentAppId,
               setCurrentAppId,
+              userDocumentation,
             ]}
           >
             <ThemeProvider>

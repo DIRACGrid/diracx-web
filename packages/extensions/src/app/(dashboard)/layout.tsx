@@ -6,6 +6,7 @@ import { DiracXWebProviders } from "@dirac-grid/diracx-web-components/contexts";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { applicationList } from "@/gubbins/applicationList";
 import { defaultSections } from "@/gubbins/DefaultUserDashboard";
+import { userDocumentation } from "@/gubbins/UserDocumentation";
 
 // Layout for the dashboard: setup the providers and the dashboard for the applications
 export default function DashboardLayout({
@@ -29,6 +30,7 @@ export default function DashboardLayout({
       // You can optionally pass a list of applications and a default user dashboard
       appList={applicationList}
       defaultUserDashboard={defaultSections}
+      userDocumentation={userDocumentation}
     >
       {/* Dashboard is the main layout for the applications, you can optionally give it a custom logo URL and a drawer width */}
       <Dashboard logoURL={customLogoURL} drawerWidth={250}>

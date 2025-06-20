@@ -4,7 +4,9 @@ import React, { createContext, useEffect, useState } from "react";
 import { applicationList } from "../components/applicationList";
 import { defaultDashboard } from "../components/defaultDashboard";
 import { DashboardGroup } from "../types/DashboardGroup";
+import { userDocumentation as userDoc } from "../components/UserDocumentation";
 import ApplicationMetadata from "../types/ApplicationMetadata";
+import { UserDocumentation } from "../types";
 
 // Create a context for the UserDashboard state
 export const ApplicationsContext = createContext<
@@ -14,13 +16,15 @@ export const ApplicationsContext = createContext<
     ApplicationMetadata[],
     string, // Id of the current application
     React.Dispatch<React.SetStateAction<string>>,
+    UserDocumentation,
   ]
->([[], () => {}, [], "", () => {}]);
+>([[], () => {}, [], "", () => {}, userDoc]);
 
 interface ApplicationsProviderProps {
   children: React.ReactNode;
   appList?: ApplicationMetadata[];
   defaultUserDashboard?: DashboardGroup[];
+  userDocumentation?: UserDocumentation;
 }
 
 /**
@@ -29,12 +33,14 @@ interface ApplicationsProviderProps {
  * @param children - The child components to be wrapped by the provider.
  * @param appList - The list of application configurations.
  * @param defaultUserDashboard - The default user dashboard.
+ * @param userDocunentation - The user documentation for the applications.
  * @returns The applications provider.
  */
 export const ApplicationsProvider = ({
   children,
   appList = applicationList,
-  defaultUserDashboard = defaultDashboard,
+  defaultUserDashboard,
+  userDocumentation = userDoc,
 }: ApplicationsProviderProps) => {
   const loadedDashboard = sessionStorage.getItem("savedDashboard");
   const parsedDashboard: DashboardGroup[] = loadedDashboard
@@ -70,6 +76,7 @@ export const ApplicationsProvider = ({
         appList,
         currentAppId,
         setCurrentAppId,
+        userDocumentation,
       ]}
     >
       {children}
