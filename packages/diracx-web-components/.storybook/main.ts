@@ -43,7 +43,7 @@ const config: StorybookConfig = {
         "../stories/mocks/metadata.mock.tsx",
       ),
       "./jobDataService": require.resolve(
-        "../stories/mocks/jobDataService.mock.ts",
+        "../stories/mocks/jobDataService.mock.tsx",
       ),
     };
     return config;

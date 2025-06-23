@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect } from "react";
 import { ColumnDef } from "@tanstack/react-table";
 import { useOidcAccessToken } from "@axa-fr/react-oidc";
 import { useOIDCContext } from "../../hooks/oidcConfiguration";
@@ -44,16 +44,11 @@ export function JobSearchBar({
 }: JobSearchBarProps) {
   const { configuration } = useOIDCContext();
   const { accessToken } = useOidcAccessToken(configuration?.scope);
-  const oldFilters = useRef<string>("");
 
   const diracxUrl = useDiracxUrl();
 
   useEffect(() => {
-    const currentFilters = JSON.stringify(filters);
-    if (oldFilters.current !== currentFilters) {
-      oldFilters.current = currentFilters;
-      handleApplyFilters();
-    }
+    handleApplyFilters();
   }, [filters, handleApplyFilters]);
 
   return (
@@ -135,12 +130,12 @@ async function createSuggestions(
     previousToken.nature === SearchBarTokenNature.CUSTOM ||
     previousToken.nature === SearchBarTokenNature.VALUE
   ) {
-    const items = columns.map((column) => column.header as string);
+    const items = columns.map((column) => String(column.header));
     const type = columns.map(
       (column) => column.meta?.type || CategoryType.STRING,
     ) as CategoryType[];
     const hideSuggestion = columns.map(
-      (column) => column.meta?.hideSuggestion || false,
+      (column) => column.meta?.isQuasiUnique || false,
     );
 
     return {
@@ -165,7 +160,7 @@ async function createSuggestions(
     if (!previousToken.hideSuggestion) {
       // Load the suggestions for the selected category
       const category = fromHumanReadableText(
-        previousEquation.items[0].label as string,
+        String(previousEquation.items[0].label),
         columns,
       );
       await fetchJobSummary(category);

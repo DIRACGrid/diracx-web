@@ -287,6 +287,7 @@ export default function SearchField({
         setInputValue(value);
       }}
       sx={{
+        marginTop: "2px",
         minWidth: "180px",
         width: "auto",
         maxWidth: 0.9,
