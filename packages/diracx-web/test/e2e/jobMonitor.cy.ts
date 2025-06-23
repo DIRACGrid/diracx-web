@@ -200,6 +200,8 @@ describe("Job Monitor", () => {
       }
     });
 
+    cy.wait(1000); // Wait for the table to update
+
     let firstValue: number;
     let lastValue: number;
 
@@ -213,7 +215,7 @@ describe("Job Monitor", () => {
         firstValue = parseInt(text.trim(), 10);
       });
 
-    // Scroll and get the last visible row value (e.g. 6)
+    // Scroll and get the last visible row value
     cy.get('[data-testid="virtuoso-scroller"]')
       .wait(100)
       .scrollTo("bottom", { ensureScrollable: false });
@@ -256,9 +258,9 @@ describe("Job Monitor", () => {
   });
 
   it("should delete jobs", () => {
-    cy.get("[data-index=1]").as("jobItem1");
-    cy.get("[data-index=2]").as("jobItem2");
-    cy.get("[data-index=3]").as("jobItem3");
+    cy.get("[data-index=0]").as("jobItem1");
+    cy.get("[data-index=1]").as("jobItem2");
+    cy.get("[data-index=2]").as("jobItem3");
     cy.get("@jobItem1").click({ force: true });
     cy.get("@jobItem2").click({ force: true });
     cy.get("@jobItem3").click({ force: true });
@@ -272,20 +274,42 @@ describe("Job Monitor", () => {
     cy.get("@jobItem3").find("td").eq(2).should("contain", "Deleted");
   });
 
-  // FIXME
-  // This test can't pass because the reschedule functionality is not completly working yet
-  // it("should reschedule jobs", () => {
-  //   cy.get("[data-index=1]").click({ force: true });
-  //   cy.get("[data-index=2]").click({ force: true });
-  //   cy.get("[data-index=3]").click({ force: true });
+  // ### FIXME: The reschedule functionality is not working as expected ###
+  // The test below would be decommented once the reschedule functionality is fixed in diracx
 
+  // it("should reschedule jobs", () => {
+  //   cy.wait(1000); // Wait for the table to load
+
+  //   cy.get("[data-testid=search-field]").type("Reschedule Counter{enter}!={enter}3{enter}");
+
+  //   cy.wait(1000); // Wait for the search to complete
+
+  //   // Create aliases for the job items
+  //   cy.get("[data-index=0]").as("jobItem1");
+  //   cy.get("[data-index=1]").as("jobItem2");
+  //   cy.get("[data-index=2]").as("jobItem3");
+
+  //   // First, kill the jobs to ensure they can be rescheduled
+  //   cy.get("@jobItem1").click({ force: true });
+  //   cy.get("@jobItem2").click({ force: true });
+  //   cy.get("@jobItem3").click({ force: true });
+
+  //   cy.get('[data-testid="ClearIcon"] > path').click();
+
+  //   // Then, select the jobs to reschedule
+  //   cy.get("@jobItem1").click({ force: true });
+  //   cy.get("@jobItem2").click({ force: true });
+  //   cy.get("@jobItem3").click({ force: true });
+
+  //   cy.get('[data-testid="ReplayIcon"] > path').click({ force: true });
+  //   cy.get('[aria-label="Reschedule"]').click({ force: true });
   //   cy.get('[data-testid="ReplayIcon"] > path').click({ force: true });
   //   cy.get('[aria-label="Reschedule"]').click({ force: true });
 
   //   // Make sure the job status is "Received"
+  //   cy.get("[data-index=0]").find("td").eq(2).should("contain", "Received");
   //   cy.get("[data-index=1]").find("td").eq(2).should("contain", "Received");
   //   cy.get("[data-index=2]").find("td").eq(2).should("contain", "Received");
-  //   cy.get("[data-index=3]").find("td").eq(2).should("contain", "Received");
   // });
 
   /** Column interactions */
@@ -301,17 +325,23 @@ describe("Job Monitor", () => {
       }
     });
 
+    cy.wait(1000); // Wait for the table to load
+
     // Click on the visibility icon
     cy.get('[data-testid="VisibilityIcon"] > path').click();
     cy.get('[data-testid="column-visibility-popover"]').should("be.visible");
 
     // Hide the "Status" column and Show the "VO" column
-    cy.get('[data-testid="column-visibility-popover"]').within(() => {
-      cy.contains("VO").parent().find('input[type="checkbox"]').click();
-    });
-    cy.get('[data-testid="column-visibility-popover"]').within(() => {
-      cy.contains("Status").parent().find('input[type="checkbox"]').click();
-    });
+    cy.get('[data-testid="column-visibility-popover"]')
+      .contains("Status")
+      .parent()
+      .find('input[type="checkbox"]')
+      .click();
+    cy.get('[data-testid="column-visibility-popover"]')
+      .contains("VO")
+      .parent()
+      .find('input[type="checkbox"]')
+      .click();
 
     // Close the popover by clicking outside
     cy.get("body").click(0, 0);
@@ -405,7 +435,7 @@ describe("Job Monitor", () => {
 
     cy.get("[data-testid=search-field]").type("ID{enter}={enter}1{enter}");
 
-    cy.get('[role="group"]').find("button").should("have.length", 3);
+    cy.get('[role="group"]').find("button").should("have.length", 5);
   });
 
   it("should handle filter editing", () => {
@@ -422,13 +452,11 @@ describe("Job Monitor", () => {
 
     cy.get("[data-testid=search-field]").type("Name{enter}={enter}test{enter}");
 
-    cy.get("[data-testid=search-field]").type("ID{enter}={enter}1{enter}");
-
-    cy.get('[role="group"]').find("button").should("have.length", 6);
+    cy.get('[role="group"]').find("button").should("have.length", 5);
 
     cy.get('[data-testid="DeleteIcon"]').click();
 
-    cy.get('[role="group"]').should("not.exist");
+    cy.get('[role="group"]').find("button").should("have.length", 2);
   });
 
   it("should handle filter apply and persist", () => {
@@ -447,7 +475,7 @@ describe("Job Monitor", () => {
           `ID{enter}={enter}${jobID}{enter}`,
         );
       });
-    cy.get('[role="group"]').find("button").should("have.length", 3);
+    cy.get('[role="group"]').find("button").should("have.length", 5);
     cy.get('[role="group"]').find("button").contains("ID").should("exist");
 
     // Wait for the filter to apply
@@ -459,20 +487,32 @@ describe("Job Monitor", () => {
   it("should handle filter apply and save filters in dashboard", () => {
     cy.get("table").should("be.visible");
 
-    cy.get("[data-testid=search-field]").type("ID{enter}={enter}5{enter}");
+    let jobID: string;
+    cy.get("table tbody tr")
+      .first()
+      .find("td")
+      .eq(1)
+      .invoke("text")
+      .then((text) => {
+        jobID = text.trim();
+
+        cy.get("[data-testid=search-field]").type(
+          `ID{enter}={enter}${jobID}{enter}`,
+        );
+      });
 
     // Wait for the filter to apply
     cy.wait(1000);
 
-    cy.get('[role="group"]').find("button").should("have.length", 3);
+    cy.get('[role="group"]').find("button").should("have.length", 5);
 
     cy.get(".MuiButtonBase-root").contains("Job Monitor 2").click();
 
-    cy.get('[role="group"]').should("not.exist");
+    cy.get('[role="group"]').find("button").should("have.length", 2);
 
     cy.get(".MuiButtonBase-root").contains("Job Monitor").click();
 
-    cy.get('[role="group"]').find("button").should("have.length", 3);
+    cy.get('[role="group"]').find("button").should("have.length", 5);
   });
 
   it("should control the in the last operator utilization", () => {
@@ -484,8 +524,21 @@ describe("Job Monitor", () => {
     // Wait for the filter to apply
     cy.wait(1000);
 
-    cy.get('[role="group"]').find("button").should("have.length", 3);
+    cy.get('[role="group"]').find("button").should("have.length", 5);
 
     cy.get("table").should("be.visible");
+  });
+
+  /** Sunburst */
+
+  it("should render the sunburst chart", () => {
+    // Click on the sunburst button
+    cy.get('[role="group"]').last().click();
+
+    // Make sure the sunburst chart is visible
+    cy.get('[data-testid="sunburst-chart"]').should("be.visible");
+
+    // Make sure the column selector is visible
+    cy.get('[data-testid="column-selector"]').should("be.visible");
   });
 });

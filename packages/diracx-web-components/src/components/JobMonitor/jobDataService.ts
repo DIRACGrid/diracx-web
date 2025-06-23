@@ -1,8 +1,9 @@
 "use client";
 
-import useSWR, { mutate } from "swr";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
+
+import { useEffect, useState } from "react";
 
 dayjs.extend(utc);
 import { fetcher } from "../../hooks/utils";
@@ -11,6 +12,11 @@ import type { JobSummary } from "../../types";
 
 type TimeUnit = "minute" | "hour" | "day" | "month" | "year";
 
+/**
+ * Convert the 'last' operator in the search body to a date filter.
+ * @param searchBody The search body to be processed
+ * @returns The processed search body with adjusted filters
+ */
 function processSearchBody(searchBody: SearchBody) {
   searchBody.search = searchBody.search?.map((filter: Filter) => {
     if (filter.operator == "last") {
@@ -41,63 +47,6 @@ function processSearchBody(searchBody: SearchBody) {
     return filter;
   });
 }
-
-/**
- * Custom hook for fetching jobs data.
- *
- * @param diracxUrl - The base URL of the DiracX API.
- * @param accessToken - The access token for authentication.
- * @param searchBody - The search body for filtering jobs.
- * @param page - The page number for pagination.
- * @param rowsPerPage - The number of rows per page.
- * @returns The response from the API call.
- */
-export const useJobs = (
-  diracxUrl: string | null,
-  accessToken: string,
-  searchBody: SearchBody,
-  page: number,
-  rowsPerPage: number,
-) => {
-  const urlGetJobs = diracxUrl
-    ? `${diracxUrl}/api/jobs/search?page=${page + 1}&per_page=${rowsPerPage}`
-    : null;
-
-  processSearchBody(searchBody);
-
-  return useSWR(
-    urlGetJobs ? [urlGetJobs, accessToken, "POST", searchBody] : null,
-    (args) => fetcher<Job[]>(args),
-    {
-      revalidateOnFocus: false,
-    },
-  );
-};
-
-/**
- * Refreshes the jobs by mutating the SWR cache with the search body and pagination values
- *
- * @param diracxUrl - The base URL of the DiracX API.
- * @param accessToken - The access token for authentication.
- * @param searchBody - The search body containing the filters and search criteria.
- * @param page - The page number for pagination.
- * @param rowsPerPage - The number of rows per page for pagination.
- */
-export const refreshJobs = (
-  diracxUrl: string | null,
-  accessToken: string,
-  searchBody: SearchBody,
-  page: number,
-  rowsPerPage: number,
-) => {
-  if (!diracxUrl) {
-    throw new Error("Invalid URL generated for refreshing jobs.");
-  }
-
-  const urlGetJobs = `${diracxUrl}/api/jobs/search?page=${page + 1}&per_page=${rowsPerPage}`;
-  processSearchBody(searchBody);
-  mutate([urlGetJobs, accessToken, "POST", searchBody]);
-};
 
 /**
  * Deletes jobs with the specified IDs.
@@ -284,4 +233,83 @@ export async function getJobSummary(
   ]);
 
   return { data };
+}
+
+/**
+ * Custom hook for fetching jobs data.
+ *
+ * @param diracxUrl - The base URL of the DiracX API.
+ * @param accessToken - The access token for authentication.
+ * @param searchBody - The search body for filtering jobs.
+ * @param page - The page number for pagination.
+ * @param rowsPerPage - The number of rows per page.
+ * @returns The response from the API call.
+ */
+export function useJobs(
+  diracxUrl: string | null,
+  accessToken: string,
+  searchBody: SearchBody,
+  page: number,
+  rowsPerPage: number,
+) {
+  const [data, setData] = useState<Job[] | null>([]);
+  const [headers, setHeaders] = useState<Headers>(new Headers());
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [error, setError] = useState<Error | null>(null);
+
+  useEffect(() => {
+    if (!diracxUrl) {
+      setData(null);
+      setIsLoading(false);
+      setError(Error("Invalid URL generated for fetching jobs."));
+      return;
+    }
+
+    let cancelled = false;
+
+    async function fetchJobs() {
+      setIsLoading(true);
+
+      const urlGetJobs = `${diracxUrl}/api/jobs/search?page=${page + 1}&per_page=${rowsPerPage}`;
+      try {
+        processSearchBody(searchBody);
+
+        const body = {
+          search: searchBody?.search || [],
+          sort: searchBody?.sort || [],
+        };
+
+        // Expect the response to be an array of objects with all the grouping fields
+        const res = await fetcher<Job[]>([
+          urlGetJobs,
+          accessToken,
+          "POST",
+          body,
+        ]);
+
+        if (!cancelled) {
+          setData(res.data);
+          setIsLoading(false);
+          setHeaders(res.headers);
+          setError(null);
+        }
+      } catch {
+        setData(null);
+        setIsLoading(false);
+        setError(Error("Failed to fetch jobs"));
+      }
+    }
+    fetchJobs();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [diracxUrl, accessToken, searchBody, page, rowsPerPage]);
+
+  return {
+    headers,
+    data,
+    isLoading,
+    error,
+  };
 }

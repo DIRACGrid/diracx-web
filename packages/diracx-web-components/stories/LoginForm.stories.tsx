@@ -68,7 +68,7 @@ const meta = {
   },
   tags: ["autodocs"],
   argTypes: {
-    logoURL: { control: "text" },
+    logoURL: { control: { disable: true } },
   },
   decorators: [
     (Story) => {
