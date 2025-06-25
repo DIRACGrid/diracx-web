@@ -16,7 +16,7 @@ import {
   Toolbar,
   useTheme,
 } from "@mui/material";
-import { MenuBook, Add } from "@mui/icons-material";
+import { MenuBook, Add, TipsAndUpdates } from "@mui/icons-material";
 import React, { useContext, useEffect, useState } from "react";
 import { monitorForElements } from "@atlaskit/pragmatic-drag-and-drop/element/adapter";
 import { extractClosestEdge } from "@atlaskit/pragmatic-drag-and-drop-hitbox/closest-edge";
@@ -24,6 +24,7 @@ import { ApplicationsContext } from "../../contexts/ApplicationsProvider";
 import { DashboardGroup } from "../../types";
 import DrawerItemGroup from "./DrawerItemGroup";
 import AppDialog from "./ApplicationDialog";
+import HelpOverlay from "./HelpOverlay";
 
 interface DashboardDrawerProps {
   /** The variant of the drawer. Usually temporary if on mobile and permanent otherwise. */
@@ -77,6 +78,8 @@ export default function DashboardDrawer({
   const [renamingItemId, setRenamingItemId] = useState<string | null>(null);
   const [renamingGroupId, setRenamingGroupId] = useState<string | null>(null);
   const [renameValue, setRenameValue] = useState("");
+
+  const [helpOpen, setHelpOpen] = useState(false);
 
   // Define the applications that are accessible to users.
   // Each application has an associated icon and path.
@@ -456,6 +459,15 @@ export default function DashboardDrawer({
                 <ListItemText primary={"Add application"} />
               </ListItemButton>
             </ListItem>
+            <ListItem key={"User Guide"}>
+              <ListItemButton
+                onClick={() => setHelpOpen(true)}
+                data-testid="user-guide-button"
+              >
+                <ListItemIcon>{<TipsAndUpdates />}</ListItemIcon>
+                <ListItemText primary={"User Guide"} />
+              </ListItemButton>
+            </ListItem>
             <ListItem key={"Documentation"}>
               <ListItemButton target="_blank" href={docURL}>
                 <ListItemIcon>{<MenuBook />}</ListItemIcon>
@@ -523,6 +535,8 @@ export default function DashboardDrawer({
         setAppDialogOpen={setAppDialogOpen}
         handleCreateApp={handleAppCreation}
       />
+
+      <HelpOverlay isOpen={helpOpen} closeHelp={() => setHelpOpen(false)} />
     </>
   );
 }

@@ -6,3 +6,4 @@ export * from "./SearchBody";
 export * from "./Job";
 export * from "./JobHistory";
 export * from "./ApplicationSettings";
+export * from "./UserDocumentation";

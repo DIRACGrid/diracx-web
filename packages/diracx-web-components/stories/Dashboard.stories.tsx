@@ -4,6 +4,7 @@ import { Box } from "@mui/material";
 import { ApplicationsContext } from "../src/contexts/ApplicationsProvider";
 import { NavigationProvider } from "../src/contexts/NavigationProvider";
 import { applicationList } from "../src/components/ApplicationList";
+import { userDocumentation } from "../src/components/UserDocumentation";
 import { DashboardGroup } from "../src/types/DashboardGroup";
 import Dashboard from "../src/components/DashboardLayout/Dashboard";
 import { ThemeProvider } from "../src/contexts/ThemeProvider";
@@ -52,6 +53,7 @@ const meta = {
               applicationList,
               currentAppId,
               setCurrentAppId,
+              userDocumentation,
             ]}
           >
             <ThemeProvider>

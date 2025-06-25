@@ -12,6 +12,7 @@ import {
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { applicationList } from "@/gubbins/ApplicationList";
 import { defaultSections } from "@/gubbins/DefaultUserDashboard";
+import { userDocumentation } from "@/gubbins/UserDocumentation";
 
 // Layout for the dashboard: setup the providers and the dashboard for the applications
 export default function DashboardLayout({
@@ -38,6 +39,7 @@ export default function DashboardLayout({
       <ApplicationsProvider
         appList={applicationList}
         defaultUserDashboard={defaultSections}
+        userDocumentation={userDocumentation}
       >
         {/* OIDCSecure is used to make sure the user is authenticated before accessing the dashboard */}
         <OIDCSecure>
