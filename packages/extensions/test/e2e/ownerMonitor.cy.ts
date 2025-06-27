@@ -3,7 +3,7 @@
 describe("Job Monitor", () => {
   beforeEach(() => {
     cy.session("login", () => {
-      cy.visit("/");
+      cy.visit("/auth");
       //login
       cy.get('[data-testid="button-login"]').click();
       cy.get("#login").type("admin@example.com");
@@ -17,12 +17,16 @@ describe("Job Monitor", () => {
     });
 
     // Visit the page where the Job Monitor is rendered
-    cy.visit(
-      "/?appId=OwnerMonitor1&dashboard=%5B3Gubbins+Apps%27~extended%21true~items%21%5B-020.04~data%21%5B%5D%29%2C3Job2Job.Job4%29%5D%29%5D*Monitor-%28%27title%21%27.*1%27~type%21%270Owner2s%27~id%21%273-My+4+*%27%014320.-*_",
-    );
+    cy.window().then((win) => {
+      win.sessionStorage.setItem(
+        "savedDashboard",
+        '[{"title":"Group 2","extended":true,"items":[{"title":"Owner Monitor","id":"JOwner Monitor0","type":"Owner Monitor"},{"title":"Owner Monitor 2","id":"Owner Monitor 21","type":"Owner Monitor"}]}]',
+      );
+    });
   });
 
   it("should render the drawer", () => {
+    cy.wait(20000);
     cy.get("header").contains("Owner Monitor").should("be.visible");
   });
 
