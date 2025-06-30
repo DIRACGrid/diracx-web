@@ -1,6 +1,6 @@
 /// <reference types="cypress" />
 
-describe("Job Monitor", () => {
+describe("Owner Monitor", () => {
   beforeEach(() => {
     cy.session("login", () => {
       cy.visit("/auth");
@@ -23,10 +23,11 @@ describe("Job Monitor", () => {
         '[{"title":"Group 2","extended":true,"items":[{"title":"Owner Monitor","id":"JOwner Monitor0","type":"Owner Monitor"},{"title":"Owner Monitor 2","id":"Owner Monitor 21","type":"Owner Monitor"}]}]',
       );
     });
+
+    cy.visit("/");
   });
 
   it("should render the drawer", () => {
-    cy.wait(20000);
     cy.get("header").contains("Owner Monitor").should("be.visible");
   });
 
@@ -51,8 +52,13 @@ describe("Job Monitor", () => {
   });
 
   /** Column interactions */
-
   it("should hide/show columns", () => {
+    // Type the new owner name
+    cy.get('[data-testid="owner-name-input"]').type("Josephine");
+
+    // Click the Add Owner button
+    cy.contains("button", "Add Owner").click();
+
     // Click on the visibility icon
     cy.get('[data-testid="VisibilityIcon"] > path').click();
     cy.get('[data-testid="column-visibility-popover"]').should("be.visible");

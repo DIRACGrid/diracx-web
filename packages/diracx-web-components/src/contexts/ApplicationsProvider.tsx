@@ -1,7 +1,8 @@
 "use client";
 
 import React, { createContext, useEffect, useState } from "react";
-import { applicationList } from "../components/ApplicationList";
+import { applicationList } from "../components/applicationList";
+import { defaultDashboard } from "../components/defaultDashboard";
 import { DashboardGroup } from "../types/DashboardGroup";
 import ApplicationMetadata from "../types/ApplicationMetadata";
 
@@ -33,7 +34,7 @@ interface ApplicationsProviderProps {
 export const ApplicationsProvider = ({
   children,
   appList = applicationList,
-  defaultUserDashboard,
+  defaultUserDashboard = defaultDashboard,
 }: ApplicationsProviderProps) => {
   const loadedDashboard = sessionStorage.getItem("savedDashboard");
   const parsedDashboard: DashboardGroup[] = loadedDashboard
@@ -51,21 +52,7 @@ export const ApplicationsProvider = ({
   useEffect(() => {
     if (userDashboard.length !== 0) return;
 
-    setUserDashboard(
-      defaultUserDashboard || [
-        {
-          title: "My dashboard",
-          extended: true,
-          items: [
-            {
-              title: "My Jobs",
-              type: "Job Monitor",
-              id: "JobMonitor0",
-            },
-          ],
-        },
-      ],
-    );
+    setUserDashboard(defaultUserDashboard);
   }, [appList, defaultUserDashboard]);
 
   // Save the dashboard in session storage

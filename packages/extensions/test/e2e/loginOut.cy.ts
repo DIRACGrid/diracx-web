@@ -7,7 +7,7 @@ describe("Login and Logout", () => {
     // so we must tell it to visit our website with the `cy.visit()` command.
     // Since we want to visit the same URL at the start of all our tests,
     // we include it in our beforeEach function so that it runs before each test
-    cy.visit("/");
+    cy.visit("/auth");
   });
 
   it("login", () => {
@@ -43,6 +43,8 @@ describe("Login and Logout", () => {
     // From now on the user is logged in
     // The login buttton should not be present anymore
     cy.get('[data-testid="button-login"]').should("not.exist");
+
+    cy.visit("/");
     cy.contains("Owners").should("exist");
 
     // Click on the user avatar

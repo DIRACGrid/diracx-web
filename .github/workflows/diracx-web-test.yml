@@ -25,7 +25,7 @@ jobs:
     - name: Clone source
       run: |
         cd ..
-        git clone https://github.com/aldbr/diracx-charts.git -b main_FIX_diracx-web-install-resources
+        git clone https://github.com/DIRACGrid/diracx-charts.git
 
     - name: Start demo
       run: |

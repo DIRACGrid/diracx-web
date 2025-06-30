@@ -53,7 +53,7 @@ jobs:
   #   standalone setup.                                                         #
   prepare-gubbins-backend:
     runs-on: ubuntu-latest
-    if: github.event_name == 'push' #${{ github.event_name != 'push' || github.repository == 'DIRACGrid/diracx-web' }}
+    if: ${{ github.event_name != 'push' || github.repository == 'DIRACGrid/diracx-web' }}
     defaults:
       run:
         # We need extglob for REFERENCE_BRANCH substitution
@@ -152,7 +152,7 @@ jobs:
 
   prepare-gubbins-frontend-as-a-standalone:
     runs-on: ubuntu-latest
-    if: github.event_name == 'push' #${{ github.event_name != 'push' || github.repository == 'DIRACGrid/diracx-web' }}
+    if: ${{ github.event_name != 'push' || github.repository == 'DIRACGrid/diracx-web' }}
     steps:
       - uses: actions/checkout@v4
 
@@ -246,14 +246,14 @@ jobs:
   run-demo:
     runs-on: ubuntu-latest
     needs: [prepare-gubbins-frontend-as-a-standalone, prepare-gubbins-backend]
-    if: github.event_name == 'push' #github.event_name != 'push' || github.repository == 'DIRACGrid/diracx-web'
+    if: github.event_name != 'push' || github.repository == 'DIRACGrid/diracx-web'
     steps:
     - uses: actions/checkout@v4 
       
     - name: Clone source
       run: |
         cd ..
-        git clone https://github.com/TheauW/diracx-charts.git -b twartel-fix-ci
+        git clone https://github.com/DIRACGrid/diracx-charts.git
 
     # ========================================================================#
     # WARNING: In your CI/CD pipeline, you should remove the following steps  #
@@ -330,3 +330,10 @@ jobs:
         browser: chrome
         config: baseUrl=${{ env.DIRACX_URL }}
         project: /tmp/gubbins-web
+    
+    - name: Upload Cypress screenshots
+      if: failure()  
+      uses: actions/upload-artifact@v4
+      with:
+        name: cypress-screenshots
+        path: /tmp/gubbins-web/cypress/screenshots
