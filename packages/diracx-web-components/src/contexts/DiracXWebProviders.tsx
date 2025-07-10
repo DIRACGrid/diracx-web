@@ -1,5 +1,8 @@
 "use client";
 
+import type { ApplicationMetadata, DashboardGroup } from "../types";
+
+import { OIDCSecure } from "../components";
 import {
   OIDCConfigurationProvider,
   ThemeProvider,
@@ -12,6 +15,8 @@ interface DiracXWebProvidersProps {
   getPath: () => string;
   setPath: (path: string) => void;
   getSearchParams: () => URLSearchParams;
+  appList?: ApplicationMetadata[];
+  defaultUserDashboard?: DashboardGroup[];
 }
 
 export function DiracXWebProviders({
@@ -19,6 +24,8 @@ export function DiracXWebProviders({
   getPath,
   setPath,
   getSearchParams,
+  appList,
+  defaultUserDashboard,
 }: DiracXWebProvidersProps) {
   return (
     <OIDCConfigurationProvider>
@@ -27,8 +34,13 @@ export function DiracXWebProviders({
         setPath={setPath}
         getSearchParams={getSearchParams}
       >
-        <ApplicationsProvider>
-          <ThemeProvider>{children}</ThemeProvider>
+        <ApplicationsProvider
+          appList={appList}
+          defaultUserDashboard={defaultUserDashboard}
+        >
+          <ThemeProvider>
+            <OIDCSecure>{children}</OIDCSecure>
+          </ThemeProvider>
         </ApplicationsProvider>
       </NavigationProvider>
     </OIDCConfigurationProvider>

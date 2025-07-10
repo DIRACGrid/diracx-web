@@ -6,7 +6,7 @@ The applicatins created here will be available for DiracX-Web and for all the ex
 
 ### Declare the application
 
-In the file `packages/diracx-web-components/src/components/ApplicationList.ts` you can extend the `applicationList` with your new app. 
+In the file `packages/diracx-web-components/src/components/applicationList.ts` you can extend the `applicationList` with your new app. 
 
 You must provide: 
 - A clear and explicit name

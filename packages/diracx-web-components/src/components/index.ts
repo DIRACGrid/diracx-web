@@ -1,5 +1,5 @@
 // Application list
-export { applicationList } from "./ApplicationList";
+export { applicationList } from "./applicationList";
 
 // Dashboard Layout
 export * from "./DashboardLayout";

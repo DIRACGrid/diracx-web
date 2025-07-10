@@ -2,10 +2,7 @@
 import React from "react";
 import { Box } from "@mui/material";
 import { DiracXWebProviders } from "@dirac-grid/diracx-web-components/contexts";
-import {
-  OIDCSecure,
-  Dashboard,
-} from "@dirac-grid/diracx-web-components/components";
+import { Dashboard } from "@dirac-grid/diracx-web-components/components";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 export default function DashboardLayout({
@@ -25,22 +22,20 @@ export default function DashboardLayout({
         }}
         getSearchParams={() => searchParams}
       >
-        <OIDCSecure>
-          <Dashboard>
-            <Box
-              sx={{
-                ml: "1%",
-                mr: "1%",
-                display: "flex",
-                flexDirection: "column",
-                flexGrow: 1,
-                overflow: "hidden",
-              }}
-            >
-              {children}
-            </Box>
-          </Dashboard>
-        </OIDCSecure>
+        <Dashboard>
+          <Box
+            sx={{
+              ml: "1%",
+              mr: "1%",
+              display: "flex",
+              flexDirection: "column",
+              flexGrow: 1,
+              overflow: "hidden",
+            }}
+          >
+            {children}
+          </Box>
+        </Dashboard>
       </DiracXWebProviders>
     </section>
   );

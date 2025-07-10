@@ -3,7 +3,7 @@ import type { Meta, StoryObj } from "@storybook/react";
 import { Box } from "@mui/material";
 import { ApplicationsContext } from "../src/contexts/ApplicationsProvider";
 import { NavigationProvider } from "../src/contexts/NavigationProvider";
-import { applicationList } from "../src/components/ApplicationList";
+import { applicationList } from "../src/components/applicationList";
 import { DashboardGroup } from "../src/types/DashboardGroup";
 import Dashboard from "../src/components/DashboardLayout/Dashboard";
 import { ThemeProvider } from "../src/contexts/ThemeProvider";
