@@ -1,5 +1,5 @@
 "use client";
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useState, useEffect, useCallback } from "react";
 import { useOidcAccessToken } from "@axa-fr/react-oidc";
 import {
   fetcher,
@@ -34,7 +34,7 @@ export default function OwnerMonitor() {
   });
 
   // Fetch the list of owners
-  const fetchOwners = async () => {
+  const fetchOwners = useCallback(async () => {
     try {
       setIsLoading(true);
       const response = await fetcher<string[]>([
@@ -53,7 +53,7 @@ export default function OwnerMonitor() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [accessToken]);
 
   // Handle adding a new owner
   const handleAddOwner = async () => {
@@ -90,6 +90,10 @@ export default function OwnerMonitor() {
     getCoreRowModel: getCoreRowModel(),
     onPaginationChange: setPagination,
   });
+
+  useEffect(() => {
+    fetchOwners();
+  }, [fetchOwners]);
 
   return (
     <Box

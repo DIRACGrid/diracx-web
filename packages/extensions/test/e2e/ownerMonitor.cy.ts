@@ -53,12 +53,6 @@ describe("Owner Monitor", () => {
 
   /** Column interactions */
   it("should hide/show columns", () => {
-    // Type the new owner name
-    cy.get('[data-testid="owner-name-input"]').type("Josephine");
-
-    // Click the Add Owner button
-    cy.contains("button", "Add Owner").click();
-
     // Click on the visibility icon
     cy.get('[data-testid="VisibilityIcon"] > path').click();
     cy.get('[data-testid="column-visibility-popover"]').should("be.visible");
