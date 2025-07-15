@@ -131,7 +131,7 @@ function DataTableToolbar<T extends Record<string, unknown>>({
       )}
       {numSelected > 0 ? (
         <Stack direction="row">
-          <Tooltip title="Get IDs">
+          <Tooltip title={`Get ID${numSelected > 1 ? "s" : ""}`}>
             <IconButton onClick={handleCopyIDs}>
               <FormatListBulleted />
             </IconButton>
@@ -212,7 +212,7 @@ export interface DataTableProps<T extends Record<string, unknown>> {
   totalRows: number;
   /** The search body to send along with the request */
   searchBody: SearchBody;
-  /** The function to call when the search body changes */
+  /** Function to set the search body */
   setSearchBody: React.Dispatch<React.SetStateAction<SearchBody>>;
   /** The error message */
   error: string | null;
@@ -394,8 +394,10 @@ export function DataTable<T extends Record<string, unknown>>({
         <DataTableToolbar
           title={title}
           table={table}
-          numSelected={Object.keys(table.getState().rowSelection).length}
-          selectedIds={Object.keys(table.getState().rowSelection).map(Number)}
+          numSelected={table.getSelectedRowModel().rows.length}
+          selectedIds={table
+            .getSelectedRowModel()
+            .rows.map((row) => Number(row.id))}
           toolbarComponents={toolbarComponents}
         />
         <TableVirtuoso
@@ -422,8 +424,9 @@ export function DataTable<T extends Record<string, unknown>>({
                   >
                     <Checkbox
                       indeterminate={
-                        table.getIsSomeRowsSelected() &&
-                        !table.getIsAllRowsSelected()
+                        table.getSelectedRowModel().rows.length > 0 &&
+                        table.getSelectedRowModel().rows.length <
+                          table.getState().pagination.pageSize
                       }
                       checked={table.getIsAllRowsSelected()}
                       onChange={table.getToggleAllRowsSelectedHandler()}

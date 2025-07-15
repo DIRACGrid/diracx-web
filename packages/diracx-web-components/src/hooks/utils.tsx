@@ -40,10 +40,14 @@ export async function fetcher<T>(
     throw new Error(errorMessage);
   }
 
-  const data = (await response.json()) as T;
-  const responseHeaders = response.headers;
+  if (response.status === 204) {
+    // No content response, return empty data
+    return { headers: response.headers, data: {} as T };
+  }
 
-  return { headers: responseHeaders, data };
+  const data = (await response.json()) as T;
+
+  return { headers: response.headers, data };
 }
 
 /**
