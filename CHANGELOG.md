@@ -1,5 +1,23 @@
 # Changelog
 
+## [0.1.0-a7](https://github.com/DIRACGrid/diracx-web/compare/v0.1.0-a6...v0.1.0-a7) (2025-07-16)
+
+
+### Features
+
+* new Search Bar for the Job Monitor ([4bbc9a9](https://github.com/DIRACGrid/diracx-web/commit/4bbc9a97c8bb4dd324e550847813ec4789599423))
+* new Search Bar for the Job Monitor ([8c759ae](https://github.com/DIRACGrid/diracx-web/commit/8c759ae3ec4ac9dca44b0ca74739e1b6df2ec5b2))
+* save and load from the local storage ([725a952](https://github.com/DIRACGrid/diracx-web/commit/725a9527240030a6c39bc5f853e64a5b97720860))
+* save and load in/from local storage ([2688537](https://github.com/DIRACGrid/diracx-web/commit/2688537d05b01d45fbe858315ac4d0fa504471a5))
+
+
+### Bug Fixes
+
+* fix the tests of gubbins ([f6dfa3f](https://github.com/DIRACGrid/diracx-web/commit/f6dfa3f76a1d018b17a05294924024583f84b7ec))
+* gubbins tests ([e4e2b00](https://github.com/DIRACGrid/diracx-web/commit/e4e2b005c131c14b570a5f7fea3332cbb19a6041))
+* owner monitor ([c93d4cf](https://github.com/DIRACGrid/diracx-web/commit/c93d4cf8e9cc914bb06c4c16b35d2748861b6f5b))
+* remove the second definition of the application provider ([818adc6](https://github.com/DIRACGrid/diracx-web/commit/818adc6e9e15127f6dd694f13db6334301731db5))
+
 ## [0.1.0-a6](https://github.com/DIRACGrid/diracx-web/compare/v0.1.0-a5...v0.1.0-a6) (2025-05-28)
 
 
