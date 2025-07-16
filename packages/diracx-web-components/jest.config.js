@@ -13,7 +13,7 @@ const config = {
   moduleNameMapper: {
     "^@axa-fr/react-oidc$": "<rootDir>/stories/mocks/react-oidc.mock.tsx",
     "^../../hooks/metadata$": "<rootDir>/stories/mocks/metadata.mock.tsx",
-    "^./JobDataService$": "<rootDir>/stories/mocks/JobDataService.mock.tsx",
+    "^./jobDataService$": "<rootDir>/stories/mocks/jobDataService.mock.ts",
   },
 };
 

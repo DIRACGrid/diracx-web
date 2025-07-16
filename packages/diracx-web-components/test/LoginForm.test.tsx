@@ -2,6 +2,7 @@ import { render, screen, fireEvent } from "@testing-library/react";
 import { composeStories } from "@storybook/react";
 import * as stories from "../stories/LoginForm.stories";
 import { useOidc } from "../stories/mocks/react-oidc.mock";
+import "@testing-library/jest-dom";
 
 const { SingleVO, MultiVO, Error, Loading } = composeStories(stories);
 

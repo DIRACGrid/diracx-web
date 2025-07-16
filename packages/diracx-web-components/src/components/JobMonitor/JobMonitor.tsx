@@ -20,13 +20,14 @@ import {
   RowSelectionState,
   VisibilityState,
   PaginationState,
+  ColumnDef,
 } from "@tanstack/react-table";
 
 import { useApplicationId } from "../../hooks/application";
-import { FilterToolbar } from "../shared/FilterToolbar";
-import { InternalFilter } from "../../types/Filter";
-import { Job, SearchBody } from "../../types";
+import { Filter } from "../../types/Filter";
+import { Job, SearchBody, CategoryType } from "../../types";
 import { JobDataTable } from "./JobDataTable";
+import { JobSearchBar } from "./JobSearchBar";
 
 /**
  * Build the Job Monitor application
@@ -44,14 +45,14 @@ export default function JobMonitor() {
     typeof initialState === "string" ? JSON.parse(initialState) : null;
 
   // State for filters
-  const [filters, setFilters] = useState<InternalFilter[]>(
+  const [filters, setFilters] = useState<Filter[]>(
     parsedInitialState ? parsedInitialState.filters : [],
   );
 
   // State for search body
   const [searchBody, setSearchBody] = useState<SearchBody>({
     search: parsedInitialState
-      ? parsedInitialState.filters.map((filter: InternalFilter) => ({
+      ? parsedInitialState.filters.map((filter: Filter) => ({
           parameter: filter.parameter,
           operator: filter.operator,
           value: filter.value,
@@ -98,7 +99,7 @@ export default function JobMonitor() {
   // Save the state of the app in local storage
   useEffect(() => {
     const state = {
-      filters: [...filters.filter((filter) => filter.isApplied)],
+      filters: [...filters],
       columnVisibility: { ...columnVisibility },
       columnPinning: {
         left: [...(columnPinning.left || [])],
@@ -123,15 +124,10 @@ export default function JobMonitor() {
 
   // Handle the application of filters
   const handleApplyFilters = () => {
-    // Switch the applied state of the filters
-    setFilters((filters) =>
-      filters.map((filter) => ({ ...filter, isApplied: true })),
-    );
-
     setSearchBody((prev) => ({
       ...prev,
       search: filters.map(({ parameter, operator, value, values }) => ({
-        parameter,
+        parameter: fromHumanReadableText(parameter, columns),
         operator,
         value,
         values,
@@ -142,18 +138,6 @@ export default function JobMonitor() {
       pageIndex: 0,
     }));
   };
-
-  const handleRemoveAllFilters = useCallback(() => {
-    setSearchBody((prevState) => ({
-      ...prevState,
-      search: [],
-    }));
-    setPagination((prevState) => ({
-      ...prevState,
-      pageIndex: 0,
-    }));
-    setFilters([]);
-  }, [setFilters]);
 
   // Status colors
   const statusColors: Record<string, string> = useMemo(
@@ -213,13 +197,17 @@ export default function JobMonitor() {
       columnHelper.accessor("JobID", {
         id: "JobID",
         header: "ID",
-        meta: { type: "number" },
+        meta: { type: CategoryType.NUMBER, hideSuggestion: true },
       }),
       columnHelper.accessor("Status", {
         id: "Status",
         header: "Status",
         cell: (info) => renderStatusCell(info.getValue()),
-        meta: { type: "category", values: Object.keys(statusColors).sort() },
+        meta: {
+          type: CategoryType.STRING,
+          values: Object.keys(statusColors).sort(),
+          hideSuggestion: false,
+        },
       }),
       columnHelper.accessor("MinorStatus", {
         id: "MinorStatus",
@@ -248,17 +236,17 @@ export default function JobMonitor() {
       columnHelper.accessor("LastUpdateTime", {
         id: "LastUpdateTime",
         header: "Last Update Time",
-        meta: { type: "date" },
+        meta: { type: CategoryType.DATE, hideSuggestion: true },
       }),
       columnHelper.accessor("HeartBeatTime", {
         id: "HeartBeatTime",
         header: "Last Sign of Life",
-        meta: { type: "date" },
+        meta: { type: CategoryType.DATE, hideSuggestion: true },
       }),
       columnHelper.accessor("SubmissionTime", {
         id: "SubmissionTime",
         header: "Submission Time",
-        meta: { type: "date" },
+        meta: { type: CategoryType.DATE, hideSuggestion: true },
       }),
       columnHelper.accessor("Owner", {
         id: "Owner",
@@ -275,17 +263,22 @@ export default function JobMonitor() {
       columnHelper.accessor("StartExecTime", {
         id: "StartExecTime",
         header: "Start Execution Time",
-        meta: { type: "date" },
+        meta: { type: CategoryType.DATE, hideSuggestion: true },
       }),
       columnHelper.accessor("EndExecTime", {
         id: "EndExecTime",
         header: "End Execution Time",
-        meta: { type: "date" },
+        meta: { type: CategoryType.DATE, hideSuggestion: true },
       }),
       columnHelper.accessor("UserPriority", {
         id: "UserPriority",
         header: "User Priority",
-        meta: { type: "number" },
+        meta: { type: CategoryType.NUMBER },
+      }),
+      columnHelper.accessor("RescheduleCounter", {
+        id: "RescheduleCounter",
+        header: "Reschedule Counter",
+        meta: { type: CategoryType.NUMBER },
       }),
     ],
     [columnHelper, renderStatusCell, statusColors],
@@ -300,12 +293,12 @@ export default function JobMonitor() {
         overflow: "hidden",
       }}
     >
-      <FilterToolbar
-        columns={columns}
+      <JobSearchBar
         filters={filters}
         setFilters={setFilters}
+        searchBody={searchBody}
         handleApplyFilters={handleApplyFilters}
-        handleClearFilters={handleRemoveAllFilters}
+        columns={columns}
       />
       <JobDataTable
         searchBody={searchBody}
@@ -369,4 +362,22 @@ export function validateAndConvertState(state: string): [string, boolean] {
   };
 
   return [JSON.stringify(newState), true];
+}
+
+/**
+ * Converts a human-readable job attribute name to its internal name.
+ * @param name - The human-readable name of the job attribute
+ * @param columns - The array of column definitions
+ * @returns The corresponding internal name of the job attribute
+ */
+export function fromHumanReadableText(
+  name: string,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  columns: ColumnDef<Job, any>[],
+): string {
+  const index = columns.findIndex((column) => column.header === name);
+  if (index !== -1) {
+    return columns[index].id || name; // Return the id if it exists, otherwise
+  }
+  return name;
 }

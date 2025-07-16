@@ -42,8 +42,8 @@ const config: StorybookConfig = {
       "../../hooks/metadata": require.resolve(
         "../stories/mocks/metadata.mock.tsx",
       ),
-      "./JobDataService": require.resolve(
-        "../stories/mocks/JobDataService.mock.tsx",
+      "./jobDataService": require.resolve(
+        "../stories/mocks/jobDataService.mock.ts",
       ),
     };
     return config;

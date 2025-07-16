@@ -64,6 +64,15 @@ export default [
       "react/prop-types": "off",
       "react/react-in-jsx-scope": "off",
       "react/destructuring-assignment": ["error", "always"],
+      "@typescript-eslint/no-unused-vars": [
+        "error",
+        {
+          argsIgnorePattern: "^_",
+          varsIgnorePattern: "^_",
+          caughtErrorsIgnorePattern: "^_",
+          ignoreRestSiblings: true,
+        },
+      ],
       "no-restricted-properties": [
         "error",
         {
