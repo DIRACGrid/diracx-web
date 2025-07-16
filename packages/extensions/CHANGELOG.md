@@ -1,5 +1,22 @@
 # Changelog
 
+## [0.1.0-a7](https://github.com/DIRACGrid/diracx-web/compare/v0.1.0-a6...v0.1.0-a7) (2025-07-16)
+
+
+### Bug Fixes
+
+* fix the tests of gubbins ([f6dfa3f](https://github.com/DIRACGrid/diracx-web/commit/f6dfa3f76a1d018b17a05294924024583f84b7ec))
+* gubbins tests ([e4e2b00](https://github.com/DIRACGrid/diracx-web/commit/e4e2b005c131c14b570a5f7fea3332cbb19a6041))
+* owner monitor ([c93d4cf](https://github.com/DIRACGrid/diracx-web/commit/c93d4cf8e9cc914bb06c4c16b35d2748861b6f5b))
+* remove the second definition of the application provider ([818adc6](https://github.com/DIRACGrid/diracx-web/commit/818adc6e9e15127f6dd694f13db6334301731db5))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @dirac-grid/diracx-web-components bumped from 0.1.0-a6 to 0.1.0-a7
+
 ## [0.1.0-a6](https://github.com/DIRACGrid/diracx-web/compare/v0.1.0-a5...v0.1.0-a6) (2025-05-28)
 
 
