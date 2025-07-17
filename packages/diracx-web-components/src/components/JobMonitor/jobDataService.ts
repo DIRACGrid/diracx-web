@@ -114,9 +114,25 @@ export function deleteJobs(
   if (!diracxUrl) {
     throw new Error("Invalid URL generated for deleting jobs.");
   }
-  const queryString = selectedIds.map((id) => `job_ids=${id}`).join("&");
-  const deleteUrl = `${diracxUrl}/api/jobs/?${queryString}`;
-  return fetcher([deleteUrl, accessToken, "DELETE"]);
+
+  const deleteUrl = `${diracxUrl}/api/jobs/status`;
+
+  const currentDate = dayjs()
+    .utc()
+    .format("YYYY-MM-DDTHH:mm:ss.SSSSSS[Z]")
+    .toString();
+
+  const body = selectedIds.reduce((acc: StatusBody, jobId) => {
+    acc[jobId] = {
+      [currentDate]: {
+        Status: "Deleted",
+        MinorStatus: "Marked for deletion",
+        Source: "JobManager",
+      },
+    };
+    return acc;
+  }, {});
+  return fetcher([deleteUrl, accessToken, "PATCH", body]);
 }
 
 type JobBulkResponse = {
