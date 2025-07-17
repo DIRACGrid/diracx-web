@@ -3,9 +3,9 @@
 import type { ApplicationMetadata, DashboardGroup } from "../types";
 
 import { OIDCSecure } from "../components";
+import { ThemeProvider } from "./ThemeProvider";
 import {
   OIDCConfigurationProvider,
-  ThemeProvider,
   NavigationProvider,
   ApplicationsProvider,
 } from "./index";

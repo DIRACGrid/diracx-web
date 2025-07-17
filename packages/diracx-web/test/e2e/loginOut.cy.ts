@@ -75,12 +75,12 @@ describe("Login and Logout", () => {
     // Make sure we are on the /auth page
     cy.url().should("include", "/auth");
 
-    const currentUrl = cy.url();
+    cy.url().then((currentUrl) => {
+      cy.wait(2000); // Wait 2 seconds to let a possible infinite loop happen
 
-    cy.wait(5000); // Wait 5 seconds to let a possible infinite loop happen
-
-    // Check that the URL has not changed
-    cy.url().should("eq", currentUrl);
+      // Check that the URL has not changed
+      cy.url().should("eq", currentUrl);
+    });
 
     // Login
     cy.get('[data-testid="button-login"]').click();
@@ -94,6 +94,6 @@ describe("Login and Logout", () => {
     cy.url().should("include", "/auth");
 
     // The user is redirected to the dashboard page
-    cy.url().should("eq", Cypress.config().baseUrl);
+    cy.url().should("eq", Cypress.config().baseUrl + "/");
   });
 });
