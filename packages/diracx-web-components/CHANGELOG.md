@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.1.0-a8](https://github.com/DIRACGrid/diracx-web/compare/v0.1.0-a7...v0.1.0-a8) (2025-07-17)
+
+
+### Bug Fixes
+
+* prevent abuse of redirect behavior ([7e00d98](https://github.com/DIRACGrid/diracx-web/commit/7e00d983f434910ad90f93a0813ab86edf555e7a))
+* prevent abuse of redirect behavior ([eba3b7b](https://github.com/DIRACGrid/diracx-web/commit/eba3b7bc4f9d394074215986e6d3c15b546b25d5))
+
 ## [0.1.0-a7](https://github.com/DIRACGrid/diracx-web/compare/v0.1.0-a6...v0.1.0-a7) (2025-07-16)
 
 
