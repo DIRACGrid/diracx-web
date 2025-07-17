@@ -18,19 +18,14 @@ export function OIDCSecure({ children }: OIDCProps) {
   const { configuration } = useOIDCContext();
   const { isAuthenticated } = useOidc(configuration?.scope);
   const { setPath } = useContext(NavigationContext);
+  const pathName = useContext(NavigationContext).getPath();
 
   useEffect(() => {
     // Redirect to login page if not authenticated
-    if (!isAuthenticated) {
-      setPath(
-        "/auth?" +
-          // URLSearchParams to ensure that auth redirects users to the URL they came from
-          new URLSearchParams({
-            redirect: window.location.pathname + window.location.search,
-          }).toString(),
-      );
+    if (!isAuthenticated && !pathName.startsWith("/auth")) {
+      setPath("/auth");
     }
-  }, [isAuthenticated, setPath]);
+  }, [isAuthenticated, setPath, pathName]);
 
   return <>{children}</>;
 }

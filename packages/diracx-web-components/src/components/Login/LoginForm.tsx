@@ -14,8 +14,6 @@ import { Stack } from "@mui/material";
 import { useOidc } from "@axa-fr/react-oidc";
 import { useMetadata, Metadata } from "../../hooks/metadata";
 import { useOIDCContext } from "../../hooks/oidcConfiguration";
-
-import { useSearchParamsUtils } from "../../hooks/searchParamsUtils";
 import { NavigationContext } from "../../contexts/NavigationProvider";
 import { useDiracxUrl } from "../../hooks";
 
@@ -39,7 +37,6 @@ export function LoginForm({
   const { configuration, setConfiguration } = useOIDCContext();
   const { isAuthenticated, login } = useOidc(configuration?.scope);
   const { setPath } = useContext(NavigationContext);
-  const { getParam } = useSearchParamsUtils();
   const OIDC_LOGIN_ATTEMPTED_KEY = "oidcLoginAttempted";
 
   // Login if not authenticated
@@ -60,14 +57,10 @@ export function LoginForm({
     // Redirect to dashboard if already authenticated
     if (isAuthenticated) {
       sessionStorage.removeItem(OIDC_LOGIN_ATTEMPTED_KEY);
-      const redirect = getParam("redirect");
-      if (redirect) {
-        setPath(redirect);
-      } else {
-        setPath("/");
-      }
+      // Redirect to the root path
+      setPath("/");
     }
-  }, [getParam, isAuthenticated, setPath]);
+  }, [isAuthenticated, setPath]);
 
   // Get default group
   const getDefaultGroup = (
