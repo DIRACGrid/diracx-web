@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.1.0-a9](https://github.com/DIRACGrid/diracx-web/compare/v0.1.0-a8...v0.1.0-a9) (2025-07-18)
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @dirac-grid/diracx-web-components bumped from 0.1.0-a8 to 0.1.0-a9
+
 ## [0.1.0-a8](https://github.com/DIRACGrid/diracx-web/compare/v0.1.0-a7...v0.1.0-a8) (2025-07-17)
 
 
