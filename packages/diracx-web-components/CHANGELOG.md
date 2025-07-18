@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.1.0-a9](https://github.com/DIRACGrid/diracx-web/compare/v0.1.0-a8...v0.1.0-a9) (2025-07-18)
+
+
+### Bug Fixes
+
+* tests and change the source in the request ([dc06d4e](https://github.com/DIRACGrid/diracx-web/commit/dc06d4ebd3a385143bea6a3a281fe8d7f1c6c8cd))
+* use the status endpoint instead of delete ([4d3f322](https://github.com/DIRACGrid/diracx-web/commit/4d3f322778b3a5d09264180adf8a8cb3515e211f))
+
 ## [0.1.0-a8](https://github.com/DIRACGrid/diracx-web/compare/v0.1.0-a7...v0.1.0-a8) (2025-07-17)
 
 
