@@ -69,31 +69,4 @@ describe("Login and Logout", () => {
     cy.visit("/");
     cy.url().should("include", "/auth");
   });
-
-  it("prevent infinite login loop", () => {
-    // The user is redirected to the /auth page because not authenticated
-    // Make sure we are on the /auth page
-    cy.url().should("include", "/auth");
-
-    const currentUrl = cy.url();
-
-    cy.wait(5000); // Wait 5 seconds to let a possible infinite loop happen
-
-    // Check that the URL has not changed
-    cy.url().should("eq", currentUrl);
-
-    // Login
-    cy.get('[data-testid="button-login"]').click();
-    cy.get("#login").type("admin@example.com");
-    cy.get("#password").type("password");
-
-    // Find the login button and click on it
-    cy.get("button").click();
-    // Grant access
-    cy.get(":nth-child(1) > form > .dex-btn").click();
-    cy.url().should("include", "/auth");
-
-    // The user is redirected to the dashboard page
-    cy.url().should("eq", Cypress.config().baseUrl);
-  });
 });

@@ -105,18 +105,36 @@ export const refreshJobs = (
  * @param diracxUrl - The base URL of the DiracX API.
  * @param selectedIds - An array of job IDs to delete.
  * @param accessToken - The authentication token.
+ * @param accessTokenPayload - Information about the user.
  */
 export function deleteJobs(
   diracxUrl: string | null,
   selectedIds: readonly number[],
   accessToken: string,
+  accessTokenPayload: Record<string, number | string>,
 ) {
   if (!diracxUrl) {
     throw new Error("Invalid URL generated for deleting jobs.");
   }
-  const queryString = selectedIds.map((id) => `job_ids=${id}`).join("&");
-  const deleteUrl = `${diracxUrl}/api/jobs/?${queryString}`;
-  return fetcher([deleteUrl, accessToken, "DELETE"]);
+
+  const deleteUrl = `${diracxUrl}/api/jobs/status`;
+
+  const currentDate = dayjs()
+    .utc()
+    .format("YYYY-MM-DDTHH:mm:ss.SSSSSS[Z]")
+    .toString();
+
+  const body = selectedIds.reduce((acc: StatusBody, jobId) => {
+    acc[jobId] = {
+      [currentDate]: {
+        Status: "Deleted",
+        MinorStatus: "Marked for deletion",
+        Source: `User: ${accessTokenPayload["preferred_username"]}`,
+      },
+    };
+    return acc;
+  }, {});
+  return fetcher([deleteUrl, accessToken, "PATCH", body]);
 }
 
 type JobBulkResponse = {
@@ -143,13 +161,15 @@ type StatusBody = {
  *
  * @param diracxUrl - The base URL of the DiracX API.
  * @param selectedIds - An array of job IDs to be killed.
- * @param token - The authentication token.
+ * @param accessToken - The authentication token.
+ * @param accessTokenPayload - Information about the user.
  * @returns A Promise that resolves to an object containing the response headers and data.
  */
 export function killJobs(
   diracxUrl: string | null,
   selectedIds: readonly number[],
   accessToken: string,
+  accessTokenPayload: Record<string, number | string>,
 ): Promise<{ headers: Headers; data: JobBulkResponse }> {
   if (!diracxUrl) {
     throw new Error("Invalid URL generated for killing jobs.");
@@ -165,7 +185,7 @@ export function killJobs(
       [currentDate]: {
         Status: "Killed",
         MinorStatus: "Marked for termination",
-        Source: "JobManager",
+        Source: `User: ${accessTokenPayload["preferred_username"]}`,
       },
     };
     return acc;
