@@ -89,7 +89,9 @@ export function JobDataTable({
 }: JobDataTableProps) {
   // Authentication
   const { configuration } = useOIDCContext();
-  const { accessToken } = useOidcAccessToken(configuration?.scope);
+  const { accessToken, accessTokenPayload } = useOidcAccessToken(
+    configuration?.scope,
+  );
 
   const diracxUrl = useDiracxUrl();
 
@@ -144,7 +146,7 @@ export function JobDataTable({
     setBackdropOpen(true);
     try {
       const selectedIds = Object.keys(rowSelection).map(Number);
-      await deleteJobs(diracxUrl, selectedIds, accessToken);
+      await deleteJobs(diracxUrl, selectedIds, accessToken, accessTokenPayload);
       setBackdropOpen(false);
       refreshJobs(
         diracxUrl,
@@ -189,7 +191,12 @@ export function JobDataTable({
     setBackdropOpen(true);
     try {
       const selectedIds = Object.keys(rowSelection).map(Number);
-      const { data } = await killJobs(diracxUrl, selectedIds, accessToken);
+      const { data } = await killJobs(
+        diracxUrl,
+        selectedIds,
+        accessToken,
+        accessTokenPayload,
+      );
 
       const failedJobs = Object.entries(data.failed).map(
         ([jobId, error]) => `Job ${jobId}: ${error.detail}`,
