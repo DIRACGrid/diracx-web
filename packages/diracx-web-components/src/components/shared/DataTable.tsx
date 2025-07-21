@@ -199,7 +199,7 @@ function DataTableToolbar<T extends Record<string, unknown>>({
  * @property {function} setSearchBody - the function to call when the search body changes
  * @property {Column<T>[]} columns - the columns of the table
  * @property {T[]} rows - the rows of the table
- * @property {string | null} error - the error message
+ * @property {Error | null} error - the error message
  * @property {JSX.Element} toolbarComponents - the components to display in the toolbar
  * @property {MenuItem[]} menuItems - the menu items
  */
@@ -214,10 +214,8 @@ export interface DataTableProps<T extends Record<string, unknown>> {
   searchBody: SearchBody;
   /** The function to call when the search body changes */
   setSearchBody: React.Dispatch<React.SetStateAction<SearchBody>>;
-  /** The error message */
-  error: string | null;
-  /** Whether the table is validating */
-  isValidating: boolean;
+  /** The error or null if no error */
+  error: Error | null;
   /** Whether the table is loading */
   isLoading: boolean;
   /** The components to display in the toolbar */
@@ -239,7 +237,6 @@ export function DataTable<T extends Record<string, unknown>>({
   setSearchBody,
   error,
   isLoading,
-  isValidating,
   toolbarComponents,
   menuItems,
 }: DataTableProps<T>) {
@@ -348,10 +345,10 @@ export function DataTable<T extends Record<string, unknown>>({
   // Handle no data
   const noData = !rows || rows.length === 0;
 
-  if (isValidating || isLoading || error || noData) {
+  if (isLoading || error || noData) {
     return (
       <Box sx={{ width: "100%", marginTop: 2 }}>
-        {isValidating || isLoading ? (
+        {isLoading ? (
           <Skeleton
             variant="rectangular"
             animation="pulse"
@@ -361,7 +358,8 @@ export function DataTable<T extends Record<string, unknown>>({
           />
         ) : error ? (
           <Alert severity="error">
-            An error occurred while fetching data. Reload the page.
+            {error.message ||
+              "An error occurred while fetching data. Reload the page."}
           </Alert>
         ) : (
           <Alert severity="info">

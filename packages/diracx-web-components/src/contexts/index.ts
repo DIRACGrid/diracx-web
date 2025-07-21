@@ -6,10 +6,5 @@ export {
   OIDCConfigurationContext,
   OIDCConfigurationProvider,
 } from "./OIDCConfigurationProvider";
-export {
-  ThemeContext,
-  ThemeProvider,
-  type ThemeProviderProps,
-} from "./ThemeProvider";
+export { DiracXWebProviders } from "./DiracXWebProviders";
 export * from "./NavigationProvider";
-export * from "./DiracXWebProviders";

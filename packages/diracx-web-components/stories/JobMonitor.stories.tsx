@@ -2,7 +2,7 @@ import { StoryObj, Meta } from "@storybook/react";
 import { Box } from "@mui/material";
 import { ThemeProvider } from "../src/contexts/ThemeProvider";
 import JobMonitor from "../src/components/JobMonitor/JobMonitor";
-import { setJobsMock, setJobHistoryMock } from "./mocks/jobDataService.mock";
+import { JobMockProvider } from "./mocks/contexts.mock";
 
 const meta = {
   title: "Job Monitor/JobMonitor",
@@ -105,48 +105,56 @@ const jobHistory = [
     Source: "Storybook",
   },
 ];
+export const Default: Story = {
+  args: {},
+  decorators: [
+    (Story) => {
+      return (
+        <JobMockProvider
+          jobs={jobs}
+          jobHistory={jobHistory}
+          error={null}
+          isLoading={false}
+        >
+          <Story key="default" />
+        </JobMockProvider>
+      );
+    },
+  ],
+};
 
 export const Loading: Story = {
   args: {},
   decorators: [
     (Story) => {
-      setJobsMock({
-        jobs: null,
-        error: null,
-        isLoading: true,
-      });
-
-      setJobHistoryMock({
-        jobHistory: jobHistory,
-        error: null,
-        isLoading: false,
-      });
-
-      return <Story />;
+      return (
+        <JobMockProvider
+          jobs={null}
+          jobHistory={null}
+          error={null}
+          isLoading={true}
+        >
+          <Story />
+        </JobMockProvider>
+      );
     },
   ],
 };
 
-export const Error: Story = {
+export const WithError: Story = {
   args: {},
   decorators: [
     (Story) => {
-      setJobsMock({
-        jobs: null,
-        error: {
-          message: "Error loading jobs",
-          name: "Error",
-        },
-        isLoading: false,
-      });
-
-      setJobHistoryMock({
-        jobHistory: jobHistory,
-        error: null,
-        isLoading: false,
-      });
-
-      return <Story />;
+      return (
+        <JobMockProvider
+          jobs={null}
+          jobHistory={null}
+          error={new Error("Custom error message here")}
+          isLoading={false}
+        >
+          <Story />
+        </JobMockProvider>
+      );
     },
   ],
 };
@@ -155,40 +163,16 @@ export const Empty: Story = {
   args: {},
   decorators: [
     (Story) => {
-      setJobsMock({
-        jobs: [],
-        error: null,
-        isLoading: false,
-      });
-
-      setJobHistoryMock({
-        jobHistory: [],
-        error: null,
-        isLoading: false,
-      });
-
-      return <Story />;
-    },
-  ],
-};
-
-export const Default: Story = {
-  args: {},
-  decorators: [
-    (Story) => {
-      setJobsMock({
-        jobs: jobs,
-        error: null,
-        isLoading: false,
-      });
-
-      setJobHistoryMock({
-        jobHistory: jobHistory,
-        error: null,
-        isLoading: false,
-      });
-
-      return <Story />;
+      return (
+        <JobMockProvider
+          jobs={[]}
+          jobHistory={[]}
+          error={null}
+          isLoading={false}
+        >
+          <Story />
+        </JobMockProvider>
+      );
     },
   ],
 };

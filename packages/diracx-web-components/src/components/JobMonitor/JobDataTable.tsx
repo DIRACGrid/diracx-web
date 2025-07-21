@@ -32,7 +32,6 @@ import {
   deleteJobs,
   getJobHistory,
   killJobs,
-  refreshJobs,
   rescheduleJobs,
   useJobs,
 } from "./jobDataService";
@@ -109,20 +108,21 @@ export function JobDataTable({
   // State for job history
   const [isHistoryDialogOpen, setIsHistoryDialogOpen] = useState(false);
   const [jobHistoryData, setJobHistoryData] = useState<JobHistory[]>([]);
-
   /**
    * Fetches the jobs from the /api/jobs/search endpoint
    */
-  const { data, error, isLoading, isValidating } = useJobs(
+  const {
+    data: results,
+    headers: dataHeader,
+    error: dataError,
+    isLoading,
+  } = useJobs(
     diracxUrl,
     accessToken,
     searchBody,
     pagination.pageIndex,
     pagination.pageSize,
   );
-
-  const dataHeader = data?.headers;
-  const results = useMemo(() => data?.data || [], [data?.data]);
 
   // Parse the headers to get the first item, last item and number of items
   const contentRange = dataHeader?.get("content-range");
@@ -148,13 +148,10 @@ export function JobDataTable({
       const selectedIds = Object.keys(rowSelection).map(Number);
       await deleteJobs(diracxUrl, selectedIds, accessToken, accessTokenPayload);
       setBackdropOpen(false);
-      refreshJobs(
-        diracxUrl,
-        accessToken,
-        searchBody,
-        pagination.pageIndex,
-        pagination.pageSize,
-      );
+      // Refresh the data manually
+      setSearchBody((prev) => {
+        return { ...prev };
+      });
       clearSelected();
       setSnackbarInfo({
         open: true,
@@ -206,13 +203,12 @@ export function JobDataTable({
       );
 
       setBackdropOpen(false);
-      refreshJobs(
-        diracxUrl,
-        accessToken,
-        searchBody,
-        pagination.pageIndex,
-        pagination.pageSize,
-      );
+
+      // Refresh the data manually
+      setSearchBody((prev) => {
+        return { ...prev };
+      });
+
       clearSelected();
       // Handle Snackbar Messaging
       if (successfulJobs.length > 0 && failedJobs.length > 0) {
@@ -278,13 +274,10 @@ export function JobDataTable({
       );
 
       setBackdropOpen(false);
-      refreshJobs(
-        diracxUrl,
-        accessToken,
-        searchBody,
-        pagination.pageIndex,
-        pagination.pageSize,
-      );
+      // Refresh the data manually
+      setSearchBody((prev) => {
+        return { ...prev };
+      });
       clearSelected();
       // Handle Snackbar Messaging
       if (successfulJobs.length > 0 && failedJobs.length > 0) {
@@ -412,7 +405,7 @@ export function JobDataTable({
    * Table instance
    */
   const table = useReactTable({
-    data: results,
+    data: useMemo(() => results || [], [results]),
     columns,
     state: {
       columnVisibility,
@@ -450,9 +443,8 @@ export function JobDataTable({
         totalRows={totalJobs}
         searchBody={searchBody}
         setSearchBody={setSearchBody}
-        error={error}
+        error={dataError}
         isLoading={isLoading}
-        isValidating={isValidating}
         toolbarComponents={toolbarComponents}
         menuItems={menuItems}
       />

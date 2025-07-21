@@ -142,7 +142,6 @@ export default function OwnerMonitor() {
         setSearchBody={() => {}}
         error={null}
         isLoading={isLoading}
-        isValidating={isLoading}
         toolbarComponents={<></>}
         menuItems={[]}
       />
