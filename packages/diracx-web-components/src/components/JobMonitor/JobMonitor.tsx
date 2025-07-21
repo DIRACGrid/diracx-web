@@ -21,6 +21,7 @@ import {
   Box,
   ToggleButtonGroup,
   ToggleButton,
+  Tooltip,
 } from "@mui/material";
 
 import { TableChart, DonutSmall } from "@mui/icons-material";
@@ -108,7 +109,7 @@ export default function JobMonitor() {
         },
   );
 
-  const [chartType, setChartType] = useState("table");
+  const [chartType, setChartType] = useState("CHART_TYPE_TABLE");
 
   // Save the state of the app in local storage
   useEffect(() => {
@@ -292,7 +293,11 @@ export default function JobMonitor() {
         values,
       })),
     }));
-  }, [filters, columns]);
+    setPagination((prev) => ({
+      ...prev,
+      pageIndex: 0, // Reset to the first page when applying filters
+    }));
+  }, [filters, columns, setSearchBody, setPagination]);
 
   return (
     <Box
@@ -319,7 +324,7 @@ export default function JobMonitor() {
         <PlotTypeSelector plotType={chartType} setPlotType={setChartType} />
       </Box>
 
-      {chartType === "table" && (
+      {chartType === "CHART_TYPE_TABLE" && (
         <JobDataTable
           searchBody={searchBody}
           setSearchBody={setSearchBody}
@@ -335,7 +340,7 @@ export default function JobMonitor() {
           statusColors={statusColors}
         />
       )}
-      {chartType === "sunburst" && (
+      {chartType === "CHART_TYPE_SUNBURST" && (
         <JobSunburst
           searchBody={searchBody}
           statusColors={statusColors}
@@ -434,12 +439,16 @@ export function PlotTypeSelector({
         }}
         aria-label="text alignment"
       >
-        <ToggleButton value="table" aria-label="left aligned">
-          <TableChart fontSize="large" />
-        </ToggleButton>
-        <ToggleButton value="sunburst" aria-label="centered">
-          <DonutSmall fontSize="large" />
-        </ToggleButton>
+        <Tooltip title="Table view">
+          <ToggleButton value="CHART_TYPE_TABLE" aria-label="left aligned">
+            <TableChart fontSize="large" />
+          </ToggleButton>
+        </Tooltip>
+        <Tooltip title="Sunburst view">
+          <ToggleButton value="CHART_TYPE_SUNBURST" aria-label="centered">
+            <DonutSmall fontSize="large" />
+          </ToggleButton>
+        </Tooltip>
       </ToggleButtonGroup>
     </>
   );

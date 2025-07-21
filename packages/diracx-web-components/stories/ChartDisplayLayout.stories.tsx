@@ -59,16 +59,17 @@ type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {
   args: {
-    Chart: <div>Nothing</div>,
+    chart: <div>Nothing</div>,
     columnList: ["Column 1", "Column 2", "Column 3"],
     groupColumns: ["Column 1"],
     setGroupColumns: () => {},
+    currentPath: [],
     setCurrentPath: () => {},
     defaultColumns: ["Column 1"],
     title: "Select Columns",
   },
   argTypes: {
-    Chart: {
+    chart: {
       control: { type: "select" },
       options: ["Sunburst", "None"],
       mapping: {
@@ -85,15 +86,17 @@ export const Default: Story = {
   },
   render: (args) => {
     const [groupColumns, setGroupColumns] = useState(args.groupColumns);
+    const [currentPath, setCurrentPath] = useState(args.currentPath);
 
     return (
       <ThemeProvider>
         <ChartDisplayLayout
-          Chart={args.Chart}
+          chart={args.chart}
           columnList={args.columnList}
           groupColumns={groupColumns}
           setGroupColumns={setGroupColumns}
-          setCurrentPath={args.setCurrentPath}
+          currentPath={currentPath}
+          setCurrentPath={setCurrentPath}
           defaultColumns={args.defaultColumns}
           title={args.title}
         />

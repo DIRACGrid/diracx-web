@@ -31,6 +31,8 @@ interface SelectColumnsProps {
   groupColumns: string[];
   /** Setter for groupColumns */
   setGroupColumns: React.Dispatch<React.SetStateAction<string[]>>;
+  /** The current path in the tree */
+  currentPath: string[];
   /** Setter for the current path in the tree */
   setCurrentPath: React.Dispatch<React.SetStateAction<string[]>>;
   /** Default columns to use */
@@ -50,6 +52,7 @@ export function ColumnSelector({
   columnList,
   groupColumns,
   setGroupColumns,
+  currentPath,
   setCurrentPath,
   defaultColumns: defaultGroupColumns,
   title = "Column Selector",
@@ -65,14 +68,17 @@ export function ColumnSelector({
     if (event.target.value === "None") {
       // Delete a column
       newGroups = newGroups.filter((_elt, index) => index !== depth);
-      if (newGroups.length > 0)
-        setCurrentPath((currentPath) => currentPath.slice(0, depth - 1));
+      if (newGroups.length > 0 && currentPath.length > depth)
+        setCurrentPath((currentPath) =>
+          currentPath.slice(0, Math.max(0, depth - 1)),
+        );
     } else {
       // Add or change a column
       if (newGroups[depth]) {
         // Change the column
         newGroups[depth] = event.target.value;
-        setCurrentPath((currentPath) => currentPath.slice(0, depth));
+        if (currentPath.length > depth)
+          setCurrentPath((currentPath) => currentPath.slice(0, depth));
       } else {
         // Add a column
         newGroups.push(event.target.value);

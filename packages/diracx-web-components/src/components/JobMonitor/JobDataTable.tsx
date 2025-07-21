@@ -405,7 +405,7 @@ export function JobDataTable({
    * Table instance
    */
   const table = useReactTable({
-    data: results || [],
+    data: useMemo(() => results || [], [results]),
     columns,
     state: {
       columnVisibility,

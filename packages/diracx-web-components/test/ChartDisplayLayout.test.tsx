@@ -19,9 +19,9 @@ describe("ChartDisplayLayout", () => {
   });
 
   it("renders with columns", () => {
-    render(<Default groupColumns={["Custom Column 1", "Custom Column 2"]} />);
+    render(<Default groupColumns={["Column 1", "Column 2"]} />);
 
-    expect(screen.getByDisplayValue("Custom Column 1")).toBeInTheDocument();
-    expect(screen.getByDisplayValue("Custom Column 2")).toBeInTheDocument();
+    expect(screen.getByDisplayValue("Column 1")).toBeInTheDocument();
+    expect(screen.getByDisplayValue("Column 2")).toBeInTheDocument();
   });
 });
