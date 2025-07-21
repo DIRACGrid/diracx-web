@@ -149,7 +149,7 @@ export const WithError: Story = {
         <JobMockProvider
           jobs={null}
           jobHistory={null}
-          error={Error("Custom error message here")}
+          error={new Error("Custom error message here")}
           isLoading={false}
         >
           <Story />

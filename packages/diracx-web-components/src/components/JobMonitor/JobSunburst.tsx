@@ -82,7 +82,7 @@ export function JobSunburst({
   ]);
 
   const defaultColors = scaleOrdinal(
-    quantize(interpolateRainbow, tree?.children?.length || 0 + 1),
+    quantize(interpolateRainbow, (tree?.children?.length ?? 0) + 1),
   );
 
   function colorScales(name: string, _size: number, _depth: number): string {
@@ -116,10 +116,11 @@ export function JobSunburst({
 
   return (
     <ChartDisplayLayout
-      Chart={Chart}
+      chart={Chart}
       columnList={columnList}
       groupColumns={groupColumns}
       setGroupColumns={setGroupColumns}
+      currentPath={currentPath}
       setCurrentPath={setCurrentPath}
       defaultColumns={["Status"]}
       title={"Columns to plot"}
@@ -262,17 +263,17 @@ function buildTree(
 function sizeToText(size: number, total?: number): string {
   if (size > 1e9)
     return (
-      `${(size / 1e9).toFixed(1)} billion jobs` +
+      `${(size / 1e9).toFixed(2)}B \njobs` +
       (total ? ` (${((size / total) * 100).toFixed(2)}%)` : "")
     );
   if (size > 1e6)
     return (
-      `${(size / 1e6).toFixed(1)} million jobs` +
+      `${(size / 1e6).toFixed(2)}M \njobs` +
       (total ? ` (${((size / total) * 100).toFixed(2)}%)` : "")
     );
   if (size > 1e3)
     return (
-      `${(size / 1e3).toFixed(1)} thousand\njobs` +
+      `${(size / 1e3).toFixed(2)}k \njobs` +
       (total ? ` (${((size / total) * 100).toFixed(2)}%)` : "")
     );
   if (size > 1)

@@ -17,6 +17,7 @@
 
 
 ## Use the table
+By default, the jobs are displayed in a table. If you are viewing them in another chart, you can click the table button next to the search bar to switch back to the table view.
 The table displays the jobs that match the criteria specified in the search bar. Each row represents a job, and the columns show various attributes of the job, such as its ID, status, type, and submission date.
 
 ### Actions on the table
@@ -32,3 +33,5 @@ You can select one or more jobs by clicking on the checkboxes next to each job. 
 - **Kill**: This button will kill the selected jobs.
 - **Delete**: This button will delete the selected jobs.
 
+## Use the Pie Chart
+You can change the visualization to use a pie chart with the button next to the search bar. The pie chart provides a hierarchical view of the jobs based on their attributes. The `Columns to plot` component lets you choose your criteria for visualizing the jobs. The chart can display two levels, and you can then click on a section of the chart to zoom into that category and see more details.

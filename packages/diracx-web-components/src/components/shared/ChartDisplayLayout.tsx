@@ -6,13 +6,15 @@ import { ColumnSelector } from "./ColumnSelector";
 
 interface ChartDisplayLayoutProps {
   /** The chart to be displayed */
-  Chart: JSX.Element;
+  chart: JSX.Element;
   /** List of columns available for selection */
   columnList: string[];
   /** Currently selected group columns */
   groupColumns: string[];
   /** Function to set the group columns */
   setGroupColumns: React.Dispatch<React.SetStateAction<string[]>>;
+  /** The current path in the chart */
+  currentPath: string[];
   /** Function to set the current path in the chart */
   setCurrentPath: React.Dispatch<React.SetStateAction<string[]>>;
   /** Default group columns to be used */
@@ -29,10 +31,11 @@ interface ChartDisplayLayoutProps {
  * @returns
  */
 export function ChartDisplayLayout({
-  Chart,
+  chart,
   columnList,
   groupColumns,
   setGroupColumns,
+  currentPath,
   setCurrentPath,
   defaultColumns: defaultGroupColumns,
   title = "Level selector",
@@ -57,7 +60,7 @@ export function ChartDisplayLayout({
           overflow: "auto",
         }}
       >
-        {Chart}
+        {chart}
       </Box>
 
       {/* Right Section: Column selection */}
@@ -75,6 +78,7 @@ export function ChartDisplayLayout({
           columnList={columnList}
           groupColumns={groupColumns}
           setGroupColumns={setGroupColumns}
+          currentPath={currentPath}
           setCurrentPath={setCurrentPath}
           defaultColumns={defaultGroupColumns}
           title={title}
