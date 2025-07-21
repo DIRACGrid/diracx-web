@@ -201,9 +201,7 @@ export function JobDataTable({
       const failedJobs = Object.entries(data.failed).map(
         ([jobId, error]) => `Job ${jobId}: ${error.detail}`,
       );
-      const successfulJobs = Object.keys(data.success).map(
-        (jobId) => `Job ${jobId}`,
-      );
+      const areSucceedJobs = Object.keys(data.success).length > 0;
 
       setBackdropOpen(false);
       refreshJobs(
@@ -215,22 +213,22 @@ export function JobDataTable({
       );
       clearSelected();
       // Handle Snackbar Messaging
-      if (successfulJobs.length > 0 && failedJobs.length > 0) {
+      if (areSucceedJobs && failedJobs.length > 0) {
         setSnackbarInfo({
           open: true,
-          message: `Kill operation summary. Success: ${successfulJobs.join(", ")}. Failed: ${failedJobs.join("; ")}`,
+          message: `Kill operation summary. Failed: ${failedJobs.join("; ")}, Success for the rest`,
           severity: "warning",
         });
-      } else if (successfulJobs.length > 0) {
+      } else if (areSucceedJobs) {
         setSnackbarInfo({
           open: true,
-          message: `Kill operation summary. Success: ${successfulJobs.join(", ")}`,
+          message: `Kill operation summary. Success for all selected jobs.`,
           severity: "success",
         });
       } else {
         setSnackbarInfo({
           open: true,
-          message: `Kill operation summary. Failed: ${failedJobs.join("; ")}`,
+          message: `Kill operation summary. Failure for all selected jobs.`,
           severity: "error",
         });
       }
@@ -273,9 +271,7 @@ export function JobDataTable({
       const failedJobs = Object.entries(data.failed).map(
         ([jobId, error]) => `Job ${jobId}: ${error.detail}`,
       );
-      const successfulJobs = Object.keys(data.success).map(
-        (jobId) => `Job ${jobId}`,
-      );
+      const areSucceedJobs = Object.keys(data.success).length > 0;
 
       setBackdropOpen(false);
       refreshJobs(
@@ -287,22 +283,22 @@ export function JobDataTable({
       );
       clearSelected();
       // Handle Snackbar Messaging
-      if (successfulJobs.length > 0 && failedJobs.length > 0) {
+      if (areSucceedJobs && failedJobs.length > 0) {
         setSnackbarInfo({
           open: true,
-          message: `Reschedule operation summary. Success: ${successfulJobs.join(", ")}. Failed: ${failedJobs.join("; ")}`,
+          message: `Reschedule operation summary. Failed: ${failedJobs.join("; ")}, Success for the rest`,
           severity: "warning",
         });
-      } else if (successfulJobs.length > 0) {
+      } else if (areSucceedJobs) {
         setSnackbarInfo({
           open: true,
-          message: `Reschedule operation summary. Success: ${successfulJobs.join(", ")}`,
+          message: `Reschedule operation summary. Success for all selected jobs.`,
           severity: "success",
         });
       } else {
         setSnackbarInfo({
           open: true,
-          message: `Reschedule operation summary. Failed: ${failedJobs.join("; ")}`,
+          message: `Reschedule operation summary. Failure for all selected jobs.`,
           severity: "error",
         });
       }
