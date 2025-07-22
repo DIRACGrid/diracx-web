@@ -9,8 +9,6 @@ export type SearchBarToken = {
   type: CategoryType;
   /** The nature of the token, e.g., "category", "operator", "value" */
   nature: SearchBarTokenNature;
-  /** Boolean indicating if we should hide the suggestions */
-  hideSuggestion: boolean;
   /** Optional suggestions for the token, useful for auto-completion or hints */
   suggestions?: SearchBarSuggestions;
 };

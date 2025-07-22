@@ -441,16 +441,16 @@ describe("Job Monitor", () => {
   it("should handle filter editing", () => {
     cy.get("table").should("be.visible");
 
-    cy.get("[data-testid=search-field]").type("Name{enter}={enter}test{enter}");
+    cy.get("[data-testid=search-field]").type("ID{enter}={enter}1{enter}");
 
     cy.get("[data-testid=search-field]").type("{leftArrow}2{enter}");
-    cy.get('[role="group"]').find("button").contains("test2").should("exist");
+    cy.get('[role="group"]').find("button").contains("12").should("exist");
   });
 
   it("should handle filter clear", () => {
     cy.get("table").should("be.visible");
 
-    cy.get("[data-testid=search-field]").type("Name{enter}={enter}test{enter}");
+    cy.get("[data-testid=search-field]").type("ID{enter}={enter}1{enter}");
 
     cy.get('[role="group"]').find("button").should("have.length", 5);
 
@@ -533,7 +533,7 @@ describe("Job Monitor", () => {
 
   it("should render the sunburst chart", () => {
     // Click on the sunburst button
-    cy.get('[role="group"]').last().click();
+    cy.get('[role="group"]').get("[data-testid='DonutSmallIcon']").click();
 
     // Make sure the sunburst chart is visible
     cy.get('[data-testid="sunburst-chart"]').should("be.visible");
