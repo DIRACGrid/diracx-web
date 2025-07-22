@@ -77,11 +77,9 @@ describe("SearchBar", () => {
     await user.type(searchInput, "Status");
     await user.keyboard("{Enter}");
 
-    // Type operator
-    const operatorInput = screen.getByPlaceholderText("Enter an operator");
-    await user.type(operatorInput, "=");
-
     // Check if operator suggestions appear
+    const operatorInput = screen.getByPlaceholderText("Enter an operator");
+    await user.type(operatorInput, "{downArrow}");
     await waitFor(() => {
       expect(screen.getByText("=")).toBeInTheDocument();
     });

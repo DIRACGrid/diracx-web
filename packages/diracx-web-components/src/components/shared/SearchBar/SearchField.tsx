@@ -123,7 +123,7 @@ export default function SearchField({
         // We are creating a new equation
         const newLastEquation: SearchBarTokenEquation = {
           status:
-            type === CategoryType.CUSTOM
+            nature === SearchBarTokenNature.CUSTOM
               ? EquationStatus.VALID
               : EquationStatus.WAITING,
           items: [
