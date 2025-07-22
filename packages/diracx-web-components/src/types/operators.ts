@@ -7,6 +7,8 @@ export class Operators {
   static readonly NOT_IN = new Operators("is not in", "not in");
   static readonly LIKE = new Operators("like", "like");
   static readonly LAST = new Operators("in the last", "last");
+  static readonly NOT_LIKE = new Operators("not like", "not like");
+  static readonly REGEX = new Operators("match", "regex");
 
   private constructor(
     private readonly display: string,
@@ -51,6 +53,8 @@ export class Operators {
       Operators.NOT_IN,
       Operators.LIKE,
       Operators.LAST,
+      Operators.NOT_LIKE,
+      Operators.REGEX,
     ];
   }
 
@@ -69,6 +73,8 @@ export class Operators {
       Operators.IN,
       Operators.NOT_IN,
       Operators.LIKE,
+      Operators.NOT_LIKE,
+      Operators.REGEX,
     ];
   }
 
@@ -81,6 +87,7 @@ export class Operators {
       Operators.IN,
       Operators.NOT_IN,
       Operators.LIKE,
+      Operators.NOT_LIKE,
     ];
   }
 
@@ -99,17 +106,21 @@ export class Operators {
       Operators.GREATER_THAN,
       Operators.LESS_THAN,
       Operators.LIKE,
+      Operators.NOT_LIKE,
+      Operators.REGEX,
     ];
   }
 
   static getFreeTextOperators(): Operators[] {
     return [
       Operators.LIKE,
+      Operators.NOT_LIKE,
       Operators.IN,
       Operators.NOT_IN,
       Operators.LAST,
       Operators.GREATER_THAN,
       Operators.LESS_THAN,
+      Operators.REGEX,
     ];
   }
 }

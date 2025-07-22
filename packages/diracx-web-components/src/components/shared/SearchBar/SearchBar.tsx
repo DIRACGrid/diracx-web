@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useMemo } from "react";
 
 import { Box, Menu, MenuItem, IconButton } from "@mui/material";
 
@@ -30,17 +30,25 @@ import {
 
 import SearchField from "./SearchField";
 
+export interface CreateSuggestionsParams {
+  previousToken?: SearchBarToken;
+  previousEquation?: SearchBarTokenEquation;
+  currentInput?: string;
+  equationIndex?: number;
+}
+
 export interface SearchBarProps {
   /** The filters to be applied to the search */
   filters: Filter[];
   /** The function to set the filters */
   setFilters: React.Dispatch<React.SetStateAction<Filter[]>>;
   /** The data to be used for suggestions */
-  createSuggestions: (
-    previousToken: SearchBarToken | undefined,
-    previousEquation: SearchBarTokenEquation | undefined,
-    equationIndex?: number,
-  ) => Promise<SearchBarSuggestions>;
+  createSuggestions: ({
+    previousToken,
+    previousEquation,
+    currentInput,
+    equationIndex,
+  }: CreateSuggestionsParams) => Promise<SearchBarSuggestions>;
   /** The function to call when the search is performed (optional) */
   searchFunction?: (
     equations: SearchBarTokenEquation[],
@@ -123,18 +131,34 @@ export function SearchBar({
     if (filters.length !== 0 && tokenEquations.length === 0) load();
   }, [filters, createSuggestions]);
 
+  const usesCurrentInput = useMemo(
+    () => functionUsesCurrentInput(createSuggestions),
+    [createSuggestions],
+  );
   // Create a list of options based on the current tokens and data
   useEffect(() => {
     async function load() {
-      const result = await createSuggestions(
+      const params: CreateSuggestionsParams = {
         previousToken,
         previousEquation,
-        focusedTokenIndex?.equationIndex,
-      );
+        equationIndex: focusedTokenIndex?.equationIndex,
+      };
+
+      if (usesCurrentInput && inputValue) {
+        params.currentInput = inputValue;
+      }
+
+      const result = await createSuggestions(params);
       setSuggestions(result);
     }
     load();
-  }, [previousEquation, previousToken, createSuggestions]);
+  }, [
+    previousEquation,
+    previousToken,
+    createSuggestions,
+    // If the current input is not used, we don't want to trigger the suggestions for each letter typed
+    ...(usesCurrentInput ? [inputValue] : []),
+  ]);
 
   // Timer to delay the search function
   // This effect will trigger the searchFonction after a delay if the equations are valid
@@ -253,11 +277,11 @@ export function SearchBar({
       );
       tokenEquations[clickedTokenIndex.equationIndex].items[
         clickedTokenIndex.tokenIndex
-      ].suggestions = await createSuggestions(
+      ].suggestions = await createSuggestions({
         previousToken,
         previousEquation,
-        clickedTokenIndex.equationIndex,
-      );
+        equationIndex: clickedTokenIndex.equationIndex,
+      });
 
       setTokenEquations([...tokenEquations]); // Update the state to trigger a re-render
     }
@@ -354,5 +378,20 @@ export function SearchBar({
         </IconButton>
       )}
     </Box>
+  );
+}
+
+/**
+ * This function is used to check if the provided function uses the current input
+ *
+ * @param func The function to check if it uses the current input
+ * @returns A boolean indicating whether the function uses the current input
+ */
+function functionUsesCurrentInput(
+  func: (params: CreateSuggestionsParams) => Promise<SearchBarSuggestions>,
+): boolean {
+  const funcString = func.toString();
+  return (
+    funcString.includes("currentInput") || funcString.includes("inputValue")
   );
 }

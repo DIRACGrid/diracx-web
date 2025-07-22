@@ -10,6 +10,8 @@ import {
   Operators,
 } from "../../../types";
 
+import { CreateSuggestionsParams } from "./SearchBar";
+
 /**
  * @param tokenEquations The list of token equations to be verified.
  * @param setTokenEquations A function to update the state of token equations.
@@ -92,7 +94,8 @@ function handleEquationVerification(
       if (
         freeTextOperators.includes(tokenEquation.items[1].label as string) ||
         (tokenEquation.items[1].type === CategoryType.NUMBER &&
-          !Number.isNaN(Number(tokenEquation.items[2].label)))
+          tokenEquation.items[2].type === CategoryType.NUMBER &&
+          !isNaN(Number(tokenEquation.items[2].label)))
       )
         tokenEquation.status = EquationStatus.VALID;
       else tokenEquation.status = EquationStatus.INVALID;
@@ -232,13 +235,13 @@ export function getTokenMetadata(
     // If the last token is an operator, we assume the current token is a value
     return {
       nature: SearchBarTokenNature.VALUE,
-      type: CategoryType.CUSTOM,
+      type: lastToken?.type || CategoryType.CUSTOM,
       hideSuggestion: lastToken.hideSuggestion,
     };
   }
   return {
     nature: SearchBarTokenNature.CUSTOM,
-    type: CategoryType.CUSTOM,
+    type: lastToken?.type || CategoryType.CUSTOM,
     hideSuggestion: true,
   };
 }
@@ -268,11 +271,11 @@ export function convertListToString(labelList: string[] | string): string {
 export async function convertFilterToTokenEquation(
   filter: Filter,
   filterIndex: number,
-  createSuggestions: (
-    previousToken: SearchBarToken | undefined,
-    previousEquation: SearchBarTokenEquation | undefined,
-    filterIndex?: number,
-  ) => Promise<SearchBarSuggestions>,
+  createSuggestions: ({
+    previousToken,
+    previousEquation,
+    equationIndex,
+  }: CreateSuggestionsParams) => Promise<SearchBarSuggestions>,
 ): Promise<SearchBarTokenEquation> {
   const newEquation: SearchBarTokenEquation = {
     items: [
@@ -299,11 +302,9 @@ export async function convertFilterToTokenEquation(
   };
 
   // For the category
-  const suggestions_categories = await createSuggestions(
-    undefined,
-    undefined,
-    filterIndex,
-  );
+  const suggestions_categories = await createSuggestions({
+    equationIndex: filterIndex,
+  });
 
   newEquation.items[0].type =
     suggestions_categories.type[
@@ -311,11 +312,11 @@ export async function convertFilterToTokenEquation(
     ] || SearchBarTokenNature.CATEGORY;
 
   // For the operator
-  const suggestions_operators = await createSuggestions(
-    newEquation.items[0],
-    newEquation,
-    filterIndex,
-  );
+  const suggestions_operators = await createSuggestions({
+    previousToken: newEquation.items[0],
+    previousEquation: newEquation,
+    equationIndex: filterIndex,
+  });
 
   newEquation.items[1].type =
     suggestions_operators.type[
@@ -325,11 +326,11 @@ export async function convertFilterToTokenEquation(
     ] || SearchBarTokenNature.OPERATOR;
 
   // For the value(s)
-  const suggestions_values = await createSuggestions(
-    newEquation.items[1],
-    newEquation,
-    filterIndex,
-  );
+  const suggestions_values = await createSuggestions({
+    previousToken: newEquation.items[1],
+    previousEquation: newEquation,
+    equationIndex: filterIndex,
+  });
 
   newEquation.items[1].suggestions = suggestions_operators;
   newEquation.items[2].suggestions = suggestions_values;

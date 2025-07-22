@@ -39,10 +39,13 @@ function customClearFunction(
   );
 }
 
-const createSuggestions = async (
-  previousToken: SearchBarToken | undefined,
-  previousEquation: SearchBarTokenEquation | undefined,
-): Promise<SearchBarSuggestions> => {
+const createSuggestions = async ({
+  previousToken,
+  previousEquation,
+}: {
+  previousToken?: SearchBarToken;
+  previousEquation?: SearchBarTokenEquation;
+}): Promise<SearchBarSuggestions> => {
   // Simulate fetching suggestions based on the previous token and equation
   if (
     !previousToken ||
