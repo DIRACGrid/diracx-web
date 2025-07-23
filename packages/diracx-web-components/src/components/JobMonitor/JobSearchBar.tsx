@@ -60,20 +60,16 @@ export function JobSearchBar({
     <SearchBar
       filters={filters}
       setFilters={setFilters}
-      createSuggestions={(
-        previousToken: SearchBarToken | undefined,
-        previousEquation: SearchBarTokenEquation | undefined,
-        equationIndex?: number,
-      ) =>
-        createSuggestions(
+      createSuggestions={({ previousToken, previousEquation, equationIndex }) =>
+        createSuggestions({
           diracxUrl,
           accessToken,
           previousToken,
           previousEquation,
           columns,
           searchBody,
-          equationIndex,
-        )
+          searchBodyIndex: equationIndex,
+        })
       }
       allowKeyWordSearch={false} // Disable keyword search for job monitor
     />
@@ -93,20 +89,28 @@ export function JobSearchBar({
  * @param searchBodyIndex The index of the search body, which is used to determine the current search context (optional).
  * @returns A list of suggestions based on the current tokens and data.
  */
-async function createSuggestions(
-  diracxUrl: string | null,
-  accessToken: string | undefined,
-  previousToken: SearchBarToken | undefined,
-  previousEquation: SearchBarTokenEquation | undefined,
+async function createSuggestions({
+  diracxUrl,
+  accessToken,
+  previousToken,
+  previousEquation,
+  columns,
+  searchBody,
+  searchBodyIndex = 0,
+}: {
+  diracxUrl: string | null;
+  accessToken: string | undefined;
+  previousToken: SearchBarToken | undefined;
+  previousEquation: SearchBarTokenEquation | undefined;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  columns: ColumnDef<Job, any>[],
-  searchBody: SearchBody,
-  searchBodyIndex?: number,
-): Promise<SearchBarSuggestions> {
+  columns: ColumnDef<Job, any>[];
+  searchBody?: SearchBody;
+  searchBodyIndex?: number;
+}): Promise<SearchBarSuggestions> {
   let data: JobSummary[] = [];
 
   const search = [...(searchBody?.search || [])];
-
+  /** The search body index is used to determine the current search context */
   const newSearchBody = {
     ...searchBody,
     search: search.slice(0, searchBodyIndex),
@@ -169,14 +173,14 @@ async function createSuggestions(
         columns,
       );
       await fetchJobSummary(category);
-      const items = data.map(
-        (item) => item[category as keyof JobSummary] as string,
+      const items = data.map((item) =>
+        String(item[category as keyof JobSummary]),
       );
 
       return {
         items: items,
         nature: Array(items.length).fill(SearchBarTokenNature.VALUE),
-        type: Array(items.length).fill(CategoryType.STRING),
+        type: Array(items.length).fill(previousToken.type),
         hideSuggestion: Array(items.length).fill(previousToken.hideSuggestion),
       };
     }
