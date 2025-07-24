@@ -89,4 +89,4 @@ Follow the instructions from the [Gubbins extension README](https://github.com/D
 
 ## Creating a new extension
 
-More details available in the [**extensions** README](/packages/extensions/README.md)
+More details available in the [**extensions** README](../../packages/extensions/README.md)

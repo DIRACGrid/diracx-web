@@ -170,7 +170,7 @@ Having a directory dedicated to your extension components will help you keep you
 
 To add new apps to your extension, you can create new components in your extension directory.
 
-[`testApp`](src/gubbins/components/TestApp/testApp.tsx) provides an example of a basic app component and the [Storybook documentation](https://diracgrid.github.io/diracx-web/) showcases all the components you can use from the library in an interactive interface.
+[`OwnerMonitor`](src/gubbins/components/OwnerMonitor/OwnerMonitor.tsx) provides an example of a basic app component and the [Storybook documentation](https://diracgrid.github.io/diracx-web/) showcases all the components you can use from the library in an interactive interface.
 
 It is then pretty easy to add them to DiracX Web by extending the `applicationList` (the list of apps available in DiracX-Web) from `diracx-web-components/components`.
 

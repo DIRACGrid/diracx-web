@@ -1,5 +1,6 @@
 import { useState, useContext } from "react";
 import { MuiMarkdown, defaultOverrides } from "mui-markdown";
+import { emojify } from "node-emoji";
 
 import {
   Box,
@@ -99,7 +100,7 @@ export default function HelpOverlay({
       return (
         <>
           <MuiMarkdown overrides={customOverrides}>
-            {userDocumentation.generalUsage}
+            {emojify(userDocumentation.generalUsage)}
           </MuiMarkdown>
         </>
       );
@@ -114,7 +115,7 @@ export default function HelpOverlay({
     return (
       <>
         <MuiMarkdown overrides={customOverrides}>
-          {section?.content}
+          {emojify(section?.content || "")}
         </MuiMarkdown>
       </>
     );
