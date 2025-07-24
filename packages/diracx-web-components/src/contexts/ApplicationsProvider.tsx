@@ -4,7 +4,7 @@ import React, { createContext, useEffect, useState } from "react";
 import { applicationList } from "../components/applicationList";
 import { defaultDashboard } from "../components/defaultDashboard";
 import { DashboardGroup } from "../types/DashboardGroup";
-import { userDocumentation as userDoc } from "../components/UserDocumentation";
+import { userDocumentation as userDoc } from "../generatedDocs";
 import ApplicationMetadata from "../types/ApplicationMetadata";
 import { UserDocumentation } from "../types";
 
@@ -39,8 +39,8 @@ interface ApplicationsProviderProps {
 export const ApplicationsProvider = ({
   children,
   appList = applicationList,
-  defaultUserDashboard,
-  userDocumentation = userDoc,
+  defaultUserDashboard = defaultDashboard,
+  userDocumentation,
 }: ApplicationsProviderProps) => {
   const loadedDashboard = sessionStorage.getItem("savedDashboard");
   const parsedDashboard: DashboardGroup[] = loadedDashboard
@@ -66,6 +66,16 @@ export const ApplicationsProvider = ({
     sessionStorage.setItem("savedDashboard", JSON.stringify(userDashboard));
   }, [userDashboard]);
 
+  const mergedDocumentation: UserDocumentation = { ...userDoc };
+
+  if (userDocumentation) {
+    mergedDocumentation.applications = mergedDocumentation.applications.concat(
+      userDocumentation.applications,
+    );
+    mergedDocumentation.generalUsage =
+      userDocumentation.generalUsage || mergedDocumentation.generalUsage;
+  }
+
   return (
     <ApplicationsContext.Provider
       value={[
@@ -76,7 +86,7 @@ export const ApplicationsProvider = ({
         appList,
         currentAppId,
         setCurrentAppId,
-        userDocumentation,
+        mergedDocumentation,
       ]}
     >
       {children}
