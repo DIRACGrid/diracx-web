@@ -1,9 +1,9 @@
 "use client";
 
-import type { 
-  ApplicationMetadata, 
+import type {
+  ApplicationMetadata,
   DashboardGroup,
-  UserDocumentation
+  UserDocumentation,
 } from "../types";
 
 import { OIDCSecure } from "../components";
@@ -45,7 +45,9 @@ export function DiracXWebProviders({
           defaultUserDashboard={defaultUserDashboard}
           userDocumentation={userDocumentation}
         >
-          <ThemeProvider>{children}</ThemeProvider>
+          <ThemeProvider>
+            <OIDCSecure>{children}</OIDCSecure>
+          </ThemeProvider>
         </ApplicationsProvider>
       </NavigationProvider>
     </OIDCConfigurationProvider>

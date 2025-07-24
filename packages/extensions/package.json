@@ -6,7 +6,7 @@
   "license": "GPL-3.0-only",
   "scripts": {
     "dev": "next dev",
-    "build": "node script/generateDocs.js && build",
+    "build": "node script/generateDocs.js && next build",
     "test": "cypress open --config baseUrl=$DIRACX_URL",
     "start": "next start",
     "lint": "next lint",
