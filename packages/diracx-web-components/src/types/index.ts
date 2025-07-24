@@ -15,3 +15,4 @@ export * from "./EquationStatus";
 export * from "./operators";
 export * from "./SearchBarTokenNature";
 export * from "./CategoryType";
+export * from "./UserDocumentation";

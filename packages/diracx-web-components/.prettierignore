@@ -7,3 +7,4 @@ jest.config.mjs
 release-please-config.json
 .release-please-manifest.json
 CHANGELOG.md
+src/generatedDocs.ts
