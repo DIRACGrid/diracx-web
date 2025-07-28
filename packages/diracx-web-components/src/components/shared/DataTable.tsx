@@ -38,22 +38,22 @@ import { SearchBody } from "../../types";
  */
 export interface MenuItem {
   label: string;
-  onClick: (id: number | null) => void;
+  onClick: (id: string | null) => void;
 }
 
 /**
  * Data table toolbar props
  * @property {string} title - the title of the table
  * @property {number} numSelected - the number of selected rows
- * @property {number[]} selectedIds - the ids of the selected rows
+ * @property {string[]} selectedIds - the ids of the selected rows
  * @property {function} clearSelected - the function to call when the selected rows are cleared
  */
 interface DataTableToolbarProps<T extends Record<string, unknown>> {
   title: string;
   table: TanstackTable<T>;
   numSelected: number;
-  selectedIds: readonly number[];
-  toolbarComponents: JSX.Element;
+  selectedIds: readonly (number | string)[];
+  toolbarComponents?: JSX.Element;
 }
 
 /**
@@ -221,7 +221,7 @@ export interface DataTableProps<T extends Record<string, unknown>> {
   /** Whether the table is loading */
   isLoading: boolean;
   /** The components to display in the toolbar */
-  toolbarComponents: JSX.Element;
+  toolbarComponents?: JSX.Element;
   /** The context menu items */
   menuItems: MenuItem[];
 }
@@ -250,7 +250,7 @@ export function DataTable<T extends Record<string, unknown>>({
   const [contextMenu, setContextMenu] = useState<{
     mouseX: number | null;
     mouseY: number | null;
-    id: number | null;
+    id: string | null;
   }>({ mouseX: null, mouseY: null, id: null });
 
   // Manage sorting
@@ -286,7 +286,7 @@ export function DataTable<T extends Record<string, unknown>>({
 
   // Manage context menu
   const handleContextMenu = useCallback(
-    (event: React.MouseEvent, id: number) => {
+    (event: React.MouseEvent, id: string) => {
       event.preventDefault();
       setContextMenu({
         mouseX: event.clientX - 2,
@@ -329,7 +329,7 @@ export function DataTable<T extends Record<string, unknown>>({
           key={item.id}
           onClick={() => item.toggleSelected()}
           style={{ cursor: "context-menu" }}
-          onContextMenu={(event) => handleContextMenu(event, Number(item.id))}
+          onContextMenu={(event) => handleContextMenu(event, item.id)}
           {...props}
         />
       ),
@@ -395,9 +395,7 @@ export function DataTable<T extends Record<string, unknown>>({
           title={title}
           table={table}
           numSelected={table.getSelectedRowModel().rows.length}
-          selectedIds={table
-            .getSelectedRowModel()
-            .rows.map((row) => Number(row.id))}
+          selectedIds={table.getSelectedRowModel().rows.map((row) => row.id)}
           toolbarComponents={toolbarComponents}
         />
         <TableVirtuoso

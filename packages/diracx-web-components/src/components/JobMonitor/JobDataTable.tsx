@@ -398,7 +398,7 @@ export function JobDataTable({
     () => [
       {
         label: "Get history",
-        onClick: (id: number | null) => handleHistory(id),
+        onClick: (id: string | null) => handleHistory(Number(id)),
       },
     ],
     [handleHistory],
