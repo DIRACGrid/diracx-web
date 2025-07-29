@@ -25,6 +25,7 @@ By default, a few application instances are displayed (e.g., `My Jobs`, an insta
 2. Select **Rename**.
    - :bulb: The instance name will change to an input field.
 3. Enter a new name and press **Enter** to save it.
+   - :bulb: You can't use the same name for several intances
 
 ### Moving an Application Instance
 
@@ -42,13 +43,16 @@ By default, a few application instances are displayed (e.g., `My Jobs`, an insta
 
 ### Sharing Your Dashboard
 
-1. Copy the URL from your browser.
-   - :bulb: The URL encodes the current state of your dashboard.
-2. Share it with others.
-   - :warning: The recipient will see a similar dashboard layout but may not see identical content if:
-     - They belong to a different VO or group.
-     - Time-sensitive data has changed since sharing.
-   - :warning: Encoding too many application instances may create discrepancies as the URL has a theoretical limit of 8000 characters based on [RFC9110](https://www.rfc-editor.org/rfc/rfc9110#section-4.1-5) 
+1. Click on the **Export** button at the top-right corner of the page.
+2. Select the instances you want to share.
+   - :bulb: You can select a group to select all instances within that group.
+   - :bulb: For each instance, the shared content will include the name you gave it and the settings you configured.
+3. Click on **Export N Selected**.
+   - :bulb: A menu will appear with a text box containing the exported JSON.
+4. Click on the **Copy to Clipboard** button.
+5. Send this text to the person you want to share it with.
+   - :bulb: If you're using **Mattermost**, you can wrap the text with triple backticks (```) to display it nicely.
+
 
 ## Advanced Features
 
@@ -90,12 +94,5 @@ When managing multiple instances of the same application, grouping can help you 
    - :bulb: A context menu will appear.
 2. Select **Delete**.
    - :bulb: The group and all its application instances will disappear from the sidebar.
-
-
-### Share and import the settings of an application
-
-1. **Share**: You can export the status of an app by clicking on the share button in the top-right corner of the screen. After clicking, you can select which group and app you want to share and then copy a text corresponding to the states of the selected applications.
-
-2. **Import**: Next to the export button you can find the import button. You can paste into the window opened by the button the text corresponding to one or multiple shared apps. This will create a new group named *Imported App* with the imported applications and their settings. 
 
 **Good to know:** When switching to a new version, the settings you are trying to import may no longer be valid. In this case, a new window will appear, offering to resolve the issue by updating the state copied to your clipboard. This updated version preserves your imported rules as much as possible. 

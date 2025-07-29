@@ -7,7 +7,7 @@
     "access": "public"
   },
   "scripts": {
-    "build": "node script/generateDocs && tsup --minify",
+    "build": "npm run generate-doc && tsup --minify",
     "dev": "tsup --watch",
     "test": "jest --ci",
     "lint": "eslint ./src",
@@ -16,7 +16,7 @@
     "prepack": "rm -rf dist && npm run build",
     "doc": "storybook dev -p 6006",
     "build-doc": "storybook build",
-    "generate-docs": "node script/generateDocs.js"
+    "generate-doc": "node script/generateDoc.js"
   },
   "license": "GPL-3.0",
   "type": "module",

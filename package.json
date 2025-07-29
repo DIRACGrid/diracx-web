@@ -22,6 +22,7 @@
     "doc:diracx-web-components": "npm --prefix packages/diracx-web-components run doc",
     "lint": "npm --prefix packages/diracx-web-components run lint && npm --prefix packages/diracx-web run lint",
     "ts-lint": "npm --prefix packages/diracx-web-components run ts-lint && npm --prefix packages/diracx-web run ts-lint",
-    "prepare": "husky"
+    "prepare": "husky",
+    "generate-doc": "npm --prefix packages/diracx-web-components run generate-doc && npm --prefix packages/extensions run generate-doc"
   }
 }

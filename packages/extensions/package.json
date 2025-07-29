@@ -6,14 +6,14 @@
   "license": "GPL-3.0-only",
   "scripts": {
     "dev": "next dev",
-    "build": "node script/generateDocs.js && next build",
+    "build": "npm run generate-doc && next build",
     "test": "cypress open --config baseUrl=$DIRACX_URL",
     "start": "next start",
     "lint": "next lint",
     "lint-staged": "lint-staged",
     "ts-lint": "tsc -noEmit -incremental",
     "postinstall": "node ../../node_modules/@axa-fr/react-oidc/bin/copy-service-worker-files.mjs public",
-    "generate-docs": "node script/generateDocs.js"
+    "generate-doc": "node script/generateDoc.js"
   },
   "dependencies": {
     "@axa-fr/react-oidc": "^7.24.0",
@@ -40,6 +40,8 @@
     "eslint": "^9",
     "eslint-config-next": "15.0.2",
     "eslint-config-prettier": "^10.0.1",
+    "eslint-plugin-import": "^2.29.1",
+    "eslint-plugin-unused-imports": "^4.1.4",
     "lint-staged": "^15.2.2",
     "prettier": "^3.2.5",
     "typescript": "^5"

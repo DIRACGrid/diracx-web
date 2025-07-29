@@ -11,8 +11,7 @@
     "lint": "next lint",
     "lint-staged": "lint-staged",
     "ts-lint": "tsc -noEmit -incremental",
-    "postinstall": "node ../../node_modules/@axa-fr/react-oidc/bin/copy-service-worker-files.mjs public",
-    "generate-docs": "ts-node script/generateDocs.ts"
+    "postinstall": "node ../../node_modules/@axa-fr/react-oidc/bin/copy-service-worker-files.mjs public"
   },
   "dependencies": {
     "@axa-fr/react-oidc": "^7.24.0",

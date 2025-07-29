@@ -74,7 +74,7 @@ export default function HelpOverlay({
         variant: "h5",
         gutterBottom: true,
         sx: {
-          marginTop: "0.75rem",
+          marginTop: "1rem",
           marginBottom: "0.25rem",
         },
       } as React.HTMLProps<HTMLHeadingElement>,
@@ -145,6 +145,7 @@ export default function HelpOverlay({
         >
           <CloseIcon />
         </IconButton>
+
         <Box
           sx={{ width: 250, borderRight: "1px solid #ddd", overflowY: "auto" }}
         >
@@ -190,7 +191,7 @@ export default function HelpOverlay({
         </Box>
 
         {/* Right content pane */}
-        <Box sx={{ flex: 1, p: 3, overflowY: "auto" }}>{RenderContent()}</Box>
+        <Box sx={{ flex: 1, p: 4, overflowY: "auto" }}>{RenderContent()}</Box>
       </Box>
     </Modal>
   );
