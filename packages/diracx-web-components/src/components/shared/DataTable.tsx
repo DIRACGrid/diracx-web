@@ -224,6 +224,8 @@ export interface DataTableProps<T extends Record<string, unknown>> {
   toolbarComponents?: JSX.Element;
   /** The context menu items */
   menuItems: MenuItem[];
+  /** Boolean to disable the checkbox */
+  disableCheckbox?: boolean;
 }
 
 /**
@@ -242,6 +244,7 @@ export function DataTable<T extends Record<string, unknown>>({
   isValidating,
   toolbarComponents,
   menuItems,
+  disableCheckbox = false,
 }: DataTableProps<T>) {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
@@ -372,7 +375,7 @@ export function DataTable<T extends Record<string, unknown>>({
     );
   }
 
-  const checkboxWidth = 50;
+  const checkboxWidth = disableCheckbox ? 0 : 50;
 
   return (
     <Box
@@ -407,29 +410,31 @@ export function DataTable<T extends Record<string, unknown>>({
             <>
               {table.getHeaderGroups().map((headerGroup) => (
                 <TableRow key={headerGroup.id}>
-                  <TableCell
-                    padding="checkbox"
-                    style={{
-                      position: "sticky",
-                      left: 0,
-                      zIndex: 2,
-                      width: checkboxWidth,
-                      minWidth: checkboxWidth,
-                      backgroundColor: theme.palette.background.default,
-                      textOverflow: "ellipsis",
-                      whiteSpace: "nowrap",
-                    }}
-                  >
-                    <Checkbox
-                      indeterminate={
-                        table.getSelectedRowModel().rows.length > 0 &&
-                        table.getSelectedRowModel().rows.length <
-                          table.getState().pagination.pageSize
-                      }
-                      checked={table.getIsAllRowsSelected()}
-                      onChange={table.getToggleAllRowsSelectedHandler()}
-                    />
-                  </TableCell>
+                  {!disableCheckbox && (
+                    <TableCell
+                      padding="checkbox"
+                      style={{
+                        position: "sticky",
+                        left: 0,
+                        zIndex: 2,
+                        width: checkboxWidth,
+                        minWidth: checkboxWidth,
+                        backgroundColor: theme.palette.background.default,
+                        textOverflow: "ellipsis",
+                        whiteSpace: "nowrap",
+                      }}
+                    >
+                      <Checkbox
+                        indeterminate={
+                          table.getSelectedRowModel().rows.length > 0 &&
+                          table.getSelectedRowModel().rows.length <
+                            table.getState().pagination.pageSize
+                        }
+                        checked={table.getIsAllRowsSelected()}
+                        onChange={table.getToggleAllRowsSelectedHandler()}
+                      />
+                    </TableCell>
+                  )}
                   {headerGroup.headers.map((header) => (
                     <TableCell
                       key={header.id}
@@ -508,25 +513,27 @@ export function DataTable<T extends Record<string, unknown>>({
                 : theme.palette.background.default;
             return (
               <>
-                <TableCell
-                  padding="checkbox"
-                  style={{
-                    position: "sticky",
-                    left: 0,
-                    zIndex: 1,
-                    width: checkboxWidth,
-                    backgroundColor: rowColor,
-                    textOverflow: "ellipsis",
-                    whiteSpace: "nowrap",
-                  }}
-                >
-                  <Checkbox
-                    name={`select-row-${row.id}`}
-                    checked={row.getIsSelected()}
-                    disabled={!row.getCanSelect()}
-                    onChange={row.getToggleSelectedHandler()}
-                  />
-                </TableCell>
+                {!disableCheckbox && (
+                  <TableCell
+                    padding="checkbox"
+                    style={{
+                      position: "sticky",
+                      left: 0,
+                      zIndex: 1,
+                      width: checkboxWidth,
+                      backgroundColor: rowColor,
+                      textOverflow: "ellipsis",
+                      whiteSpace: "nowrap",
+                    }}
+                  >
+                    <Checkbox
+                      name={`select-row-${row.id}`}
+                      checked={row.getIsSelected()}
+                      disabled={!row.getCanSelect()}
+                      onChange={row.getToggleSelectedHandler()}
+                    />
+                  </TableCell>
+                )}
                 {row.getVisibleCells().map((cell) => (
                   <TableCell
                     key={cell.id}

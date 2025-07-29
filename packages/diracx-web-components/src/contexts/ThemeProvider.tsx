@@ -97,11 +97,11 @@ export const ThemeProvider = ({ children }: ThemeProviderProps) => {
         ? lighten(secondaryColor, 0.2)
         : darken(secondaryColor, 0.2);
 
-    const tableRowEven =
+    const tableRowOdd =
       theme === "light"
         ? lighten(tableRowEvenColor, 0.2)
         : darken(tableRowEvenColor, 0.9);
-    const tableRowOdd =
+    const tableRowEven =
       theme === "light"
         ? lighten(tableRowOddColor, 0.2)
         : darken(tableRowOddColor, 0.8);
