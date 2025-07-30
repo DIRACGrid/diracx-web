@@ -7,7 +7,7 @@
     "access": "public"
   },
   "scripts": {
-    "build": "tsup --minify",
+    "build": "npm run generate-doc && tsup --minify",
     "dev": "tsup --watch",
     "test": "jest --ci",
     "lint": "eslint ./src",
@@ -15,7 +15,8 @@
     "ts-lint": "tsc -noEmit -incremental",
     "prepack": "rm -rf dist && npm run build",
     "doc": "storybook dev -p 6006",
-    "build-doc": "storybook build"
+    "build-doc": "storybook build",
+    "generate-doc": "node script/generateDoc.js"
   },
   "license": "GPL-3.0",
   "type": "module",
@@ -35,6 +36,8 @@
     "@types/react": "^18.3.12",
     "@types/react-dom": "^18.3.1",
     "dayjs": "^1.11.13",
+    "mui-markdown": "^2.0.1",
+    "node-emoji": "^2.2.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-virtuoso": "^4.12.3",

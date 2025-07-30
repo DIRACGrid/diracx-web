@@ -22,4 +22,6 @@ The code of your app should be in `packages/diracx-web-components/src/components
 
 In order to be compatible with the share and import buttons, the application must write its state to the session storage at `<appId>_State`. This slot is read from and written to by the corresponding functions.
 
+You can create documentation for your new application. If you create documentation for the users (in `docs/user/`), you should follow the structure: each folder represents an application, and each file explains a section of that application. This folder is used to automatically build the documentation that will be available in the web application.
+
 💡You can look at `JobMonitor` as an example.

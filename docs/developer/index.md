@@ -38,14 +38,14 @@ flowchart TD
 
 This repository is organized as a monorepo, with the following key packages:
 
-- [**DiracX-Web-Components**](packages/diracx-web-components): A library of reusable React components designed for integration within the `DiracX-Web` package and to facilitate the creation of custom DiracX web extensions.
+- [**DiracX-Web-Components**](../../packages/diracx-web-components): A library of reusable React components designed for integration within the `DiracX-Web` package and to facilitate the creation of custom DiracX web extensions.
 
-- [**DiracX-Web**](packages/diracx-web): Vanilla Dirac web interface based on Next.js. Leverages components from `DiracX-Web-Components` to provide core functionalities.
+- [**DiracX-Web**](../../packages/diracx-web): Vanilla Dirac web interface based on Next.js. Leverages components from `DiracX-Web-Components` to provide core functionalities.
 
-- [**Extensions**](packages/extensions): An illustrative example of a web extension, also based on Next.js, demonstrating how to extend the functionality of `DiracX-Web` using the components from the `DiracX-Web-Components` package.
+- [**Extensions**](../../packages/extensions): An illustrative example of a web extension, also based on Next.js, demonstrating how to extend the functionality of `DiracX-Web` using the components from the `DiracX-Web-Components` package.
 
 
-The monorepo structure is based on *npm workspaces* to ensure that related packages ([DiracX-Web-Components](packages/diracx-web-components)) are automatically used from their local versions instead of fetching them from the npm registry.
+The monorepo structure is based on *npm workspaces* to ensure that related packages ([DiracX-Web-Components](../../packages/diracx-web-components)) are automatically used from their local versions instead of fetching them from the npm registry.
 
 ## Ramping up
 

@@ -4,6 +4,7 @@ import { Box } from "@mui/material";
 import { Dashboard } from "@dirac-grid/diracx-web-components/components";
 import { DiracXWebProviders } from "@dirac-grid/diracx-web-components/contexts";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { userDocumentation } from "../../generatedDoc";
 import { applicationList } from "@/gubbins/applicationList";
 import { defaultSections } from "@/gubbins/DefaultUserDashboard";
 
@@ -29,6 +30,7 @@ export default function DashboardLayout({
       // You can optionally pass a list of applications and a default user dashboard
       appList={applicationList}
       defaultUserDashboard={defaultSections}
+      userDocumentation={userDocumentation}
     >
       {/* Dashboard is the main layout for the applications, you can optionally give it a custom logo URL and a drawer width */}
       <Dashboard logoURL={customLogoURL} drawerWidth={250}>

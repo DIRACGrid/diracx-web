@@ -19,6 +19,7 @@ packages/*/tsup.config.ts
 packages/*/.next
 packages/*/.tsup
 packages/*/out
+packages/*/src/generatedDoc.ts
 
 **/release-please-config.json
 **/.release-please-manifest.json
