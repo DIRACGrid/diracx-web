@@ -4,7 +4,7 @@ import React, { createContext, useEffect, useState } from "react";
 import { applicationList } from "../components/applicationList";
 import { defaultDashboard } from "../components/defaultDashboard";
 import { DashboardGroup } from "../types/DashboardGroup";
-import { userDocumentation as userDoc } from "../generatedDocs";
+import { userDocumentation as userDoc } from "../generatedDoc";
 import ApplicationMetadata from "../types/ApplicationMetadata";
 import { UserDocumentation } from "../types";
 

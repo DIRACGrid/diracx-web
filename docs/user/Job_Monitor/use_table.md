@@ -2,8 +2,7 @@
 
 The table displays the jobs that match the criteria specified in the search bar. Each row represents a job, and the columns show various attributes of the job, such as its ID, status, type, and submission date.
 
-## Change the Visibility
-
+## Table display settings
 You can click on the eye icon to select additional columns to display in the table. Some columns are hidden by default.
 
 You can sort the table by clicking on the column headers. Clicking once will sort the table in ascending order; clicking again will sort it in descending order.

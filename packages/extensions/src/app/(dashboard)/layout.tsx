@@ -4,7 +4,7 @@ import { Box } from "@mui/material";
 import { Dashboard } from "@dirac-grid/diracx-web-components/components";
 import { DiracXWebProviders } from "@dirac-grid/diracx-web-components/contexts";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { userDocumentation } from "../../generatedDocs";
+import { userDocumentation } from "../../generatedDoc";
 import { applicationList } from "@/gubbins/applicationList";
 import { defaultSections } from "@/gubbins/DefaultUserDashboard";
 

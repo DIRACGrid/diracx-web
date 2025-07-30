@@ -2,7 +2,7 @@ import * as fs from "fs";
 import * as path from "path";
 
 const DOCS_PATH = "../../docs/user";
-const OUTPUT_PATH = "./src/generatedDocs.ts";
+const OUTPUT_PATH = "./src/generatedDoc.ts";
 
 async function readMarkdown(filePath) {
   return fs.promises.readFile(filePath, "utf-8");

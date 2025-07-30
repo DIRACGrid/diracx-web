@@ -1,3 +1,4 @@
+npm run generate-doc && git add packages/*/*/generatedDoc.ts
 npm --prefix packages/diracx-web-components run lint-staged
 npm --prefix packages/diracx-web run lint-staged
 npm --prefix packages/extensions run lint-staged

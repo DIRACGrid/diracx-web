@@ -2,7 +2,7 @@ import { promises } from "fs";
 import { join } from "path";
 
 const DOCS_PATH = "./docs/user";
-const OUTPUT_PATH = "./src/generatedDocs.ts";
+const OUTPUT_PATH = "./src/generatedDoc.ts";
 
 async function readMarkdown(filePath) {
   return promises.readFile(filePath, "utf-8");
