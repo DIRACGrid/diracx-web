@@ -7,7 +7,7 @@ import { applicationList } from "../src/components/applicationList";
 import { DashboardGroup } from "../src/types/DashboardGroup";
 import Dashboard from "../src/components/DashboardLayout/Dashboard";
 import { ThemeProvider } from "../src/contexts/ThemeProvider";
-import { userDocumentation } from "../src/generatedDocs";
+import { userDocumentation } from "../src/generatedDoc";
 
 const meta = {
   title: "Dashboard Layout/Dashboard",
