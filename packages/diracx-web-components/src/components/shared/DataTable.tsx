@@ -28,8 +28,14 @@ import {
   Switch,
   useMediaQuery,
   useTheme,
+  darken,
 } from "@mui/material";
-import { flexRender, Row, Table as TanstackTable } from "@tanstack/react-table";
+import {
+  Column,
+  flexRender,
+  Row,
+  Table as TanstackTable,
+} from "@tanstack/react-table";
 import { TableComponents, TableVirtuoso } from "react-virtuoso";
 import { SearchBody } from "../../types";
 
@@ -202,6 +208,7 @@ function DataTableToolbar<T extends Record<string, unknown>>({
  * @property {string | null} error - the error message
  * @property {JSX.Element} toolbarComponents - the components to display in the toolbar
  * @property {MenuItem[]} menuItems - the menu items
+ * @property {boolean} disableCheckbox - boolean to disable the checkbox
  */
 export interface DataTableProps<T extends Record<string, unknown>> {
   /** The title of the table */
@@ -223,7 +230,7 @@ export interface DataTableProps<T extends Record<string, unknown>> {
   /** The components to display in the toolbar */
   toolbarComponents?: JSX.Element;
   /** The context menu items */
-  menuItems: MenuItem[];
+  menuItems?: MenuItem[];
   /** Boolean to disable the checkbox */
   disableCheckbox?: boolean;
 }
@@ -248,6 +255,8 @@ export function DataTable<T extends Record<string, unknown>>({
 }: DataTableProps<T>) {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+
+  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
 
   // State for the context menu
   const [contextMenu, setContextMenu] = useState<{
@@ -330,9 +339,11 @@ export function DataTable<T extends Record<string, unknown>>({
       TableRow: ({ item, ...props }) => (
         <TableRow
           key={item.id}
-          onClick={() => item.toggleSelected()}
+          onClick={() => !disableCheckbox && item.toggleSelected()}
           style={{ cursor: "context-menu" }}
           onContextMenu={(event) => handleContextMenu(event, item.id)}
+          onMouseEnter={() => setHoveredIndex(item.index)}
+          onMouseLeave={() => setHoveredIndex(null)}
           {...props}
         />
       ),
@@ -344,6 +355,18 @@ export function DataTable<T extends Record<string, unknown>>({
     }),
     [handleContextMenu],
   );
+
+  function getLeftOffsetForColumn(column: Column<T, unknown>): number {
+    const pinnedColumns = table.getLeftLeafColumns();
+
+    let offset = checkboxWidth;
+
+    for (const col of pinnedColumns) {
+      if (col.id === column.id) break;
+      offset += col.getSize(); // ajoute la largeur des colonnes précédentes
+    }
+    return offset;
+  }
 
   // Wait for the data to load
   const rows = table.getRowModel().rows;
@@ -444,7 +467,7 @@ export function DataTable<T extends Record<string, unknown>>({
                           : "relative",
                         left:
                           header.column.getIsPinned() === "left"
-                            ? checkboxWidth
+                            ? getLeftOffsetForColumn(header.column)
                             : undefined,
                         right:
                           header.column.getIsPinned() === "right"
@@ -456,6 +479,14 @@ export function DataTable<T extends Record<string, unknown>>({
                         overflow: "hidden",
                         textOverflow: "ellipsis",
                         whiteSpace: "nowrap",
+                      }}
+                      onDoubleClick={() => {
+                        const currentPin = header.column.getIsPinned();
+                        if (!currentPin) {
+                          header.column.pin("left");
+                        } else {
+                          header.column.pin(false);
+                        }
                       }}
                     >
                       {header.isPlaceholder ? null : (
@@ -505,12 +536,15 @@ export function DataTable<T extends Record<string, unknown>>({
             </>
           )}
           itemContent={(index, row: Row<T>) => {
-            const rowColor =
+            let rowColor =
               theme.palette.tableRow !== undefined
                 ? index % 2 === 0
                   ? theme.palette.tableRow.even
                   : theme.palette.tableRow.odd
                 : theme.palette.background.default;
+            if (hoveredIndex === index) {
+              rowColor = darken(rowColor, 0.1);
+            }
             return (
               <>
                 {!disableCheckbox && (
@@ -541,7 +575,7 @@ export function DataTable<T extends Record<string, unknown>>({
                       position: cell.column.getIsPinned() ? "sticky" : "static",
                       left:
                         cell.column.getIsPinned() === "left"
-                          ? checkboxWidth
+                          ? getLeftOffsetForColumn(cell.column)
                           : undefined,
                       right:
                         cell.column.getIsPinned() === "right" ? 0 : undefined,
@@ -574,28 +608,30 @@ export function DataTable<T extends Record<string, unknown>>({
           sx={{ flexShrink: 0 }}
         />
       </Paper>
-      <Menu
-        open={contextMenu.mouseY !== null}
-        onClose={handleCloseContextMenu}
-        anchorReference="anchorPosition"
-        anchorPosition={
-          contextMenu.mouseY !== null && contextMenu.mouseX !== null
-            ? { top: contextMenu.mouseY, left: contextMenu.mouseX }
-            : undefined
-        }
-      >
-        {menuItems.map((menuItem, index: number) => (
-          <MenuItem
-            key={index}
-            onClick={() => {
-              handleCloseContextMenu();
-              menuItem.onClick(contextMenu.id);
-            }}
-          >
-            {menuItem.label}
-          </MenuItem>
-        ))}
-      </Menu>
+      {menuItems && (
+        <Menu
+          open={contextMenu.mouseY !== null}
+          onClose={handleCloseContextMenu}
+          anchorReference="anchorPosition"
+          anchorPosition={
+            contextMenu.mouseY !== null && contextMenu.mouseX !== null
+              ? { top: contextMenu.mouseY, left: contextMenu.mouseX }
+              : undefined
+          }
+        >
+          {menuItems.map((menuItem, index: number) => (
+            <MenuItem
+              key={index}
+              onClick={() => {
+                handleCloseContextMenu();
+                menuItem.onClick(contextMenu.id);
+              }}
+            >
+              {menuItem.label}
+            </MenuItem>
+          ))}
+        </Menu>
+      )}
     </Box>
   );
 }
