@@ -214,7 +214,7 @@ function buildTree(
           othersValue = { name: key, value: groupTotal };
         else
           othersValue = {
-            name: "Others",
+            name: key,
             children: buildTree(group, groupColumns.slice(1), [
               ...parentPath,
               key,
