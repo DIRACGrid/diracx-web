@@ -79,7 +79,6 @@ export default function SearchField({
     label: string,
     nature: SearchBarTokenNature,
     type: CategoryType,
-    hideSuggestion: boolean,
   ) {
     if (!allowKeyWordSearch && nature === SearchBarTokenNature.CUSTOM) return;
 
@@ -100,7 +99,6 @@ export default function SearchField({
           nature: nature,
           suggestions:
             nature === SearchBarTokenNature.CATEGORY ? undefined : suggestions,
-          hideSuggestion: hideSuggestion,
         };
         handleEquationsVerification(updatedTokens, setTokenEquations);
       }
@@ -116,7 +114,6 @@ export default function SearchField({
           type: type,
           nature: nature,
           suggestions: suggestions,
-          hideSuggestion: hideSuggestion,
         });
         handleEquationsVerification([...tokenEquations], setTokenEquations);
       } else {
@@ -132,7 +129,6 @@ export default function SearchField({
               type: type,
               nature: nature,
               suggestions: undefined,
-              hideSuggestion: hideSuggestion,
             },
           ],
         };
@@ -255,7 +251,6 @@ export default function SearchField({
         newValue,
         SearchBarTokenNature.VALUE,
         CategoryType.DATE,
-        false,
       );
     }
   };
@@ -312,18 +307,13 @@ export default function SearchField({
                 optionSelectedRef.current = false;
                 return;
               }
-              const { nature, type, hideSuggestion } = getTokenMetadata(
+              const { nature, type } = getTokenMetadata(
                 inputValue.trim(),
                 suggestions,
                 previousToken,
               );
               // Always create token on Enter press, regardless of operator type
-              handleTokenCreation(
-                inputValue.trim(),
-                nature,
-                type,
-                hideSuggestion,
-              );
+              handleTokenCreation(inputValue.trim(), nature, type);
             }
             if (e.key === "Backspace") {
               handleBackspaceKeyDown();
@@ -373,12 +363,12 @@ export default function SearchField({
           }
 
           // For all other operators, create token immediately
-          const { nature, type, hideSuggestion } = getTokenMetadata(
+          const { nature, type } = getTokenMetadata(
             value.trim(),
             suggestions,
             previousToken,
           );
-          handleTokenCreation(value, nature, type, hideSuggestion);
+          handleTokenCreation(value, nature, type);
         }
       }}
     />
