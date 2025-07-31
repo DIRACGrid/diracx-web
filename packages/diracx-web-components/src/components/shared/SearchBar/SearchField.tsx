@@ -249,9 +249,6 @@ export default function SearchField({
     }, 0);
   }
 
-  // Calculate the width of the input field based on the input value length
-  const width = Math.min(Math.max(inputValue.length * 8 + 50, 150), 800);
-
   const handleDateAccepted = (newValue: string | null) => {
     if (newValue) {
       handleTokenCreation(
@@ -289,8 +286,7 @@ export default function SearchField({
       sx={{
         marginTop: "2px",
         minWidth: "180px",
-        width: "auto",
-        maxWidth: 0.9,
+        flexGrow: 1,
       }}
       disableClearable={true}
       options={suggestions.items}
@@ -309,9 +305,6 @@ export default function SearchField({
             input: {
               ...params.InputProps,
               disableUnderline: true,
-              style: {
-                width: `${width}px`,
-              },
             },
           }}
           onKeyDown={(e: React.KeyboardEvent<HTMLDivElement>) => {

@@ -104,6 +104,8 @@ export function SearchBar<T extends string>({
     SearchBarTokenEquation[]
   >([]);
 
+  const currentFilters = useRef<string | null>(null);
+
   const [suggestions, setSuggestions] = useState<SearchBarSuggestions>({
     items: [],
     nature: [],
@@ -127,7 +129,11 @@ export function SearchBar<T extends string>({
 
   // Effect to initialize the token equations from filters
   useEffect(() => {
-    if (tokenEquations.length !== 0) return; // Avoid reloading if already loaded
+    const newFiltersString = String(
+      filters.map((filter) => JSON.stringify(filter)),
+    );
+
+    if (currentFilters && currentFilters.current === newFiltersString) return; // Avoid reloading if already loaded
 
     async function load() {
       const promises = filters.map(async (filter, filterIndex) =>
@@ -137,14 +143,15 @@ export function SearchBar<T extends string>({
       setTokenEquations(newTokenEquations);
     }
 
-    if (filters.length !== 0 && tokenEquations.length === 0) load();
-  }, []);
+    if (filters.length !== 0) load();
+    currentFilters.current = newFiltersString;
+  }, [filters, createSuggestions, currentFilters, tokenEquations.length]);
 
   const usesCurrentInput = useMemo(
     () => functionUsesCurrentInput(createSuggestions),
     [createSuggestions],
   );
-  // Create a list of options based on the current tokens and data
+
   useEffect(() => {
     async function load() {
       const params: CreateSuggestionsParams = {
@@ -324,7 +331,7 @@ export function SearchBar<T extends string>({
         display: "flex",
         border: "1px solid",
         borderColor: "grey.400",
-        overflow: "auto",
+        overflow: "hidden",
         borderRadius: 1,
         ":focus-within": {
           borderColor: "primary.main",
@@ -332,7 +339,9 @@ export function SearchBar<T extends string>({
       }}
       data-testid="search-bar"
     >
-      <Box sx={{ gap: 1, display: "flex", padding: 1, width: 0.9 }}>
+      <Box
+        sx={{ gap: 1, display: "flex", padding: 1, width: 1, overflow: "auto" }}
+      >
         {tokenEquations.map((equation, index) => (
           <DisplayTokenEquation
             key={index}
