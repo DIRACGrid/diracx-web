@@ -1,4 +1,3 @@
-
 import React, { useState, useRef, useEffect, useMemo } from "react";
 
 import { Box, Menu, MenuItem, IconButton } from "@mui/material";
@@ -90,7 +89,7 @@ export function SearchBar<T extends string>({
   plotTypeSelectorProps,
 }: SearchBarProps<T>) {
   const [inputValue, setInputValue] = useState("");
-  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const [anchorEl, setAnchorEl] = useState<null | Element>(null);
   const [clickedTokenIndex, setClickedTokenIndex] =
     useState<EquationAndTokenIndex | null>(null);
   const [focusedTokenIndex, setFocusedTokenIndex] =
@@ -103,14 +102,13 @@ export function SearchBar<T extends string>({
   const [tokenEquations, setTokenEquations] = useState<
     SearchBarTokenEquation[]
   >([]);
-
   const currentFilters = useRef<string | null>(null);
+  const isUpdatingFromSearch = useRef<boolean>(false);
 
   const [suggestions, setSuggestions] = useState<SearchBarSuggestions>({
     items: [],
     nature: [],
     type: [],
-    hideSuggestion: [],
   });
 
   const { previousEquation, previousToken } = getPreviousEquationAndToken(
@@ -133,6 +131,11 @@ export function SearchBar<T extends string>({
       filters.map((filter) => JSON.stringify(filter)),
     );
 
+    if (isUpdatingFromSearch.current) {
+      isUpdatingFromSearch.current = false; // Reset the flag after updating from search
+      currentFilters.current = newFiltersString; // Update the current filters to the new filters
+      return;
+    }
     if (currentFilters && currentFilters.current === newFiltersString) return; // Avoid reloading if already loaded
 
     async function load() {
@@ -147,6 +150,9 @@ export function SearchBar<T extends string>({
     currentFilters.current = newFiltersString;
   }, [filters, createSuggestions, currentFilters, tokenEquations.length]);
 
+  /**
+   * This effect is used to check if the provided function uses the current input
+   */
   const usesCurrentInput = useMemo(
     () => functionUsesCurrentInput(createSuggestions),
     [createSuggestions],
@@ -201,6 +207,7 @@ export function SearchBar<T extends string>({
     if (allEquationsValid && hasChanged) {
       searchTimerRef.current = setTimeout(() => {
         lastSearchedEquationsRef.current = currentEquationsString;
+        isUpdatingFromSearch.current = true;
         searchFunction(tokenEquations, setFilters);
       }, 800);
     }
@@ -217,19 +224,24 @@ export function SearchBar<T extends string>({
     inputRef.current?.focus();
   }, [focusedTokenIndex]);
 
-  const handleOptionMenuOpen = (
-    event: React.MouseEvent<HTMLButtonElement>,
-    equationIndex: number,
-    tokenIndex: number,
-  ) => {
-    if (
-      (tokenEquations[equationIndex].items[tokenIndex].suggestions?.items || [])
-        .length > 0
-    ) {
-      setAnchorEl(event.currentTarget);
-      setClickedTokenIndex({ equationIndex, tokenIndex });
+  // Effect to open the suggestions menu when a token is clicked
+  useEffect(() => {
+    if (clickedTokenIndex !== null) {
+      const { equationIndex, tokenIndex } = clickedTokenIndex;
+      const suggestions =
+        tokenEquations[equationIndex].items[tokenIndex].suggestions?.items ||
+        [];
+
+      if (suggestions.length > 0) {
+        // If there are suggestions, open the menu
+        setAnchorEl(
+          document.querySelector(
+            `#tokenid\\:equation-${equationIndex}-token-${tokenIndex}`,
+          ),
+        );
+      }
     }
-  };
+  }, [tokenEquations, clickedTokenIndex]);
 
   const handleOptionMenuClose = () => {
     setAnchorEl(null);
@@ -240,7 +252,6 @@ export function SearchBar<T extends string>({
     option: string,
     nature: SearchBarTokenNature,
     type: CategoryType,
-    hideSuggestion: boolean,
   ) => {
     if (searchTimerRef.current) {
       clearTimeout(searchTimerRef.current);
@@ -255,7 +266,6 @@ export function SearchBar<T extends string>({
         type: type, // Change the type
         nature: nature, // Change the nature
         label: option,
-        hideSuggestion,
       };
 
       updatedTokens[clickedTokenIndex.equationIndex] = updatedToken; // Update the equation in the list
@@ -317,84 +327,118 @@ export function SearchBar<T extends string>({
           items: [],
           nature: [],
           type: [],
-          hideSuggestion: [],
         }
-      : { items: [], nature: [], type: [], hideSuggestion: [] };
+      : { items: [], nature: [], type: [] };
 
   return (
     <Box
-      onClick={() => {
-        inputRef.current?.focus();
-      }}
       sx={{
-        width: 1,
         display: "flex",
-        border: "1px solid",
-        borderColor: "grey.400",
-        overflow: "hidden",
-        borderRadius: 1,
-        ":focus-within": {
-          borderColor: "primary.main",
-        },
+        flexDirection: "row",
+        width: 1,
       }}
-      data-testid="search-bar"
     >
+      {/* The search bar */}
       <Box
-        sx={{ gap: 1, display: "flex", padding: 1, width: 1, overflow: "auto" }}
+        onClick={() => {
+          inputRef.current?.focus();
+        }}
+        sx={{
+          width: 1,
+          height: "auto",
+          display: "flex",
+          border: "1px solid",
+          borderColor: "grey.400",
+          overflow: "hidden",
+          borderRadius: 1,
+          ":focus-within": {
+            borderColor: "primary.main",
+          },
+          alignItems: "center",
+        }}
+        data-testid="search-bar"
       >
-        {tokenEquations.map((equation, index) => (
-          <DisplayTokenEquation
-            key={index}
-            tokensEquation={equation}
-            handleClick={(e, tokenIndex) =>
-              handleOptionMenuOpen(e, index, tokenIndex)
-            }
-            handleRightClick={() =>
-              setTokenEquations((prev) => [
-                ...prev.filter((_, i) => i !== index),
-              ])
-            } // Remove the equation on right click
-            equationIndex={index}
-            DynamicSearchField={DynamicSearchField} // The dynamic search field can be in the middle of the equations
-            focusedTokenIndex={focusedTokenIndex}
-          />
-        ))}
-        {!focusedTokenIndex && DynamicSearchField}
-        {/* Otherwise, the search field is at the end */}
-        <Menu
-          anchorEl={anchorEl}
-          open={Boolean(anchorEl)}
-          onClose={handleOptionMenuClose}
-        >
-          {clickedTokenIndex !== null &&
-            currentSuggestions.items.map((option, idx) => (
-              <MenuItem
-                key={idx}
-                onClick={() =>
-                  handleOptionSelect(
-                    option,
-                    currentSuggestions.nature[idx],
-                    currentSuggestions.type[idx],
-                    currentSuggestions.hideSuggestion[idx],
-                  )
-                }
-              >
-                {option}
-              </MenuItem>
-            ))}
-        </Menu>
-      </Box>
-      {tokenEquations.length !== 0 && (
-        <IconButton
-          onClick={() => {
-            setInputValue("");
-            clearFunction(setFilters, setTokenEquations);
+        <Box
+          sx={{
+            gap: 1,
+            display: "flex",
+            padding: 1,
+            width: 1,
+            overflow: "auto",
           }}
-          disabled={tokenEquations.length === 0}
-          sx={{ marginLeft: "auto", width: "40px", height: "40px" }}
         >
-          <DeleteIcon />
-        </IconButton>
+          {tokenEquations.map((equation, index) => (
+            <DisplayTokenEquation
+              key={index}
+              tokensEquation={equation}
+              handleClick={(_e, tokenIndex) =>
+                setClickedTokenIndex({ equationIndex: index, tokenIndex })
+              }
+              handleRightClick={() =>
+                setTokenEquations((prev) => [
+                  ...prev.filter((_, i) => i !== index),
+                ])
+              } // Remove the equation on right click
+              equationIndex={index}
+              DynamicSearchField={DynamicSearchField} // The dynamic search field can be in the middle of the equations
+              focusedTokenIndex={focusedTokenIndex}
+            />
+          ))}
+          {!focusedTokenIndex && DynamicSearchField}
+          {/* Otherwise, the search field is at the end */}
+          <Menu
+            anchorEl={anchorEl}
+            open={Boolean(anchorEl)}
+            onClose={handleOptionMenuClose}
+          >
+            {clickedTokenIndex !== null &&
+              currentSuggestions.items.map((option, idx) => (
+                <MenuItem
+                  key={idx}
+                  onClick={() =>
+                    handleOptionSelect(
+                      option,
+                      currentSuggestions.nature[idx],
+                      currentSuggestions.type[idx],
+                    )
+                  }
+                >
+                  {option}
+                </MenuItem>
+              ))}
+          </Menu>
+        </Box>
+        <Box sx={{ marginLeft: "auto", display: "flex", alignItems: "center" }}>
+          <IconButton
+            onClick={() => searchFunction(tokenEquations, setFilters)}
+            disabled={
+              !tokenEquations.every((eq) => eq.status === EquationStatus.VALID)
+            }
+            sx={{ width: "40px", height: "40px" }}
+          >
+            <RefreshIcon />
+          </IconButton>
+
+          {tokenEquations.length !== 0 && (
+            <IconButton
+              onClick={() => {
+                setInputValue("");
+                clearFunction(setFilters, setTokenEquations);
+              }}
+              sx={{ width: "40px", height: "40px" }}
+            >
+              <DeleteIcon />
+            </IconButton>
+          )}
+        </Box>
+      </Box>
+      {/* Plot type selector if provided */}
+      {plotTypeSelectorProps && (
+        <PlotTypeSelector
+          plotType={plotTypeSelectorProps.plotType}
+          setPlotType={plotTypeSelectorProps.setPlotType}
+          buttonList={plotTypeSelectorProps.buttonList}
+        />
       )}
     </Box>
   );

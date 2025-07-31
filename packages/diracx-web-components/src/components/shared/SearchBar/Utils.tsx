@@ -212,7 +212,7 @@ export function getPreviousEquationAndToken(
  * @param value The value of the token to be checked.
  * @param suggestions The suggestions object containing items and their types.
  * @param lastToken The last token in the equation, which can be undefined
- * @returns The type of the token, which can be "custom", "value", "operator", "custom_value", or a category type.
+ * @returns The type of the token and its nature.
  */
 export function getTokenMetadata(
   value: string,
@@ -221,14 +221,12 @@ export function getTokenMetadata(
 ): {
   nature: SearchBarTokenNature;
   type: CategoryType;
-  hideSuggestion: boolean;
 } {
   const index = suggestions.items.indexOf(value);
   if (index >= 0) {
     return {
       nature: suggestions.nature[index],
       type: suggestions.type[index],
-      hideSuggestion: suggestions.hideSuggestion[index],
     };
   }
   if (lastToken && lastToken.nature === SearchBarTokenNature.OPERATOR) {
@@ -236,13 +234,11 @@ export function getTokenMetadata(
     return {
       nature: SearchBarTokenNature.VALUE,
       type: lastToken?.type || CategoryType.CUSTOM,
-      hideSuggestion: lastToken.hideSuggestion,
     };
   }
   return {
     nature: SearchBarTokenNature.CUSTOM,
     type: lastToken?.type || CategoryType.CUSTOM,
-    hideSuggestion: true,
   };
 }
 
@@ -283,19 +279,16 @@ export async function convertFilterToTokenEquation(
         label: filter.parameter,
         nature: SearchBarTokenNature.CATEGORY,
         type: CategoryType.UNKNOWN,
-        hideSuggestion: true,
       },
       {
         label: Operators.getDisplayFromInternal(filter.operator),
         nature: SearchBarTokenNature.OPERATOR,
         type: CategoryType.UNKNOWN,
-        hideSuggestion: true,
       },
       {
         label: filter.value || filter.values || "",
         nature: SearchBarTokenNature.VALUE,
         type: CategoryType.UNKNOWN,
-        hideSuggestion: true,
       },
     ],
     status: EquationStatus.VALID,
@@ -325,7 +318,7 @@ export async function convertFilterToTokenEquation(
       )
     ] || SearchBarTokenNature.OPERATOR;
 
-  // For the value(s)
+  // For the value
   const suggestions_values = await createSuggestions({
     previousToken: newEquation.items[1],
     previousEquation: newEquation,
