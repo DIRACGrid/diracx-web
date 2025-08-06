@@ -16,7 +16,7 @@ import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 import Tooltip from "@mui/material/Tooltip";
 import IconButton from "@mui/material/IconButton";
-import { FormatListBulleted, Visibility } from "@mui/icons-material";
+import { FormatListBulleted, Visibility, PushPin } from "@mui/icons-material";
 import {
   Alert,
   Menu,
@@ -363,7 +363,7 @@ export function DataTable<T extends Record<string, unknown>>({
 
     for (const col of pinnedColumns) {
       if (col.id === column.id) break;
-      offset += col.getSize(); // ajoute la largeur des colonnes précédentes
+      offset += col.getSize(); // Add the width of the previous columns
     }
     return offset;
   }
@@ -480,37 +480,47 @@ export function DataTable<T extends Record<string, unknown>>({
                         textOverflow: "ellipsis",
                         whiteSpace: "nowrap",
                       }}
-                      onDoubleClick={() => {
-                        const currentPin = header.column.getIsPinned();
-                        if (!currentPin) {
-                          header.column.pin("left");
-                        } else {
-                          header.column.pin(false);
-                        }
-                      }}
                     >
                       {header.isPlaceholder ? null : (
-                        <TableSortLabel
-                          active={
-                            searchBody.sort &&
-                            searchBody.sort[0]?.parameter === header.id
-                          }
-                          direction={
-                            searchBody.sort &&
-                            searchBody.sort[0]?.direction === "asc"
-                              ? "asc"
-                              : "desc"
-                          }
-                          onClick={(event) =>
-                            handleRequestSort(event, header.id)
-                          }
-                          data-testid={`sort-${header.id}`}
-                        >
-                          {flexRender(
-                            header.column.columnDef.header,
-                            header.getContext(),
-                          )}
-                        </TableSortLabel>
+                        <>
+                          {/* Render the header content with an arrow for sorting */}
+                          <TableSortLabel
+                            active={
+                              searchBody.sort &&
+                              searchBody.sort[0]?.parameter === header.id
+                            }
+                            direction={
+                              searchBody.sort &&
+                              searchBody.sort[0]?.direction === "asc"
+                                ? "asc"
+                                : "desc"
+                            }
+                            onClick={(event) =>
+                              handleRequestSort(event, header.id)
+                            }
+                            data-testid={`sort-${header.id}`}
+                          >
+                            {flexRender(
+                              header.column.columnDef.header,
+                              header.getContext(),
+                            )}
+                          </TableSortLabel>
+
+                          {/* Render the pin button */}
+                          <TableSortLabel
+                            onClick={() => {
+                              const currentPin = header.column.getIsPinned();
+                              if (!currentPin) {
+                                header.column.pin("left");
+                              } else {
+                                header.column.pin(false);
+                              }
+                            }}
+                            active={header.column.getIsPinned() === "left"}
+                            direction="desc"
+                            IconComponent={PushPin}
+                          />
+                        </>
                       )}
                       {header.column.getCanResize() && (
                         <Box
