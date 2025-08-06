@@ -1,6 +1,7 @@
 # Logging in & out
 
 ## Basics
+
 ### Logging in
 
 1. Go to the DiracX-Web instance homepage.  
