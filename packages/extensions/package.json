@@ -20,7 +20,7 @@
     "@mui/icons-material": "^6.4.2",
     "@mui/material": "^6.1.6",
     "@mui/utils": "^6.1.6",
-    "@mui/x-date-pickers": "^7.28.3",
+    "@mui/x-date-pickers": "^8.9.2",
     "@tanstack/react-table": "^8.20.5",
     "autoprefixer": "10.4.20",
     "next": "15.3.1",
