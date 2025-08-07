@@ -17,6 +17,7 @@ import {
   Operators,
   SearchBarTokenNature,
   CategoryType,
+  JobMonitorChartType,
 } from "../../types";
 import { getJobSummary } from "./jobDataService";
 import { fromHumanReadableText } from "./JobMonitor";
@@ -33,6 +34,15 @@ interface JobSearchBarProps {
   /** The columns to display in the job monitor */
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   columns: ColumnDef<Job, any>[];
+  /** Props for the plot type selector */
+  plotTypeSelectorProps?: {
+    /** The type of the plot */
+    plotType: JobMonitorChartType;
+    /** Function to set the plot type */
+    setPlotType: React.Dispatch<React.SetStateAction<JobMonitorChartType>>;
+    /** List of buttons to select the type of plot */
+    buttonList?: { plotName: JobMonitorChartType; icon: React.ReactNode }[];
+  };
 }
 
 export function JobSearchBar({
@@ -41,6 +51,7 @@ export function JobSearchBar({
   setFilters,
   handleApplyFilters,
   columns,
+  plotTypeSelectorProps,
 }: JobSearchBarProps) {
   const { configuration } = useOIDCContext();
   const { accessToken } = useOidcAccessToken(configuration?.scope);
@@ -71,6 +82,7 @@ export function JobSearchBar({
         )
       }
       allowKeyWordSearch={false} // Disable keyword search for job monitor
+      plotTypeSelectorProps={plotTypeSelectorProps}
     />
   );
 }

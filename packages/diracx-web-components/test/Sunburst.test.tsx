@@ -1,6 +1,8 @@
 import { render, screen } from "@testing-library/react";
+import { composeStories } from "@storybook/react";
 import { Sunburst } from "../src/components/shared/Sunburst/Sunburst";
 import { SunburstTree } from "../src/types";
+import * as stories from "../stories/Sunburst.stories"; // Importing all stories to use in tests
 import "@testing-library/jest-dom";
 
 // Sample tree data for testing
@@ -56,6 +58,8 @@ const customSizeToText = (size: number, total?: number) => {
 };
 
 describe("Sunburst Component", () => {
+  const { Default } = composeStories(stories);
+
   describe("Rendering States", () => {
     test("renders loading skeleton when isLoading is true", () => {
       render(<Sunburst tree={mockTree} isLoading={true} error={null} />);
@@ -170,6 +174,21 @@ describe("Sunburst Component", () => {
       // In a real test environment, we would check if the visualization has updated
       const svg = document.querySelector("svg");
       expect(svg).toBeInTheDocument();
+    });
+  });
+
+  // The previous tests cover the main functionalities of the Sunburst component.
+  // Here we just ensure that the story renders correctly.
+  describe("Storybook Integration", () => {
+    test("renders the Default story correctly", () => {
+      render(<Default />);
+      expect(screen.getByText("Top")).toBeInTheDocument();
+      expect(screen.getByTestId("sunburst-chart")).toBeInTheDocument();
+    });
+
+    test("renders while loading", () => {
+      render(<Default isLoading={true} />);
+      expect(screen.getByTestId("loading-skeleton")).toBeInTheDocument();
     });
   });
 });

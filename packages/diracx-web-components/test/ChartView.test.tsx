@@ -1,12 +1,12 @@
 import { render, screen } from "@testing-library/react";
 import { composeStories } from "@storybook/react";
-import * as stories from "../stories/ChartDisplayLayout.stories";
+import * as stories from "../stories/ChartView.stories";
 import "@testing-library/jest-dom";
 
 // Compose the stories to get actual Storybook behavior (decorators, args, etc)
 const { Default } = composeStories(stories);
 
-describe("ChartDisplayLayout", () => {
+describe("ChartView", () => {
   it("renders the element", () => {
     render(<Default />);
     expect(screen.getByText("Select Columns")).toBeInTheDocument();

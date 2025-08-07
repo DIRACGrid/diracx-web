@@ -4,7 +4,7 @@ import { Box } from "@mui/material";
 
 import { ColumnSelector } from "./ColumnSelector";
 
-interface ChartDisplayLayoutProps {
+interface ChartViewProps {
   /** The chart to be displayed */
   chart: JSX.Element;
   /** List of columns available for selection */
@@ -24,13 +24,13 @@ interface ChartDisplayLayoutProps {
 }
 
 /**
- * Creates a layout for displaying a chart alongside a column selector.
+ * Creates a component that displays a chart and allows users to select columns for grouping.
  *
- * @param props Props for the ChartDisplayLayout component
+ * @param props Props for the ChartViewLayout component
  * @see ChartDisplayLayoutProps
  * @returns
  */
-export function ChartDisplayLayout({
+export function ChartView({
   chart,
   columnList,
   groupColumns,
@@ -39,7 +39,7 @@ export function ChartDisplayLayout({
   setCurrentPath,
   defaultColumns: defaultGroupColumns,
   title = "Level selector",
-}: ChartDisplayLayoutProps) {
+}: ChartViewProps) {
   return (
     <Box
       sx={{

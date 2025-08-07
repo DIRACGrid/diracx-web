@@ -16,7 +16,8 @@ import { scaleOrdinal } from "d3-scale";
 import { Stack, useTheme, Box, Alert, Skeleton } from "@mui/material";
 
 import type { SunburstTree, SunburstNode } from "../../../types";
-import { DisplayPath, getPath, sizeToText as defaultSizeToText } from "./Utils";
+import { getPath, sizeToText as defaultSizeToText } from "./Utils";
+import { BreadCrumbsTrail } from "./BreadCrumbsTrail";
 
 interface SunburstProps {
   /** Formatted data to be displayed in the chart */
@@ -335,7 +336,7 @@ export function Sunburst({
         }}
       >
         {currentPath && setCurrentPath && (
-          <DisplayPath path={currentPath} setPath={setCurrentPath} />
+          <BreadCrumbsTrail path={currentPath} setPath={setCurrentPath} />
         )}
       </Box>
       <div

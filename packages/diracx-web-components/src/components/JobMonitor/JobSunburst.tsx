@@ -9,7 +9,7 @@ import { useDiracxUrl } from "../../hooks/utils";
 import type { JobSummary, SearchBody, Job, SunburstTree } from "../../types";
 import { Sunburst } from "../shared/Sunburst";
 import { useOIDCContext } from "../../hooks/oidcConfiguration";
-import { ChartDisplayLayout } from "../shared";
+import { ChartView } from "../shared";
 import { getJobSummary } from "./jobDataService";
 
 import { fromHumanReadableText } from "./JobMonitor";
@@ -115,7 +115,7 @@ export function JobSunburst({
   );
 
   return (
-    <ChartDisplayLayout
+    <ChartView
       chart={Chart}
       columnList={columnList}
       groupColumns={groupColumns}

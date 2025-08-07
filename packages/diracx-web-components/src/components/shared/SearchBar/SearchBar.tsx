@@ -30,8 +30,9 @@ import {
 } from "./defaultFunctions";
 
 import SearchField from "./SearchField";
+import { PlotTypeSelector } from "./PlotTypeSelector";
 
-export interface SearchBarProps {
+export interface SearchBarProps<T extends string> {
   /** The filters to be applied to the search */
   filters: Filter[];
   /** The function to set the filters */
@@ -56,6 +57,11 @@ export interface SearchBarProps {
   ) => void;
   /** Whether to allow keyword search or not (default is true) */
   allowKeyWordSearch?: boolean;
+  plotTypeSelectorProps?: {
+    plotType: T;
+    setPlotType: React.Dispatch<React.SetStateAction<T>>;
+    buttonList?: { plotName: T; icon: React.ReactNode }[];
+  };
 }
 
 /**
@@ -65,14 +71,15 @@ export interface SearchBarProps {
  * @param props - The properties for the SearchBar component.
  * @returns The rendered SearchBar component.
  */
-export function SearchBar({
+export function SearchBar<T extends string>({
   filters,
   setFilters,
   createSuggestions,
   searchFunction = convertAndApplyFilters,
   clearFunction = defaultClearFunction,
   allowKeyWordSearch = true,
-}: SearchBarProps) {
+  plotTypeSelectorProps,
+}: SearchBarProps<T>) {
   const [inputValue, setInputValue] = useState("");
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [clickedTokenIndex, setClickedTokenIndex] =
@@ -283,90 +290,107 @@ export function SearchBar({
 
   return (
     <Box
-      onClick={() => {
-        inputRef.current?.focus();
-      }}
       sx={{
-        width: 1,
-        height: "auto",
         display: "flex",
-        border: "1px solid",
-        borderColor: "grey.400",
-        overflow: "hidden",
-        borderRadius: 1,
-        ":focus-within": {
-          borderColor: "primary.main",
-        },
-        alignItems: "center",
+        flexDirection: "row",
+        width: 1,
       }}
-      data-testid="search-bar"
     >
-      <Box sx={{ gap: 1, display: "flex", padding: 1, overflow: "auto" }}>
-        {tokenEquations.map((equation, index) => (
-          <DisplayTokenEquation
-            key={index}
-            tokensEquation={equation}
-            handleClick={(e, tokenIndex) =>
-              handleOptionMenuOpen(e, index, tokenIndex)
-            }
-            handleRightClick={() =>
-              setTokenEquations((prev) => [
-                ...prev.filter((_, i) => i !== index),
-              ])
-            } // Remove the equation on right click
-            equationIndex={index}
-            DynamicSearchField={DynamicSearchField} // The dynamic search field can be in the middle of the equations
-            focusedTokenIndex={focusedTokenIndex}
-          />
-        ))}
-        {!focusedTokenIndex && DynamicSearchField}
-        {/* Otherwise, the search field is at the end */}
-        <Menu
-          anchorEl={anchorEl}
-          open={Boolean(anchorEl)}
-          onClose={handleOptionMenuClose}
-        >
-          {clickedTokenIndex !== null &&
-            currentSuggestions.items.map((option, idx) => (
-              <MenuItem
-                key={idx}
-                onClick={() =>
-                  handleOptionSelect(
-                    option,
-                    currentSuggestions.nature[idx],
-                    currentSuggestions.type[idx],
-                    currentSuggestions.hideSuggestion[idx],
-                  )
-                }
-              >
-                {option}
-              </MenuItem>
-            ))}
-        </Menu>
-      </Box>
-      <Box sx={{ marginLeft: "auto", display: "flex", alignItems: "center" }}>
-        <IconButton
-          onClick={() => searchFunction(tokenEquations, setFilters)}
-          disabled={
-            !tokenEquations.every((eq) => eq.status === EquationStatus.VALID)
-          }
-          sx={{ width: "40px", height: "40px" }}
-        >
-          <RefreshIcon />
-        </IconButton>
-
-        {tokenEquations.length !== 0 && (
+      {/* The search bar */}
+      <Box
+        onClick={() => {
+          inputRef.current?.focus();
+        }}
+        sx={{
+          width: 1,
+          height: "auto",
+          display: "flex",
+          border: "1px solid",
+          borderColor: "grey.400",
+          overflow: "hidden",
+          borderRadius: 1,
+          ":focus-within": {
+            borderColor: "primary.main",
+          },
+          alignItems: "center",
+        }}
+        data-testid="search-bar"
+      >
+        <Box sx={{ gap: 1, display: "flex", padding: 1, overflow: "auto" }}>
+          {tokenEquations.map((equation, index) => (
+            <DisplayTokenEquation
+              key={index}
+              tokensEquation={equation}
+              handleClick={(e, tokenIndex) =>
+                handleOptionMenuOpen(e, index, tokenIndex)
+              }
+              handleRightClick={() =>
+                setTokenEquations((prev) => [
+                  ...prev.filter((_, i) => i !== index),
+                ])
+              } // Remove the equation on right click
+              equationIndex={index}
+              DynamicSearchField={DynamicSearchField} // The dynamic search field can be in the middle of the equations
+              focusedTokenIndex={focusedTokenIndex}
+            />
+          ))}
+          {!focusedTokenIndex && DynamicSearchField}
+          {/* Otherwise, the search field is at the end */}
+          <Menu
+            anchorEl={anchorEl}
+            open={Boolean(anchorEl)}
+            onClose={handleOptionMenuClose}
+          >
+            {clickedTokenIndex !== null &&
+              currentSuggestions.items.map((option, idx) => (
+                <MenuItem
+                  key={idx}
+                  onClick={() =>
+                    handleOptionSelect(
+                      option,
+                      currentSuggestions.nature[idx],
+                      currentSuggestions.type[idx],
+                      currentSuggestions.hideSuggestion[idx],
+                    )
+                  }
+                >
+                  {option}
+                </MenuItem>
+              ))}
+          </Menu>
+        </Box>
+        <Box sx={{ marginLeft: "auto", display: "flex", alignItems: "center" }}>
           <IconButton
-            onClick={() => {
-              setInputValue("");
-              clearFunction(setFilters, setTokenEquations);
-            }}
+            onClick={() => searchFunction(tokenEquations, setFilters)}
+            disabled={
+              !tokenEquations.every((eq) => eq.status === EquationStatus.VALID)
+            }
             sx={{ width: "40px", height: "40px" }}
           >
-            <DeleteIcon />
+            <RefreshIcon />
           </IconButton>
-        )}
+
+          {tokenEquations.length !== 0 && (
+            <IconButton
+              onClick={() => {
+                setInputValue("");
+                clearFunction(setFilters, setTokenEquations);
+              }}
+              sx={{ width: "40px", height: "40px" }}
+            >
+              <DeleteIcon />
+            </IconButton>
+          )}
+        </Box>
       </Box>
+      {/* Plot type selector if provided */}
+      {plotTypeSelectorProps && (
+        <PlotTypeSelector
+          plotType={plotTypeSelectorProps.plotType}
+          setPlotType={plotTypeSelectorProps.setPlotType}
+          buttonList={plotTypeSelectorProps.buttonList}
+        />
+      )}
     </Box>
   );
 }

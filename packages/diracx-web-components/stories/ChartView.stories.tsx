@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react";
 
 import { useState } from "react";
-import { ChartDisplayLayout } from "../src/components/shared/ChartDisplayLayout";
+import { ChartView } from "../src/components/shared";
 import { ThemeProvider } from "../src/contexts/ThemeProvider";
 import { Sunburst } from "../src/components";
 
@@ -40,8 +40,8 @@ const mockTree = {
 };
 
 const meta = {
-  title: "Shared/ChartDisplayLayout",
-  component: ChartDisplayLayout,
+  title: "Shared/ChartView",
+  component: ChartView,
   parameters: {
     layout: "centered",
   },
@@ -51,7 +51,7 @@ const meta = {
       return <Story />;
     },
   ],
-} satisfies Meta<typeof ChartDisplayLayout>;
+} satisfies Meta<typeof ChartView>;
 
 export default meta;
 
@@ -90,7 +90,7 @@ export const Default: Story = {
 
     return (
       <ThemeProvider>
-        <ChartDisplayLayout
+        <ChartView
           chart={args.chart}
           columnList={args.columnList}
           groupColumns={groupColumns}

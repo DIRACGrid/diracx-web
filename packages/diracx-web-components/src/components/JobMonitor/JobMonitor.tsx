@@ -14,15 +14,7 @@ import {
   amber,
 } from "@mui/material/colors";
 
-import {
-  lighten,
-  darken,
-  useTheme,
-  Box,
-  ToggleButtonGroup,
-  ToggleButton,
-  Tooltip,
-} from "@mui/material";
+import { lighten, darken, useTheme, Box } from "@mui/material";
 
 import { TableChart, DonutSmall } from "@mui/icons-material";
 
@@ -37,7 +29,12 @@ import {
 
 import { useApplicationId } from "../../hooks/application";
 import { Filter } from "../../types/Filter";
-import { Job, SearchBody, CategoryType } from "../../types";
+import {
+  Job,
+  SearchBody,
+  CategoryType,
+  JobMonitorChartType,
+} from "../../types";
 import { JobDataTable } from "./JobDataTable";
 import { JobSearchBar } from "./JobSearchBar";
 import { JobSunburst } from "./JobSunburst";
@@ -109,7 +106,7 @@ export default function JobMonitor() {
         },
   );
 
-  const [chartType, setChartType] = useState("CHART_TYPE_TABLE");
+  const [chartType, setChartType] = useState(JobMonitorChartType.TABLE);
 
   // Save the state of the app in local storage
   useEffect(() => {
@@ -320,11 +317,24 @@ export default function JobMonitor() {
           searchBody={searchBody}
           handleApplyFilters={handleApplyFilters}
           columns={columns}
+          plotTypeSelectorProps={{
+            plotType: chartType,
+            setPlotType: setChartType,
+            buttonList: [
+              {
+                plotName: JobMonitorChartType.TABLE,
+                icon: <TableChart fontSize="large" />,
+              },
+              {
+                plotName: JobMonitorChartType.SUNBURST,
+                icon: <DonutSmall fontSize="large" />,
+              },
+            ],
+          }}
         />
-        <PlotTypeSelector plotType={chartType} setPlotType={setChartType} />
       </Box>
 
-      {chartType === "CHART_TYPE_TABLE" && (
+      {chartType === JobMonitorChartType.TABLE && (
         <JobDataTable
           searchBody={searchBody}
           setSearchBody={setSearchBody}
@@ -340,7 +350,7 @@ export default function JobMonitor() {
           statusColors={statusColors}
         />
       )}
-      {chartType === "CHART_TYPE_SUNBURST" && (
+      {chartType === JobMonitorChartType.SUNBURST && (
         <JobSunburst
           searchBody={searchBody}
           statusColors={statusColors}
@@ -413,43 +423,4 @@ export function fromHumanReadableText(
     return columns[index].id || name; // Return the id if it exists, otherwise
   }
   return name;
-}
-
-/**
- * Component to select the type of plot
- *
- * @param plotType The type of the plot
- * @param setPlotType The setter for the plot type
- * @returns A list of buttons to select the type of plot
- */
-export function PlotTypeSelector({
-  plotType,
-  setPlotType,
-}: {
-  plotType: string;
-  setPlotType: React.Dispatch<React.SetStateAction<string>>;
-}) {
-  return (
-    <>
-      <ToggleButtonGroup
-        value={plotType}
-        exclusive
-        onChange={(_event: React.MouseEvent, val: string) => {
-          if (val !== null) setPlotType(val);
-        }}
-        aria-label="text alignment"
-      >
-        <Tooltip title="Table view">
-          <ToggleButton value="CHART_TYPE_TABLE" aria-label="left aligned">
-            <TableChart fontSize="large" />
-          </ToggleButton>
-        </Tooltip>
-        <Tooltip title="Sunburst view">
-          <ToggleButton value="CHART_TYPE_SUNBURST" aria-label="centered">
-            <DonutSmall fontSize="large" />
-          </ToggleButton>
-        </Tooltip>
-      </ToggleButtonGroup>
-    </>
-  );
 }
