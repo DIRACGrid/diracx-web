@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect } from "react";
 import { ColumnDef } from "@tanstack/react-table";
 import { useOidcAccessToken } from "@axa-fr/react-oidc";
 import { useOIDCContext } from "../../hooks/oidcConfiguration";
@@ -17,6 +17,7 @@ import {
   Operators,
   SearchBarTokenNature,
   CategoryType,
+  JobMonitorChartType,
 } from "../../types";
 import { getJobSummary } from "./jobDataService";
 import { fromHumanReadableText } from "./JobMonitor";
@@ -33,6 +34,15 @@ interface JobSearchBarProps {
   /** The columns to display in the job monitor */
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   columns: ColumnDef<Job, any>[];
+  /** Props for the plot type selector */
+  plotTypeSelectorProps?: {
+    /** The type of the plot */
+    plotType: JobMonitorChartType;
+    /** Function to set the plot type */
+    setPlotType: React.Dispatch<React.SetStateAction<JobMonitorChartType>>;
+    /** List of buttons to select the type of plot */
+    buttonList?: { plotName: JobMonitorChartType; icon: React.ReactNode }[];
+  };
 }
 
 export function JobSearchBar({
@@ -41,19 +51,15 @@ export function JobSearchBar({
   setFilters,
   handleApplyFilters,
   columns,
+  plotTypeSelectorProps,
 }: JobSearchBarProps) {
   const { configuration } = useOIDCContext();
   const { accessToken } = useOidcAccessToken(configuration?.scope);
-  const oldFilters = useRef<string>("");
 
   const diracxUrl = useDiracxUrl();
 
   useEffect(() => {
-    const currentFilters = JSON.stringify(filters);
-    if (oldFilters.current !== currentFilters) {
-      oldFilters.current = currentFilters;
-      handleApplyFilters();
-    }
+    handleApplyFilters();
   }, [filters, handleApplyFilters]);
 
   return (
@@ -76,6 +82,7 @@ export function JobSearchBar({
         )
       }
       allowKeyWordSearch={false} // Disable keyword search for job monitor
+      plotTypeSelectorProps={plotTypeSelectorProps}
     />
   );
 }
@@ -135,12 +142,12 @@ async function createSuggestions(
     previousToken.nature === SearchBarTokenNature.CUSTOM ||
     previousToken.nature === SearchBarTokenNature.VALUE
   ) {
-    const items = columns.map((column) => column.header as string);
+    const items = columns.map((column) => String(column.header));
     const type = columns.map(
       (column) => column.meta?.type || CategoryType.STRING,
     ) as CategoryType[];
     const hideSuggestion = columns.map(
-      (column) => column.meta?.hideSuggestion || false,
+      (column) => column.meta?.isQuasiUnique || false,
     );
 
     return {
@@ -165,7 +172,7 @@ async function createSuggestions(
     if (!previousToken.hideSuggestion) {
       // Load the suggestions for the selected category
       const category = fromHumanReadableText(
-        previousEquation.items[0].label as string,
+        String(previousEquation.items[0].label),
         columns,
       );
       await fetchJobSummary(category);

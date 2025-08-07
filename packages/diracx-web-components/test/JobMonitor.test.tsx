@@ -11,7 +11,7 @@ import * as stories from "../stories/JobMonitor.stories";
 import "@testing-library/jest-dom";
 
 // Compose Storybook stories (includes all decorators/args)
-const { Default, Loading, Empty, Error } = composeStories(stories);
+const { Default, Loading, Empty, WithError } = composeStories(stories);
 
 describe("JobMonitor", () => {
   it("renders the job monitor component", async () => {
@@ -34,13 +34,11 @@ describe("JobMonitor", () => {
   });
 
   it("renders error state when data fetch fails", async () => {
-    const { getByText } = render(<Error />);
+    const { getByText } = render(<WithError />);
 
     // Verify error message
     await waitFor(() => {
-      expect(
-        getByText("An error occurred while fetching data. Reload the page."),
-      ).toBeInTheDocument();
+      expect(getByText("Custom error message here")).toBeInTheDocument();
     });
   });
 

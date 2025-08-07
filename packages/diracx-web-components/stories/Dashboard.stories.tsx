@@ -18,6 +18,8 @@ const meta = {
   argTypes: {
     children: { control: false },
     drawerWidth: { control: { type: "range", min: 200, max: 500, step: 10 } },
+    logoURL: { control: { disable: true } },
+    documentationURL: { control: { disable: true } },
   },
   decorators: [
     (Story) => {

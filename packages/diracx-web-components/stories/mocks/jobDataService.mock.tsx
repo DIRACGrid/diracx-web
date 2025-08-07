@@ -1,15 +1,13 @@
 /* eslint-disable */
 import { Job, JobHistory, SearchBody, JobSummary } from "../../src/types";
 
+import { useJobMockContext } from "./contexts.mock";
+
 // Mock data store for jobs
 let mockJobsResponse: {
   jobs: Job[] | null;
-  error: Error | null;
-  isLoading: boolean;
 } = {
   jobs: null,
-  error: null,
-  isLoading: false,
 };
 
 // Mock data store for job history
@@ -24,11 +22,7 @@ let mockJobHistoryResponse: {
 };
 
 // Function to set mock jobs data
-export function setJobsMock(data: {
-  jobs: Job[] | null;
-  error: Error | null;
-  isLoading: boolean;
-}) {
+export function setJobsMock(data: { jobs: Job[] | null }) {
   mockJobsResponse = data;
 }
 
@@ -41,42 +35,37 @@ export function setJobHistoryMock(data: {
   mockJobHistoryResponse = data;
 }
 
-// Mock implementation of `useJobs`
-export const useJobs = (
+export function useJobs(
   _diracxUrl: string | null,
   _accessToken: string,
   _searchBody: any,
   _page: number,
   _rowsPerPage: number,
-) => {
-  if (mockJobsResponse.error) {
-    return {
-      data: undefined,
-      error: mockJobsResponse.error,
-      isLoading: mockJobsResponse.isLoading,
-      isValidating: false,
-    };
+) {
+  const { jobs, isLoading, error } = useJobMockContext();
+
+  if (isLoading) {
+    return { data: undefined, error: null, isLoading: true };
   }
 
-  // Create headers with content-range for pagination
+  if (error) {
+    return { data: undefined, error, isLoading: false };
+  }
+
+  if (!jobs || jobs.length === 0) {
+    return { data: [], error: null, isLoading: false };
+  }
+
   const headers = new Headers();
-  headers.append(
-    "content-range",
-    `jobs 0-${mockJobsResponse.jobs?.length || 0}/${mockJobsResponse.jobs?.length || 0}`,
-  );
+  headers.append("content-range", `jobs 0-${jobs.length}/${jobs.length}`);
 
   return {
-    data: mockJobsResponse.jobs
-      ? {
-          headers,
-          data: mockJobsResponse.jobs,
-        }
-      : undefined,
+    headers,
+    data: jobs,
     error: null,
-    isLoading: mockJobsResponse.isLoading,
-    isValidating: false,
+    isLoading: false,
   };
-};
+}
 
 // Mock implementation of `getJobHistory`
 export const getJobHistory = async (
@@ -177,6 +166,7 @@ export async function getJobSummary(
         VO: "VOA",
         UserPriority: 100,
         RescheduleCounter: 0,
+        count: 10,
       },
       {
         Status: "Completed",
@@ -191,6 +181,7 @@ export async function getJobSummary(
         VO: "VOB",
         UserPriority: 200,
         RescheduleCounter: 1,
+        count: 5,
       },
       {
         Status: "Failed",
@@ -205,6 +196,7 @@ export async function getJobSummary(
         VO: "VOC",
         UserPriority: 300,
         RescheduleCounter: 2,
+        count: 2,
       },
     ],
   });

@@ -13,7 +13,11 @@ import {
   lime,
   amber,
 } from "@mui/material/colors";
+
 import { lighten, darken, useTheme, Box } from "@mui/material";
+
+import { TableChart, DonutSmall } from "@mui/icons-material";
+
 import {
   createColumnHelper,
   ColumnPinningState,
@@ -25,9 +29,15 @@ import {
 
 import { useApplicationId } from "../../hooks/application";
 import { Filter } from "../../types/Filter";
-import { Job, SearchBody, CategoryType } from "../../types";
+import {
+  Job,
+  SearchBody,
+  CategoryType,
+  JobMonitorChartType,
+} from "../../types";
 import { JobDataTable } from "./JobDataTable";
 import { JobSearchBar } from "./JobSearchBar";
+import { JobSunburst } from "./JobSunburst";
 
 /**
  * Build the Job Monitor application
@@ -96,6 +106,8 @@ export default function JobMonitor() {
         },
   );
 
+  const [chartType, setChartType] = useState(JobMonitorChartType.TABLE);
+
   // Save the state of the app in local storage
   useEffect(() => {
     const state = {
@@ -121,23 +133,6 @@ export default function JobMonitor() {
     rowSelection,
     pagination,
   ]);
-
-  // Handle the application of filters
-  const handleApplyFilters = () => {
-    setSearchBody((prev) => ({
-      ...prev,
-      search: filters.map(({ parameter, operator, value, values }) => ({
-        parameter: fromHumanReadableText(parameter, columns),
-        operator,
-        value,
-        values,
-      })),
-    }));
-    setPagination((prevState) => ({
-      ...prevState,
-      pageIndex: 0,
-    }));
-  };
 
   // Status colors
   const statusColors: Record<string, string> = useMemo(
@@ -197,7 +192,7 @@ export default function JobMonitor() {
       columnHelper.accessor("JobID", {
         id: "JobID",
         header: "ID",
-        meta: { type: CategoryType.NUMBER, hideSuggestion: true },
+        meta: { type: CategoryType.NUMBER, isQuasiUnique: true },
       }),
       columnHelper.accessor("Status", {
         id: "Status",
@@ -206,7 +201,7 @@ export default function JobMonitor() {
         meta: {
           type: CategoryType.STRING,
           values: Object.keys(statusColors).sort(),
-          hideSuggestion: false,
+          isQuasiUnique: false,
         },
       }),
       columnHelper.accessor("MinorStatus", {
@@ -236,17 +231,17 @@ export default function JobMonitor() {
       columnHelper.accessor("LastUpdateTime", {
         id: "LastUpdateTime",
         header: "Last Update Time",
-        meta: { type: CategoryType.DATE, hideSuggestion: true },
+        meta: { type: CategoryType.DATE, isQuasiUnique: true },
       }),
       columnHelper.accessor("HeartBeatTime", {
         id: "HeartBeatTime",
         header: "Last Sign of Life",
-        meta: { type: CategoryType.DATE, hideSuggestion: true },
+        meta: { type: CategoryType.DATE, isQuasiUnique: true },
       }),
       columnHelper.accessor("SubmissionTime", {
         id: "SubmissionTime",
         header: "Submission Time",
-        meta: { type: CategoryType.DATE, hideSuggestion: true },
+        meta: { type: CategoryType.DATE, isQuasiUnique: true },
       }),
       columnHelper.accessor("Owner", {
         id: "Owner",
@@ -263,12 +258,12 @@ export default function JobMonitor() {
       columnHelper.accessor("StartExecTime", {
         id: "StartExecTime",
         header: "Start Execution Time",
-        meta: { type: CategoryType.DATE, hideSuggestion: true },
+        meta: { type: CategoryType.DATE, isQuasiUnique: true },
       }),
       columnHelper.accessor("EndExecTime", {
         id: "EndExecTime",
         header: "End Execution Time",
-        meta: { type: CategoryType.DATE, hideSuggestion: true },
+        meta: { type: CategoryType.DATE, isQuasiUnique: true },
       }),
       columnHelper.accessor("UserPriority", {
         id: "UserPriority",
@@ -284,6 +279,23 @@ export default function JobMonitor() {
     [columnHelper, renderStatusCell, statusColors],
   );
 
+  // Handle the application of filters
+  const handleApplyFilters = useCallback(() => {
+    setSearchBody((prev) => ({
+      ...prev,
+      search: filters.map(({ parameter, operator, value, values }) => ({
+        parameter: fromHumanReadableText(parameter, columns),
+        operator,
+        value,
+        values,
+      })),
+    }));
+    setPagination((prev) => ({
+      ...prev,
+      pageIndex: 0, // Reset to the first page when applying filters
+    }));
+  }, [filters, columns, setSearchBody, setPagination]);
+
   return (
     <Box
       sx={{
@@ -293,27 +305,58 @@ export default function JobMonitor() {
         overflow: "hidden",
       }}
     >
-      <JobSearchBar
-        filters={filters}
-        setFilters={setFilters}
-        searchBody={searchBody}
-        handleApplyFilters={handleApplyFilters}
-        columns={columns}
-      />
-      <JobDataTable
-        searchBody={searchBody}
-        setSearchBody={setSearchBody}
-        columns={columns}
-        pagination={pagination}
-        setPagination={setPagination}
-        columnVisibility={columnVisibility}
-        setColumnVisibility={setColumnVisibility}
-        columnPinning={columnPinning}
-        setColumnPinning={setColumnPinning}
-        rowSelection={rowSelection}
-        setRowSelection={setRowSelection}
-        statusColors={statusColors}
-      />
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "row",
+        }}
+      >
+        <JobSearchBar
+          filters={filters}
+          setFilters={setFilters}
+          searchBody={searchBody}
+          handleApplyFilters={handleApplyFilters}
+          columns={columns}
+          plotTypeSelectorProps={{
+            plotType: chartType,
+            setPlotType: setChartType,
+            buttonList: [
+              {
+                plotName: JobMonitorChartType.TABLE,
+                icon: <TableChart fontSize="large" />,
+              },
+              {
+                plotName: JobMonitorChartType.SUNBURST,
+                icon: <DonutSmall fontSize="large" />,
+              },
+            ],
+          }}
+        />
+      </Box>
+
+      {chartType === JobMonitorChartType.TABLE && (
+        <JobDataTable
+          searchBody={searchBody}
+          setSearchBody={setSearchBody}
+          columns={columns}
+          pagination={pagination}
+          setPagination={setPagination}
+          columnVisibility={columnVisibility}
+          setColumnVisibility={setColumnVisibility}
+          columnPinning={columnPinning}
+          setColumnPinning={setColumnPinning}
+          rowSelection={rowSelection}
+          setRowSelection={setRowSelection}
+          statusColors={statusColors}
+        />
+      )}
+      {chartType === JobMonitorChartType.SUNBURST && (
+        <JobSunburst
+          searchBody={searchBody}
+          statusColors={statusColors}
+          columns={columns}
+        />
+      )}
     </Box>
   );
 }
