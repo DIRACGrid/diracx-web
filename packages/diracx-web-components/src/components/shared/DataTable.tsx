@@ -16,7 +16,7 @@ import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 import Tooltip from "@mui/material/Tooltip";
 import IconButton from "@mui/material/IconButton";
-import { FormatListBulleted, Visibility } from "@mui/icons-material";
+import { FormatListBulleted, Visibility, PushPin } from "@mui/icons-material";
 import {
   Alert,
   Menu,
@@ -28,8 +28,14 @@ import {
   Switch,
   useMediaQuery,
   useTheme,
+  darken,
 } from "@mui/material";
-import { flexRender, Row, Table as TanstackTable } from "@tanstack/react-table";
+import {
+  Column,
+  flexRender,
+  Row,
+  Table as TanstackTable,
+} from "@tanstack/react-table";
 import { TableComponents, TableVirtuoso } from "react-virtuoso";
 import { SearchBody } from "../../types";
 
@@ -38,22 +44,22 @@ import { SearchBody } from "../../types";
  */
 export interface MenuItem {
   label: string;
-  onClick: (id: number | null) => void;
+  onClick: (id: string | null) => void;
 }
 
 /**
  * Data table toolbar props
  * @property {string} title - the title of the table
  * @property {number} numSelected - the number of selected rows
- * @property {number[]} selectedIds - the ids of the selected rows
+ * @property {string[]} selectedIds - the ids of the selected rows
  * @property {function} clearSelected - the function to call when the selected rows are cleared
  */
 interface DataTableToolbarProps<T extends Record<string, unknown>> {
   title: string;
   table: TanstackTable<T>;
   numSelected: number;
-  selectedIds: readonly number[];
-  toolbarComponents: JSX.Element;
+  selectedIds: readonly (number | string)[];
+  toolbarComponents?: JSX.Element;
 }
 
 /**
@@ -131,7 +137,7 @@ function DataTableToolbar<T extends Record<string, unknown>>({
       )}
       {numSelected > 0 ? (
         <Stack direction="row">
-          <Tooltip title="Get IDs">
+          <Tooltip title={`Get ID${numSelected > 1 ? "s" : ""}`}>
             <IconButton onClick={handleCopyIDs}>
               <FormatListBulleted />
             </IconButton>
@@ -202,6 +208,7 @@ function DataTableToolbar<T extends Record<string, unknown>>({
  * @property {Error | null} error - the error message
  * @property {JSX.Element} toolbarComponents - the components to display in the toolbar
  * @property {MenuItem[]} menuItems - the menu items
+ * @property {boolean} disableCheckbox - boolean to disable the checkbox
  */
 export interface DataTableProps<T extends Record<string, unknown>> {
   /** The title of the table */
@@ -212,16 +219,18 @@ export interface DataTableProps<T extends Record<string, unknown>> {
   totalRows: number;
   /** The search body to send along with the request */
   searchBody: SearchBody;
-  /** The function to call when the search body changes */
+  /** Function to set the search body */
   setSearchBody: React.Dispatch<React.SetStateAction<SearchBody>>;
   /** The error or null if no error */
   error: Error | null;
   /** Whether the table is loading */
   isLoading: boolean;
   /** The components to display in the toolbar */
-  toolbarComponents: JSX.Element;
+  toolbarComponents?: JSX.Element;
   /** The context menu items */
-  menuItems: MenuItem[];
+  menuItems?: MenuItem[];
+  /** Boolean to disable the checkbox */
+  disableCheckbox?: boolean;
 }
 
 /**
@@ -239,15 +248,18 @@ export function DataTable<T extends Record<string, unknown>>({
   isLoading,
   toolbarComponents,
   menuItems,
+  disableCheckbox = false,
 }: DataTableProps<T>) {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+
+  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
 
   // State for the context menu
   const [contextMenu, setContextMenu] = useState<{
     mouseX: number | null;
     mouseY: number | null;
-    id: number | null;
+    id: string | null;
   }>({ mouseX: null, mouseY: null, id: null });
 
   // Manage sorting
@@ -283,7 +295,7 @@ export function DataTable<T extends Record<string, unknown>>({
 
   // Manage context menu
   const handleContextMenu = useCallback(
-    (event: React.MouseEvent, id: number) => {
+    (event: React.MouseEvent, id: string) => {
       event.preventDefault();
       setContextMenu({
         mouseX: event.clientX - 2,
@@ -324,9 +336,11 @@ export function DataTable<T extends Record<string, unknown>>({
       TableRow: ({ item, ...props }) => (
         <TableRow
           key={item.id}
-          onClick={() => item.toggleSelected()}
+          onClick={() => !disableCheckbox && item.toggleSelected()}
           style={{ cursor: "context-menu" }}
-          onContextMenu={(event) => handleContextMenu(event, Number(item.id))}
+          onContextMenu={(event) => handleContextMenu(event, item.id)}
+          onMouseEnter={() => setHoveredIndex(item.index)}
+          onMouseLeave={() => setHoveredIndex(null)}
           {...props}
         />
       ),
@@ -338,6 +352,18 @@ export function DataTable<T extends Record<string, unknown>>({
     }),
     [handleContextMenu],
   );
+
+  function getLeftOffsetForColumn(column: Column<T, unknown>): number {
+    const pinnedColumns = table.getLeftLeafColumns();
+
+    let offset = checkboxWidth;
+
+    for (const col of pinnedColumns) {
+      if (col.id === column.id) break;
+      offset += col.getSize(); // Add the width of the previous columns
+    }
+    return offset;
+  }
 
   // Wait for the data to load
   const rows = table.getRowModel().rows;
@@ -370,7 +396,7 @@ export function DataTable<T extends Record<string, unknown>>({
     );
   }
 
-  const checkboxWidth = 50;
+  const checkboxWidth = disableCheckbox ? 0 : 50;
 
   return (
     <Box
@@ -392,8 +418,8 @@ export function DataTable<T extends Record<string, unknown>>({
         <DataTableToolbar
           title={title}
           table={table}
-          numSelected={Object.keys(table.getState().rowSelection).length}
-          selectedIds={Object.keys(table.getState().rowSelection).map(Number)}
+          numSelected={table.getSelectedRowModel().rows.length}
+          selectedIds={table.getSelectedRowModel().rows.map((row) => row.id)}
           toolbarComponents={toolbarComponents}
         />
         <TableVirtuoso
@@ -405,28 +431,31 @@ export function DataTable<T extends Record<string, unknown>>({
             <>
               {table.getHeaderGroups().map((headerGroup) => (
                 <TableRow key={headerGroup.id}>
-                  <TableCell
-                    padding="checkbox"
-                    style={{
-                      position: "sticky",
-                      left: 0,
-                      zIndex: 2,
-                      width: checkboxWidth,
-                      minWidth: checkboxWidth,
-                      backgroundColor: theme.palette.background.default,
-                      textOverflow: "ellipsis",
-                      whiteSpace: "nowrap",
-                    }}
-                  >
-                    <Checkbox
-                      indeterminate={
-                        table.getIsSomeRowsSelected() &&
-                        !table.getIsAllRowsSelected()
-                      }
-                      checked={table.getIsAllRowsSelected()}
-                      onChange={table.getToggleAllRowsSelectedHandler()}
-                    />
-                  </TableCell>
+                  {!disableCheckbox && (
+                    <TableCell
+                      padding="checkbox"
+                      style={{
+                        position: "sticky",
+                        left: 0,
+                        zIndex: 2,
+                        width: checkboxWidth,
+                        minWidth: checkboxWidth,
+                        backgroundColor: theme.palette.background.default,
+                        textOverflow: "ellipsis",
+                        whiteSpace: "nowrap",
+                      }}
+                    >
+                      <Checkbox
+                        indeterminate={
+                          table.getSelectedRowModel().rows.length > 0 &&
+                          table.getSelectedRowModel().rows.length <
+                            table.getState().pagination.pageSize
+                        }
+                        checked={table.getIsAllRowsSelected()}
+                        onChange={table.getToggleAllRowsSelectedHandler()}
+                      />
+                    </TableCell>
+                  )}
                   {headerGroup.headers.map((header) => (
                     <TableCell
                       key={header.id}
@@ -436,7 +465,7 @@ export function DataTable<T extends Record<string, unknown>>({
                           : "relative",
                         left:
                           header.column.getIsPinned() === "left"
-                            ? checkboxWidth
+                            ? getLeftOffsetForColumn(header.column)
                             : undefined,
                         right:
                           header.column.getIsPinned() === "right"
@@ -451,27 +480,45 @@ export function DataTable<T extends Record<string, unknown>>({
                       }}
                     >
                       {header.isPlaceholder ? null : (
-                        <TableSortLabel
-                          active={
-                            searchBody.sort &&
-                            searchBody.sort[0]?.parameter === header.id
-                          }
-                          direction={
-                            searchBody.sort &&
-                            searchBody.sort[0]?.direction === "asc"
-                              ? "asc"
-                              : "desc"
-                          }
-                          onClick={(event) =>
-                            handleRequestSort(event, header.id)
-                          }
-                          data-testid={`sort-${header.id}`}
-                        >
-                          {flexRender(
-                            header.column.columnDef.header,
-                            header.getContext(),
-                          )}
-                        </TableSortLabel>
+                        <>
+                          {/* Render the header content with an arrow for sorting */}
+                          <TableSortLabel
+                            active={
+                              searchBody.sort &&
+                              searchBody.sort[0]?.parameter === header.id
+                            }
+                            direction={
+                              searchBody.sort &&
+                              searchBody.sort[0]?.direction === "asc"
+                                ? "asc"
+                                : "desc"
+                            }
+                            onClick={(event) =>
+                              handleRequestSort(event, header.id)
+                            }
+                            data-testid={`sort-${header.id}`}
+                          >
+                            {flexRender(
+                              header.column.columnDef.header,
+                              header.getContext(),
+                            )}
+                          </TableSortLabel>
+
+                          {/* Render the pin button */}
+                          <TableSortLabel
+                            onClick={() => {
+                              const currentPin = header.column.getIsPinned();
+                              if (!currentPin) {
+                                header.column.pin("left");
+                              } else {
+                                header.column.pin(false);
+                              }
+                            }}
+                            active={header.column.getIsPinned() === "left"}
+                            direction="desc"
+                            IconComponent={PushPin}
+                          />
+                        </>
                       )}
                       {header.column.getCanResize() && (
                         <Box
@@ -497,33 +544,38 @@ export function DataTable<T extends Record<string, unknown>>({
             </>
           )}
           itemContent={(index, row: Row<T>) => {
-            const rowColor =
+            let rowColor =
               theme.palette.tableRow !== undefined
                 ? index % 2 === 0
                   ? theme.palette.tableRow.even
                   : theme.palette.tableRow.odd
                 : theme.palette.background.default;
+            if (hoveredIndex === index) {
+              rowColor = darken(rowColor, 0.1);
+            }
             return (
               <>
-                <TableCell
-                  padding="checkbox"
-                  style={{
-                    position: "sticky",
-                    left: 0,
-                    zIndex: 1,
-                    width: checkboxWidth,
-                    backgroundColor: rowColor,
-                    textOverflow: "ellipsis",
-                    whiteSpace: "nowrap",
-                  }}
-                >
-                  <Checkbox
-                    name={`select-row-${row.id}`}
-                    checked={row.getIsSelected()}
-                    disabled={!row.getCanSelect()}
-                    onChange={row.getToggleSelectedHandler()}
-                  />
-                </TableCell>
+                {!disableCheckbox && (
+                  <TableCell
+                    padding="checkbox"
+                    style={{
+                      position: "sticky",
+                      left: 0,
+                      zIndex: 1,
+                      width: checkboxWidth,
+                      backgroundColor: rowColor,
+                      textOverflow: "ellipsis",
+                      whiteSpace: "nowrap",
+                    }}
+                  >
+                    <Checkbox
+                      name={`select-row-${row.id}`}
+                      checked={row.getIsSelected()}
+                      disabled={!row.getCanSelect()}
+                      onChange={row.getToggleSelectedHandler()}
+                    />
+                  </TableCell>
+                )}
                 {row.getVisibleCells().map((cell) => (
                   <TableCell
                     key={cell.id}
@@ -531,7 +583,7 @@ export function DataTable<T extends Record<string, unknown>>({
                       position: cell.column.getIsPinned() ? "sticky" : "static",
                       left:
                         cell.column.getIsPinned() === "left"
-                          ? checkboxWidth
+                          ? getLeftOffsetForColumn(cell.column)
                           : undefined,
                       right:
                         cell.column.getIsPinned() === "right" ? 0 : undefined,
@@ -564,28 +616,30 @@ export function DataTable<T extends Record<string, unknown>>({
           sx={{ flexShrink: 0 }}
         />
       </Paper>
-      <Menu
-        open={contextMenu.mouseY !== null}
-        onClose={handleCloseContextMenu}
-        anchorReference="anchorPosition"
-        anchorPosition={
-          contextMenu.mouseY !== null && contextMenu.mouseX !== null
-            ? { top: contextMenu.mouseY, left: contextMenu.mouseX }
-            : undefined
-        }
-      >
-        {menuItems.map((menuItem, index: number) => (
-          <MenuItem
-            key={index}
-            onClick={() => {
-              handleCloseContextMenu();
-              menuItem.onClick(contextMenu.id);
-            }}
-          >
-            {menuItem.label}
-          </MenuItem>
-        ))}
-      </Menu>
+      {menuItems && (
+        <Menu
+          open={contextMenu.mouseY !== null}
+          onClose={handleCloseContextMenu}
+          anchorReference="anchorPosition"
+          anchorPosition={
+            contextMenu.mouseY !== null && contextMenu.mouseX !== null
+              ? { top: contextMenu.mouseY, left: contextMenu.mouseX }
+              : undefined
+          }
+        >
+          {menuItems.map((menuItem, index: number) => (
+            <MenuItem
+              key={index}
+              onClick={() => {
+                handleCloseContextMenu();
+                menuItem.onClick(contextMenu.id);
+              }}
+            >
+              {menuItem.label}
+            </MenuItem>
+          ))}
+        </Menu>
+      )}
     </Box>
   );
 }

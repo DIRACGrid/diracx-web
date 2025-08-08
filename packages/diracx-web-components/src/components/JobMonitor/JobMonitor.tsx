@@ -12,6 +12,7 @@ import {
   blueGrey,
   lime,
   amber,
+  brown,
 } from "@mui/material/colors";
 
 import { lighten, darken, useTheme, Box } from "@mui/material";
@@ -161,6 +162,7 @@ export default function JobMonitor() {
    */
   const renderStatusCell = useCallback(
     (status: string) => {
+      const defaultColor = brown[500];
       return (
         <Box
           sx={{
@@ -169,8 +171,8 @@ export default function JobMonitor() {
             padding: "3px 10px",
             backgroundColor:
               theme.palette.mode === "light"
-                ? lighten(statusColors[status] ?? "default", 0.1)
-                : darken(statusColors[status] ?? "default", 0.3),
+                ? lighten(statusColors[status] ?? defaultColor, 0.1)
+                : darken(statusColors[status] ?? defaultColor, 0.3),
             color: "white",
             fontWeight: "bold",
           }}

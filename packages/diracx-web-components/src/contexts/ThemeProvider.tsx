@@ -85,8 +85,8 @@ export const ThemeProvider = ({ children }: ThemeProviderProps) => {
     const primaryColor = lightGreen[700];
     const secondaryColor = cyan[500];
 
-    const tableRowEvenColor = grey[200];
-    const tableRowOddColor = grey[50];
+    const tableRowFirstColor = grey[200];
+    const tableRowSecondColor = grey[50];
 
     const primary =
       theme === "light"
@@ -99,12 +99,13 @@ export const ThemeProvider = ({ children }: ThemeProviderProps) => {
 
     const tableRowEven =
       theme === "light"
-        ? lighten(tableRowEvenColor, 0.2)
-        : darken(tableRowEvenColor, 0.9);
+        ? lighten(tableRowSecondColor, 0.2)
+        : darken(tableRowFirstColor, 0.9);
+
     const tableRowOdd =
       theme === "light"
-        ? lighten(tableRowOddColor, 0.2)
-        : darken(tableRowOddColor, 0.8);
+        ? lighten(tableRowFirstColor, 0.2)
+        : darken(tableRowSecondColor, 0.8);
 
     // Create a Material-UI theme based on the current mode
     const muiTheme = createTheme({
@@ -307,9 +308,15 @@ export const ThemeProvider = ({ children }: ThemeProviderProps) => {
           root: {
             "& .MuiTableRow-root:nth-of-type(odd)": {
               backgroundColor: muiTheme.palette.tableRow.odd,
+              "&:hover": {
+                backgroundColor: darken(muiTheme.palette.tableRow.odd, 0.1),
+              },
             },
             "& .MuiTableRow-root:nth-of-type(even)": {
               backgroundColor: muiTheme.palette.tableRow.even,
+              "&:hover": {
+                backgroundColor: darken(muiTheme.palette.tableRow.even, 0.1),
+              },
             },
           },
         },

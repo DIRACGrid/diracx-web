@@ -68,10 +68,7 @@ export function deleteJobs(
 
   const deleteUrl = `${diracxUrl}/api/jobs/status`;
 
-  const currentDate = dayjs()
-    .utc()
-    .format("YYYY-MM-DDTHH:mm:ss.SSSSSS[Z]")
-    .toString();
+  const currentDate = dayjs().toISOString();
 
   const body = selectedIds.reduce((acc: StatusBody, jobId) => {
     acc[jobId] = {
@@ -158,9 +155,12 @@ export function rescheduleJobs(
   if (!diracxUrl) {
     throw new Error("Invalid URL generated for rescheduling jobs.");
   }
-  const queryString = selectedIds.map((id) => `job_ids=${id}`).join("&");
-  const rescheduleUrl = `${diracxUrl}/api/jobs/reschedule?${queryString}`;
-  return fetcher([rescheduleUrl, accessToken, "POST"]);
+  const body = {
+    job_ids: selectedIds,
+  };
+
+  const rescheduleUrl = `${diracxUrl}/api/jobs/reschedule`;
+  return fetcher([rescheduleUrl, accessToken, "POST", body]);
 }
 
 /**
