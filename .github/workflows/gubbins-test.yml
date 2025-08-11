@@ -226,7 +226,7 @@ jobs:
       # WARNING: In your CI/CD pipeline, you should remove the following steps  #
       # ------------------------------------------------------------------------#
       - name: Download gubbins-web
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v5
         with:
           name: gubbins-web
           path: /tmp/gubbins-web
@@ -259,7 +259,7 @@ jobs:
     # WARNING: In your CI/CD pipeline, you should remove the following steps  #
     # ------------------------------------------------------------------------#
     - name: Download gubbins
-      uses: actions/download-artifact@v4
+      uses: actions/download-artifact@v5
       with:
         name: gubbins
         path: /tmp/gubbins
@@ -274,7 +274,7 @@ jobs:
         git clone https://github.com/DIRACGrid/diracx.git
 
     - name: Download gubbins:services image
-      uses: actions/download-artifact@v4
+      uses: actions/download-artifact@v5
       with:
         name: gubbins-services-img
         path: /tmp/
@@ -283,7 +283,7 @@ jobs:
       run: docker load --input /tmp/gubbins_services_image.tar
 
     - name: Download gubbins-web
-      uses: actions/download-artifact@v4
+      uses: actions/download-artifact@v5
       with:
         name: gubbins-web
         path: /tmp/gubbins-web
