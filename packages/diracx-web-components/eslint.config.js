@@ -16,6 +16,7 @@ const compat = new FlatCompat({
   allConfig: js.configs.all,
 });
 
+// This config is only for typescript files
 export default [
   ...fixupConfigRules(
     compat.extends(
@@ -47,6 +48,8 @@ export default [
         ecmaFeatures: {
           jsx: true,
         },
+        project: ["./tsconfig.json"],
+        tsconfigRootDir: __dirname,
       },
     },
 
@@ -57,6 +60,7 @@ export default [
     },
 
     rules: {
+      "@typescript-eslint/no-deprecated": "warn",
       "import/order": ["error"],
       "import/no-unused-modules": ["error"],
       "import/no-useless-path-segments": ["error"],

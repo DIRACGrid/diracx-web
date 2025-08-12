@@ -68,7 +68,7 @@ export function deleteJobs(
 
   const deleteUrl = `${diracxUrl}/api/jobs/status`;
 
-  const currentDate = dayjs().toISOString();
+  const currentDate = dayjs().utc().toISOString();
 
   const body = selectedIds.reduce((acc: StatusBody, jobId) => {
     acc[jobId] = {
@@ -121,10 +121,7 @@ export function killJobs(
     throw new Error("Invalid URL generated for killing jobs.");
   }
   const killUrl = `${diracxUrl}/api/jobs/status`;
-  const currentDate = dayjs()
-    .utc()
-    .format("YYYY-MM-DDTHH:mm:ss.SSSSSS[Z]")
-    .toString();
+  const currentDate = dayjs().utc().toISOString();
 
   const body = selectedIds.reduce((acc: StatusBody, jobId) => {
     acc[jobId] = {

@@ -6,7 +6,7 @@ import { ColumnSelector } from "./ColumnSelector";
 
 interface ChartViewProps {
   /** The chart to be displayed */
-  chart: JSX.Element;
+  chart: React.ReactElement;
   /** List of columns available for selection */
   columnList: string[];
   /** Currently selected group columns */
