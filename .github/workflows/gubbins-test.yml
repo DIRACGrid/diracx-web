@@ -17,7 +17,7 @@ jobs:
     runs-on: ubuntu-latest
     if: github.event_name != 'push' || github.repository == 'DIRACGrid/diracx-web'
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       
       - uses: actions/setup-node@v4
         with:
@@ -154,7 +154,7 @@ jobs:
     runs-on: ubuntu-latest
     if: ${{ github.event_name != 'push' || github.repository == 'DIRACGrid/diracx-web' }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - uses: actions/setup-node@v4
         with:
@@ -208,7 +208,7 @@ jobs:
     needs: prepare-gubbins-frontend-as-a-standalone
     if: ${{ github.event_name != 'push' || github.repository == 'DIRACGrid/diracx-web' }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
@@ -248,7 +248,7 @@ jobs:
     needs: [prepare-gubbins-frontend-as-a-standalone, prepare-gubbins-backend]
     if: github.event_name != 'push' || github.repository == 'DIRACGrid/diracx-web'
     steps:
-    - uses: actions/checkout@v4 
+    - uses: actions/checkout@v5 
       
     - name: Clone source
       run: |
