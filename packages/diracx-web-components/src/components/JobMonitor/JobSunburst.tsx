@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 
 import { scaleOrdinal, quantize, interpolateRainbow } from "d3";
 
@@ -42,6 +42,8 @@ export function JobSunburst({
   const [tree, setTree] = useState<SunburstTree | undefined>(undefined);
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
+  const lastUsedGroupColumnsRef = useRef("");
+
   useEffect(() => {
     const newSearch = currentPath.map((elt, index) => {
       return {
@@ -71,10 +73,22 @@ export function JobSunburst({
       });
       setIsLoading(false);
     }
-    load();
+    // For optimization, only load when the used groupColumns change
+    if (
+      lastUsedGroupColumnsRef.current !==
+        groupColumns.slice(0, currentPath.length + 1).join(",") &&
+      diracxUrl &&
+      accessToken
+    ) {
+      lastUsedGroupColumnsRef.current = groupColumns
+        .slice(0, currentPath.length + 1)
+        .join(",");
+      load();
+    }
   }, [
-    groupColumns[currentPath.length],
-    groupColumns[currentPath.length + 1],
+    columns,
+    groupColumns,
+    lastUsedGroupColumnsRef,
     currentPath,
     searchBody,
     diracxUrl,

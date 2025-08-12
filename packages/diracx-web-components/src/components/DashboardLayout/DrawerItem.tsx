@@ -161,7 +161,7 @@ export default function DrawerItem({
         },
       }),
     );
-  }, [index, groupTitle, item, theme]);
+  }, [index, groupTitle, item, theme, icon]);
 
   // Handle renaming of the item
   const handleItemRename = () => {

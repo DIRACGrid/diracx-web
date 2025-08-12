@@ -37,23 +37,17 @@ export const ApplicationsProvider = ({
   defaultUserDashboard = defaultDashboard,
 }: ApplicationsProviderProps) => {
   const loadedDashboard = sessionStorage.getItem("savedDashboard");
-  const parsedDashboard: DashboardGroup[] = loadedDashboard
+  const parsedDashboard: DashboardGroup[] | null = loadedDashboard
     ? JSON.parse(loadedDashboard)
     : null;
 
-  const [userDashboard, setUserDashboard] = useState<DashboardGroup[]>(
-    parsedDashboard || [],
+  const [userDashboard, setUserDashboard] = useState(
+    parsedDashboard ? parsedDashboard : defaultUserDashboard,
   );
 
   const [currentAppId, setCurrentAppId] = useState<string>(
     userDashboard[0]?.items[0]?.id || "",
   );
-
-  useEffect(() => {
-    if (userDashboard.length !== 0) return;
-
-    setUserDashboard(defaultUserDashboard);
-  }, [appList, defaultUserDashboard]);
 
   // Save the dashboard in session storage
   useEffect(() => {

@@ -1,16 +1,23 @@
 "use client";
 
 import React, { useState, useEffect, useContext } from "react";
-import Box from "@mui/material/Box";
-import Typography from "@mui/material/Typography";
-import FormControl from "@mui/material/FormControl";
-import InputLabel from "@mui/material/InputLabel";
-import Select, { SelectChangeEvent } from "@mui/material/Select";
-import MenuItem from "@mui/material/MenuItem";
-import Button from "@mui/material/Button";
-import Autocomplete from "@mui/material/Autocomplete";
-import TextField from "@mui/material/TextField";
-import { Stack } from "@mui/material";
+
+import {
+  Box,
+  Typography,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  Button,
+  Stack,
+  Autocomplete,
+  TextField,
+  SelectChangeEvent,
+} from "@mui/material";
+
+import Image from "next/image";
+
 import { useOidc } from "@axa-fr/react-oidc";
 import { useMetadata, Metadata } from "../../hooks/metadata";
 import { useOIDCContext } from "../../hooks/oidcConfiguration";
@@ -146,7 +153,7 @@ export function LoginForm({
             paddingBottom: "10%",
           }}
         >
-          <img src={logoURL} alt="DIRAC logo" width={150} height={150} />
+          <Image src={logoURL} alt="DIRAC logo" width={150} height={150} />
         </Box>
         {singleVO ? (
           <Typography

@@ -94,6 +94,10 @@ export function SearchBar<T extends string>({
   const [tokenEquations, setTokenEquations] = useState<
     SearchBarTokenEquation[]
   >([]);
+  /** A ref to store the current filters to avoid reloading the token equations */
+  const currentFilters = useRef<string | null>(null);
+  /** A ref to store a boolean indicating if the component is updating from search */
+  const isUpdatingFromSearch = useRef<boolean>(false);
 
   const [suggestions, setSuggestions] = useState<SearchBarSuggestions>({
     items: [],
@@ -118,7 +122,16 @@ export function SearchBar<T extends string>({
 
   // Effect to initialize the token equations from filters
   useEffect(() => {
-    if (tokenEquations.length !== 0) return; // Avoid reloading if already loaded
+    const newFiltersString = String(
+      filters.map((filter) => JSON.stringify(filter)),
+    );
+
+    if (isUpdatingFromSearch.current) {
+      isUpdatingFromSearch.current = false; // Reset the flag after updating from search
+      currentFilters.current = newFiltersString; // Update the current filters to the new filters
+      return;
+    }
+    if (currentFilters && currentFilters.current === newFiltersString) return; // Avoid reloading if already loaded
 
     async function load() {
       const promises = filters.map(async (filter, filterIndex) =>
@@ -128,8 +141,11 @@ export function SearchBar<T extends string>({
       setTokenEquations(newTokenEquations);
     }
 
-    if (filters.length !== 0 && tokenEquations.length === 0) load();
-  }, []);
+    if (filters.length !== 0) {
+      load();
+      currentFilters.current = newFiltersString;
+    }
+  }, [filters, createSuggestions, currentFilters, tokenEquations.length]);
 
   // Create a list of options based on the current tokens and data
   useEffect(() => {
