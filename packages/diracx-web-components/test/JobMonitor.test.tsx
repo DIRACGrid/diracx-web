@@ -8,7 +8,6 @@ import {
 import { composeStories } from "@storybook/react";
 import { VirtuosoMockContext } from "react-virtuoso";
 import * as stories from "../stories/JobMonitor.stories";
-import "@testing-library/jest-dom";
 
 // Compose Storybook stories (includes all decorators/args)
 const { Default, Loading, Empty, WithError } = composeStories(stories);

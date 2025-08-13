@@ -1,7 +1,5 @@
 import { Metadata } from "../../src/hooks/metadata";
 
-export { Metadata } from "../../src/hooks/metadata";
-
 // Create a store for mock data
 let mockMetadataResponse: {
   metadata: Metadata | null;

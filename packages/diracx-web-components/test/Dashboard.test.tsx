@@ -3,7 +3,6 @@ import { composeStories } from "@storybook/react";
 import { useOidc, useOidcAccessToken } from "@axa-fr/react-oidc";
 import { useMediaQuery } from "@mui/material";
 import * as stories from "../stories/Dashboard.stories";
-import "@testing-library/jest-dom";
 
 // Compose your Storybook stories (this will include all decorators/args)
 const { Default } = composeStories(stories);
