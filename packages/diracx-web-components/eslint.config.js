@@ -20,6 +20,7 @@ const compat = new FlatCompat({
 export default [
   ...fixupConfigRules(
     compat.extends(
+      "next/core-web-vitals",
       "plugin:import/recommended",
       "plugin:import/typescript",
       "plugin:storybook/recommended",
@@ -61,6 +62,7 @@ export default [
 
     rules: {
       "@typescript-eslint/no-deprecated": "warn",
+      "@next/next/no-html-link-for-pages": "off", // We don't have pages, it's a library
       "import/order": ["error"],
       "import/no-unused-modules": ["error"],
       "import/no-useless-path-segments": ["error"],

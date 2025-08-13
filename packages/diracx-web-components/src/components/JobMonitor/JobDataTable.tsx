@@ -137,7 +137,10 @@ export function JobDataTable({
     totalJobs = results.length;
   }
 
-  const clearSelected = () => setRowSelection({});
+  const clearSelected = useCallback(
+    () => setRowSelection({}),
+    [setRowSelection],
+  );
 
   /**
    * Handle the deletion of the selected jobs
@@ -174,11 +177,11 @@ export function JobDataTable({
     }
   }, [
     accessToken,
+    accessTokenPayload,
     diracxUrl,
     rowSelection,
-    searchBody,
-    pagination.pageIndex,
-    pagination.pageSize,
+    clearSelected,
+    setSearchBody,
   ]);
 
   /**
@@ -244,11 +247,11 @@ export function JobDataTable({
     }
   }, [
     accessToken,
+    accessTokenPayload,
     diracxUrl,
     rowSelection,
-    searchBody,
-    pagination.pageIndex,
-    pagination.pageSize,
+    clearSelected,
+    setSearchBody,
   ]);
 
   /**
@@ -309,14 +312,7 @@ export function JobDataTable({
     } finally {
       setBackdropOpen(false);
     }
-  }, [
-    accessToken,
-    diracxUrl,
-    rowSelection,
-    searchBody,
-    pagination.pageIndex,
-    pagination.pageSize,
-  ]);
+  }, [accessToken, diracxUrl, rowSelection, clearSelected, setSearchBody]);
 
   /**
    * Handle the history of the selected job

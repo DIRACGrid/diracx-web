@@ -67,7 +67,7 @@ export function Sunburst({
       quantize(interpolateRainbow, tree.children.length + 1),
     );
     return (name: string, _size: number, _depth: number) => colorScale(name);
-  }, [tree?.children?.length]);
+  }, [tree.children]);
 
   // Use the provided colorScales or the default one
   const finalColorScales = colorScales || defaultColorScale;
@@ -310,6 +310,9 @@ export function Sunburst({
     theme,
     finalColorScales,
     sizeToText,
+    error,
+    hasHiddenLevels,
+    isLoading,
   ]);
 
   if (error) {
