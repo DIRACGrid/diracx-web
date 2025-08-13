@@ -1,5 +1,20 @@
 # Changelog
 
+## [0.1.0-a9](https://github.com/DIRACGrid/diracx-web/compare/v0.1.0-a8...v0.1.0-a9) (2025-08-13)
+
+
+### Features
+
+* pie chart for Job Monitor ([c589a96](https://github.com/DIRACGrid/diracx-web/commit/c589a962ee5ab547d0d17437d568f7fc253378a4))
+* pie chart for Job Monitor ([2f5998a](https://github.com/DIRACGrid/diracx-web/commit/2f5998a7c3b6f5480e7397ea0918d27d6859fedb))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @dirac-grid/diracx-web-components bumped from 0.1.0-a8 to 0.1.0-a9
+
 ## [0.1.0-a8](https://github.com/DIRACGrid/diracx-web/compare/v0.1.0-a7...v0.1.0-a8) (2025-07-17)
 
 
