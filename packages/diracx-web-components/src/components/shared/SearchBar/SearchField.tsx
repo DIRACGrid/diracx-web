@@ -79,7 +79,6 @@ export default function SearchField({
     label: string,
     nature: SearchBarTokenNature,
     type: CategoryType,
-    hideSuggestion: boolean,
   ) {
     if (!allowKeyWordSearch && nature === SearchBarTokenNature.CUSTOM) return;
 
@@ -100,7 +99,6 @@ export default function SearchField({
           nature: nature,
           suggestions:
             nature === SearchBarTokenNature.CATEGORY ? undefined : suggestions,
-          hideSuggestion: hideSuggestion,
         };
         handleEquationsVerification(updatedTokens, setTokenEquations);
       }
@@ -116,14 +114,13 @@ export default function SearchField({
           type: type,
           nature: nature,
           suggestions: suggestions,
-          hideSuggestion: hideSuggestion,
         });
         handleEquationsVerification([...tokenEquations], setTokenEquations);
       } else {
         // We are creating a new equation
         const newLastEquation: SearchBarTokenEquation = {
           status:
-            type === CategoryType.CUSTOM
+            nature === SearchBarTokenNature.CUSTOM
               ? EquationStatus.VALID
               : EquationStatus.WAITING,
           items: [
@@ -132,7 +129,6 @@ export default function SearchField({
               type: type,
               nature: nature,
               suggestions: undefined,
-              hideSuggestion: hideSuggestion,
             },
           ],
         };
@@ -249,16 +245,12 @@ export default function SearchField({
     }, 0);
   }
 
-  // Calculate the width of the input field based on the input value length
-  const width = Math.min(Math.max(inputValue.length * 8 + 50, 150), 800);
-
   const handleDateAccepted = (newValue: string | null) => {
     if (newValue) {
       handleTokenCreation(
         newValue,
         SearchBarTokenNature.VALUE,
         CategoryType.DATE,
-        false,
       );
     }
   };
@@ -289,8 +281,7 @@ export default function SearchField({
       sx={{
         marginTop: "2px",
         minWidth: "180px",
-        width: "auto",
-        maxWidth: 0.9,
+        flexGrow: 1,
       }}
       disableClearable={true}
       options={suggestions.items}
@@ -309,9 +300,6 @@ export default function SearchField({
             input: {
               ...params.InputProps,
               disableUnderline: true,
-              style: {
-                width: `${width}px`,
-              },
             },
           }}
           onKeyDown={(e: React.KeyboardEvent<HTMLDivElement>) => {
@@ -320,18 +308,13 @@ export default function SearchField({
                 optionSelectedRef.current = false;
                 return;
               }
-              const { nature, type, hideSuggestion } = getTokenMetadata(
+              const { nature, type } = getTokenMetadata(
                 inputValue.trim(),
                 suggestions,
                 previousToken,
               );
               // Always create token on Enter press, regardless of operator type
-              handleTokenCreation(
-                inputValue.trim(),
-                nature,
-                type,
-                hideSuggestion,
-              );
+              handleTokenCreation(inputValue.trim(), nature, type);
             }
             if (e.key === "Backspace") {
               handleBackspaceKeyDown();
@@ -381,12 +364,12 @@ export default function SearchField({
           }
 
           // For all other operators, create token immediately
-          const { nature, type, hideSuggestion } = getTokenMetadata(
+          const { nature, type } = getTokenMetadata(
             value.trim(),
             suggestions,
             previousToken,
           );
-          handleTokenCreation(value, nature, type, hideSuggestion);
+          handleTokenCreation(value, nature, type);
         }
       }}
     />

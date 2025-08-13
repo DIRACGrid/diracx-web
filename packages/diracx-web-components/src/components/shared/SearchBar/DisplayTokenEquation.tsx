@@ -75,6 +75,7 @@ export function DisplayTokenEquation({
               }}
               key={tokenIndex}
               onClick={(e) => handleClick(e, tokenIndex)}
+              id={`tokenid:equation-${equationIndex}-token-${tokenIndex}`}
               onContextMenu={(e) => {
                 e.preventDefault();
                 handleRightClick();

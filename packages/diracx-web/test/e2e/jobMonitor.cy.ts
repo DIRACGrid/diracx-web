@@ -533,7 +533,7 @@ describe("Job Monitor", () => {
 
   it("should render the sunburst chart", () => {
     // Click on the sunburst button
-    cy.get('[role="group"]').last().click();
+    cy.get('[role="group"]').get("[data-testid='DonutSmallIcon']").click();
 
     // Make sure the sunburst chart is visible
     cy.get('[data-testid="sunburst-chart"]').should("be.visible");

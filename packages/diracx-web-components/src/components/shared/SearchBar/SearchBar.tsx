@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useMemo } from "react";
 
 import { Box, Menu, MenuItem, IconButton } from "@mui/material";
 
@@ -32,17 +32,25 @@ import {
 import SearchField from "./SearchField";
 import { PlotTypeSelector } from "./PlotTypeSelector";
 
+export interface CreateSuggestionsParams {
+  previousToken?: SearchBarToken;
+  previousEquation?: SearchBarTokenEquation;
+  currentInput?: string;
+  equationIndex?: number;
+}
+
 export interface SearchBarProps<T extends string> {
   /** The filters to be applied to the search */
   filters: Filter[];
   /** The function to set the filters */
   setFilters: React.Dispatch<React.SetStateAction<Filter[]>>;
   /** The data to be used for suggestions */
-  createSuggestions: (
-    previousToken: SearchBarToken | undefined,
-    previousEquation: SearchBarTokenEquation | undefined,
-    equationIndex?: number,
-  ) => Promise<SearchBarSuggestions>;
+  createSuggestions: ({
+    previousToken,
+    previousEquation,
+    currentInput,
+    equationIndex,
+  }: CreateSuggestionsParams) => Promise<SearchBarSuggestions>;
   /** The function to call when the search is performed (optional) */
   searchFunction?: (
     equations: SearchBarTokenEquation[],
@@ -81,7 +89,7 @@ export function SearchBar<T extends string>({
   plotTypeSelectorProps,
 }: SearchBarProps<T>) {
   const [inputValue, setInputValue] = useState("");
-  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const [anchorEl, setAnchorEl] = useState<null | Element>(null);
   const [clickedTokenIndex, setClickedTokenIndex] =
     useState<EquationAndTokenIndex | null>(null);
   const [focusedTokenIndex, setFocusedTokenIndex] =
@@ -94,12 +102,13 @@ export function SearchBar<T extends string>({
   const [tokenEquations, setTokenEquations] = useState<
     SearchBarTokenEquation[]
   >([]);
+  const currentFilters = useRef<string | null>(null);
+  const isUpdatingFromSearch = useRef<boolean>(false);
 
   const [suggestions, setSuggestions] = useState<SearchBarSuggestions>({
     items: [],
     nature: [],
     type: [],
-    hideSuggestion: [],
   });
 
   const { previousEquation, previousToken } = getPreviousEquationAndToken(
@@ -118,7 +127,16 @@ export function SearchBar<T extends string>({
 
   // Effect to initialize the token equations from filters
   useEffect(() => {
-    if (tokenEquations.length !== 0) return; // Avoid reloading if already loaded
+    const newFiltersString = String(
+      filters.map((filter) => JSON.stringify(filter)),
+    );
+
+    if (isUpdatingFromSearch.current) {
+      isUpdatingFromSearch.current = false; // Reset the flag after updating from search
+      currentFilters.current = newFiltersString; // Update the current filters to the new filters
+      return;
+    }
+    if (currentFilters && currentFilters.current === newFiltersString) return; // Avoid reloading if already loaded
 
     async function load() {
       const promises = filters.map(async (filter, filterIndex) =>
@@ -128,21 +146,42 @@ export function SearchBar<T extends string>({
       setTokenEquations(newTokenEquations);
     }
 
-    if (filters.length !== 0 && tokenEquations.length === 0) load();
-  }, []);
+    if (filters.length !== 0) load();
+    currentFilters.current = newFiltersString;
+  }, [filters, createSuggestions, currentFilters, tokenEquations.length]);
 
-  // Create a list of options based on the current tokens and data
+  /**
+   * This effect is used to check if the provided function uses the current input
+   */
+  const usesCurrentInput = useMemo(
+    () => functionUsesCurrentInput(createSuggestions),
+    [createSuggestions],
+  );
+
   useEffect(() => {
     async function load() {
-      const result = await createSuggestions(
+      const params: CreateSuggestionsParams = {
         previousToken,
         previousEquation,
-        focusedTokenIndex?.equationIndex,
-      );
+        equationIndex: focusedTokenIndex?.equationIndex,
+      };
+
+      if (usesCurrentInput && inputValue) {
+        params.currentInput = inputValue;
+      }
+
+      const result = await createSuggestions(params);
       setSuggestions(result);
     }
     load();
-  }, [previousEquation, previousToken, createSuggestions, focusedTokenIndex]);
+  }, [
+    previousEquation,
+    previousToken,
+    createSuggestions,
+    focusedTokenIndex,
+    // If the current input is not used, we don't want to trigger the suggestions for each letter typed
+    ...(usesCurrentInput ? [inputValue] : []),
+  ]);
 
   // Timer to delay the search function
   // This effect will trigger the searchFonction after a delay if the equations are valid
@@ -168,6 +207,7 @@ export function SearchBar<T extends string>({
     if (allEquationsValid && hasChanged) {
       searchTimerRef.current = setTimeout(() => {
         lastSearchedEquationsRef.current = currentEquationsString;
+        isUpdatingFromSearch.current = true;
         searchFunction(tokenEquations, setFilters);
       }, 800);
     }
@@ -184,19 +224,24 @@ export function SearchBar<T extends string>({
     inputRef.current?.focus();
   }, [focusedTokenIndex]);
 
-  const handleOptionMenuOpen = (
-    event: React.MouseEvent<HTMLButtonElement>,
-    equationIndex: number,
-    tokenIndex: number,
-  ) => {
-    if (
-      (tokenEquations[equationIndex].items[tokenIndex].suggestions?.items || [])
-        .length > 0
-    ) {
-      setAnchorEl(event.currentTarget);
-      setClickedTokenIndex({ equationIndex, tokenIndex });
+  // Effect to open the suggestions menu when a token is clicked
+  useEffect(() => {
+    if (clickedTokenIndex !== null) {
+      const { equationIndex, tokenIndex } = clickedTokenIndex;
+      const suggestions =
+        tokenEquations[equationIndex].items[tokenIndex].suggestions?.items ||
+        [];
+
+      if (suggestions.length > 0) {
+        // If there are suggestions, open the menu
+        setAnchorEl(
+          document.querySelector(
+            `#tokenid\\:equation-${equationIndex}-token-${tokenIndex}`,
+          ),
+        );
+      }
     }
-  };
+  }, [tokenEquations, clickedTokenIndex]);
 
   const handleOptionMenuClose = () => {
     setAnchorEl(null);
@@ -207,7 +252,6 @@ export function SearchBar<T extends string>({
     option: string,
     nature: SearchBarTokenNature,
     type: CategoryType,
-    hideSuggestion: boolean,
   ) => {
     if (searchTimerRef.current) {
       clearTimeout(searchTimerRef.current);
@@ -222,7 +266,6 @@ export function SearchBar<T extends string>({
         type: type, // Change the type
         nature: nature, // Change the nature
         label: option,
-        hideSuggestion,
       };
 
       updatedTokens[clickedTokenIndex.equationIndex] = updatedToken; // Update the equation in the list
@@ -261,11 +304,11 @@ export function SearchBar<T extends string>({
       );
       tokenEquations[clickedTokenIndex.equationIndex].items[
         clickedTokenIndex.tokenIndex
-      ].suggestions = await createSuggestions(
+      ].suggestions = await createSuggestions({
         previousToken,
         previousEquation,
-        clickedTokenIndex.equationIndex,
-      );
+        equationIndex: clickedTokenIndex.equationIndex,
+      });
 
       setTokenEquations([...tokenEquations]); // Update the state to trigger a re-render
     }
@@ -284,9 +327,8 @@ export function SearchBar<T extends string>({
           items: [],
           nature: [],
           type: [],
-          hideSuggestion: [],
         }
-      : { items: [], nature: [], type: [], hideSuggestion: [] };
+      : { items: [], nature: [], type: [] };
 
   return (
     <Box
@@ -316,13 +358,21 @@ export function SearchBar<T extends string>({
         }}
         data-testid="search-bar"
       >
-        <Box sx={{ gap: 1, display: "flex", padding: 1, overflow: "auto" }}>
+        <Box
+          sx={{
+            gap: 1,
+            display: "flex",
+            padding: 1,
+            width: 1,
+            overflow: "auto",
+          }}
+        >
           {tokenEquations.map((equation, index) => (
             <DisplayTokenEquation
               key={index}
               tokensEquation={equation}
-              handleClick={(e, tokenIndex) =>
-                handleOptionMenuOpen(e, index, tokenIndex)
+              handleClick={(_e, tokenIndex) =>
+                setClickedTokenIndex({ equationIndex: index, tokenIndex })
               }
               handleRightClick={() =>
                 setTokenEquations((prev) => [
@@ -350,7 +400,6 @@ export function SearchBar<T extends string>({
                       option,
                       currentSuggestions.nature[idx],
                       currentSuggestions.type[idx],
-                      currentSuggestions.hideSuggestion[idx],
                     )
                   }
                 >
@@ -392,5 +441,20 @@ export function SearchBar<T extends string>({
         />
       )}
     </Box>
+  );
+}
+
+/**
+ * This function is used to check if the provided function uses the current input
+ *
+ * @param func The function to check if it uses the current input
+ * @returns A boolean indicating whether the function uses the current input
+ */
+function functionUsesCurrentInput(
+  func: (params: CreateSuggestionsParams) => Promise<SearchBarSuggestions>,
+): boolean {
+  const funcString = func.toString();
+  return (
+    funcString.includes("currentInput") || funcString.includes("inputValue")
   );
 }

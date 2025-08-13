@@ -66,20 +66,16 @@ export function JobSearchBar({
     <SearchBar
       filters={filters}
       setFilters={setFilters}
-      createSuggestions={(
-        previousToken: SearchBarToken | undefined,
-        previousEquation: SearchBarTokenEquation | undefined,
-        equationIndex?: number,
-      ) =>
-        createSuggestions(
+      createSuggestions={({ previousToken, previousEquation, equationIndex }) =>
+        createSuggestions({
           diracxUrl,
           accessToken,
           previousToken,
           previousEquation,
           columns,
           searchBody,
-          equationIndex,
-        )
+          searchBodyIndex: equationIndex,
+        })
       }
       allowKeyWordSearch={false} // Disable keyword search for job monitor
       plotTypeSelectorProps={plotTypeSelectorProps}
@@ -100,20 +96,28 @@ export function JobSearchBar({
  * @param searchBodyIndex The index of the search body, which is used to determine the current search context (optional).
  * @returns A list of suggestions based on the current tokens and data.
  */
-async function createSuggestions(
-  diracxUrl: string | null,
-  accessToken: string | undefined,
-  previousToken: SearchBarToken | undefined,
-  previousEquation: SearchBarTokenEquation | undefined,
+async function createSuggestions({
+  diracxUrl,
+  accessToken,
+  previousToken,
+  previousEquation,
+  columns,
+  searchBody,
+  searchBodyIndex,
+}: {
+  diracxUrl: string | null;
+  accessToken: string | undefined;
+  previousToken: SearchBarToken | undefined;
+  previousEquation: SearchBarTokenEquation | undefined;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  columns: ColumnDef<Job, any>[],
-  searchBody: SearchBody,
-  searchBodyIndex?: number,
-): Promise<SearchBarSuggestions> {
+  columns: ColumnDef<Job, any>[];
+  searchBody?: SearchBody;
+  searchBodyIndex?: number;
+}): Promise<SearchBarSuggestions> {
   let data: JobSummary[] = [];
 
   const search = [...(searchBody?.search || [])];
-
+  /** The search body index is used to determine the current search context */
   const newSearchBody = {
     ...searchBody,
     search: search.slice(0, searchBodyIndex),
@@ -146,15 +150,11 @@ async function createSuggestions(
     const type = columns.map(
       (column) => column.meta?.type || CategoryType.STRING,
     ) as CategoryType[];
-    const hideSuggestion = columns.map(
-      (column) => column.meta?.isQuasiUnique || false,
-    );
 
     return {
       items: items,
       type,
       nature: Array(items.length).fill(SearchBarTokenNature.CATEGORY),
-      hideSuggestion: hideSuggestion,
     };
   }
 
@@ -165,26 +165,35 @@ async function createSuggestions(
         items: ["minute", "hour", "day", "week", "month", "year"],
         nature: Array(6).fill(SearchBarTokenNature.VALUE),
         type: Array(6).fill(CategoryType.DATE),
-        hideSuggestion: Array(6).fill(previousToken.hideSuggestion),
       };
     }
 
-    if (!previousToken.hideSuggestion) {
+    const hideSuggestion = columns.some(
+      (column) =>
+        column.header === previousEquation.items[0].label &&
+        column.meta?.isQuasiUnique === true,
+    );
+
+    if (!hideSuggestion) {
       // Load the suggestions for the selected category
+
+      /**
+       * The internal name of the category is used to fetch the job summary
+       */
       const category = fromHumanReadableText(
         String(previousEquation.items[0].label),
         columns,
       );
+
       await fetchJobSummary(category);
-      const items = data.map(
-        (item) => item[category as keyof JobSummary] as string,
+      const items = data.map((item) =>
+        String(item[category as keyof JobSummary]),
       );
 
       return {
         items: items,
         nature: Array(items.length).fill(SearchBarTokenNature.VALUE),
-        type: Array(items.length).fill(CategoryType.STRING),
-        hideSuggestion: Array(items.length).fill(previousToken.hideSuggestion),
+        type: Array(items.length).fill(previousToken.type),
       };
     }
   }
@@ -197,9 +206,6 @@ async function createSuggestions(
           items: items,
           type: Array(items.length).fill(CategoryType.STRING),
           nature: Array(items.length).fill(SearchBarTokenNature.OPERATOR),
-          hideSuggestion: Array(items.length).fill(
-            previousToken.hideSuggestion,
-          ),
         };
       case CategoryType.NUMBER:
         items = Operators.getNumberOperators().map((op) => op.getDisplay());
@@ -207,9 +213,6 @@ async function createSuggestions(
           items: items,
           type: Array(items.length).fill(CategoryType.NUMBER),
           nature: Array(items.length).fill(SearchBarTokenNature.OPERATOR),
-          hideSuggestion: Array(items.length).fill(
-            previousToken.hideSuggestion,
-          ),
         };
       case CategoryType.BOOLEAN:
         items = Operators.getBooleanOperators().map((op) => op.getDisplay());
@@ -217,9 +220,6 @@ async function createSuggestions(
           items: items,
           type: Array(items.length).fill(CategoryType.BOOLEAN),
           nature: Array(items.length).fill(SearchBarTokenNature.OPERATOR),
-          hideSuggestion: Array(items.length).fill(
-            previousToken.hideSuggestion,
-          ),
         };
       case CategoryType.DATE:
         items = Operators.getDateOperators().map((op) => op.getDisplay());
@@ -227,9 +227,6 @@ async function createSuggestions(
           items: items,
           type: Array(items.length).fill(CategoryType.DATE),
           nature: Array(items.length).fill(SearchBarTokenNature.OPERATOR),
-          hideSuggestion: Array(items.length).fill(
-            previousToken.hideSuggestion,
-          ),
         };
       case CategoryType.CUSTOM:
         items = Operators.getDefaultOperators().map((op) => op.getDisplay());
@@ -237,18 +234,13 @@ async function createSuggestions(
           items: items,
           nature: Array(items.length).fill(SearchBarTokenNature.OPERATOR),
           type: Array(items.length).fill(CategoryType.CUSTOM),
-          hideSuggestion: Array(items.length).fill(
-            previousToken.hideSuggestion,
-          ),
         };
 
-      // We don't want suggestions for the number and in case of a custom token
       default:
         return {
           items: [],
           nature: [],
           type: [],
-          hideSuggestion: [],
         };
     }
   }
@@ -257,6 +249,5 @@ async function createSuggestions(
     items: [],
     nature: [],
     type: [],
-    hideSuggestion: [],
   };
 }
