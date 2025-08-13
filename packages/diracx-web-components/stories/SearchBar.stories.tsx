@@ -108,7 +108,7 @@ const createSuggestions = async (
   };
 };
 
-const meta: Meta<SearchBarProps> = {
+const meta: Meta<SearchBarProps<string>> = {
   title: "shared/SearchBar",
   component: SearchBar,
   parameters: {
@@ -127,7 +127,7 @@ const meta: Meta<SearchBarProps> = {
 };
 
 export default meta;
-type Story = StoryObj<SearchBarProps>;
+type Story = StoryObj<SearchBarProps<string>>;
 
 export const Default: Story = {
   args: {

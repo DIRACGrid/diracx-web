@@ -31,7 +31,6 @@
     "app",
     "node_modules",
     "dist",
-    "test",
     "stories",
     "tsup.config.ts",
     "jest.setup.ts"

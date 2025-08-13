@@ -3,7 +3,6 @@ import { composeStories } from "@storybook/react";
 import { Sunburst } from "../src/components/shared/Sunburst/Sunburst";
 import { SunburstTree } from "../src/types";
 import * as stories from "../stories/Sunburst.stories"; // Importing all stories to use in tests
-import "@testing-library/jest-dom";
 
 // Sample tree data for testing
 const mockTree: SunburstTree = {

@@ -1,7 +1,5 @@
 import { render, screen, fireEvent, cleanup } from "@testing-library/react";
-import "@testing-library/jest-dom";
 import { composeStories } from "@storybook/react";
-import { afterEach, describe, it, expect } from "@jest/globals";
 import * as stories from "../stories/DataTable.stories";
 
 // Compose the stories to get actual Storybook behavior (decorators, args, etc)

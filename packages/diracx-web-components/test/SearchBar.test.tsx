@@ -2,7 +2,6 @@ import { render, screen, waitFor } from "@testing-library/react";
 import { composeStories } from "@storybook/react";
 import userEvent from "@testing-library/user-event";
 import * as stories from "../stories/SearchBar.stories";
-import "@testing-library/jest-dom";
 
 // Compose the stories to get actual Storybook behavior (decorators, args, etc)
 const { Default, WithPrefilledTokens } = composeStories(stories);

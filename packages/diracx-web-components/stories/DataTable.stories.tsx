@@ -7,6 +7,8 @@ import {
 import { ThemeProvider } from "../src/contexts/ThemeProvider";
 import { DataTable, DataTableProps } from "../src/components/shared/DataTable";
 
+import { CategoryType } from "../src";
+
 interface SimpleItem extends Record<string, unknown> {
   id: number;
   name: string;
@@ -18,15 +20,15 @@ const columnHelper = createColumnHelper<SimpleItem>();
 const columnDefs = [
   columnHelper.accessor("id", {
     header: "ID",
-    meta: { type: "number" },
+    meta: { type: CategoryType.NUMBER },
   }),
   columnHelper.accessor("name", {
     header: "Name",
-    meta: { type: "string" },
+    meta: { type: CategoryType.STRING },
   }),
   columnHelper.accessor("email", {
     header: "Email",
-    meta: { type: "string" },
+    meta: { type: CategoryType.STRING },
   }),
 ];
 
