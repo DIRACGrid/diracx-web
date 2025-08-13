@@ -209,6 +209,7 @@ function DataTableToolbar<T extends Record<string, unknown>>({
  * @property {React.ReactElement} toolbarComponents - the components to display in the toolbar
  * @property {MenuItem[]} menuItems - the menu items
  * @property {boolean} disableCheckbox - boolean to disable the checkbox
+ * @property {boolean} hideFooter - boolean to hide the footer
  */
 export interface DataTableProps<T extends Record<string, unknown>> {
   /** The title of the table */
@@ -231,6 +232,8 @@ export interface DataTableProps<T extends Record<string, unknown>> {
   menuItems?: MenuItem[];
   /** Boolean to disable the checkbox */
   disableCheckbox?: boolean;
+  /** Whether to hide the footer */
+  hideFooter?: boolean;
 }
 
 /**
@@ -249,6 +252,7 @@ export function DataTable<T extends Record<string, unknown>>({
   toolbarComponents,
   menuItems,
   disableCheckbox = false,
+  hideFooter = false,
 }: DataTableProps<T>) {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
@@ -602,19 +606,22 @@ export function DataTable<T extends Record<string, unknown>>({
             );
           }}
         />
-        <TablePagination
-          component="div"
-          rowsPerPageOptions={[25, 50, 100, 500, 1000]}
-          count={totalRows}
-          showFirstButton
-          showLastButton
-          rowsPerPage={table.getState().pagination.pageSize}
-          page={table.getState().pagination.pageIndex}
-          onPageChange={handleChangePage}
-          onRowsPerPageChange={handleChangeRowsPerPage}
-          labelRowsPerPage={isMobile ? "" : "Rows per page"}
-          sx={{ flexShrink: 0 }}
-        />
+        {!hideFooter && (
+          <TablePagination
+            component="div"
+            rowsPerPageOptions={[25, 50, 100, 500, 1000]}
+            count={totalRows}
+            showFirstButton
+            showLastButton
+            rowsPerPage={table.getState().pagination.pageSize}
+            page={table.getState().pagination.pageIndex}
+            onPageChange={handleChangePage}
+            onRowsPerPageChange={handleChangeRowsPerPage}
+            labelRowsPerPage={isMobile ? "" : "Rows per page"}
+            sx={{ flexShrink: 0 }}
+            data-testid="data-table-pagination"
+          />
+        )}
       </Paper>
       {menuItems && (
         <Menu

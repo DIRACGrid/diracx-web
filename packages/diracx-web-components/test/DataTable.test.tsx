@@ -1,10 +1,16 @@
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen, fireEvent, cleanup } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import { composeStories } from "@storybook/react";
+import { afterEach, describe, it, expect } from "@jest/globals";
 import * as stories from "../stories/DataTable.stories";
 
 // Compose the stories to get actual Storybook behavior (decorators, args, etc)
 const { Default } = composeStories(stories);
+
+afterEach(() => {
+  // Clean up the DOM after each test to avoid strange behavior
+  cleanup();
+});
 
 describe("DataTable", () => {
   it("renders table title", () => {
@@ -31,5 +37,10 @@ describe("DataTable", () => {
       fireEvent.click(menuButton);
       expect(screen.getByText("Edit")).toBeInTheDocument();
     }
+  });
+
+  it("hide footer when hideFooter prop is true", () => {
+    const { queryByTestId } = render(<Default hideFooter={true} />);
+    expect(queryByTestId("data-table-pagination")).not.toBeInTheDocument();
   });
 });
