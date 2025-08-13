@@ -1,5 +1,29 @@
 # Changelog
 
+## [0.1.0-a9](https://github.com/DIRACGrid/diracx-web/compare/v0.1.0-a8...v0.1.0-a9) (2025-08-13)
+
+
+### Features
+
+* allows to hide the footer of the datatable ([6cde6a7](https://github.com/DIRACGrid/diracx-web/commit/6cde6a791e99694284351ed1f014d21c464c95d9))
+* datatable checkbox can be removed ([8e2427c](https://github.com/DIRACGrid/diracx-web/commit/8e2427c0a653ac146a1b4c97d4ff97b24e41e52c))
+* hover effect on the row, user can pin a column ([175d933](https://github.com/DIRACGrid/diracx-web/commit/175d93394c56b76536454d69e8e2b57e0c46be78))
+* improve the pin feature ([f402641](https://github.com/DIRACGrid/diracx-web/commit/f402641ff57e67f2036736878a32a2e289bc04fe))
+* pie chart for Job Monitor ([c589a96](https://github.com/DIRACGrid/diracx-web/commit/c589a962ee5ab547d0d17437d568f7fc253378a4))
+* pie chart for Job Monitor ([2f5998a](https://github.com/DIRACGrid/diracx-web/commit/2f5998a7c3b6f5480e7397ea0918d27d6859fedb))
+
+
+### Bug Fixes
+
+* missing color for non-referenced status ([607e1ab](https://github.com/DIRACGrid/diracx-web/commit/607e1ab5436e33f53a54777e5955e1cc6579fcca))
+* review suggestions ([cf0fec0](https://github.com/DIRACGrid/diracx-web/commit/cf0fec08e014246fc30fea948c9c0a106170909d))
+* review suggestions ([c8a8a67](https://github.com/DIRACGrid/diracx-web/commit/c8a8a67f1d4ecd86ad9c159b9177060e8f516795))
+* tests and change the source in the request ([dc06d4e](https://github.com/DIRACGrid/diracx-web/commit/dc06d4ebd3a385143bea6a3a281fe8d7f1c6c8cd))
+* the id can't be a number, the toolbar element should be optional ([cbf5372](https://github.com/DIRACGrid/diracx-web/commit/cbf537211c9f44fe2a348f81ad714a310e4dd1f2))
+* use Others only when there is more than 1 small category ([254368b](https://github.com/DIRACGrid/diracx-web/commit/254368b5648e5853c9a0e59f1c2bb341017e21bc))
+* use the new API and fix the job monitor ([7a42941](https://github.com/DIRACGrid/diracx-web/commit/7a42941317e66ebf89479b275606c6e1608d807f))
+* use the status endpoint instead of delete ([4d3f322](https://github.com/DIRACGrid/diracx-web/commit/4d3f322778b3a5d09264180adf8a8cb3515e211f))
+
 ## [0.1.0-a8](https://github.com/DIRACGrid/diracx-web/compare/v0.1.0-a7...v0.1.0-a8) (2025-07-17)
 
 
