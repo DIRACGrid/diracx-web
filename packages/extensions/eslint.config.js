@@ -15,6 +15,7 @@ const compat = new FlatCompat({
   allConfig: js.configs.all,
 });
 
+// This config is only for typescript files
 export default [
   ...fixupConfigRules(
     compat.extends(

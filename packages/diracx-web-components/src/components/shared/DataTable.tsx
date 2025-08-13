@@ -59,7 +59,7 @@ interface DataTableToolbarProps<T extends Record<string, unknown>> {
   table: TanstackTable<T>;
   numSelected: number;
   selectedIds: readonly (number | string)[];
-  toolbarComponents?: JSX.Element;
+  toolbarComponents?: React.ReactElement;
 }
 
 /**
@@ -206,7 +206,7 @@ function DataTableToolbar<T extends Record<string, unknown>>({
  * @property {Column<T>[]} columns - the columns of the table
  * @property {T[]} rows - the rows of the table
  * @property {Error | null} error - the error message
- * @property {JSX.Element} toolbarComponents - the components to display in the toolbar
+ * @property {React.ReactElement} toolbarComponents - the components to display in the toolbar
  * @property {MenuItem[]} menuItems - the menu items
  * @property {boolean} disableCheckbox - boolean to disable the checkbox
  */
@@ -226,7 +226,7 @@ export interface DataTableProps<T extends Record<string, unknown>> {
   /** Whether the table is loading */
   isLoading: boolean;
   /** The components to display in the toolbar */
-  toolbarComponents?: JSX.Element;
+  toolbarComponents?: React.ReactElement;
   /** The context menu items */
   menuItems?: MenuItem[];
   /** Boolean to disable the checkbox */

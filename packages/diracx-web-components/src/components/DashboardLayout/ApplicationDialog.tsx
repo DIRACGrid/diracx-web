@@ -7,7 +7,7 @@ import {
   DialogContent,
   DialogContentText,
   Button,
-  Grid,
+  Grid2 as Grid,
   Icon,
   IconButton,
 } from "@mui/material";
@@ -66,7 +66,7 @@ export default function AppDialog({
         </DialogContentText>
         <Grid container spacing={2}>
           {applicationList.map((app) => (
-            <Grid item key={app.name} xs="auto">
+            <Grid key={app.name} sx={{ xs: "auto", pt: 1 }}>
               <Button
                 fullWidth
                 variant="outlined"
