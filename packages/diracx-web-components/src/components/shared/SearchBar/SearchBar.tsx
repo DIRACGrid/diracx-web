@@ -89,7 +89,7 @@ export function SearchBar<T extends string>({
 
   const inputRef = useRef<HTMLInputElement>(null);
   const searchTimerRef = useRef<NodeJS.Timeout | null>(null);
-  const lastSearchedEquationsRef = useRef<string>("");
+  const lastSearchedEquationsRef = useRef<string>("[]");
   const lastClickedTokenIndexRef = useRef<string | null>(null);
   const [tokenEquations, setTokenEquations] = useState<
     SearchBarTokenEquation[]
