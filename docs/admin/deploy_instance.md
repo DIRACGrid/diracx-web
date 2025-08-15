@@ -40,4 +40,4 @@ By default, the `gubbins` extension is part of a monorepo and uses a local versi
 
 To deploy gubbins as a standalone package:
 - **Isolate the `packages/extensions` directory:** Copy the content of `packages/extensions` to a new repository or directory outside the monorepo.
-- **Update Configuration:** Adjust relevant variables to align with a standalone setup. Review the required changes in the [gubbins-test Github Action workflow](../../.github/workflows/gubbins-test.yml).
+- **Update Configuration:** Adjust relevant variables to align with a standalone setup. Review the gubbins-test GitHub Action workflow for required changes.

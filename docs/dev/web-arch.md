@@ -51,4 +51,4 @@ The monorepo structure is based on *npm workspaces* to ensure that related packa
 
 - [Set up a development environment](setup_environment.md)
 - [Manage the extension](manage_extension.md)
-- [Contribute to the effort](contribute.md)
+- [Contribute to the effort](../developer/contribute.md)
