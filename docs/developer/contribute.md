@@ -9,7 +9,7 @@
 
 ### 2. Make Changes
 
-*Requirements: [Getting Started](get_started.md)*
+*Requirements: [Setup Environment](setup_environment.md)*
 
 - **Fork the Repository:** Start by forking the repository and creating a new branch for your work. Use a descriptive name for your branch that reflects the work you are doing.
 
