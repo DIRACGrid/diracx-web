@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.0-a10](https://github.com/DIRACGrid/diracx-web/compare/v0.1.0-a9...v0.1.0-a10) (2025-08-15)
+
+
+### Bug Fixes
+
+* **tests:** resolve unrecognized jest-dom types in TypeScript ([852d5d1](https://github.com/DIRACGrid/diracx-web/commit/852d5d1428aa8ffdb09116fc641ae69570be738e))
+
 ## [0.1.0-a9](https://github.com/DIRACGrid/diracx-web/compare/v0.1.0-a8...v0.1.0-a9) (2025-08-13)
 
 
