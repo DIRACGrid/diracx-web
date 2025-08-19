@@ -26,7 +26,7 @@ import { MyDateTimePicker } from "./DatePicker";
 interface SearchFieldProps {
   inputValue: string;
   setInputValue: React.Dispatch<React.SetStateAction<string>>;
-  inputRef: React.RefObject<HTMLInputElement>;
+  inputRef: React.RefObject<HTMLInputElement | null>;
   setTokenEquations: React.Dispatch<
     React.SetStateAction<SearchBarTokenEquation[]>
   >;

@@ -27,13 +27,13 @@ export const useJobMockContext = () => {
   return context;
 };
 
-export const JobMockProvider: React.FC<MockProviderProps> = ({
+export const JobMockProvider = ({
   children,
   jobs,
   jobHistory,
   error = null,
   isLoading = false,
-}): JSX.Element => {
+}: MockProviderProps): React.ReactElement => {
   return (
     <JobMockContext.Provider value={{ jobs, jobHistory, error, isLoading }}>
       {children}
