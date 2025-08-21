@@ -7,6 +7,10 @@
     "packages/diracx-web",
     "packages/extensions"
   ],
+  "engines": {
+    "node": ">=24.6.0 < 25",
+    "npm": ">=11.5.0"
+  },
   "devDependencies": {
     "@commitlint/cli": "^19.7.1",
     "@commitlint/config-conventional": "^19.7.1",
