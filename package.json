@@ -12,9 +12,9 @@
     "npm": ">=11.5.0"
   },
   "devDependencies": {
-    "@commitlint/cli": "^19.7.1",
-    "@commitlint/config-conventional": "^19.7.1",
-    "husky": "^9.0.11"
+    "@commitlint/cli": "^19.8.1",
+    "@commitlint/config-conventional": "^19.8.1",
+    "husky": "^9.1.7"
   },
   "scripts": {
     "dev": "npm --prefix packages/diracx-web run dev",

@@ -47,3 +47,6 @@ next-env.d.ts
 # Storybook
 *storybook.log
 storybook-static
+
+# swap files
+.swp

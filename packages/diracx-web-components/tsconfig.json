@@ -26,13 +26,13 @@
       "@testing-library/jest-dom"
     ]
   },
-  "include": ["src/global.d.ts", "**/*.ts", "**/*.tsx"],
+  "include": ["src/global.d.ts", "**/*.ts", "**/*.tsx", ".storybook/**/*.ts"],
   "exclude": [
     "app",
     "node_modules",
     "dist",
     "stories",
     "tsup.config.ts",
-    "jest.setup.ts"
+    "jest.setup.ts",
   ]
 }

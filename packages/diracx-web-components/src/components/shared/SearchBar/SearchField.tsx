@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 
-import { Autocomplete, TextField } from "@mui/material";
+import { Autocomplete, InputBase } from "@mui/material";
 
 import {
   SearchBarTokenEquation,
@@ -30,7 +30,7 @@ interface SearchFieldProps {
   setInputValue: React.Dispatch<React.SetStateAction<string>>;
 
   /** Reference to the input element */
-  inputRef: React.RefObject<HTMLInputElement>;
+  inputRef: React.RefObject<HTMLInputElement | null>
 
   /** The current token equations */
   tokenEquations: SearchBarTokenEquation[];
@@ -262,6 +262,9 @@ export default function SearchField({
     }, 0);
   }
 
+  // Calculate the width of the input field based on the input value length
+  const width = Math.min(Math.max(inputValue.length * 8 + 50, 150), 800);
+
   const handleDateAccepted = (newValue: string | null) => {
     if (newValue) {
       handleTokenCreation(
@@ -300,64 +303,72 @@ export default function SearchField({
         minWidth: "180px",
         flexGrow: 1,
       }}
+      loading={suggestionsLoading}
       disableClearable={true}
       options={suggestions.items}
       value={inputValue}
       onHighlightChange={(_e, option) => {
         optionSelectedRef.current = option !== null;
       }}
-      loading={suggestionsLoading}
-      renderInput={(params) => (
-        <TextField
-          {...params}
-          data-testid="search-field"
-          variant="standard"
-          placeholder={placeholder}
-          inputRef={inputRef}
-          slotProps={{
-            input: {
-              ...params.InputProps,
-              disableUnderline: true,
-            },
-          }}
-          onKeyDown={(e: React.KeyboardEvent<HTMLDivElement>) => {
-            if (e.key === "Enter" && inputValue && inputValue.trim()) {
-              if (optionSelectedRef.current) {
-                optionSelectedRef.current = false;
-                return;
-              }
-              const { nature, type } = getTokenMetadata(
-                inputValue.trim(),
-                suggestions,
-                previousToken,
-              );
-              // Always create token on Enter press, regardless of operator type
-              handleTokenCreation(inputValue.trim(), nature, type);
-            }
-            if (e.key === "Backspace") {
-              handleBackspaceKeyDown();
-            }
+      onKeyDown={(e: React.KeyboardEvent<HTMLDivElement>) => {
+        if (e.key === "Enter" && inputValue && inputValue.trim()) {
+          if (optionSelectedRef.current) {
+            optionSelectedRef.current = false;
+            return;
+          }
+          const { nature, type } = getTokenMetadata(
+            inputValue.trim(),
+            suggestions,
+            previousToken,
+          );
+          // Always create token on Enter press, regardless of operator type
+          handleTokenCreation(inputValue.trim(), nature, type);
+        }
+        if (e.key === "Backspace") {
+          handleBackspaceKeyDown();
+        }
 
-            if (e.key === "ArrowLeft" || e.key === "ArrowRight") {
-              handleArrowKeyDown(e);
-            }
+        if (e.key === "ArrowLeft" || e.key === "ArrowRight") {
+          handleArrowKeyDown(e);
+        }
 
-            if (e.key === "Tab") {
-              e.preventDefault();
-              setInputValue((prev) => {
-                const options = suggestions.items.filter((val) => {
-                  return val.toLowerCase().startsWith(prev.toLowerCase());
-                });
-                return options[0] || prev;
-              });
-            }
-            if (e.key === "Escape") {
-              setFocusedTokenIndex(null);
-              setInputValue("");
-            }
-          }}
-        />
-      )}
+        if (e.key === "Tab") {
+          e.preventDefault();
+          setInputValue((prev) => {
+            const options = suggestions.items.filter((val) => {
+              return val.toLowerCase().startsWith(prev.toLowerCase());
+            });
+            return options[0] || prev;
+          });
+        }
+        if (e.key === "Escape") {
+          setFocusedTokenIndex(null);
+          setInputValue("");
+        }
+      }}
+      renderInput={(params) => {
+        const { InputProps: autoInputProps, inputProps } = params;
+
+        return (
+          <InputBase
+            placeholder={placeholder}
+            className={autoInputProps.className}
+            startAdornment={autoInputProps.startAdornment}
+            endAdornment={autoInputProps.endAdornment}
+            onMouseDown={autoInputProps.onMouseDown}
+            inputRef={(node) => {
+              const r = autoInputProps.ref;
+              if (typeof r === "function") r(node);
+              else if (r) r.current = node;
+              if (inputRef) inputRef.current = node;
+            }}
+            inputProps={{
+              ...inputProps,
+              style: { width: `${width}px` },
+            }}
+          />
+        );
+      }}
       onChange={(_e, value: string | null) => {
         if (value && value !== "") {
           optionSelectedRef.current = true;

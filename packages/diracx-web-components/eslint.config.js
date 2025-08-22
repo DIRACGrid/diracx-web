@@ -18,6 +18,17 @@ const compat = new FlatCompat({
 
 // This config is only for typescript files
 export default [
+  {
+    ignores: [
+      "dist/*",
+      "stories/*",
+      ".tsup/*",
+      ".storybook/*",
+      "*.config.js",
+      "*.config.ts",
+      "jest.setup.ts",
+    ],
+  },
   ...fixupConfigRules(
     compat.extends(
       "next/core-web-vitals",

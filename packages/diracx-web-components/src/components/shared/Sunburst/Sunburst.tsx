@@ -73,8 +73,8 @@ export function Sunburst({
   const finalColorScales = colorScales || defaultColorScale;
 
   const svgRef = useRef(null);
-  const tooltipRef: React.RefObject<HTMLDivElement> =
-    useRef<HTMLDivElement>(null);
+  const tooltipRef: React.RefObject<HTMLDivElement | null> =
+    useRef<HTMLDivElement | null>(null);
 
   const theme = useTheme();
 
