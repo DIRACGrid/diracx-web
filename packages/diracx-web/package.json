@@ -5,10 +5,10 @@
   "type": "module",
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "next build --turbopack",
     "test": "cypress open --config baseUrl=$DIRACX_URL",
     "start": "next start",
-    "lint": "next lint",
+    "lint": "eslint ./src",
     "lint-staged": "lint-staged",
     "ts-lint": "tsc -noEmit -incremental",
     "postinstall": "node ../../node_modules/@axa-fr/react-oidc/bin/copy-service-worker-files.mjs public"
