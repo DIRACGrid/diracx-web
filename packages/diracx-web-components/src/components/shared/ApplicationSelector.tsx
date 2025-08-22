@@ -1,7 +1,7 @@
 "use client";
 import { useContext, useMemo, useEffect } from "react";
 import { Typography } from "@mui/material";
-import { ApplicationsContext } from "../../contexts";
+import { ApplicationsContext } from "../../contexts/ApplicationsProvider";
 
 /**
  * ApplicationSelector component renders the currently selected application
