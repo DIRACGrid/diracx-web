@@ -354,6 +354,7 @@ export default function SearchField({
             placeholder={placeholder}
             className={autoInputProps.className}
             startAdornment={autoInputProps.startAdornment}
+            data-testid="search-field"
             endAdornment={autoInputProps.endAdornment}
             onMouseDown={autoInputProps.onMouseDown}
             inputRef={(node) => {
