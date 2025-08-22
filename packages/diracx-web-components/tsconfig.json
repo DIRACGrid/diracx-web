@@ -26,7 +26,7 @@
       "@testing-library/jest-dom"
     ]
   },
-  "include": ["src/global.d.ts", "**/*.ts", "**/*.tsx", ".storybook/**/*.ts"],
+  "include": ["src/global.d.ts", "**/*.ts", "**/*.tsx",],
   "exclude": [
     "app",
     "node_modules",
