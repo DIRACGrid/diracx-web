@@ -168,14 +168,21 @@ export function LoginForm({
           <Autocomplete
             options={Object.keys(metadata.virtual_organizations)}
             getOptionLabel={(option) => option}
-            renderInput={(params) => (
-              <TextField
-                {...params}
-                label="Select a Virtual Organization"
-                variant="outlined"
-                data-testid="autocomplete-vo-select"
-              />
-            )}
+            renderInput={(params) => {
+              const {
+                InputProps: _autoInputProps,
+                inputProps,
+                ...rest
+              } = params;
+              return (
+                <TextField
+                  {...rest}
+                  label="Select a Virtual Organization"
+                  variant="outlined"
+                  data-testid="autocomplete-vo-select"
+                />
+              );
+            }}
             value={selectedVO}
             onChange={handleVOChange}
             sx={{
