@@ -8,6 +8,4 @@ export type SearchBarSuggestions = {
   nature: SearchBarTokenNature[];
   /** The type of each suggestion (string, number, bool)*/
   type: CategoryType[];
-  /** Booleans indicating if the suggestions should be hidden */
-  hideSuggestion: boolean[];
 };

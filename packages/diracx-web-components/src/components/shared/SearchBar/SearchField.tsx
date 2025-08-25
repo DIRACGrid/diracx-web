@@ -24,18 +24,34 @@ import "dayjs/locale/en-gb"; // Import the locale for dayjs
 import { MyDateTimePicker } from "./DatePicker";
 
 interface SearchFieldProps {
+  /** The current input value in the search field */
   inputValue: string;
+  /** Function to update the input value */
   setInputValue: React.Dispatch<React.SetStateAction<string>>;
+
+  /** Reference to the input element */
   inputRef: React.RefObject<HTMLInputElement>;
+
+  /** The current token equations */
+  tokenEquations: SearchBarTokenEquation[];
+  /** Function to update the token equations */
   setTokenEquations: React.Dispatch<
     React.SetStateAction<SearchBarTokenEquation[]>
   >;
-  tokenEquations: SearchBarTokenEquation[];
+
+  /** The current suggestions for the search field */
   suggestions: SearchBarSuggestions;
+  /** Boolean indicating if suggestions are loading */
+  suggestionsLoading: boolean;
+
+  /** The current focused token index */
   focusedTokenIndex: EquationAndTokenIndex | null;
+  /** Function to update the focused token index */
   setFocusedTokenIndex: React.Dispatch<
     React.SetStateAction<EquationAndTokenIndex | null>
   >;
+
+  /** Boolean indicating if keyword search is allowed */
   allowKeyWordSearch?: boolean;
 }
 
@@ -46,6 +62,7 @@ export default function SearchField({
   setTokenEquations,
   tokenEquations,
   suggestions,
+  suggestionsLoading,
   focusedTokenIndex,
   setFocusedTokenIndex,
   allowKeyWordSearch = true,
@@ -79,7 +96,6 @@ export default function SearchField({
     label: string,
     nature: SearchBarTokenNature,
     type: CategoryType,
-    hideSuggestion: boolean,
   ) {
     if (!allowKeyWordSearch && nature === SearchBarTokenNature.CUSTOM) return;
 
@@ -100,7 +116,6 @@ export default function SearchField({
           nature: nature,
           suggestions:
             nature === SearchBarTokenNature.CATEGORY ? undefined : suggestions,
-          hideSuggestion: hideSuggestion,
         };
         handleEquationsVerification(updatedTokens, setTokenEquations);
       }
@@ -116,14 +131,13 @@ export default function SearchField({
           type: type,
           nature: nature,
           suggestions: suggestions,
-          hideSuggestion: hideSuggestion,
         });
         handleEquationsVerification([...tokenEquations], setTokenEquations);
       } else {
         // We are creating a new equation
         const newLastEquation: SearchBarTokenEquation = {
           status:
-            type === CategoryType.CUSTOM
+            nature === SearchBarTokenNature.CUSTOM
               ? EquationStatus.VALID
               : EquationStatus.WAITING,
           items: [
@@ -132,7 +146,6 @@ export default function SearchField({
               type: type,
               nature: nature,
               suggestions: undefined,
-              hideSuggestion: hideSuggestion,
             },
           ],
         };
@@ -249,16 +262,12 @@ export default function SearchField({
     }, 0);
   }
 
-  // Calculate the width of the input field based on the input value length
-  const width = Math.min(Math.max(inputValue.length * 8 + 50, 150), 800);
-
   const handleDateAccepted = (newValue: string | null) => {
     if (newValue) {
       handleTokenCreation(
         newValue,
         SearchBarTokenNature.VALUE,
         CategoryType.DATE,
-        false,
       );
     }
   };
@@ -289,8 +298,7 @@ export default function SearchField({
       sx={{
         marginTop: "2px",
         minWidth: "180px",
-        width: "auto",
-        maxWidth: 0.9,
+        flexGrow: 1,
       }}
       disableClearable={true}
       options={suggestions.items}
@@ -298,6 +306,7 @@ export default function SearchField({
       onHighlightChange={(_e, option) => {
         optionSelectedRef.current = option !== null;
       }}
+      loading={suggestionsLoading}
       renderInput={(params) => (
         <TextField
           {...params}
@@ -309,29 +318,21 @@ export default function SearchField({
             input: {
               ...params.InputProps,
               disableUnderline: true,
-              style: {
-                width: `${width}px`,
-              },
             },
           }}
           onKeyDown={(e: React.KeyboardEvent<HTMLDivElement>) => {
-            if (e.key === "Enter" && inputValue.trim()) {
+            if (e.key === "Enter" && inputValue && inputValue.trim()) {
               if (optionSelectedRef.current) {
                 optionSelectedRef.current = false;
                 return;
               }
-              const { nature, type, hideSuggestion } = getTokenMetadata(
+              const { nature, type } = getTokenMetadata(
                 inputValue.trim(),
                 suggestions,
                 previousToken,
               );
               // Always create token on Enter press, regardless of operator type
-              handleTokenCreation(
-                inputValue.trim(),
-                nature,
-                type,
-                hideSuggestion,
-              );
+              handleTokenCreation(inputValue.trim(), nature, type);
             }
             if (e.key === "Backspace") {
               handleBackspaceKeyDown();
@@ -358,7 +359,7 @@ export default function SearchField({
         />
       )}
       onChange={(_e, value: string | null) => {
-        if (value !== null && value !== "") {
+        if (value && value !== "") {
           optionSelectedRef.current = true;
 
           // Check if previous token is "in" or "not in" operator
@@ -369,24 +370,24 @@ export default function SearchField({
           ) {
             // For "in" and "not in" operators, accumulate values with " | " separator
             // Don't create token immediately - wait for Enter press
-            if (inputValue.trim() === "") {
+            if (inputValue && inputValue.trim() === "") {
               setInputValue(value);
             } else {
               // Additional value selection - append with separator
               setInputValue((prev) => {
-                return inputRef.current?.value + " | " + prev.trim();
+                return inputRef.current?.value + " | " + prev;
               });
             }
             return;
           }
 
           // For all other operators, create token immediately
-          const { nature, type, hideSuggestion } = getTokenMetadata(
+          const { nature, type } = getTokenMetadata(
             value.trim(),
             suggestions,
             previousToken,
           );
-          handleTokenCreation(value, nature, type, hideSuggestion);
+          handleTokenCreation(value, nature, type);
         }
       }}
     />

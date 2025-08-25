@@ -39,10 +39,13 @@ function customClearFunction(
   );
 }
 
-const createSuggestions = async (
-  previousToken: SearchBarToken | undefined,
-  previousEquation: SearchBarTokenEquation | undefined,
-): Promise<SearchBarSuggestions> => {
+const createSuggestions = async ({
+  previousToken,
+  previousEquation,
+}: {
+  previousToken?: SearchBarToken;
+  previousEquation?: SearchBarTokenEquation;
+}): Promise<SearchBarSuggestions> => {
   // Simulate fetching suggestions based on the previous token and equation
   if (
     !previousToken ||
@@ -62,7 +65,6 @@ const createSuggestions = async (
       ],
       type: Array(7).fill("string"),
       nature: Array(7).fill("category"),
-      hideSuggestion: Array(7).fill(false),
     };
 
   if (previousToken.nature === "category")
@@ -70,7 +72,6 @@ const createSuggestions = async (
       items: ["=", "!=", "in", "not in", "like", "<", ">"],
       type: Array(50).fill("string"),
       nature: Array(50).fill("operator"),
-      hideSuggestion: Array(50).fill(false),
     };
 
   let items: string[] = [];
@@ -104,7 +105,6 @@ const createSuggestions = async (
     items: items,
     type: Array(items.length).fill("string"),
     nature: Array(items.length).fill("value"),
-    hideSuggestion: Array(items.length).fill(previousToken.hideSuggestion),
   };
 };
 
