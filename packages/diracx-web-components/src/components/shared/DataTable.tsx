@@ -354,7 +354,7 @@ export function DataTable<T extends Record<string, unknown>>({
         },
       ),
     }),
-    [handleContextMenu],
+    [handleContextMenu, disableCheckbox],
   );
 
   function getLeftOffsetForColumn(column: Column<T, unknown>): number {

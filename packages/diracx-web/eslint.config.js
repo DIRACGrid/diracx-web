@@ -46,7 +46,10 @@ export default [
       "import/no-unused-modules": ["error"],
       "import/no-namespace": ["error"],
       "unused-imports/no-unused-imports": ["error"],
-
+      "import/no-unresolved": [
+        "error",
+        { ignore: ["@dirac-grid/diracx-web-components"] }, // We ignore this module because it is special
+      ],
       "import/no-useless-path-segments": ["error"],
       "react/destructuring-assignment": ["error", "always"],
 

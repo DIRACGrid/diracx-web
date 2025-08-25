@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 
-import { Autocomplete, TextField } from "@mui/material";
+import { Autocomplete, InputBase } from "@mui/material";
 
 import {
   SearchBarTokenEquation,
@@ -26,7 +26,7 @@ import { MyDateTimePicker } from "./DatePicker";
 interface SearchFieldProps {
   inputValue: string;
   setInputValue: React.Dispatch<React.SetStateAction<string>>;
-  inputRef: React.RefObject<HTMLInputElement>;
+  inputRef: React.RefObject<HTMLInputElement | null>;
   setTokenEquations: React.Dispatch<
     React.SetStateAction<SearchBarTokenEquation[]>
   >;
@@ -298,67 +298,68 @@ export default function SearchField({
       onHighlightChange={(_e, option) => {
         optionSelectedRef.current = option !== null;
       }}
-      renderInput={(params) => (
-        <TextField
-          {...params}
-          data-testid="search-field"
-          variant="standard"
-          placeholder={placeholder}
-          inputRef={inputRef}
-          slotProps={{
-            input: {
-              ...params.InputProps,
-              disableUnderline: true,
-              style: {
-                width: `${width}px`,
-              },
-            },
-          }}
-          onKeyDown={(e: React.KeyboardEvent<HTMLDivElement>) => {
-            if (e.key === "Enter" && inputValue.trim()) {
-              if (optionSelectedRef.current) {
-                optionSelectedRef.current = false;
-                return;
-              }
-              const { nature, type, hideSuggestion } = getTokenMetadata(
-                inputValue.trim(),
-                suggestions,
-                previousToken,
-              );
-              // Always create token on Enter press, regardless of operator type
-              handleTokenCreation(
-                inputValue.trim(),
-                nature,
-                type,
-                hideSuggestion,
-              );
-            }
-            if (e.key === "Backspace") {
-              handleBackspaceKeyDown();
-            }
+      onKeyDown={(e: React.KeyboardEvent<HTMLDivElement>) => {
+        if (e.key === "Enter" && inputValue && inputValue.trim()) {
+          if (optionSelectedRef.current) {
+            optionSelectedRef.current = false;
+            return;
+          }
+          const { nature, type, hideSuggestion } = getTokenMetadata(
+            inputValue.trim(),
+            suggestions,
+            previousToken,
+          );
+          // Always create token on Enter press, regardless of operator type
+          handleTokenCreation(inputValue.trim(), nature, type, hideSuggestion);
+        }
+        if (e.key === "Backspace") {
+          handleBackspaceKeyDown();
+        }
 
-            if (e.key === "ArrowLeft" || e.key === "ArrowRight") {
-              handleArrowKeyDown(e);
-            }
+        if (e.key === "ArrowLeft" || e.key === "ArrowRight") {
+          handleArrowKeyDown(e);
+        }
 
-            if (e.key === "Tab") {
-              e.preventDefault();
-              setInputValue((prev) => {
-                const options = suggestions.items.filter((val) => {
-                  return val.toLowerCase().startsWith(prev.toLowerCase());
-                });
-                return options[0] || prev;
-              });
-            }
-            if (e.key === "Escape") {
-              setFocusedTokenIndex(null);
-              setInputValue("");
-            }
-          }}
-        />
-      )}
+        if (e.key === "Tab") {
+          e.preventDefault();
+          setInputValue((prev) => {
+            const options = suggestions.items.filter((val) => {
+              return val.toLowerCase().startsWith(prev.toLowerCase());
+            });
+            return options[0] || prev;
+          });
+        }
+        if (e.key === "Escape") {
+          setFocusedTokenIndex(null);
+          setInputValue("");
+        }
+      }}
+      renderInput={(params) => {
+        const { InputProps: autoInputProps, inputProps } = params;
+
+        return (
+          <InputBase
+            placeholder={placeholder}
+            className={autoInputProps.className}
+            startAdornment={autoInputProps.startAdornment}
+            data-testid="search-field"
+            endAdornment={autoInputProps.endAdornment}
+            onMouseDown={autoInputProps.onMouseDown}
+            inputRef={(node) => {
+              const r = autoInputProps.ref;
+              if (typeof r === "function") r(node);
+              else if (r) r.current = node;
+              if (inputRef) inputRef.current = node;
+            }}
+            inputProps={{
+              ...inputProps,
+              style: { width: `${width}px` },
+            }}
+          />
+        );
+      }}
       onChange={(_e, value: string | null) => {
-        if (value !== null && value !== "") {
+        if (value && value !== "") {
           optionSelectedRef.current = true;
 
           // Check if previous token is "in" or "not in" operator
@@ -369,12 +370,12 @@ export default function SearchField({
           ) {
             // For "in" and "not in" operators, accumulate values with " | " separator
             // Don't create token immediately - wait for Enter press
-            if (inputValue.trim() === "") {
+            if (inputValue && inputValue.trim() === "") {
               setInputValue(value);
             } else {
               // Additional value selection - append with separator
               setInputValue((prev) => {
-                return inputRef.current?.value + " | " + prev.trim();
+                return inputRef.current?.value + " | " + prev;
               });
             }
             return;
