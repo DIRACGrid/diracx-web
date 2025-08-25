@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.1.0-a10](https://github.com/DIRACGrid/diracx-web/compare/v0.1.0-a9...v0.1.0-a10) (2025-08-25)
+
+
+### Features
+
+* improve the searchBar for other modules ([eed3ade](https://github.com/DIRACGrid/diracx-web/commit/eed3adede020abd7dab64e80b6f4410c57312f46))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @dirac-grid/diracx-web-components bumped from ^0.1.0-a9 to ^0.1.0-a10
+
 ## [0.1.0-a9](https://github.com/DIRACGrid/diracx-web/compare/v0.1.0-a8...v0.1.0-a9) (2025-08-13)
 
 
