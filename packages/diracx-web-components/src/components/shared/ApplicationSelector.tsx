@@ -1,6 +1,6 @@
 "use client";
-import { useContext, useMemo, useEffect } from "react";
-import { Typography } from "@mui/material";
+import { useContext, useEffect } from "react";
+import { Box, Typography } from "@mui/material";
 import { ApplicationsContext } from "../../contexts";
 
 /**
@@ -29,15 +29,27 @@ export function ApplicationSelector() {
     }
   }, [appType, userDashboard, setCurrentAppId]);
 
-  const Component = useMemo(() => {
-    if (appType === "none") return undefined;
-    return applicationList.find((app) => app.name === appType)?.component;
-  }, [appType, applicationList]);
-
-  // If no component is found, return an empty div
-  return Component ? (
-    <Component key={currentAppId} />
-  ) : (
-    <Typography>You can click Add Application to add an app</Typography>
+  return userDashboard.map((group) =>
+    group.items.map((item) => {
+      const Component = applicationList.find(
+        (app) => app.name === item.type,
+      )?.component;
+      return (
+        <Box
+          key={item.id}
+          sx={{
+            display: currentAppId === item.id ? "flex" : "none",
+            width: "100%",
+            height: "100%",
+          }}
+        >
+          {Component ? (
+            <Component />
+          ) : (
+            <Typography>You can click Add Application to add an app</Typography>
+          )}
+        </Box>
+      );
+    }),
   );
 }
