@@ -10,7 +10,7 @@ import "dayjs/locale/en-gb"; // Import the locale for dayjs
 import { TextField, TextFieldProps } from "@mui/material";
 
 interface CustomDateTimePickerProps
-  extends Omit<DateTimePickerProps<Dayjs>, "value" | "onChange"> {
+  extends Omit<DateTimePickerProps, "value" | "onChange"> {
   value: string | null;
   onDateAccepted: (value: string | null) => void;
   handleArrowKeyDown: (event: KeyboardEvent<HTMLInputElement>) => void;

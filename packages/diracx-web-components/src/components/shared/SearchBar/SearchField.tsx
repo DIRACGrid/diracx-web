@@ -30,7 +30,7 @@ interface SearchFieldProps {
   setInputValue: React.Dispatch<React.SetStateAction<string>>;
 
   /** Reference to the input element */
-  inputRef: React.MutableRefObject<HTMLInputElement | null>;
+  inputRef: React.RefObject<HTMLInputElement | null>;
 
   /** The current token equations */
   tokenEquations: SearchBarTokenEquation[];
@@ -360,8 +360,7 @@ export default function SearchField({
             inputRef={(node) => {
               const r = autoInputProps.ref;
               if (typeof r === "function") r(node);
-              else if (r)
-                (r.current as React.MutableRefObject<HTMLInputElement>) = node;
+              else if (r) r.current = node;
               if (inputRef) inputRef.current = node;
             }}
             inputProps={{
