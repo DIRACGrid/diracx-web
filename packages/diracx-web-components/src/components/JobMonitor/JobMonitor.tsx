@@ -28,6 +28,7 @@ import {
   ColumnDef,
 } from "@tanstack/react-table";
 
+import { mutate } from "swr";
 import { useApplicationId } from "../../hooks/application";
 import { Filter } from "../../types/Filter";
 import {
@@ -36,9 +37,11 @@ import {
   CategoryType,
   JobMonitorChartType,
 } from "../../types";
+import { useDiracxUrl } from "../../hooks";
 import { JobDataTable } from "./JobDataTable";
 import { JobSearchBar } from "./JobSearchBar";
 import { JobSunburst } from "./JobSunburst";
+import { getSearchJobUrl } from "./jobDataService";
 
 /**
  * Build the Job Monitor application
@@ -48,6 +51,7 @@ import { JobSunburst } from "./JobSunburst";
 export default function JobMonitor() {
   const appId = useApplicationId();
   const theme = useTheme();
+  const diracxUrl = useDiracxUrl();
 
   // Load the initial state from local storage
   const initialState = sessionStorage.getItem(`${appId}_State`);
@@ -298,6 +302,15 @@ export default function JobMonitor() {
     }));
   }, [filters, columns, setSearchBody, setPagination]);
 
+  const mutateJobs = useMemo(() => {
+    return () => {
+      mutate([
+        getSearchJobUrl(diracxUrl, pagination.pageIndex, pagination.pageSize),
+        searchBody,
+      ]);
+    };
+  }, [diracxUrl, pagination.pageIndex, pagination.pageSize, searchBody]);
+
   return (
     <Box
       sx={{
@@ -333,6 +346,7 @@ export default function JobMonitor() {
               },
             ],
           }}
+          mutateJobs={mutateJobs}
         />
       </Box>
 
@@ -350,6 +364,7 @@ export default function JobMonitor() {
           rowSelection={rowSelection}
           setRowSelection={setRowSelection}
           statusColors={statusColors}
+          mutateJobs={mutateJobs}
         />
       )}
       {chartType === JobMonitorChartType.SUNBURST && (
