@@ -81,10 +81,15 @@ describe("Job Monitor", () => {
       ) {
         cy.log("No data available, adding jobs");
         addJobs(55);
+        // Wait for the jobs to be created
+        cy.wait(2000);
       } else {
         cy.log("Data available, checking if enough jobs are present");
         checkAndAddJobs(55);
       }
+
+      // refresh the jobs
+      cy.get('[data-testid="RefreshIcon"]').click();
     });
   });
 
