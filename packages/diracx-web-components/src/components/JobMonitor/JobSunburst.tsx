@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 
 import { scaleOrdinal, quantize, interpolateRainbow } from "d3";
 
@@ -6,7 +6,14 @@ import { useOidcAccessToken } from "@axa-fr/react-oidc";
 import { ColumnDef } from "@tanstack/react-table";
 import { useDiracxUrl } from "../../hooks/utils";
 
-import type { JobSummary, SearchBody, Job, SunburstTree } from "../../types";
+import type {
+  JobSummary,
+  SearchBody,
+  Job,
+  SunburstTree,
+  SunburstNode,
+  Filter,
+} from "../../types";
 import { Sunburst } from "../shared/Sunburst";
 import { useOIDCContext } from "../../hooks/oidcConfiguration";
 import { ChartView } from "../shared";
@@ -14,6 +21,17 @@ import { getJobSummary } from "./jobDataService";
 
 import { fromHumanReadableText } from "./JobMonitor";
 
+interface JobSunburstProps {
+  /** The search body to be used in the search */
+  searchBody: SearchBody;
+  /** The function to update the filters */
+  setFilters: React.Dispatch<React.SetStateAction<Filter[]>>;
+  /** The status colors to be used in the chart */
+  statusColors: Record<string, string>;
+  /** The columns of the JobDataTable */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  columns: ColumnDef<Job, any>[];
+}
 /**
  * Create the JobSunburst component.
  *
@@ -24,14 +42,10 @@ import { fromHumanReadableText } from "./JobMonitor";
  */
 export function JobSunburst({
   searchBody,
+  setFilters,
   statusColors,
   columns,
-}: {
-  searchBody: SearchBody;
-  statusColors: Record<string, string>;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  columns: ColumnDef<Job, any>[];
-}) {
+}: JobSunburstProps) {
   const { configuration } = useOIDCContext();
   const { accessToken } = useOidcAccessToken(configuration?.scope);
   const diracxUrl = useDiracxUrl();
@@ -42,7 +56,11 @@ export function JobSunburst({
   const [tree, setTree] = useState<SunburstTree | undefined>(undefined);
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
-  const lastUsedGroupColumnsRef = useRef("");
+  // Memoize the relevant portion of groupColumns to avoid unnecessary refetches
+  const effectiveGroupColumns = useMemo(
+    () => groupColumns.slice(0, currentPath.length + 2).join(","),
+    [groupColumns, currentPath.length],
+  );
 
   useEffect(() => {
     const newSearch = currentPath.map((elt, index) => {
@@ -60,60 +78,75 @@ export function JobSunburst({
     };
     async function load() {
       setIsLoading(true);
-      const res = await fetchAndBuildTree(
-        groupColumns.slice(currentPath.length, currentPath.length + 2),
-        newSearchBody,
-        diracxUrl,
-        accessToken,
-        columns,
-      );
-      setTree({
-        name: "",
-        children: res,
-      });
-      setIsLoading(false);
+      try {
+        const res = await fetchAndBuildTree(
+          groupColumns.slice(currentPath.length, currentPath.length + 2),
+          newSearchBody,
+          diracxUrl,
+          accessToken,
+          columns,
+        );
+        setTree({
+          name: "",
+          children: res,
+        });
+      } finally {
+        setIsLoading(false);
+      }
     }
     // For optimization, only load when the used groupColumns change
-    if (
-      lastUsedGroupColumnsRef.current !==
-        groupColumns.slice(0, currentPath.length + 1).join(",") &&
-      diracxUrl &&
-      accessToken
-    ) {
-      lastUsedGroupColumnsRef.current = groupColumns
-        .slice(0, currentPath.length + 1)
-        .join(",");
+    if (diracxUrl && accessToken) {
       load();
     }
+     
+    // excluded: only the effective portion (via effectiveGroupColumns) should trigger refetches.
   }, [
     columns,
-    groupColumns,
-    lastUsedGroupColumnsRef,
+    effectiveGroupColumns,
     currentPath,
     searchBody,
     diracxUrl,
     accessToken,
   ]);
 
-  const defaultColors = scaleOrdinal(
-    quantize(interpolateRainbow, (tree?.children?.length ?? 0) + 1),
-  );
-
-  function colorScales(name: string, _size: number, _depth: number): string {
-    if (statusColors[name]) {
-      return statusColors[name];
-    }
-    if (tree?.children) {
-      return defaultColors(name);
-    }
-    return "#ccc";
-  }
+  const colorScales = useMemo(() => {
+    const defaultColors = scaleOrdinal(
+      quantize(interpolateRainbow, (tree?.children?.length ?? 0) + 1),
+    );
+    return (name: string, _size: number, _depth: number): string => {
+      if (statusColors[name]) {
+        return statusColors[name];
+      }
+      if (tree?.children) {
+        return defaultColors(name);
+      }
+      return "#ccc";
+    };
+  }, [statusColors, tree]);
 
   const columnList = columns
     .filter((column) => column.meta?.isQuasiUnique !== true)
     .map((column) => String(column.header));
 
   const hasHiddenLevels = groupColumns.length > currentPath.length + 2;
+
+  /**
+   * Update the category filter
+   * @param p The node which has to be disabled
+   */
+  const handleDeleteCategory = useCallback(
+    (p: SunburstNode) => {
+      setFilters((prev) => [
+        ...prev,
+        {
+          parameter: groupColumns[p.depth - 1],
+          operator: "neq",
+          value: p.data.name,
+        },
+      ]);
+    },
+    [groupColumns, setFilters],
+  );
 
   const Chart = (
     <Sunburst
@@ -125,6 +158,7 @@ export function JobSunburst({
       colorScales={colorScales}
       isLoading={isLoading}
       error={tree ? null : Error()}
+      handleRightClick={handleDeleteCategory}
     />
   );
 
