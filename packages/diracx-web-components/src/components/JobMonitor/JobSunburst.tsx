@@ -1,12 +1,23 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 
-import { scaleOrdinal, quantize, interpolateRainbow } from "d3";
+import {
+  scaleOrdinal,
+  quantize,
+  interpolateRainbow,
+  HierarchyRectangularNode,
+} from "d3";
 
 import { useOidcAccessToken } from "@axa-fr/react-oidc";
 import { ColumnDef } from "@tanstack/react-table";
 import { useDiracxUrl } from "../../hooks/utils";
 
-import type { JobSummary, SearchBody, Job, SunburstTree } from "../../types";
+import type {
+  JobSummary,
+  SearchBody,
+  Job,
+  SunburstTree,
+  Filter,
+} from "../../types";
 import { Sunburst } from "../shared/Sunburst";
 import { useOIDCContext } from "../../hooks/oidcConfiguration";
 import { ChartView } from "../shared";
@@ -14,6 +25,19 @@ import { getJobSummary } from "./jobDataService";
 
 import { fromHumanReadableText } from "./JobMonitor";
 
+interface JobSunburstProps {
+  /** The search body to be used in the search */
+  searchBody: SearchBody;
+  /** The filters to be applied to the search */
+  filters: Filter[];
+  /** The function to update the filters */
+  setFilters: React.Dispatch<React.SetStateAction<Filter[]>>;
+  /** The status colors to be used in the chart */
+  statusColors: Record<string, string>;
+  /** The columns of the JobDataTable */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  columns: ColumnDef<Job, any>[];
+}
 /**
  * Create the JobSunburst component.
  *
@@ -24,14 +48,11 @@ import { fromHumanReadableText } from "./JobMonitor";
  */
 export function JobSunburst({
   searchBody,
+  filters,
+  setFilters,
   statusColors,
   columns,
-}: {
-  searchBody: SearchBody;
-  statusColors: Record<string, string>;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  columns: ColumnDef<Job, any>[];
-}) {
+}: JobSunburstProps) {
   const { configuration } = useOIDCContext();
   const { accessToken } = useOidcAccessToken(configuration?.scope);
   const diracxUrl = useDiracxUrl();
@@ -41,8 +62,6 @@ export function JobSunburst({
 
   const [tree, setTree] = useState<SunburstTree | undefined>(undefined);
   const [isLoading, setIsLoading] = useState<boolean>(false);
-
-  const lastUsedGroupColumnsRef = useRef("");
 
   useEffect(() => {
     const newSearch = currentPath.map((elt, index) => {
@@ -74,26 +93,20 @@ export function JobSunburst({
       setIsLoading(false);
     }
     // For optimization, only load when the used groupColumns change
-    if (
-      lastUsedGroupColumnsRef.current !==
-        groupColumns.slice(0, currentPath.length + 1).join(",") &&
-      diracxUrl &&
-      accessToken
-    ) {
-      lastUsedGroupColumnsRef.current = groupColumns
-        .slice(0, currentPath.length + 1)
-        .join(",");
+    if (diracxUrl && accessToken) {
       load();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     columns,
-    groupColumns,
-    lastUsedGroupColumnsRef,
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    groupColumns.slice(0, currentPath.length + 2).join(", "),
     currentPath,
     searchBody,
     diracxUrl,
     accessToken,
   ]);
+  // The dependencies above are not exact. For performance reasons, we don't include all dependencies.
 
   const defaultColors = scaleOrdinal(
     quantize(interpolateRainbow, (tree?.children?.length ?? 0) + 1),
@@ -115,6 +128,22 @@ export function JobSunburst({
 
   const hasHiddenLevels = groupColumns.length > currentPath.length + 2;
 
+  /**
+   * Update the category filter
+   * @param p The node which has to be disabled
+   */
+  const handleDeleteCategory = (p: HierarchyRectangularNode<SunburstTree>) => {
+    const newFilters = [
+      ...filters,
+      {
+        parameter: groupColumns[p.depth - 1],
+        operator: "neq",
+        value: p.data.name,
+      },
+    ];
+    setFilters(newFilters);
+  };
+
   const Chart = (
     <Sunburst
       tree={tree || { name: "", children: [] }}
@@ -125,6 +154,7 @@ export function JobSunburst({
       colorScales={colorScales}
       isLoading={isLoading}
       error={tree ? null : Error()}
+      handleRightClick={handleDeleteCategory}
     />
   );
 
