@@ -2,18 +2,17 @@
 
 ## The search bar
 
-  The search bar allows you to filter jobs based on various criteria.   The filters are represented as equations in the search bar, where each equation consists of a job attribute, an operator, and a value. 
-  A resarch is automatically performed when all the equations in the search bar are valid. 
+The search bar allows you to filter jobs based on various criteria. The filters are represented as equations in the search bar, where each equation consists of a job attribute, an operator, and a value. A search is automatically performed when all the equations in the search bar are valid. 
 
-  ### Create a filter
-  To create a filter, click on the search bar and start typing. Suggestions will appear based on the available job attributes. You can select a suggestion to choose the criterion. After that, you can either type or select an operator and a value to filter by.
-  The search bar only suggests attributes, operators, and values that are available in your current set of jobs.
+### Create a filter
+To create a filter, click on the search bar and start typing. Suggestions will appear based on the available job attributes. You can select a suggestion to choose the criterion. After that, you can either type or select an operator and a value to filter by.
+The search bar only suggests attributes, operators, and values that are available in your current set of jobs.
 
-  ### Edit a filter
-  To edit a filter, click on the filter in the search bar. You can change the operator or value by clicking on them. You can also use the arrow keys to navigate through the equations and edit them. 
+### Edit a filter
+To edit a filter, click on the filter in the search bar. You can change the operator or value by clicking on them. You can also use the arrow keys to navigate through the equations and edit them. 
 
-  ### Remove a filter
-  To remove a filter, you can either press the `Backspace` key to remove the last token or right-click on the equation to remove the entire equation.
+### Remove a filter
+To remove a filter, you can either press the `Backspace` key to remove the last token or right-click on the equation to remove the entire equation.
 
 
 ## Use the table
