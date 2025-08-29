@@ -1,7 +1,6 @@
 import { Meta, StoryObj } from "@storybook/react";
 import React, { useState } from "react";
 import { Paper } from "@mui/material";
-import { action } from "@storybook/addon-actions";
 import {
   SearchBar,
   SearchBarProps,
@@ -161,8 +160,8 @@ export const Default: Story = {
 export const WithPrefilledTokens: Story = {
   args: {
     filters: sampleFilters,
-    setFilters: action("setFilters"),
-    searchFunction: action("searchTriggered"),
+    setFilters: () => {},
+    searchFunction: () => {},
     allowKeyWordSearch: true,
   },
   render: (args) => {

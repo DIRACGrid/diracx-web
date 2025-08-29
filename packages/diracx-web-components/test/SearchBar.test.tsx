@@ -72,13 +72,23 @@ describe("SearchBar", () => {
 
     const searchInput = screen.getByPlaceholderText("Enter a category");
 
-    // Create a category token
+    // Create a category token (Status)
     await user.type(searchInput, "Status");
     await user.keyboard("{Enter}");
 
-    // Check if operator suggestions appear
+    // Focus operator input
     const operatorInput = screen.getByPlaceholderText("Enter an operator");
-    await user.type(operatorInput, "{downArrow}");
+    await user.click(operatorInput);
+
+    // Open the autocomplete popup
+    await user.keyboard("{ArrowDown}");
+
+    // Wait for the listbox to appear (ensures popup is open)
+    await waitFor(() => {
+      expect(screen.getByRole("listbox")).toBeInTheDocument();
+    });
+
+    // Now expect "=" operator to be one of the suggestions
     await waitFor(() => {
       expect(screen.getByText("=")).toBeInTheDocument();
     });

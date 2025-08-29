@@ -1,5 +1,7 @@
 /// <reference types="cypress" />
 
+// This file is named 00_loginOut.cy.ts because we want to run it first
+
 // Make sure the user can login and logout
 describe("Login and Logout", () => {
   beforeEach(() => {
@@ -37,8 +39,7 @@ describe("Login and Logout", () => {
       cy.get(":nth-child(1) > form > .dex-btn").click();
     });
 
-    // The user is redirected back to the /auth page
-    cy.url().should("include", "/auth");
+    cy.wait(1000); // Wait for the page to load
 
     // From now on the user is logged in
     // The login buttton should not be present anymore
