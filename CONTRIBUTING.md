@@ -14,4 +14,4 @@ Thank you for your interest in contributing to our project! We appreciate all co
   - Create a [:bust_in_silhouette: User Story](https://github.com/DIRACGrid/diracx-web/discussions/categories/user-personas-and-stories) to describe your need and share your design ideas if any.
 
 - **Want to contribute to the :computer: codebase?**
-  - Read the [:book: Developer Guide](docs/developer/index.md) to set up your environment and get started.
+  - Read the [:book: Developer Guide](docs/dev/how-to/contribute.md) to set up your environment and get started.

@@ -1,4 +1,4 @@
-# Release Management
+# Managing web releases
 
 ```mermaid
 sequenceDiagram
