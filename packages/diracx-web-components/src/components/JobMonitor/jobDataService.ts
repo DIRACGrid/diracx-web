@@ -1,17 +1,16 @@
 "use client";
+import useSWR from "swr";
 
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 
-import { useEffect, useState } from "react";
-
-dayjs.extend(utc);
 import { fetcher } from "../../hooks/utils";
 import { Filter, SearchBody, Job, JobHistory } from "../../types";
 import type { JobSummary } from "../../types";
 
 type TimeUnit = "minute" | "hour" | "day" | "month" | "year";
 
+dayjs.extend(utc);
 /**
  * Convert the 'last' operator in the search body to a date filter.
  * @param searchBody The search body to be processed
@@ -249,64 +248,73 @@ export function useJobs(
   page: number,
   rowsPerPage: number,
 ) {
-  const [data, setData] = useState<Job[] | null>(null);
-  const [headers, setHeaders] = useState<Headers>(new Headers());
-  const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [error, setError] = useState<Error | null>(null);
+  /** The url to fetch jobs */
+  const urlGetJobs = getSearchJobUrl(diracxUrl, page, rowsPerPage);
 
-  useEffect(() => {
-    if (!diracxUrl) {
-      setData(null);
-      setIsLoading(false);
-      setError(new Error("Invalid URL generated for fetching jobs."));
-      return;
-    }
+  /** The key used to revalidate the SWR cache */
+  const swrKey: [string, SearchBody] | null = urlGetJobs
+    ? [urlGetJobs, searchBody]
+    : null;
 
-    let cancelled = false;
+  const {
+    data: swrData,
+    error: swrError,
+    isLoading,
+  } = useSWR(
+    swrKey,
+    async ([url, _searchBody]) => {
+      processSearchBody(_searchBody);
 
-    async function fetchJobs() {
-      setIsLoading(true);
+      const body = {
+        search: _searchBody.search || [],
+        sort: _searchBody.sort || [],
+      };
 
-      const urlGetJobs = `${diracxUrl}/api/jobs/search?page=${page + 1}&per_page=${rowsPerPage}`;
-      try {
-        processSearchBody(searchBody);
-
-        const body = {
-          search: searchBody?.search || [],
-          sort: searchBody?.sort || [],
-        };
-
-        // Expect the response to be an array of objects with all the grouping fields
-        const res = await fetcher<Job[]>([
-          urlGetJobs,
-          accessToken,
-          "POST",
-          body,
-        ]);
-
-        if (!cancelled) {
-          setData(res.data);
-          setIsLoading(false);
-          setHeaders(res.headers);
-          setError(null);
-        }
-      } catch {
-        setData(null);
-        setIsLoading(false);
-        setError(new Error("Failed to fetch jobs"));
+      if (diracxUrl) {
+        return await fetcher<Job[]>([url, accessToken, "POST", body]);
       }
-    }
-    fetchJobs();
 
-    return () => {
-      cancelled = true;
-    };
-  }, [diracxUrl, accessToken, searchBody, page, rowsPerPage]);
+      return {
+        headers: new Headers(),
+        data: null as Job[] | null,
+        isLoading: false,
+        error: new Error("Invalid URL generated for fetching jobs."),
+      };
+    },
+    {
+      revalidateOnMount: false,
+      revalidateOnFocus: false,
+      revalidateOnReconnect: false,
+      revalidateIfStale: false,
+      refreshInterval: 0,
+      shouldRetryOnError: false,
+    },
+  );
 
   return {
-    headers,
-    data,
+    headers: swrData?.headers ?? new Headers(),
+    data: (swrData?.data as Job[] | undefined) ?? null,
     isLoading,
-    error,
+    error: swrError,
   };
+}
+
+/**
+ * Generates the URL for searching jobs.
+ *
+ * @param diracxUrl - The base URL of the DiracX API.
+ * @param page - The page number for pagination.
+ * @param rowsPerPage - The number of rows per page.
+ * @returns The URL for the job search API endpoint.
+ */
+export function getSearchJobUrl(
+  diracxUrl: string | null,
+  page: number,
+  rowsPerPage: number,
+) {
+  if (!diracxUrl) {
+    return null;
+  }
+
+  return `${diracxUrl}/api/jobs/search?page=${page + 1}&per_page=${rowsPerPage}`;
 }
