@@ -355,6 +355,8 @@ export default function JobMonitor() {
       {chartType === JobMonitorChartType.SUNBURST && (
         <JobSunburst
           searchBody={searchBody}
+          filters={filters}
+          setFilters={setFilters}
           statusColors={statusColors}
           columns={columns}
         />
