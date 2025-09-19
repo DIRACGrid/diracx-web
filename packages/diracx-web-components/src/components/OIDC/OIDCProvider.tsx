@@ -36,6 +36,7 @@ export function OIDCProvider({ children }: OIDCProviderProps) {
         client_id: "myDIRACClientID",
         scope: scope,
         redirect_uri: `${originUri}/#authentication-callback`,
+        logout_tokens_to_invalidate: ["refresh_token"],
       });
     }
   }, [diracxUrl, configuration, setConfiguration]);
