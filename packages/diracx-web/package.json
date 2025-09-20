@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "next dev",
+    "dev": "export NEXT_PUBLIC_DIRACX_URL=$DIRACX_URL; next dev",
     "build": "next build",
     "test": "cypress open --config baseUrl=$DIRACX_URL",
     "start": "next start",

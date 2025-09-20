@@ -113,7 +113,7 @@ cd diracx-web
 npm ci
 
 # Set the DiracX backend URL you are targeting
-export NEXT_PUBLIC_DIRACX_URL=<backend url>
+export DIRACX_URL=<backend url>
 
 # Run it
 npm run dev
