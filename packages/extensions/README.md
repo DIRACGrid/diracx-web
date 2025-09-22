@@ -102,6 +102,17 @@ You can either create a new repository or start from this one to build your Dira
 
    See the [OIDC library documentation](https://github.com/AxaFrance/oidc-client/tree/main/packages/react-oidc#getting-started) for more information.
 
+   Note: for backendless local development, replace the `dev` command by:
+
+   ```json
+   "scripts": {
+     "dev": "export NEXT_PUBLIC_DIRACX_URL=$DIRACX_URL; next dev",
+     ...
+   }
+   ```
+
+   This avoids having to set 2 environment variables with the same value: NextJS can only read from variables prefixed with `NEXT_PUBLIC`.
+
 4. **Edit the Next.js config** with these options:
 
    ```js
@@ -214,7 +225,6 @@ It can be automatically deployed using CI/CD tools like GitHub Actions, GitLab C
 - **Code Quality**: Ensure your code is clean, well-documented, and follows best practices. Use tools like [ESLint](https://eslint.org/) and [Prettier](https://prettier.io/) to maintain code quality.
 
 - **Testing**:
-
   - **Component Testing**: Write tests for your components to ensure they work as expected. Use [Jest](https://jestjs.io/) for unit testing and snapshot testing of your React components.
   - **Application Testing**: Use [Cypress](https://www.cypress.io/) for end-to-end testing to simulate real user interactions and ensure your application behaves correctly.
   - **Test Coverage**: Maintain good test coverage to ensure that your critical features are well-protected during updates. Tools like Jest provide [coverage reports](https://jestjs.io/docs/code-coverage) that help you identify untested parts of your code.
@@ -222,7 +232,6 @@ It can be automatically deployed using CI/CD tools like GitHub Actions, GitLab C
 - **Accessibility**: Make your extension accessible to all users. Use semantic HTML, ARIA attributes, and test your extension with different screen sizes and assistive technologies.
 
 - **Security**:
-
   - **Dependency Management**: Keeping dependencies up to date is crucial for security and performance. Using deprecated packages can expose your application to known vulnerabilities.
   - **Identifying Vulnerabilities**: Regularly check for known vulnerabilities in your dependencies. Tools like [`npm audit`](https://docs.npmjs.com/cli/v7/commands/npm-audit) can help spot these issues.
   - **Automating Updates**: Use tools like [Dependabot](https://github.com/dependabot) or [Renovate](https://www.whitesourcesoftware.com/free-developer-tools/renovate/) to automate dependency updates. These tools can automatically create pull requests to update dependencies, making it easier to stay current and see if updates are compatible with tests used in CI. Keeping dependencies up to date is crucial for security as deprecated packages can expose your application to known vulnerabilities.
