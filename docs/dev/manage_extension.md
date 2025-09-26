@@ -7,10 +7,6 @@ This implies setting up the backend as well as the frontend.
 ### `gubbins-web` (frontend)
 
 ```mermaid
----
-config:
-  layout: elk
----
 flowchart TD
  subgraph root-cmds["root package.json"]
         root:dev["dev"]

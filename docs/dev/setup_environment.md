@@ -1,10 +1,6 @@
 # Setting up your Development Environment
 
 ```mermaid
----
-config:
-  layout: elk
----
 flowchart TD
  subgraph root-cmds["root package.json"]
         root:dev["dev"]
