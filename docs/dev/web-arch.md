@@ -7,10 +7,6 @@ Welcome to the DiracX-Web Developer Guide! This guide will help you navigate and
 ## Architecture Overview
 
 ```mermaid
----
-config:
-  layout: elk
----
 flowchart TD
  subgraph monorep["Monorepo"]
         monorep1["diracx-web-components"]
