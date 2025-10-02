@@ -160,12 +160,8 @@ npm run --prefix packages/diracx-web test
 
 ## Documenting
 
-[Storybook]((https://storybook.js.org/docs)) can be started with:
+[Storybook](https://storybook.js.org/docs) can be started with:
 
 ```bash
 npm run doc:diracx-web-components
 ```
-
-## Contributing
-
-See the [Contributing guidelines](/CONTRIBUTING.md)

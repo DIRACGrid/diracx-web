@@ -95,5 +95,3 @@ npm run test:watch
    rm -rf node_modules package-lock.json
    npm install
    ```
-
-For more detailed information, see the [CONTRIBUTING.md](/CONTRIBUTING.md) file.
