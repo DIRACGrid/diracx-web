@@ -86,7 +86,3 @@ npm run --prefix packages/extensions test
 Follow the instructions from the [Gubbins extension README](https://github.com/DIRACGrid/diracx/tree/main/extensions#work-on-gubbins).
 
 :bulb: Like `diracx-web`, `gubbins-web` does automatically reflect changes made in `diracx-web-components`. This means that while running `gubbins` using `diracx-charts/run_demo.sh`, any modifications to `diracx-web-components` will also be applied to `gubbins`.
-
-## Creating a new extension
-
-More details available in the [**extensions** README](/packages/extensions/README.md)
