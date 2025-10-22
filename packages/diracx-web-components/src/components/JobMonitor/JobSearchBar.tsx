@@ -34,6 +34,8 @@ interface JobSearchBarProps {
   /** The columns to display in the job monitor */
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   columns: ColumnDef<Job, any>[];
+  /** Function to mutate the job data */
+  mutateJobs: () => void;
   /** Props for the plot type selector */
   plotTypeSelectorProps?: {
     /** The type of the plot */
@@ -51,8 +53,10 @@ export function JobSearchBar({
   setFilters,
   handleApplyFilters,
   columns,
+  mutateJobs,
   plotTypeSelectorProps,
 }: JobSearchBarProps) {
+  // Authentication
   const { configuration } = useOIDCContext();
   const { accessToken } = useOidcAccessToken(configuration?.scope);
 
@@ -66,6 +70,7 @@ export function JobSearchBar({
     <SearchBar
       filters={filters}
       setFilters={setFilters}
+      refreshFunction={mutateJobs}
       createSuggestions={({ previousToken, previousEquation, equationIndex }) =>
         createSuggestions({
           diracxUrl,

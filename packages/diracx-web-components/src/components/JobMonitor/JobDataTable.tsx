@@ -67,6 +67,8 @@ interface JobDataTableProps {
   setColumnPinning: React.Dispatch<React.SetStateAction<ColumnPinningState>>;
   /** Status Colors */
   statusColors: Record<string, string>;
+  /** Mutate Jobs */
+  mutateJobs: () => void;
 }
 
 /**
@@ -85,6 +87,7 @@ export function JobDataTable({
   columnPinning,
   setColumnPinning,
   statusColors,
+  mutateJobs,
 }: JobDataTableProps) {
   // Authentication
   const { configuration } = useOIDCContext();
@@ -151,10 +154,8 @@ export function JobDataTable({
       const selectedIds = Object.keys(rowSelection).map(Number);
       await deleteJobs(diracxUrl, selectedIds, accessToken, accessTokenPayload);
       setBackdropOpen(false);
-      // Refresh the data manually
-      setSearchBody((prev) => {
-        return { ...prev };
-      });
+      // Refresh the data
+      mutateJobs();
       clearSelected();
       setSnackbarInfo({
         open: true,
@@ -182,6 +183,7 @@ export function JobDataTable({
     rowSelection,
     clearSelected,
     setSearchBody,
+    mutateJobs,
   ]);
 
   /**
@@ -205,10 +207,8 @@ export function JobDataTable({
 
       setBackdropOpen(false);
 
-      // Refresh the data manually
-      setSearchBody((prev) => {
-        return { ...prev };
-      });
+      // Refresh the data
+      mutateJobs();
 
       clearSelected();
       // Handle Snackbar Messaging
@@ -252,6 +252,7 @@ export function JobDataTable({
     rowSelection,
     clearSelected,
     setSearchBody,
+    mutateJobs,
   ]);
 
   /**
@@ -273,10 +274,8 @@ export function JobDataTable({
       const areSucceedJobs = Object.keys(data.success).length > 0;
 
       setBackdropOpen(false);
-      // Refresh the data manually
-      setSearchBody((prev) => {
-        return { ...prev };
-      });
+      // Refresh the data
+      mutateJobs();
       clearSelected();
       // Handle Snackbar Messaging
       if (areSucceedJobs && failedJobs.length > 0) {
@@ -312,7 +311,14 @@ export function JobDataTable({
     } finally {
       setBackdropOpen(false);
     }
-  }, [accessToken, diracxUrl, rowSelection, clearSelected, setSearchBody]);
+  }, [
+    accessToken,
+    diracxUrl,
+    rowSelection,
+    clearSelected,
+    setSearchBody,
+    mutateJobs,
+  ]);
 
   /**
    * Handle the history of the selected job

@@ -56,6 +56,11 @@ export interface SearchBarProps<T extends string> {
     equations: SearchBarTokenEquation[],
     setFilters: React.Dispatch<React.SetStateAction<Filter[]>>,
   ) => void;
+  /** The function to call when the search is refreshed (optional) */
+  refreshFunction?: (
+    equations: SearchBarTokenEquation[],
+    setFilters: React.Dispatch<React.SetStateAction<Filter[]>>,
+  ) => void;
   /** The function to call when the search is cleared (optional) */
   clearFunction?: (
     setFilters: React.Dispatch<React.SetStateAction<Filter[]>>,
@@ -85,6 +90,7 @@ export function SearchBar<T extends string>({
   createSuggestions,
   searchFunction = convertAndApplyFilters,
   clearFunction = defaultClearFunction,
+  refreshFunction = convertAndApplyFilters,
   allowKeyWordSearch = true,
   plotTypeSelectorProps,
 }: SearchBarProps<T>) {
@@ -446,7 +452,7 @@ export function SearchBar<T extends string>({
         </Box>
         <Box sx={{ marginLeft: "auto", display: "flex", alignItems: "center" }}>
           <IconButton
-            onClick={() => searchFunction(tokenEquations, setFilters)}
+            onClick={() => refreshFunction(tokenEquations, setFilters)}
             disabled={
               !tokenEquations.every((eq) => eq.status === EquationStatus.VALID)
             }
