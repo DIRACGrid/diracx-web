@@ -76,7 +76,7 @@ jobs:
           sed -i 's@../../@@g' /tmp/gubbins/gubbins-*/pyproject.toml
 
       - name: Upload artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: gubbins
           path: /tmp/gubbins
@@ -145,7 +145,7 @@ jobs:
             EXTENSION_CUSTOM_SOURCES_TO_INSTALL=/bindmount/gubbins_db*.whl,/bindmount/gubbins_routers*.whl,/bindmount/gubbins_client*.whl
 
       - name: Upload artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: gubbins-services-img
           path: /tmp/gubbins_services_image.tar
@@ -189,7 +189,7 @@ jobs:
         run: npm install
 
       - name: Upload the extensions directory
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: gubbins-web
           path: /tmp/gubbins-web
@@ -333,7 +333,7 @@ jobs:
     
     - name: Upload Cypress screenshots
       if: failure()  
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v5
       with:
         name: cypress-screenshots
         path: /tmp/gubbins-web/cypress/screenshots
