@@ -7,6 +7,12 @@
       "description": "Group all GitHub Actions updates together",
       "matchManagers": ["github-actions"],
       "groupName": "GitHub Actions"
+    },
+    {
+      "description": "Group all non-major npm dependency updates together",
+      "matchManagers": ["npm"],
+      "matchUpdateTypes": ["minor", "patch"],
+      "groupName": "npm dependencies (non-major)"
     }
   ]
 }

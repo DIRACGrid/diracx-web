@@ -2,7 +2,7 @@
 # build stage and the runtime stage into two different steps
 
 # Stage 1: Build the Next.js application
-FROM node:alpine AS build
+FROM node:24-alpine AS build
 WORKDIR /app
 
 # Copy the package.json and package-lock.json files to the working directory
@@ -21,7 +21,7 @@ COPY . .
 RUN NEXT_TELEMETRY_DISABLED=1 npm run build
 
 # Stage 2: Copy the website from the previous container to a Nginx container
-FROM nginxinc/nginx-unprivileged:alpine
+FROM nginxinc/nginx-unprivileged:1.27-alpine
 EXPOSE 8080
 COPY --from=build /app/out /usr/share/nginx/html
 COPY ./config/nginx/default.conf /etc/nginx/conf.d/default.conf
