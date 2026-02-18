@@ -2,7 +2,7 @@
 # build stage and the runtime stage into two different steps
 
 # Stage 1: Build the Next.js application
-FROM node:24-alpine AS build
+FROM --platform=$BUILDPLATFORM node:24-alpine AS build
 WORKDIR /app
 
 # Copy the package.json and package-lock.json files to the working directory
