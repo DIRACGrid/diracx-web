@@ -3,6 +3,7 @@ name: Basic checks
 on:
   push:
     branches-ignore:
+      - renovate/**
       - release-please-**
   pull_request:
     branches-ignore:
@@ -11,7 +12,7 @@ on:
 jobs:
   basic-checks:
     runs-on: ubuntu-latest
-    if: github.actor != 'dependabot[bot]' && (github.event_name != 'push' || github.repository == 'DIRACGrid/diracx-web')
+    if: github.event_name != 'push' || github.repository == 'DIRACGrid/diracx-web'
     steps:
       - uses: actions/checkout@v5
         with:

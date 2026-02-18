@@ -7,7 +7,7 @@ on:
       - 'package.json'
       - 'package-lock.json'
     branches-ignore:
-      - dependabot/**
+      - renovate/**
       - release-please-**
   pull_request:
     paths:

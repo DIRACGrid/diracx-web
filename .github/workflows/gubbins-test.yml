@@ -5,7 +5,7 @@ on:
     paths-ignore:
       - 'packages/diracx-web/**'
     branches-ignore:
-      - dependabot/**
+      - renovate/**
       - release-please-**
   pull_request:
     branches-ignore:

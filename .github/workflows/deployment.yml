@@ -3,7 +3,7 @@ name: Deployment
 on:
   push:
     branches-ignore:
-      - dependabot/**
+      - renovate/**
       - release-please-**
   pull_request:
     branches-ignore:
