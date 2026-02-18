@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.1.0-a11](https://github.com/DIRACGrid/diracx-web/compare/v0.1.0-a10...v0.1.0-a11) (2026-02-18)
+
+
+### Bug Fixes
+
+* **oidc:** revoke only refresh token ([7eb3fd4](https://github.com/DIRACGrid/diracx-web/commit/7eb3fd432960374a3a8ce80696726a20eba8f0c7))
+* **oidc:** revoke only refresh token ([209c4ec](https://github.com/DIRACGrid/diracx-web/commit/209c4ec7915324aba6ec5987849d5781dec86266))
+
 ## [0.1.0-a10](https://github.com/DIRACGrid/diracx-web/compare/v0.1.0-a9...v0.1.0-a10) (2025-08-25)
 
 
