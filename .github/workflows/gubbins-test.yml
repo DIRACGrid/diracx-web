@@ -17,9 +17,9 @@ jobs:
     runs-on: ubuntu-latest
     if: github.event_name != 'push' || github.repository == 'DIRACGrid/diracx-web'
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v6
         with:
           node-version: 'lts/*'
           cache: 'npm'
@@ -76,7 +76,7 @@ jobs:
           sed -i 's@../../@@g' /tmp/gubbins/gubbins-*/pyproject.toml
 
       - name: Upload artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: gubbins
           path: /tmp/gubbins
@@ -145,7 +145,7 @@ jobs:
             EXTENSION_CUSTOM_SOURCES_TO_INSTALL=/bindmount/gubbins_db*.whl,/bindmount/gubbins_routers*.whl,/bindmount/gubbins_client*.whl
 
       - name: Upload artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: gubbins-services-img
           path: /tmp/gubbins_services_image.tar
@@ -154,9 +154,9 @@ jobs:
     runs-on: ubuntu-latest
     if: ${{ github.event_name != 'push' || github.repository == 'DIRACGrid/diracx-web' }}
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v6
         with:
           node-version: 'lts/*'
           registry-url: 'https://registry.npmjs.org'
@@ -189,7 +189,7 @@ jobs:
         run: npm install
 
       - name: Upload the extensions directory
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: gubbins-web
           path: /tmp/gubbins-web
@@ -208,7 +208,7 @@ jobs:
     needs: prepare-gubbins-frontend-as-a-standalone
     if: ${{ github.event_name != 'push' || github.repository == 'DIRACGrid/diracx-web' }}
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
@@ -226,7 +226,7 @@ jobs:
       # WARNING: In your CI/CD pipeline, you should remove the following steps  #
       # ------------------------------------------------------------------------#
       - name: Download gubbins-web
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v7
         with:
           name: gubbins-web
           path: /tmp/gubbins-web
@@ -248,7 +248,7 @@ jobs:
     needs: [prepare-gubbins-frontend-as-a-standalone, prepare-gubbins-backend]
     if: github.event_name != 'push' || github.repository == 'DIRACGrid/diracx-web'
     steps:
-    - uses: actions/checkout@v5 
+    - uses: actions/checkout@v6 
       
     - name: Clone source
       run: |
@@ -259,7 +259,7 @@ jobs:
     # WARNING: In your CI/CD pipeline, you should remove the following steps  #
     # ------------------------------------------------------------------------#
     - name: Download gubbins
-      uses: actions/download-artifact@v5
+      uses: actions/download-artifact@v7
       with:
         name: gubbins
         path: /tmp/gubbins
@@ -274,7 +274,7 @@ jobs:
         git clone https://github.com/DIRACGrid/diracx.git
 
     - name: Download gubbins:services image
-      uses: actions/download-artifact@v5
+      uses: actions/download-artifact@v7
       with:
         name: gubbins-services-img
         path: /tmp/
@@ -283,7 +283,7 @@ jobs:
       run: docker load --input /tmp/gubbins_services_image.tar
 
     - name: Download gubbins-web
-      uses: actions/download-artifact@v5
+      uses: actions/download-artifact@v7
       with:
         name: gubbins-web
         path: /tmp/gubbins-web
@@ -333,7 +333,7 @@ jobs:
     
     - name: Upload Cypress screenshots
       if: failure()  
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v6
       with:
         name: cypress-screenshots
         path: /tmp/gubbins-web/cypress/screenshots
