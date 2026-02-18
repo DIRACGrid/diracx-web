@@ -1,5 +1,16 @@
 # Changelog
 
+## [0.1.0-a11](https://github.com/DIRACGrid/diracx-web/compare/v0.1.0-a10...v0.1.0-a11) (2026-02-18)
+
+
+### Bug Fixes
+
+* **deps:** update npm dependencies (non-major) ([13658ae](https://github.com/DIRACGrid/diracx-web/commit/13658ae59e71f4ac27beafc690ee060a2fa35738))
+* issue [#412](https://github.com/DIRACGrid/diracx-web/issues/412) ([5b6b1b2](https://github.com/DIRACGrid/diracx-web/commit/5b6b1b2fad260094d2848042a85dd0dc4257d0e3))
+* issue [#412](https://github.com/DIRACGrid/diracx-web/issues/412) ([ccce03c](https://github.com/DIRACGrid/diracx-web/commit/ccce03c5a1db2b4e71458d0a3103e2d21e0b06d5))
+* **oidc:** revoke only refresh token ([7eb3fd4](https://github.com/DIRACGrid/diracx-web/commit/7eb3fd432960374a3a8ce80696726a20eba8f0c7))
+* **oidc:** revoke only refresh token ([209c4ec](https://github.com/DIRACGrid/diracx-web/commit/209c4ec7915324aba6ec5987849d5781dec86266))
+
 ## [0.1.0-a10](https://github.com/DIRACGrid/diracx-web/compare/v0.1.0-a9...v0.1.0-a10) (2025-08-25)
 
 
