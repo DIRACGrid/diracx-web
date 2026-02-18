@@ -4,6 +4,7 @@ import { fixupConfigRules, fixupPluginRules } from "@eslint/compat";
 import _import from "eslint-plugin-import";
 import typescriptEslint from "@typescript-eslint/eslint-plugin";
 import react from "eslint-plugin-react";
+import reactHooks from "eslint-plugin-react-hooks";
 import tsParser from "@typescript-eslint/parser";
 import js from "@eslint/js";
 import { FlatCompat } from "@eslint/eslintrc";
@@ -20,12 +21,12 @@ const compat = new FlatCompat({
 export default [
   ...fixupConfigRules(
     compat.extends(
-      "next/core-web-vitals",
       "plugin:import/recommended",
       "plugin:import/typescript",
       "plugin:storybook/recommended",
       "plugin:@typescript-eslint/recommended",
       "plugin:react/recommended",
+      "plugin:react-hooks/recommended",
       "prettier",
     ),
   ),
@@ -62,7 +63,6 @@ export default [
 
     rules: {
       "@typescript-eslint/no-deprecated": "warn",
-      "@next/next/no-html-link-for-pages": "off", // We don't have pages, it's a library
       "import/order": ["error"],
       "import/no-unused-modules": ["error"],
       "import/no-useless-path-segments": ["error"],

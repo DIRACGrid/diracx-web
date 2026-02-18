@@ -1,5 +1,5 @@
 import { useState } from "react";
-import type { Meta, StoryObj } from "@storybook/react";
+import type { Meta, StoryObj } from "@storybook/nextjs";
 import { Box } from "@mui/material";
 import { ApplicationsContext } from "../src/contexts/ApplicationsProvider";
 import { NavigationProvider } from "../src/contexts/NavigationProvider";
