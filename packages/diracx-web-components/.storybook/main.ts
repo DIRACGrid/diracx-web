@@ -1,30 +1,20 @@
-import { join, dirname } from "path";
+import { dirname, resolve } from "path";
+import { fileURLToPath } from "url";
 import type { StorybookConfig } from "@storybook/nextjs";
 
-/**
- * This function is used to resolve the absolute path of a package.
- * It is needed in projects that use Yarn PnP or are set up within a monorepo.
- */
-function getAbsolutePath(value: string): string {
-  return dirname(require.resolve(join(value, "package.json")));
-}
+const __dirname = dirname(fileURLToPath(import.meta.url));
+
 const config: StorybookConfig = {
-  stories: [
-    "./*.mdx",
-    "../**/*.mdx",
-    "../stories/*.stories.@(js|jsx|mjs|ts|tsx)",
-  ],
+  stories: ["../stories/*.mdx", "../stories/*.stories.@(js|jsx|mjs|ts|tsx)"],
 
   addons: [
-    getAbsolutePath("@storybook/addon-links"),
-    getAbsolutePath("@storybook/addon-essentials"),
-    getAbsolutePath("@chromatic-com/storybook"),
-    getAbsolutePath("@storybook/addon-interactions"),
-    getAbsolutePath("@storybook/addon-mdx-gfm"),
+    "@storybook/addon-docs",
+    "@storybook/addon-links",
+    "@chromatic-com/storybook",
   ],
 
   framework: {
-    name: getAbsolutePath("@storybook/nextjs"),
+    name: "@storybook/nextjs",
     options: {},
   },
 
@@ -34,15 +24,23 @@ const config: StorybookConfig = {
     if (!config.resolve) {
       return config;
     }
+    // Handle .md files as raw text for MDX imports
+    config.module?.rules?.push({
+      test: /\.md$/,
+      type: "asset/source",
+    });
     config.resolve.alias = {
       ...config.resolve.alias,
-      "@axa-fr/react-oidc": require.resolve(
+      "@axa-fr/react-oidc": resolve(
+        __dirname,
         "../stories/mocks/react-oidc.mock.tsx",
       ),
-      "../../hooks/metadata": require.resolve(
+      "../../hooks/metadata": resolve(
+        __dirname,
         "../stories/mocks/metadata.mock.tsx",
       ),
-      "./jobDataService": require.resolve(
+      "./jobDataService": resolve(
+        __dirname,
         "../stories/mocks/jobDataService.mock.tsx",
       ),
     };

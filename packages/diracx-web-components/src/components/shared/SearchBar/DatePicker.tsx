@@ -9,8 +9,10 @@ import React, { KeyboardEvent, useState } from "react";
 import "dayjs/locale/en-gb"; // Import the locale for dayjs
 import { TextField, TextFieldProps } from "@mui/material";
 
-interface CustomDateTimePickerProps
-  extends Omit<DateTimePickerProps, "value" | "onChange"> {
+interface CustomDateTimePickerProps extends Omit<
+  DateTimePickerProps,
+  "value" | "onChange"
+> {
   value: string | null;
   onDateAccepted: (value: string | null) => void;
   handleArrowKeyDown: (event: KeyboardEvent<HTMLInputElement>) => void;

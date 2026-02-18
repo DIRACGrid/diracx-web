@@ -1,4 +1,4 @@
-import { StoryObj, Meta } from "@storybook/react";
+import { StoryObj, Meta } from "@storybook/nextjs";
 import { Box } from "@mui/material";
 import { ThemeProvider } from "../src/contexts/ThemeProvider";
 import JobMonitor from "../src/components/JobMonitor/JobMonitor";

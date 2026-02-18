@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from "@storybook/react";
+import type { Meta, StoryObj } from "@storybook/nextjs";
 
 import { useState } from "react";
 import { ChartView } from "../src/components/shared";
@@ -84,7 +84,7 @@ export const Default: Story = {
       control: { disable: true },
     },
   },
-  render: (args) => {
+  render: function ChartViewRender(args) {
     const [groupColumns, setGroupColumns] = useState(args.groupColumns);
     const [currentPath, setCurrentPath] = useState(args.currentPath);
 

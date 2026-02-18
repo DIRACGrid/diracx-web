@@ -13,7 +13,7 @@
     "forceConsistentCasingInFileNames": true,
     "noEmit": true,
     "esModuleInterop": true,
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "resolveJsonModule": true,
     "isolatedModules": true,
     "jsx": "react-jsx",
@@ -26,12 +26,11 @@
       "@testing-library/jest-dom"
     ]
   },
-  "include": ["src/global.d.ts", "**/*.ts", "**/*.tsx"],
+  "include": ["src/global.d.ts", "**/*.ts", "**/*.tsx", ".storybook/**/*.ts", ".storybook/**/*.tsx"],
   "exclude": [
     "app",
     "node_modules",
     "dist",
-    "stories",
     "tsup.config.ts",
     "jest.setup.ts"
   ]

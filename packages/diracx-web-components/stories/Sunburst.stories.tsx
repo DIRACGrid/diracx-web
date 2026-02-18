@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from "@storybook/react";
+import type { Meta, StoryObj } from "@storybook/nextjs";
 import { useState, useEffect } from "react";
 import { Sunburst } from "../src/components/shared/Sunburst/Sunburst";
 
@@ -129,7 +129,7 @@ export const Default: Story = {
     },
   },
 
-  render: (args) => {
+  render: function SunburstRender(args) {
     const [currentPath, setCurrentPath] = useState<string[]>([]);
     const [tree, setTree] = useState(args.tree);
 

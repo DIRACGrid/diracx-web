@@ -1,4 +1,4 @@
-import { Meta, StoryObj } from "@storybook/react";
+import { Meta, StoryObj } from "@storybook/nextjs";
 import {
   createColumnHelper,
   getCoreRowModel,
@@ -78,7 +78,7 @@ export const Default: Story = {
     toolbarComponents: <></>,
     menuItems: [{ label: "Edit", onClick: () => {} }],
   },
-  render: (args) => {
+  render: function DataTableRender(args) {
     const table = useReactTable<SimpleItem>({
       data,
       columns: columnDefs,

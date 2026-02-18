@@ -1,4 +1,4 @@
-import { StoryObj, Meta } from "@storybook/react";
+import { StoryObj, Meta } from "@storybook/nextjs";
 import { Paper } from "@mui/material";
 import { ThemeProvider } from "../src/contexts/ThemeProvider";
 import { LoginForm } from "../src/components/Login/LoginForm";

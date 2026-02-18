@@ -1,7 +1,7 @@
-import { Meta, StoryObj } from "@storybook/react";
+import { Meta, StoryObj } from "@storybook/nextjs";
 import React, { useState } from "react";
 import { Paper } from "@mui/material";
-import { action } from "@storybook/addon-actions";
+import { action } from "storybook/actions";
 import {
   SearchBar,
   SearchBarProps,
@@ -144,7 +144,7 @@ export const Default: Story = {
       },
     },
   },
-  render: (args) => {
+  render: function DefaultRender(args) {
     const [filters, setFilters] = useState<Filter[]>(args.filters);
 
     return (
@@ -165,7 +165,7 @@ export const WithPrefilledTokens: Story = {
     searchFunction: action("searchTriggered"),
     allowKeyWordSearch: true,
   },
-  render: (args) => {
+  render: function WithPrefilledTokensRender(args) {
     const [filters, setFilters] = useState<Filter[]>(args.filters);
 
     return (

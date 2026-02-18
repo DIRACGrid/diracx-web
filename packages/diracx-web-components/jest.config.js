@@ -19,7 +19,7 @@ const config = {
 
   // To support ESM modules in Jest
   transformIgnorePatterns: [
-    "/node_modules/(?!d3|d3-[^/]+|internmap|delaunator|robust-predicates)",
+    "/node_modules/(?!d3|d3-[^/]+|internmap|delaunator|robust-predicates|storybook|@storybook)",
   ],
 
   // Tell Jest how to transform files
