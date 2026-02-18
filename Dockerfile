@@ -17,7 +17,7 @@ COPY . .
 RUN NEXT_TELEMETRY_DISABLED=1 npm run build
 
 # Stage 2: Copy the website from the previous container to a Nginx container
-FROM nginxinc/nginx-unprivileged:1.27-alpine
+FROM nginxinc/nginx-unprivileged:1.29-alpine
 EXPOSE 8080
 COPY --from=build /app/out /usr/share/nginx/html
 COPY ./config/nginx/default.conf /etc/nginx/conf.d/default.conf
