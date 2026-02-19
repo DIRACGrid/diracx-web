@@ -249,16 +249,16 @@ export function useJobs(
   page: number,
   rowsPerPage: number,
 ) {
+  const urlError = !diracxUrl
+    ? new Error("Invalid URL generated for fetching jobs.")
+    : null;
   const [data, setData] = useState<Job[] | null>(null);
   const [headers, setHeaders] = useState<Headers>(new Headers());
-  const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [error, setError] = useState<Error | null>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(!urlError);
+  const [error, setError] = useState<Error | null>(urlError);
 
   useEffect(() => {
     if (!diracxUrl) {
-      setData(null);
-      setIsLoading(false);
-      setError(new Error("Invalid URL generated for fetching jobs."));
       return;
     }
 
@@ -291,9 +291,11 @@ export function useJobs(
           setError(null);
         }
       } catch {
-        setData(null);
-        setIsLoading(false);
-        setError(new Error("Failed to fetch jobs"));
+        if (!cancelled) {
+          setData(null);
+          setIsLoading(false);
+          setError(new Error("Failed to fetch jobs"));
+        }
       }
     }
     fetchJobs();

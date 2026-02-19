@@ -1,65 +1,28 @@
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { fixupConfigRules, fixupPluginRules } from "@eslint/compat";
-import _import from "eslint-plugin-import";
-import typescriptEslint from "@typescript-eslint/eslint-plugin";
-import react from "eslint-plugin-react";
-import tsParser from "@typescript-eslint/parser";
-import js from "@eslint/js";
-import { FlatCompat } from "@eslint/eslintrc";
+import { fixupConfigRules } from "@eslint/compat";
+import nextCoreWebVitals from "eslint-config-next/core-web-vitals";
+import nextTypescript from "eslint-config-next/typescript";
+import prettier from "eslint-config-prettier/flat";
+import storybook from "eslint-plugin-storybook";
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-const compat = new FlatCompat({
-  baseDirectory: __dirname,
-  recommendedConfig: js.configs.recommended,
-  allConfig: js.configs.all,
-});
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 // This config is only for typescript files
 export default [
-  ...fixupConfigRules(
-    compat.extends(
-      "next/core-web-vitals",
-      "plugin:import/recommended",
-      "plugin:import/typescript",
-      "plugin:storybook/recommended",
-      "plugin:@typescript-eslint/recommended",
-      "plugin:react/recommended",
-      "prettier",
-    ),
-  ),
+  // Wrap next configs with fixupConfigRules for ESLint 10 compat
+  // (eslint-plugin-react still uses legacy context.getFilename API)
+  ...fixupConfigRules(nextCoreWebVitals),
+  ...fixupConfigRules(nextTypescript),
+  ...storybook.configs["flat/recommended"],
+  prettier,
   {
-    plugins: {
-      import: fixupPluginRules(_import),
-      "@typescript-eslint": fixupPluginRules(typescriptEslint),
-      react: fixupPluginRules(react),
-    },
-
     languageOptions: {
-      globals: {
-        JSX: "readonly",
-      },
-
-      parser: tsParser,
-      ecmaVersion: 2021,
-      sourceType: "module",
-
       parserOptions: {
-        ecmaFeatures: {
-          jsx: true,
-        },
         project: ["./tsconfig.json"],
         tsconfigRootDir: __dirname,
       },
     },
-
-    settings: {
-      react: {
-        version: "detect",
-      },
-    },
-
     rules: {
       "@typescript-eslint/no-deprecated": "warn",
       "@next/next/no-html-link-for-pages": "off", // We don't have pages, it's a library

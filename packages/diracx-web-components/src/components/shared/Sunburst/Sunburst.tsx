@@ -199,6 +199,7 @@ export function Sunburst({
     path
       .on(
         "mouseover",
+        // eslint-disable-next-line react-hooks/unsupported-syntax -- D3 requires `this` for element reference
         function (this: SVGPathElement, event: MouseEvent, p: SunburstNode) {
           mouseOn.call(this, event, p);
         },

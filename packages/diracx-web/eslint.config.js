@@ -1,43 +1,19 @@
-import path from "node:path";
-import { fileURLToPath } from "node:url";
-import { fixupConfigRules, fixupPluginRules } from "@eslint/compat";
-import _import from "eslint-plugin-import";
-import js from "@eslint/js";
-import { FlatCompat } from "@eslint/eslintrc";
-import tsPlugin from "@typescript-eslint/eslint-plugin";
-import tsParser from "@typescript-eslint/parser";
+import { fixupConfigRules } from "@eslint/compat";
+import nextCoreWebVitals from "eslint-config-next/core-web-vitals";
+import nextTypescript from "eslint-config-next/typescript";
+import prettier from "eslint-config-prettier/flat";
 import eslintPluginUnusedImports from "eslint-plugin-unused-imports";
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-const compat = new FlatCompat({
-  baseDirectory: __dirname,
-  recommendedConfig: js.configs.recommended,
-  allConfig: js.configs.all,
-});
 
 // This config is only for typescript files
 export default [
-  ...fixupConfigRules(
-    compat.extends(
-      "next/core-web-vitals",
-      "prettier",
-      "plugin:import/recommended",
-      "plugin:import/typescript",
-    ),
-  ),
+  // Wrap next configs with fixupConfigRules for ESLint 10 compat
+  // (eslint-plugin-react still uses legacy context.getFilename API)
+  ...fixupConfigRules(nextCoreWebVitals),
+  ...fixupConfigRules(nextTypescript),
+  prettier,
   {
     plugins: {
-      import: fixupPluginRules(_import),
-      "@typescript-eslint": tsPlugin,
       "unused-imports": eslintPluginUnusedImports,
-    },
-
-    languageOptions: {
-      parser: tsParser,
-      globals: {
-        JSX: "readonly",
-      },
     },
 
     rules: {

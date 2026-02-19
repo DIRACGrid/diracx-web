@@ -12,7 +12,7 @@ import {
   useMediaQuery,
 } from "@mui/material";
 import { cyan, grey, lightGreen } from "@mui/material/colors";
-import { createContext, useEffect, useMemo, useState } from "react";
+import { createContext, useMemo, useState } from "react";
 
 declare module "@mui/material/styles" {
   interface Palette {
@@ -57,19 +57,19 @@ export const ThemeContext = createContext<ThemeContextType | undefined>(
  * ThemeProvider component to provide the theme context to its children
  */
 export const ThemeProvider = ({ children }: ThemeProviderProps) => {
-  const [theme, setTheme] = useState<string>("light");
   const prefersDarkMode = useMediaQuery("(prefers-color-scheme: dark)");
-
-  useEffect(() => {
+  const [theme, setTheme] = useState<string>(() => {
+    if (typeof sessionStorage === "undefined") {
+      return prefersDarkMode ? "dark" : "light";
+    }
     const storedTheme = sessionStorage.getItem("theme");
     if (storedTheme) {
-      setTheme(storedTheme);
-    } else {
-      const defaultTheme = prefersDarkMode ? "dark" : "light";
-      setTheme(defaultTheme);
-      sessionStorage.setItem("theme", defaultTheme);
+      return storedTheme;
     }
-  }, [prefersDarkMode]);
+    const defaultTheme = prefersDarkMode ? "dark" : "light";
+    sessionStorage.setItem("theme", defaultTheme);
+    return defaultTheme;
+  });
 
   const toggleTheme = () => {
     setTheme((prevTheme) => {
