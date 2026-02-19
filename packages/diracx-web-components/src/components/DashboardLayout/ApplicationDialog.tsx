@@ -7,7 +7,7 @@ import {
   DialogContent,
   DialogContentText,
   Button,
-  Grid2 as Grid,
+  Grid,
   Icon,
   IconButton,
 } from "@mui/material";
