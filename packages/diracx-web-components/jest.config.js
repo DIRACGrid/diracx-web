@@ -14,7 +14,7 @@ const config = {
     "^@axa-fr/react-oidc$": "<rootDir>/stories/mocks/react-oidc.mock.tsx",
     "^../../hooks/metadata$": "<rootDir>/stories/mocks/metadata.mock.tsx",
     "^./jobDataService$": "<rootDir>/stories/mocks/jobDataService.mock.tsx",
-    "\\.css$": "<rootDir>/stories/mocks/style.mock.ts",
+    "\\.css$": "<rootDir>/stories/mocks/style.mock.js",
   },
 
   // To support ESM modules in Jest
