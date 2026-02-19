@@ -11,7 +11,7 @@ import {
   TextField,
 } from "@mui/material";
 import InputIcon from "@mui/icons-material/Input";
-import React, { useState, useContext, useEffect } from "react";
+import React, { useState, useContext } from "react";
 import { ApplicationsContext } from "../../contexts";
 import {
   ApplicationMetadata,
@@ -37,25 +37,24 @@ function ImportDialog({ open, onClose, onImport }: ImportDialogProps) {
   const [stateText, setStateText] = useState("");
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
+  const handleClose = () => {
     setStateText("");
     setError(null);
-  }, [open]);
+    onClose();
+  };
 
   const handleImport = () => {
     try {
       const parsedState: ApplicationSettings[] = JSON.parse(stateText);
       onImport(parsedState);
-      onClose();
-      setStateText("");
-      setError(null);
+      handleClose();
     } catch {
       setError("Invalid JSON format");
     }
   };
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
+    <Dialog open={open} onClose={handleClose} maxWidth="md" fullWidth>
       <DialogTitle data-testid="import-menu">
         Import Application State
       </DialogTitle>
@@ -74,7 +73,7 @@ function ImportDialog({ open, onClose, onImport }: ImportDialogProps) {
         />
       </DialogContent>
       <DialogActions>
-        <Button onClick={onClose} data-testid="cancel-import-button">
+        <Button onClick={handleClose} data-testid="cancel-import-button">
           Cancel
         </Button>
         <Button

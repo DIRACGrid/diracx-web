@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useMemo, useRef } from "react";
 
 import { Autocomplete, TextField } from "@mui/material";
 
@@ -72,10 +72,8 @@ export default function SearchField({
     focusedTokenIndex,
     tokenEquations,
   );
-  const [placeholder, setPlaceholder] = useState<string>("");
-
-  useEffect(() => {
-    setPlaceholder(
+  const placeholder = useMemo(
+    () =>
       previousToken
         ? previousToken.nature === SearchBarTokenNature.OPERATOR
           ? "Enter a value"
@@ -83,8 +81,8 @@ export default function SearchField({
             ? "Enter an operator"
             : "Enter a category"
         : "Enter a category",
-    );
-  }, [previousToken]);
+    [previousToken],
+  );
 
   /**
    * Create a new token based on the input value and type.
