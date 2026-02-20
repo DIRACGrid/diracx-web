@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.1.0-a11](https://github.com/DIRACGrid/diracx-web/compare/v0.1.0-a10...v0.1.0-a11) (2026-02-20)
+
+
+### Bug Fixes
+
+* **deps:** update dependency @atlaskit/pragmatic-drag-and-drop-react-drop-indicator to v3 ([876a3c5](https://github.com/DIRACGrid/diracx-web/commit/876a3c51f450e3af70edacc25515d5fe208eb100))
+* **deps:** update dependency @types/node to v24 ([055109d](https://github.com/DIRACGrid/diracx-web/commit/055109d279fa0b51b4e930148fcd525a6d8ff77b))
+* **deps:** update material-ui monorepo ([6b12dca](https://github.com/DIRACGrid/diracx-web/commit/6b12dca8775c68c2e0743abbaf772fd6883b5cc2))
+* **deps:** update react monorepo ([cb03f7f](https://github.com/DIRACGrid/diracx-web/commit/cb03f7f5204d92af7267b3b63ef4fa33ad805d48))
+* **oidc:** revoke only refresh token ([7eb3fd4](https://github.com/DIRACGrid/diracx-web/commit/7eb3fd432960374a3a8ce80696726a20eba8f0c7))
+* **oidc:** revoke only refresh token ([209c4ec](https://github.com/DIRACGrid/diracx-web/commit/209c4ec7915324aba6ec5987849d5781dec86266))
+
 ## [0.1.0-a10](https://github.com/DIRACGrid/diracx-web/compare/v0.1.0-a9...v0.1.0-a10) (2025-08-25)
 
 
