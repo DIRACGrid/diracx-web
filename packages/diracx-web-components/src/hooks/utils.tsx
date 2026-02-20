@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 /**
  * Fetcher function for useSWR
@@ -55,14 +55,13 @@ export async function fetcher<T>(
  * @returns the diracx installation URL
  */
 export function useDiracxUrl() {
-  const [diracxUrl, setDiracxUrl] = useState<string | null>(null);
-
-  useEffect(() => {
-    const backendUrl =
+  const [diracxUrl] = useState<string | null>(() => {
+    if (typeof window === "undefined") return null;
+    return (
       process.env.NEXT_PUBLIC_DIRACX_URL ||
-      `${window.location.protocol}//${window.location.host}`;
-    setDiracxUrl(backendUrl);
-  }, []);
+      `${window.location.protocol}//${window.location.host}`
+    );
+  });
 
   return diracxUrl;
 }

@@ -59,6 +59,17 @@ export default function DrawerItemGroup({
   // State to track whether the user is hovering over the item during a drag operation
   const [hovered, setHovered] = useState(false);
 
+  // Handles expansion of the accordion group
+  const handleChange =
+    (title: string) => (_: React.ChangeEvent<unknown>, isExpanded: boolean) => {
+      // Set the extended state of the accordion group.
+      setUserDashboard((groups) =>
+        groups.map((group) =>
+          group.title === title ? { ...group, extended: isExpanded } : group,
+        ),
+      );
+    };
+
   useEffect(() => {
     if (!dropRef.current) return;
     const dropItem = dropRef.current;
@@ -76,17 +87,6 @@ export default function DrawerItemGroup({
       onDragLeave: () => setHovered(false),
     });
   });
-
-  // Handles expansion of the accordion group
-  const handleChange =
-    (title: string) => (_: React.ChangeEvent<unknown>, isExpanded: boolean) => {
-      // Set the extended state of the accordion group.
-      setUserDashboard((groups) =>
-        groups.map((group) =>
-          group.title === title ? { ...group, extended: isExpanded } : group,
-        ),
-      );
-    };
 
   // Handle renaming of the group
   const handleGroupRename = () => {
