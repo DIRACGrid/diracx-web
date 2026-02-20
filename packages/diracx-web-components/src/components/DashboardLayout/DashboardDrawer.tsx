@@ -17,7 +17,7 @@ import {
   useTheme,
 } from "@mui/material";
 import { MenuBook, Add } from "@mui/icons-material";
-import React, { useContext, useEffect, useState } from "react";
+import React, { use, useEffect, useState } from "react";
 import Image from "next/image";
 import { monitorForElements } from "@atlaskit/pragmatic-drag-and-drop/element/adapter";
 import { extractClosestEdge } from "@atlaskit/pragmatic-drag-and-drop-hitbox/closest-edge";
@@ -82,7 +82,7 @@ export default function DashboardDrawer({
   // Define the applications that are accessible to users.
   // Each application has an associated icon and path.
   const [userDashboard, setUserDashboard, , , setCurrentAppId] =
-    useContext(ApplicationsContext);
+    use(ApplicationsContext);
 
   const theme = useTheme();
 

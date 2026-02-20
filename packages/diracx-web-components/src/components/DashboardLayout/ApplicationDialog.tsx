@@ -1,6 +1,6 @@
 "use client";
 
-import { useContext } from "react";
+import { use } from "react";
 import {
   Dialog,
   DialogTitle,
@@ -34,7 +34,7 @@ export default function AppDialog({
   setAppDialogOpen,
   handleCreateApp,
 }: AppDialogProps) {
-  const applicationList = useContext(ApplicationsContext)[2];
+  const applicationList = use(ApplicationsContext)[2];
   return (
     <Dialog
       open={appDialogOpen}

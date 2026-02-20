@@ -11,7 +11,7 @@ import {
   TextField,
 } from "@mui/material";
 import InputIcon from "@mui/icons-material/Input";
-import React, { useState, useContext, useEffect } from "react";
+import React, { useState, use } from "react";
 import { ApplicationsContext } from "../../contexts";
 import {
   ApplicationMetadata,
@@ -36,11 +36,13 @@ interface ImportDialogProps {
 function ImportDialog({ open, onClose, onImport }: ImportDialogProps) {
   const [stateText, setStateText] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [prevOpen, setPrevOpen] = useState(open);
 
-  useEffect(() => {
+  if (prevOpen !== open) {
+    setPrevOpen(open);
     setStateText("");
     setError(null);
-  }, [open]);
+  }
 
   const handleImport = () => {
     try {
@@ -184,8 +186,7 @@ export function ImportButton() {
   const [correctStates, setCorrectStates] = useState<
     { oldSettings: ApplicationSettings; newState: ApplicationState }[]
   >([]);
-  const [userDashboard, setUserDashboard, appList] =
-    useContext(ApplicationsContext);
+  const [userDashboard, setUserDashboard, appList] = use(ApplicationsContext);
 
   const handleImport = (
     importedStates: ApplicationSettings | ApplicationSettings[],

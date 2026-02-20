@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useCallback, useContext } from "react";
+import { useMemo, useCallback, use } from "react";
 import { NavigationContext } from "../contexts/NavigationProvider";
 
 /**
@@ -10,7 +10,7 @@ import { NavigationContext } from "../contexts/NavigationProvider";
  * @returns An object containing the `getParam`, `setParam`, and `removeParam` functions.
  */
 export function useSearchParamsUtils() {
-  const { getPath, setPath, getSearchParams } = useContext(NavigationContext);
+  const { getPath, setPath, getSearchParams } = use(NavigationContext);
   const searchParams = useMemo(() => getSearchParams(), [getSearchParams]);
   const pathname = useMemo(() => getPath(), [getPath]);
 

@@ -103,8 +103,9 @@ export function MyDateTimePicker({
  *  that allows it to be used with the DateTimePicker component.
  *  It forwards the ref to the input element and applies custom styles.
  */
-const ForwardedTextField = React.forwardRef<HTMLElement, TextFieldProps>(
-  function ForwardedTextField(props, ref) {
-    return <TextField {...props} inputRef={ref} variant="standard" />;
-  },
-);
+function ForwardedTextField({
+  ref,
+  ...props
+}: TextFieldProps & { ref?: React.Ref<HTMLElement> }) {
+  return <TextField {...props} inputRef={ref} variant="standard" />;
+}

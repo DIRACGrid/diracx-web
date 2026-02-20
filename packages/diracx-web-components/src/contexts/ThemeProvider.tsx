@@ -12,7 +12,7 @@ import {
   useMediaQuery,
 } from "@mui/material";
 import { cyan, grey, lightGreen } from "@mui/material/colors";
-import { createContext, useEffect, useMemo, useState } from "react";
+import { createContext, useMemo, useState } from "react";
 
 declare module "@mui/material/styles" {
   interface Palette {
@@ -57,19 +57,42 @@ export const ThemeContext = createContext<ThemeContextType | undefined>(
  * ThemeProvider component to provide the theme context to its children
  */
 export const ThemeProvider = ({ children }: ThemeProviderProps) => {
-  const [theme, setTheme] = useState<string>("light");
   const prefersDarkMode = useMediaQuery("(prefers-color-scheme: dark)");
+  const [theme, setTheme] = useState<string | null>(null);
+  const [prevPrefersDark, setPrevPrefersDark] = useState(prefersDarkMode);
 
-  useEffect(() => {
-    const storedTheme = sessionStorage.getItem("theme");
+  // Initialize theme from sessionStorage or system preference
+  if (theme === null) {
+    const storedTheme =
+      typeof sessionStorage !== "undefined"
+        ? sessionStorage.getItem("theme")
+        : null;
     if (storedTheme) {
       setTheme(storedTheme);
     } else {
       const defaultTheme = prefersDarkMode ? "dark" : "light";
       setTheme(defaultTheme);
-      sessionStorage.setItem("theme", defaultTheme);
+      if (typeof sessionStorage !== "undefined") {
+        sessionStorage.setItem("theme", defaultTheme);
+      }
     }
-  }, [prefersDarkMode]);
+  }
+
+  // Update theme when system preference changes
+  if (prevPrefersDark !== prefersDarkMode) {
+    setPrevPrefersDark(prefersDarkMode);
+    const storedTheme =
+      typeof sessionStorage !== "undefined"
+        ? sessionStorage.getItem("theme")
+        : null;
+    if (!storedTheme) {
+      const defaultTheme = prefersDarkMode ? "dark" : "light";
+      setTheme(defaultTheme);
+      if (typeof sessionStorage !== "undefined") {
+        sessionStorage.setItem("theme", defaultTheme);
+      }
+    }
+  }
 
   const toggleTheme = () => {
     setTheme((prevTheme) => {
@@ -331,11 +354,11 @@ export const ThemeProvider = ({ children }: ThemeProviderProps) => {
   }
 
   return (
-    <ThemeContext.Provider value={{ theme: theme, toggleTheme }}>
+    <ThemeContext value={{ theme: theme, toggleTheme }}>
       <MUIThemeProvider theme={muiTheme}>
         <CssBaseline />
         {children}
       </MUIThemeProvider>
-    </ThemeContext.Provider>
+    </ThemeContext>
   );
 };

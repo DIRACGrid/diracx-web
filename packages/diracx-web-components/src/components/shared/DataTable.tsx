@@ -317,9 +317,14 @@ export function DataTable<T extends Record<string, unknown>>({
   // Virtualizer
   const VirtuosoTableComponents: TableComponents<Row<T>, unknown> = useMemo(
     () => ({
-      Scroller: React.forwardRef<HTMLDivElement>(function Scroller(props, ref) {
+      Scroller: function Scroller({
+        ref,
+        ...props
+      }: { ref?: React.Ref<HTMLDivElement> } & React.ComponentProps<
+        typeof TableContainer
+      >) {
         return <TableContainer {...props} ref={ref} />;
-      }),
+      },
       Table: (props) => (
         <Table
           {...props}
@@ -332,11 +337,14 @@ export function DataTable<T extends Record<string, unknown>>({
           size="small"
         />
       ),
-      TableHead: React.forwardRef<HTMLTableSectionElement>(
-        function TableHeadRef(props, ref) {
-          return <TableHead {...props} ref={ref} />;
-        },
-      ),
+      TableHead: function TableHeadComponent({
+        ref,
+        ...props
+      }: { ref?: React.Ref<HTMLTableSectionElement> } & React.ComponentProps<
+        typeof TableHead
+      >) {
+        return <TableHead {...props} ref={ref} />;
+      },
       TableRow: ({ item, ...props }) => (
         <TableRow
           key={item.id}
@@ -348,11 +356,14 @@ export function DataTable<T extends Record<string, unknown>>({
           {...props}
         />
       ),
-      TableBody: React.forwardRef<HTMLTableSectionElement>(
-        function TableBodyRef(props, ref) {
-          return <TableBody {...props} ref={ref} />;
-        },
-      ),
+      TableBody: function TableBodyComponent({
+        ref,
+        ...props
+      }: { ref?: React.Ref<HTMLTableSectionElement> } & React.ComponentProps<
+        typeof TableBody
+      >) {
+        return <TableBody {...props} ref={ref} />;
+      },
     }),
     [handleContextMenu, disableCheckbox],
   );

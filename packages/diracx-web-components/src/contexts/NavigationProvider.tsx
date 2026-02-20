@@ -28,8 +28,8 @@ export const NavigationProvider = ({
   getSearchParams,
 }: NavigationProviderProps) => {
   return (
-    <NavigationContext.Provider value={{ getPath, setPath, getSearchParams }}>
+    <NavigationContext value={{ getPath, setPath, getSearchParams }}>
       {children}
-    </NavigationContext.Provider>
+    </NavigationContext>
   );
 };

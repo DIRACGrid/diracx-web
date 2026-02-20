@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useContext } from "react";
+import { useState, use } from "react";
 
 import {
   IconButton,
@@ -96,7 +96,7 @@ export function ExportButton() {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedApps, setSelectedApps] = useState<string[]>([]);
   const [selectedState, setSelectedState] = useState("");
-  const [groups, ,] = useContext(ApplicationsContext);
+  const [groups, ,] = use(ApplicationsContext);
 
   // Function to handle the click event on the share button
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {

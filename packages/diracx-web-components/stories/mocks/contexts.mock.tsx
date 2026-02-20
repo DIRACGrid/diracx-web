@@ -33,10 +33,10 @@ export const JobMockProvider: React.FC<MockProviderProps> = ({
   jobHistory,
   error = null,
   isLoading = false,
-}): JSX.Element => {
+}) => {
   return (
-    <JobMockContext.Provider value={{ jobs, jobHistory, error, isLoading }}>
+    <JobMockContext value={{ jobs, jobHistory, error, isLoading }}>
       {children}
-    </JobMockContext.Provider>
+    </JobMockContext>
   );
 };

@@ -1,6 +1,6 @@
 "use client";
 
-import { useContext } from "react";
+import { use } from "react";
 import { OIDCConfigurationContext } from "../contexts/OIDCConfigurationProvider";
 
 /**
@@ -8,7 +8,7 @@ import { OIDCConfigurationContext } from "../contexts/OIDCConfigurationProvider"
  * @returns the OIDC configuration context
  */
 export const useOIDCContext = () => {
-  const context = useContext(OIDCConfigurationContext);
+  const context = use(OIDCConfigurationContext);
   if (!context) {
     throw new Error(
       "useOIDCConfigurationContext must be used within an OIDCConfigurationProvider",
