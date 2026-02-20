@@ -256,9 +256,6 @@ export function useJobs(
 
   useEffect(() => {
     if (!diracxUrl) {
-      setData(null);
-      setIsLoading(false);
-      setError(new Error("Invalid URL generated for fetching jobs."));
       return;
     }
 
@@ -302,6 +299,15 @@ export function useJobs(
       cancelled = true;
     };
   }, [diracxUrl, accessToken, searchBody, page, rowsPerPage]);
+
+  if (!diracxUrl) {
+    return {
+      headers: new Headers(),
+      data: null,
+      isLoading: false,
+      error: new Error("Invalid URL generated for fetching jobs."),
+    };
+  }
 
   return {
     headers,
