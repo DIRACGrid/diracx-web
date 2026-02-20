@@ -1,4 +1,4 @@
-import React, { MouseEvent, useEffect, useRef, useMemo } from "react";
+import React, { MouseEvent, useEffect, useRef } from "react";
 
 import {
   HierarchyNode,
@@ -59,15 +59,15 @@ export function Sunburst({
   isLoading = false,
   error = null,
 }: SunburstProps) {
-  // Create a stable default color scale with useMemo
-  const defaultColorScale = useMemo(() => {
+  // Create a default color scale
+  const defaultColorScale = (() => {
     if (!tree?.children) return () => "#ccc";
 
     const colorScale = scaleOrdinal(
       quantize(interpolateRainbow, tree.children.length + 1),
     );
     return (name: string, _size: number, _depth: number) => colorScale(name);
-  }, [tree.children]);
+  })();
 
   // Use the provided colorScales or the default one
   const finalColorScales = colorScales || defaultColorScale;
@@ -196,18 +196,8 @@ export function Sunburst({
 
     // Make them interact with the mouse
     path
-      .on(
-        "mouseover",
-        function (this: SVGPathElement, event: MouseEvent, p: SunburstNode) {
-          mouseOn.call(this, event, p);
-        },
-      )
-      .on(
-        "mouseout",
-        function (this: SVGPathElement, event: MouseEvent, p: SunburstNode) {
-          mouseOut.call(this, event, p);
-        },
-      )
+      .on("mouseover", mouseOn)
+      .on("mouseout", mouseOut)
       .on("mousemove", mouseMove)
       .on("contextmenu", rightClicked);
 
@@ -260,13 +250,10 @@ export function Sunburst({
       return `rotate(${x - 90}) translate(${y},0) rotate(${x < 180 ? 0 : 180})`;
     }
 
-    function mouseOn(
-      this: SVGPathElement | null,
-      event: MouseEvent,
-      p: SunburstNode,
-    ) {
+    function mouseOn(event: MouseEvent, p: SunburstNode) {
+      const element = event.currentTarget as SVGPathElement;
       if (p.children && setCurrentPath) {
-        select(this).transition().duration(30).attr("opacity", "0.85");
+        select(element).transition().duration(30).attr("opacity", "0.85");
       }
       tooltip.style("visibility", "visible");
       tooltip
@@ -279,12 +266,9 @@ export function Sunburst({
       );
     }
 
-    function mouseOut(
-      this: SVGPathElement,
-      _event: MouseEvent,
-      _p: SunburstNode,
-    ) {
-      select(this).transition().duration(30).attr("opacity", "1");
+    function mouseOut(_event: MouseEvent, _p: SunburstNode) {
+      const element = _event.currentTarget as SVGPathElement;
+      select(element).transition().duration(30).attr("opacity", "1");
       tooltip.style("visibility", "hidden");
     }
 
