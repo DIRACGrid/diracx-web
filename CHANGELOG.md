@@ -1,5 +1,22 @@
 # Changelog
 
+## [0.1.0-a11](https://github.com/DIRACGrid/diracx-web/compare/v0.1.0-a10...v0.1.0-a11) (2026-02-20)
+
+
+### Bug Fixes
+
+* **deps:** update dependency @atlaskit/pragmatic-drag-and-drop-react-drop-indicator to v3 ([876a3c5](https://github.com/DIRACGrid/diracx-web/commit/876a3c51f450e3af70edacc25515d5fe208eb100))
+* **deps:** update dependency @types/node to v24 ([055109d](https://github.com/DIRACGrid/diracx-web/commit/055109d279fa0b51b4e930148fcd525a6d8ff77b))
+* **deps:** update dependency next to v15.5.10 [security] ([5b93bca](https://github.com/DIRACGrid/diracx-web/commit/5b93bcae99dd0a2d044a00c0880bac113c3ccc06))
+* **deps:** update material-ui monorepo ([6b12dca](https://github.com/DIRACGrid/diracx-web/commit/6b12dca8775c68c2e0743abbaf772fd6883b5cc2))
+* **deps:** update nextjs monorepo to v16 ([c2cbdb3](https://github.com/DIRACGrid/diracx-web/commit/c2cbdb3f9323fca95a4d77b617e1fb5d29a61992))
+* **deps:** update npm dependencies (non-major) ([61643c0](https://github.com/DIRACGrid/diracx-web/commit/61643c0e297137cd64eac7d32b641e8e39efe01e))
+* **deps:** update react monorepo ([cb03f7f](https://github.com/DIRACGrid/diracx-web/commit/cb03f7f5204d92af7267b3b63ef4fa33ad805d48))
+* issue [#412](https://github.com/DIRACGrid/diracx-web/issues/412) ([5b6b1b2](https://github.com/DIRACGrid/diracx-web/commit/5b6b1b2fad260094d2848042a85dd0dc4257d0e3))
+* issue [#412](https://github.com/DIRACGrid/diracx-web/issues/412) ([ccce03c](https://github.com/DIRACGrid/diracx-web/commit/ccce03c5a1db2b4e71458d0a3103e2d21e0b06d5))
+* **oidc:** revoke only refresh token ([7eb3fd4](https://github.com/DIRACGrid/diracx-web/commit/7eb3fd432960374a3a8ce80696726a20eba8f0c7))
+* **oidc:** revoke only refresh token ([209c4ec](https://github.com/DIRACGrid/diracx-web/commit/209c4ec7915324aba6ec5987849d5781dec86266))
+
 ## [0.1.0-a10](https://github.com/DIRACGrid/diracx-web/compare/v0.1.0-a9...v0.1.0-a10) (2025-08-25)
 
 
