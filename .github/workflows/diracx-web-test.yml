@@ -62,3 +62,10 @@ jobs:
         browser: chrome
         config: baseUrl=${{ env.DIRACX_URL }}
         project: packages/diracx-web
+
+    - name: Upload Cypress screenshots
+      if: failure()
+      uses: actions/upload-artifact@v4
+      with:
+        name: cypress-screenshots
+        path: packages/diracx-web/cypress/screenshots
