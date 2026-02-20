@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useContext, useEffect, useRef, useState } from "react";
+import React, { use, useEffect, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
 import {
   ListItemButton,
@@ -70,7 +70,7 @@ export default function DrawerItem({
   // Represents the closest edge to the mouse cursor
   const [closestEdge, setClosestEdge] = useState<Edge | null>(null);
 
-  const [, , appList, appId, setCurrentAppId] = useContext(ApplicationsContext);
+  const [, , appList, appId, setCurrentAppId] = use(ApplicationsContext);
   const { icon } = appList.find((app) => app.name === item.type) || {
     icon: EggIcon,
   };

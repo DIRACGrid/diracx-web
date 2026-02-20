@@ -1,6 +1,6 @@
 "use client";
 
-import { useContext, useMemo } from "react";
+import { use, useMemo } from "react";
 import { ApplicationsContext } from "../contexts/ApplicationsProvider";
 
 /**
@@ -8,7 +8,7 @@ import { ApplicationsContext } from "../contexts/ApplicationsProvider";
  * @returns the application id
  */
 export function useApplicationId() {
-  const [, , , appId] = useContext(ApplicationsContext);
+  const [, , , appId] = use(ApplicationsContext);
   return appId;
 }
 
@@ -17,7 +17,7 @@ export function useApplicationId() {
  * @returns the application title
  */
 export function useApplicationTitle() {
-  const [userDashboard, , , appId] = useContext(ApplicationsContext);
+  const [userDashboard, , , appId] = use(ApplicationsContext);
 
   return useMemo(() => {
     if (!userDashboard || !appId) return null;
@@ -38,7 +38,7 @@ export function useApplicationTitle() {
  * @returns the application type
  */
 export function useApplicationType() {
-  const [userDashboard] = useContext(ApplicationsContext);
+  const [userDashboard] = use(ApplicationsContext);
   const appId = useApplicationId();
 
   return useMemo(() => {

@@ -1,5 +1,5 @@
 "use client";
-import { useContext, useMemo, useEffect } from "react";
+import { use, useMemo, useEffect } from "react";
 import { Typography } from "@mui/material";
 import { ApplicationsContext } from "../../contexts";
 
@@ -10,7 +10,7 @@ import { ApplicationsContext } from "../../contexts";
  */
 export function ApplicationSelector() {
   const [userDashboard, , applicationList, currentAppId, setCurrentAppId] =
-    useContext(ApplicationsContext);
+    use(ApplicationsContext);
 
   const group = userDashboard.find((group) =>
     group.items.some((item) => item.id === currentAppId),

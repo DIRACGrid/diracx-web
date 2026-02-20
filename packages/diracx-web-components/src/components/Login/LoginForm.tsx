@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect, use } from "react";
 
 import {
   Box,
@@ -43,7 +43,7 @@ export function LoginForm({
   const [selectedGroup, setSelectedGroup] = useState<string | null>(null);
   const { configuration, setConfiguration } = useOIDCContext();
   const { isAuthenticated, login } = useOidc(configuration?.scope);
-  const { setPath } = useContext(NavigationContext);
+  const { setPath } = use(NavigationContext);
   const OIDC_LOGIN_ATTEMPTED_KEY = "oidcLoginAttempted";
 
   // Login if not authenticated

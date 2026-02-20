@@ -55,7 +55,7 @@ export const ApplicationsProvider = ({
   }, [userDashboard]);
 
   return (
-    <ApplicationsContext.Provider
+    <ApplicationsContext
       value={[
         userDashboard,
         (group) => {
@@ -67,6 +67,6 @@ export const ApplicationsProvider = ({
       ]}
     >
       {children}
-    </ApplicationsContext.Provider>
+    </ApplicationsContext>
   );
 };

@@ -35,13 +35,13 @@ export const OIDCConfigurationProvider = ({
   );
 
   return (
-    <OIDCConfigurationContext.Provider
+    <OIDCConfigurationContext
       value={{
         configuration,
         setConfiguration,
       }}
     >
       <OIDCProvider>{children}</OIDCProvider>
-    </OIDCConfigurationContext.Provider>
+    </OIDCConfigurationContext>
   );
 };
