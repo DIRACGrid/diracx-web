@@ -3,7 +3,7 @@
 
 ### Development mode
 
-Refer to the [Developer Guide: Setting up you Development Environment](../developer/setup_environment.md) for instructions on running `diracx-web` in development mode.
+Refer to the [Developer Guide: Setting up your Development Environment](../../dev/how-to/setup_web_environment.md) for instructions on running `diracx-web` in development mode.
 
 ### Production mode
 
@@ -14,7 +14,8 @@ global.images.web.tag: <latest diracx-web version, docker tag>
 global.images.web.repository: <diracx-web docker image>
 ```
 
-:bulb: Make sure to update these values to point to the appropriate Docker image and version for your deployment.
+!!! tip
+    Make sure to update these values to point to the appropriate Docker image and version for your deployment.
 
 ### Integrating new features/hotfixes
 
@@ -25,14 +26,15 @@ diracxWeb.repoURL: <repository hosting the branch you want to apply>
 diracxWeb.branch: <branch hosting the changes you want to apply>
 ```
 
-:bulb: Make sure to update these values to point to the appropriate Docker image and version for your deployment.
+!!! tip
+    Make sure to update these values to point to the appropriate Docker image and version for your deployment.
 
 ## Extension
 
 
 ### `gubbins` extension in development mode
 
-For managing the `gubbins` extension in development mode, refer to the [Developer Guide: Managing an extension](../developer/manage_extension.md).
+For managing the `gubbins` extension in development mode, refer to the [Developer Guide: Managing an extension](../../dev/how-to/manage_web_extension.md).
 
 ### `gubbins` extension in development mode, as a standalone
 

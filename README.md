@@ -7,6 +7,7 @@
 ![Unit tests](https://github.com/DIRACGrid/diracx-web/actions/workflows/diracx-web-components-test.yml/badge.svg?branch=main)
 ![Integration tests](https://github.com/DIRACGrid/diracx-web/actions/workflows/diracx-web-test.yml/badge.svg?branch=main)
 ![Deployment](https://github.com/DIRACGrid/diracx-web/actions/workflows/deployment.yml/badge.svg?branch=main)
+![Gubbins](https://github.com/DIRACGrid/diracx-web/actions/workflows/gubbins-test.yml/badge.svg?branch=main)
 
 
 **DiracX-Web** is a web application that provides a user-friendly interface to interact with the [DiracX](https://github.com/DIRACGrid/diracx) services. It is part of the [DIRAC](https://github.com/DIRACGrid) ecosystem.

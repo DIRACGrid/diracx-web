@@ -140,7 +140,8 @@ git clone git@github.com:DIRACGrid/diracx-charts.git
 diracx-charts/run_demo.sh ./diracx-web [./diracx]
 ```
 
-:bulb: Any change made in `diracx-web-components` are automatically reflected into the development environment. We rely on the [NextJS transpile option](https://nextjs.org/docs/app/api-reference/config/next-config-js/transpilePackages). Further details are available in the `diracx-web` NextJS configuration.
+!!! tip
+    Any change made in `diracx-web-components` is automatically reflected into the development environment. We rely on the [NextJS transpile option](https://nextjs.org/docs/app/api-reference/config/next-config-js/transpilePackages). Further details are available in the `diracx-web` NextJS configuration.
 
 ## Testing
 
