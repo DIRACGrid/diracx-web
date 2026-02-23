@@ -471,7 +471,6 @@ export function SearchBar<T extends string>({
             disabled={
               !tokenEquations.every((eq) => eq.status === EquationStatus.VALID)
             }
-            size="small"
           >
             <RefreshIcon />
           </IconButton>
@@ -482,7 +481,6 @@ export function SearchBar<T extends string>({
                 setInputValue("");
                 clearFunction(setFilters, setTokenEquations);
               }}
-              size="small"
             >
               <DeleteIcon />
             </IconButton>

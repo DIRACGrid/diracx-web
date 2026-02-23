@@ -71,7 +71,6 @@ export function DisplayTokenEquation({
             key={tokenIndex}
             label={chipLabel}
             color={chipColor}
-            size="small"
             onClick={(e) => handleClick(e, tokenIndex)}
             onDelete={isLast ? handleDelete : undefined}
             id={`tokenid:equation-${equationIndex}-token-${tokenIndex}`}

@@ -26,8 +26,6 @@ import {
   convertListToString,
 } from "./Utils";
 
-import "dayjs/locale/en-gb"; // Import the locale for dayjs
-
 import { MyDateTimePicker } from "./DatePicker";
 
 /** Merge multiple React refs into a single callback ref. */
@@ -39,7 +37,7 @@ function mergeRefs<T>(
       if (typeof ref === "function") {
         ref(node);
       } else if (ref && typeof ref === "object") {
-        (ref as React.MutableRefObject<T | null>).current = node;
+        (ref as React.RefObject<T | null>).current = node;
       }
     }
   };
@@ -278,12 +276,15 @@ export default function SearchField({
 
   function handleBackspaceKeyDown() {
     if (inputValue === "" && tokenEquations.length > 0) {
-      const updatedTokens = [...tokenEquations];
-      const lastEquation = updatedTokens[updatedTokens.length - 1];
+      const lastEquation = tokenEquations[tokenEquations.length - 1];
+      let updatedTokens: SearchBarTokenEquation[];
       if (lastEquation.items.length > 1) {
-        lastEquation.items = lastEquation.items.slice(0, -1);
+        updatedTokens = [
+          ...tokenEquations.slice(0, -1),
+          { ...lastEquation, items: lastEquation.items.slice(0, -1) },
+        ];
       } else {
-        updatedTokens.pop();
+        updatedTokens = tokenEquations.slice(0, -1);
       }
       handleEquationsVerification(updatedTokens, setTokenEquations);
       setFocusedTokenIndex(null);
@@ -295,13 +296,14 @@ export default function SearchField({
 
   /** Submit the current input value as a new token. */
   function handleSubmit() {
-    if (inputValue && inputValue.trim()) {
+    const trimmed = inputValue.trim();
+    if (trimmed) {
       const { nature, type } = getTokenMetadata(
-        inputValue.trim(),
+        trimmed,
         suggestions,
         previousToken,
       );
-      handleTokenCreation(inputValue.trim(), nature, type);
+      handleTokenCreation(trimmed, nature, type);
     }
   }
 
@@ -350,7 +352,7 @@ export default function SearchField({
         optionSelectedRef.current = option !== null;
       }}
       onKeyDown={(e: React.KeyboardEvent<HTMLDivElement>) => {
-        if (e.key === "Enter" && inputValue && inputValue.trim()) {
+        if (e.key === "Enter" && inputValue.trim()) {
           if (optionSelectedRef.current) {
             optionSelectedRef.current = false;
             return;
