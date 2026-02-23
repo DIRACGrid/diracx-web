@@ -67,6 +67,7 @@ export function MyDateTimePicker({
     <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale={"en-gb"}>
       <div onClick={(e) => e.stopPropagation()}>
         <DateTimePicker
+          enableAccessibleFieldDOMStructure={false}
           value={dateValue}
           onChange={(val) => setDateValue(val)}
           views={["year", "month", "day", "hours", "minutes", "seconds"]}

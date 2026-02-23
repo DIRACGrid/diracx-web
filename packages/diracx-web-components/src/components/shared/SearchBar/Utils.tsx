@@ -31,7 +31,13 @@ export function handleEquationsVerification(
       EquationStatus.INVALID &&
     tokenEquations[tokenEquations.length - 1].items.length < 3
   ) {
-    tokenEquations[tokenEquations.length - 1].status = EquationStatus.WAITING;
+    tokenEquations = [
+      ...tokenEquations.slice(0, -1),
+      {
+        ...tokenEquations[tokenEquations.length - 1],
+        status: EquationStatus.WAITING,
+      },
+    ];
   }
 
   setTokenEquations([...tokenEquations]);
@@ -42,8 +48,12 @@ export function handleEquationsVerification(
  * @returns The equation with its status updated based on its validity.
  */
 function handleEquationVerification(
-  tokenEquation: SearchBarTokenEquation,
+  inputEquation: SearchBarTokenEquation,
 ): SearchBarTokenEquation {
+  const tokenEquation = {
+    ...inputEquation,
+    items: [...inputEquation.items],
+  };
   const freeTextOperators = Operators.getFreeTextOperators().map((operator) =>
     operator.getDisplay(),
   );
@@ -333,7 +343,7 @@ export async function convertFilterToTokenEquation(
   newEquation.items[0].type =
     suggestions_categories.type[
       suggestions_categories.items.indexOf(filter.parameter)
-    ] || SearchBarTokenNature.CATEGORY;
+    ] || CategoryType.UNKNOWN;
 
   // For the operator
   const suggestions_operators = await createSuggestions({
@@ -347,7 +357,7 @@ export async function convertFilterToTokenEquation(
       suggestions_operators.items.indexOf(
         Operators.getDisplayFromInternal(filter.operator),
       )
-    ] || SearchBarTokenNature.OPERATOR;
+    ] || CategoryType.UNKNOWN;
 
   // For the value
   const suggestions_values = await createSuggestions({
