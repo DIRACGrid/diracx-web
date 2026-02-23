@@ -347,7 +347,7 @@ export const ThemeProvider = ({ children }: ThemeProviderProps) => {
             // Only apply the primary/secondary colors to chips using the
             // default color so that semantic colors (success, warning, error)
             // used by the SearchBar are not overridden.
-            "&.MuiChip-colorDefault": {
+            "&.MuiChip-colorDefault.MuiChip-filled": {
               backgroundColor: primary,
               color: getContrastRatio(primary, "#fff") > 4.5 ? "#fff" : "#111",
               "&:hover": {

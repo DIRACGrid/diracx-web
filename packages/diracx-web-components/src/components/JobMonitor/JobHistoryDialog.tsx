@@ -1,4 +1,7 @@
+import { useState } from "react";
 import {
+  Box,
+  Chip,
   Dialog,
   DialogContent,
   DialogTitle,
@@ -10,7 +13,7 @@ import {
   Typography,
   useTheme,
 } from "@mui/material";
-import { Close } from "@mui/icons-material";
+import { Close, ExpandMore, ExpandLess } from "@mui/icons-material";
 import { JobHistory } from "../../types/JobHistory";
 
 interface JobHistoryDialogProps {
@@ -63,33 +66,21 @@ export function JobHistoryDialog({
   // Group consecutive entries by Status
   const grouped = groupByConsecutiveStatus(reversedHistory);
 
-  // Custom StepIcon for color logic
-  const CustomStepIcon = (props: {
-    active?: boolean;
-    completed?: boolean;
-    className?: string;
-  }) => {
-    const { active, completed, className } = props;
-    let color = theme.palette.grey[400];
-    if (active) {
-      color = statusColors[grouped[0].status] || theme.palette.primary.main;
-    } else if (completed) {
-      color = theme.palette.grey[400];
-    }
-    return (
-      <span
-        className={className}
-        style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          width: 24,
-          height: 24,
-          borderRadius: "50%",
-          background: color,
-        }}
-      />
-    );
+  // Track which sections are collapsed (empty = all expanded by default)
+  const [collapsedSections, setCollapsedSections] = useState<Set<number>>(
+    () => new Set(),
+  );
+
+  const toggleSection = (idx: number) => {
+    setCollapsedSections((prev) => {
+      const next = new Set(prev);
+      if (next.has(idx)) {
+        next.delete(idx);
+      } else {
+        next.add(idx);
+      }
+      return next;
+    });
   };
 
   return (
@@ -107,45 +98,104 @@ export function JobHistoryDialog({
         <Close />
       </IconButton>
       <DialogContent sx={{ padding: 2 }}>
-        <Stepper orientation="vertical" nonLinear activeStep={0}>
+        <Stepper orientation="vertical" nonLinear activeStep={-1}>
           {grouped.map((group, idx) => {
-            const isActive = idx === 0;
+            const stepColor =
+              statusColors[group.status] || theme.palette.primary.main;
+            const isExpanded = !collapsedSections.has(idx);
 
-            let labelColor: string = theme.palette.grey[400];
-            if (isActive) {
-              labelColor =
-                statusColors[group.status] || theme.palette.primary.main;
-            }
+            // Per-step icon colored by its own status
+            const StepIcon = ({ className }: { className?: string }) => (
+              <span
+                className={className}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  width: 20,
+                  height: 20,
+                  borderRadius: "50%",
+                  background: stepColor,
+                }}
+              />
+            );
 
             return (
-              <Step key={idx} expanded completed={!isActive}>
-                <StepLabel slots={{ stepIcon: CustomStepIcon }}>
-                  <Typography fontWeight="bold" color={labelColor}>
-                    {group.status}
-                  </Typography>
+              <Step key={idx} expanded={isExpanded}>
+                <StepLabel
+                  slots={{ stepIcon: StepIcon }}
+                  onClick={() => toggleSection(idx)}
+                  sx={{ cursor: "pointer" }}
+                >
+                  <Box
+                    sx={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 0.5,
+                    }}
+                  >
+                    <Typography fontWeight="bold" color={stepColor}>
+                      {group.status}
+                    </Typography>
+                    <Typography variant="caption" color="text.secondary">
+                      ({group.entries.length})
+                    </Typography>
+                    {isExpanded ? (
+                      <ExpandLess
+                        sx={{ fontSize: 16, color: "text.secondary" }}
+                      />
+                    ) : (
+                      <ExpandMore
+                        sx={{ fontSize: 16, color: "text.secondary" }}
+                      />
+                    )}
+                  </Box>
                 </StepLabel>
                 <StepContent>
                   {group.entries.map((entry, i) => (
-                    <div key={i} style={{ marginBottom: 12 }}>
+                    <Box key={i} sx={{ mb: 1 }}>
                       <Typography variant="body2" fontWeight="bold">
                         {entry.MinorStatus}
                       </Typography>
-                      <Typography variant="body2" sx={{ fontStyle: "italic" }}>
-                        {entry.ApplicationStatus}
-                      </Typography>
-                      <Typography
-                        variant="caption"
-                        display="block"
-                        sx={{ mt: 1 }}
+                      <Box
+                        sx={{
+                          display: "flex",
+                          alignItems: "center",
+                          flexWrap: "wrap",
+                          gap: 0.5,
+                        }}
                       >
-                        {new Date(entry.StatusTime).toLocaleString("en-GB", {
-                          timeZone: "UTC",
-                        })}{" "}
-                        UTC
-                        <br />
-                        {entry.Source}
-                      </Typography>
-                    </div>
+                        <Typography
+                          variant="caption"
+                          sx={{ fontStyle: "italic" }}
+                        >
+                          {entry.ApplicationStatus}
+                        </Typography>
+                        <Typography variant="caption" color="text.secondary">
+                          {new Date(entry.StatusTime).toLocaleString("en-GB", {
+                            timeZone: "UTC",
+                          })}{" "}
+                          UTC
+                        </Typography>
+                        {entry.Source && (
+                          <Chip
+                            label={entry.Source}
+                            size="small"
+                            variant="outlined"
+                            sx={{
+                              height: 18,
+                              fontSize: "0.65rem",
+                              backgroundColor: "transparent",
+                              borderColor: "grey.500",
+                              color: "text.secondary",
+                              "&:hover": {
+                                backgroundColor: "transparent",
+                              },
+                            }}
+                          />
+                        )}
+                      </Box>
+                    </Box>
                   ))}
                 </StepContent>
               </Step>
