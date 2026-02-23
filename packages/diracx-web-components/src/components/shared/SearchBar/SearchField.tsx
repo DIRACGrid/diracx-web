@@ -339,7 +339,7 @@ export default function SearchField({
         setInputValue(value);
       }}
       sx={{
-        minWidth: "180px",
+        minWidth: "120px",
         flexGrow: 1,
       }}
       loading={suggestionsLoading}

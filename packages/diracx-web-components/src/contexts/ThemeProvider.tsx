@@ -145,6 +145,9 @@ export const ThemeProvider = ({ children }: ThemeProviderProps) => {
           odd: tableRowOdd,
         },
       },
+      typography: {
+        fontSize: 14,
+      },
     });
 
     const scrollbarBackground = theme === "dark" ? "#333" : "#f1f1f1";
@@ -153,6 +156,25 @@ export const ThemeProvider = ({ children }: ThemeProviderProps) => {
     const scrollbarColor = `${scrollbarThumbBackground} ${scrollbarBackground}`;
 
     muiTheme.components = {
+      // Global dense defaults — enforces compact sizing across all components
+      MuiTextField: {
+        defaultProps: { size: "small" },
+      },
+      MuiFormControl: {
+        defaultProps: { size: "small" },
+      },
+      MuiInputBase: {
+        defaultProps: { size: "small" },
+      },
+      MuiSelect: {
+        defaultProps: { size: "small" },
+      },
+      MuiIconButton: {
+        defaultProps: { size: "small" },
+      },
+      MuiToolbar: {
+        defaultProps: { variant: "dense" },
+      },
       MuiCssBaseline: {
         styleOverrides: `
         ::-webkit-scrollbar {
@@ -185,6 +207,7 @@ export const ThemeProvider = ({ children }: ThemeProviderProps) => {
         },
       },
       MuiButton: {
+        defaultProps: { size: "small" },
         styleOverrides: {
           contained: {
             // Target the 'contained' variant
@@ -258,6 +281,9 @@ export const ThemeProvider = ({ children }: ThemeProviderProps) => {
       },
       MuiTableCell: {
         styleOverrides: {
+          root: {
+            padding: "4px 8px",
+          },
           head: {
             borderRight: `1px solid ${muiTheme.palette.divider}`,
             borderColor: "divider",
@@ -315,6 +341,7 @@ export const ThemeProvider = ({ children }: ThemeProviderProps) => {
         },
       },
       MuiChip: {
+        defaultProps: { size: "small" },
         styleOverrides: {
           root: {
             // Only apply the primary/secondary colors to chips using the
@@ -333,6 +360,7 @@ export const ThemeProvider = ({ children }: ThemeProviderProps) => {
         },
       },
       MuiTable: {
+        defaultProps: { size: "small" },
         styleOverrides: {
           root: {
             "& .MuiTableRow-root:nth-of-type(odd)": {

@@ -30,7 +30,7 @@ export default function DashboardLayout({
               display: "flex",
               flexDirection: "column",
               flexGrow: 1,
-              overflow: "hidden",
+              overflow: "auto",
             }}
           >
             {children}

@@ -392,6 +392,7 @@ export function SearchBar<T extends string>({
         display: "flex",
         flexDirection: "row",
         width: 1,
+        pt: 0.5,
       }}
     >
       {/* The search bar */}
@@ -401,11 +402,9 @@ export function SearchBar<T extends string>({
         }}
         sx={{
           width: 1,
-          height: "auto",
           display: "flex",
           border: "1px solid",
           borderColor: "grey.400",
-          overflow: "hidden",
           borderRadius: 1,
           ":focus-within": {
             borderColor: "primary.main",
@@ -416,12 +415,13 @@ export function SearchBar<T extends string>({
       >
         <Box
           sx={{
-            gap: 1,
+            gap: 0.5,
             display: "flex",
-            px: 1,
-            py: 0.5,
+            flexWrap: "wrap",
+            alignItems: "center",
+            px: 0.5,
+            py: 0.25,
             width: 1,
-            overflow: "auto",
           }}
         >
           {tokenEquations.map((equation, index) => (
