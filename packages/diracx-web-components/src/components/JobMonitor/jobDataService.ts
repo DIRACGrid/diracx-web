@@ -232,6 +232,61 @@ export async function getJobSummary(
 }
 
 /**
+ * Custom hook for fetching job summary data using SWR.
+ *
+ * @param diracxUrl - The base URL of the DiracX API.
+ * @param accessToken - The access token for authentication.
+ * @param grouping - The column to group by (API field name).
+ * @param searchBody - The search body for filtering jobs.
+ * @returns The summary data, loading state, and error.
+ */
+export function useJobSummary(
+  diracxUrl: string | null,
+  accessToken: string | undefined,
+  grouping: string,
+  searchBody: SearchBody,
+) {
+  const summaryUrl =
+    diracxUrl && accessToken ? `${diracxUrl}/api/jobs/summary` : null;
+
+  const swrKey: [string, string, SearchBody] | null = summaryUrl
+    ? [summaryUrl, grouping, searchBody]
+    : null;
+
+  const {
+    data: swrData,
+    error: swrError,
+    isLoading,
+  } = useSWR(
+    swrKey,
+    async ([url, _grouping, _searchBody]) => {
+      processSearchBody(_searchBody);
+
+      const body = {
+        grouping: [_grouping],
+        search: _searchBody.search || [],
+      };
+
+      return await fetcher<JobSummary[]>([url, accessToken!, "POST", body]);
+    },
+    {
+      revalidateOnMount: true,
+      revalidateOnFocus: false,
+      revalidateOnReconnect: false,
+      revalidateIfStale: false,
+      dedupingInterval: 60000,
+      shouldRetryOnError: false,
+    },
+  );
+
+  return {
+    data: (swrData?.data as JobSummary[] | undefined) ?? null,
+    isLoading,
+    error: swrError,
+  };
+}
+
+/**
  * Custom hook for fetching jobs data.
  *
  * @param diracxUrl - The base URL of the DiracX API.

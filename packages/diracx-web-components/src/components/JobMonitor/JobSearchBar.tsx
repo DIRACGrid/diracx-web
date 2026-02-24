@@ -17,7 +17,6 @@ import {
   Operators,
   SearchBarTokenNature,
   CategoryType,
-  JobMonitorChartType,
 } from "../../types";
 import { getJobSummary } from "./jobDataService";
 import { fromHumanReadableText } from "./JobMonitor";
@@ -36,15 +35,6 @@ interface JobSearchBarProps {
   columns: ColumnDef<Job, any>[];
   /** Function to mutate the job data */
   mutateJobs: () => void;
-  /** Props for the plot type selector */
-  plotTypeSelectorProps?: {
-    /** The type of the plot */
-    plotType: JobMonitorChartType;
-    /** Function to set the plot type */
-    setPlotType: React.Dispatch<React.SetStateAction<JobMonitorChartType>>;
-    /** List of buttons to select the type of plot */
-    buttonList?: { plotName: JobMonitorChartType; icon: React.ReactNode }[];
-  };
 }
 
 export function JobSearchBar({
@@ -54,7 +44,6 @@ export function JobSearchBar({
   handleApplyFilters,
   columns,
   mutateJobs,
-  plotTypeSelectorProps,
 }: JobSearchBarProps) {
   // Authentication
   const { configuration } = useOIDCContext();
@@ -83,7 +72,6 @@ export function JobSearchBar({
         })
       }
       allowKeyWordSearch={false} // Disable keyword search for job monitor
-      plotTypeSelectorProps={plotTypeSelectorProps}
     />
   );
 }
@@ -139,7 +127,9 @@ async function createSuggestions({
         );
         data = result.data || [];
       } catch {
-        throw new Error("Failed to fetch job summary");
+        // If the fetch fails, leave data empty — the search bar
+        // will still work, just without personalized value suggestions.
+        data = [];
       }
     }
   };

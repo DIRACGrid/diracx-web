@@ -31,7 +31,6 @@
     "app",
     "node_modules",
     "dist",
-    "tsup.config.ts",
-    "jest.setup.ts"
+    "tsup.config.ts"
   ]
 }
