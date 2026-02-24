@@ -4,6 +4,6 @@ DiracX Web is the graphical interface for interacting with DiracX services throu
 
 ## Guides
 
-- [Logging in & out](login_out.md) — How to authenticate and access your dashboard.
-- [Managing application instances](list_and_share_applications.md) — How to add, organize, group, share, and import applications.
-- [Monitor jobs](monitor_jobs.md) — How to search, filter, and act on jobs using the Job Monitor.
+- [Logging in & out](login-out.md) — How to authenticate and access your dashboard.
+- [Managing application instances](list-and-share-applications.md) — How to add, organize, group, share, and import applications.
+- [Monitor jobs](monitor-jobs.md) — How to search, filter, and act on jobs using the Job Monitor.
