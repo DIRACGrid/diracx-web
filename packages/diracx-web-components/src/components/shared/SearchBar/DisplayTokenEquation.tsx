@@ -1,4 +1,4 @@
-import { Button, ButtonGroup, Box } from "@mui/material";
+import { Box, Chip } from "@mui/material";
 
 import {
   type SearchBarTokenEquation,
@@ -9,11 +9,15 @@ import {
 import { convertListToString } from "./Utils";
 
 /**
- * Displays a token equation as a button group.
+ * Displays a token equation as a tightly grouped row of chips.
+ *
+ * Chips within the same equation have no gap and squared inner edges
+ * so they visually read as a single connected unit, while the parent
+ * container's gap separates different equations.
  *
  * @param tokensEquation The token equation to display.
  * @param handleClick Function to handle click events on tokens.
- * @param handleRightClick Function to handle right-click events.
+ * @param handleDelete Function to handle deletion of the equation.
  * @param equationIndex The index of the equation in the list.
  * @param DynamicSearchField A dynamic search field component to render when focused.
  * @param focusedTokenIndex The index of the currently focused token, if any.
@@ -21,71 +25,69 @@ import { convertListToString } from "./Utils";
 export function DisplayTokenEquation({
   tokensEquation,
   handleClick,
-  handleRightClick,
+  handleDelete,
   equationIndex,
   DynamicSearchField,
   focusedTokenIndex,
 }: {
   tokensEquation: SearchBarTokenEquation;
   handleClick: (
-    e: React.MouseEvent<HTMLButtonElement>,
+    e: React.MouseEvent<HTMLDivElement>,
     tokenIndex: number,
   ) => void;
-  handleRightClick: () => void;
+  handleDelete: () => void;
   equationIndex: number;
   DynamicSearchField: React.ReactNode;
   focusedTokenIndex: EquationAndTokenIndex | null;
 }) {
   const tokens = tokensEquation.items;
 
-  const buttonColor =
+  const chipColor =
     tokensEquation.status === EquationStatus.VALID
-      ? "green"
+      ? "success"
       : tokensEquation.status === EquationStatus.INVALID
-        ? "red"
+        ? "error"
         : tokensEquation.status === EquationStatus.WAITING
-          ? "orange"
-          : "grey";
+          ? "warning"
+          : "default";
 
   return (
-    <Box>
-      <ButtonGroup
-        variant="outlined"
-        sx={{
-          "& .MuiButtonGroup-grouped": {
-            borderColor: buttonColor,
-          },
-        }}
-      >
-        {tokens.map((token, tokenIndex) => {
-          if (
-            equationIndex === focusedTokenIndex?.equationIndex &&
-            tokenIndex === focusedTokenIndex.tokenIndex
-          ) {
-            return DynamicSearchField;
-          }
-          let buttonLabel = token.label;
-          if (typeof token.label !== "string") {
-            buttonLabel = convertListToString(token.label);
-          }
-          return (
-            <Button
-              sx={{
-                color: buttonColor,
-              }}
-              key={tokenIndex}
-              onClick={(e) => handleClick(e, tokenIndex)}
-              id={`tokenid:equation-${equationIndex}-token-${tokenIndex}`}
-              onContextMenu={(e) => {
-                e.preventDefault();
-                handleRightClick();
-              }}
-            >
-              {buttonLabel}
-            </Button>
-          );
-        })}
-      </ButtonGroup>
+    <Box sx={{ display: "flex", alignItems: "center" }}>
+      {tokens.map((token, tokenIndex) => {
+        if (
+          equationIndex === focusedTokenIndex?.equationIndex &&
+          tokenIndex === focusedTokenIndex.tokenIndex
+        ) {
+          return DynamicSearchField;
+        }
+        let chipLabel = token.label;
+        if (typeof token.label !== "string") {
+          chipLabel = convertListToString(token.label);
+        }
+        const isFirst = tokenIndex === 0;
+        const isLast = tokenIndex === tokens.length - 1;
+        return (
+          <Chip
+            key={tokenIndex}
+            label={chipLabel}
+            color={chipColor}
+            onClick={(e) => handleClick(e, tokenIndex)}
+            onDelete={isLast ? handleDelete : undefined}
+            id={`tokenid:equation-${equationIndex}-token-${tokenIndex}`}
+            sx={{
+              // Square off the inner edges so chips look connected
+              borderRadius:
+                isFirst && isLast
+                  ? undefined // single chip — keep default pill shape
+                  : isFirst
+                    ? "16px 0 0 16px"
+                    : isLast
+                      ? "0 16px 16px 0"
+                      : 0,
+            }}
+          />
+        );
+      })}
     </Box>
   );
 }

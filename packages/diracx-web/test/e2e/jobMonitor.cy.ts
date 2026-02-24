@@ -440,7 +440,9 @@ describe("Job Monitor", () => {
 
     cy.get("[data-testid=search-field]").type("ID{enter}={enter}1{enter}");
 
-    cy.get('[role="group"]').find("button").should("have.length", 5);
+    cy.get('[data-testid="search-bar"]')
+      .find(".MuiChip-root")
+      .should("have.length", 3);
   });
 
   it("should handle filter editing", () => {
@@ -449,7 +451,10 @@ describe("Job Monitor", () => {
     cy.get("[data-testid=search-field]").type("ID{enter}={enter}1{enter}");
 
     cy.get("[data-testid=search-field]").type("{leftArrow}2{enter}");
-    cy.get('[role="group"]').find("button").contains("12").should("exist");
+    cy.get('[data-testid="search-bar"]')
+      .find(".MuiChip-root")
+      .contains("12")
+      .should("exist");
   });
 
   it("should handle filter clear", () => {
@@ -457,11 +462,15 @@ describe("Job Monitor", () => {
 
     cy.get("[data-testid=search-field]").type("ID{enter}={enter}1{enter}");
 
-    cy.get('[role="group"]').find("button").should("have.length", 5);
+    cy.get('[data-testid="search-bar"]')
+      .find(".MuiChip-root")
+      .should("have.length", 3);
 
     cy.get('[data-testid="DeleteIcon"]').click();
 
-    cy.get('[role="group"]').find("button").should("have.length", 2);
+    cy.get('[data-testid="search-bar"]')
+      .find(".MuiChip-root")
+      .should("have.length", 0);
   });
 
   it("should handle filter apply and persist", () => {
@@ -480,8 +489,13 @@ describe("Job Monitor", () => {
           `ID{enter}={enter}${jobID}{enter}`,
         );
       });
-    cy.get('[role="group"]').find("button").should("have.length", 5);
-    cy.get('[role="group"]').find("button").contains("ID").should("exist");
+    cy.get('[data-testid="search-bar"]')
+      .find(".MuiChip-root")
+      .should("have.length", 3);
+    cy.get('[data-testid="search-bar"]')
+      .find(".MuiChip-root")
+      .contains("ID")
+      .should("exist");
 
     // Wait for the filter to apply
     cy.wait(1000);
@@ -509,15 +523,21 @@ describe("Job Monitor", () => {
     // Wait for the filter to apply
     cy.wait(1000);
 
-    cy.get('[role="group"]').find("button").should("have.length", 5);
+    cy.get('[data-testid="search-bar"]')
+      .find(".MuiChip-root")
+      .should("have.length", 3);
 
     cy.get(".MuiButtonBase-root").contains("Job Monitor 2").click();
 
-    cy.get('[role="group"]').find("button").should("have.length", 2);
+    cy.get('[data-testid="search-bar"]')
+      .find(".MuiChip-root")
+      .should("have.length", 0);
 
     cy.get(".MuiButtonBase-root").contains("Job Monitor").click();
 
-    cy.get('[role="group"]').find("button").should("have.length", 5);
+    cy.get('[data-testid="search-bar"]')
+      .find(".MuiChip-root")
+      .should("have.length", 3);
   });
 
   it("should control the in the last operator utilization", () => {
@@ -529,7 +549,9 @@ describe("Job Monitor", () => {
     // Wait for the filter to apply
     cy.wait(1000);
 
-    cy.get('[role="group"]').find("button").should("have.length", 5);
+    cy.get('[data-testid="search-bar"]')
+      .find(".MuiChip-root")
+      .should("have.length", 3);
 
     cy.get("table").should("be.visible");
   });

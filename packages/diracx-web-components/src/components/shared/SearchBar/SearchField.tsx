@@ -1,6 +1,13 @@
 import { useMemo, useRef } from "react";
 
-import { Autocomplete, TextField } from "@mui/material";
+import {
+  Autocomplete,
+  IconButton,
+  InputAdornment,
+  InputBase,
+  Tooltip,
+} from "@mui/material";
+import KeyboardReturnIcon from "@mui/icons-material/KeyboardReturn";
 
 import {
   SearchBarTokenEquation,
@@ -19,9 +26,22 @@ import {
   convertListToString,
 } from "./Utils";
 
-import "dayjs/locale/en-gb"; // Import the locale for dayjs
-
 import { MyDateTimePicker } from "./DatePicker";
+
+/** Merge multiple React refs into a single callback ref. */
+function mergeRefs<T>(
+  ...refs: (React.Ref<T> | undefined)[]
+): React.RefCallback<T> {
+  return (node: T | null) => {
+    for (const ref of refs) {
+      if (typeof ref === "function") {
+        ref(node);
+      } else if (ref && typeof ref === "object") {
+        (ref as React.RefObject<T | null>).current = node;
+      }
+    }
+  };
+}
 
 interface SearchFieldProps {
   /** The current input value in the search field */
@@ -124,13 +144,24 @@ export default function SearchField({
         previousEquation &&
         previousEquation.status === EquationStatus.WAITING
       ) {
-        previousEquation.items.push({
-          label: formatedLabel,
-          type: type,
-          nature: nature,
-          suggestions: suggestions,
-        });
-        handleEquationsVerification([...tokenEquations], setTokenEquations);
+        const updatedEquation = {
+          ...previousEquation,
+          items: [
+            ...previousEquation.items,
+            {
+              label: formatedLabel,
+              type: type,
+              nature: nature,
+              suggestions: suggestions,
+            },
+          ],
+        };
+        handleEquationsVerification(
+          tokenEquations.map((eq) =>
+            eq === previousEquation ? updatedEquation : eq,
+          ),
+          setTokenEquations,
+        );
       } else {
         // We are creating a new equation
         const newLastEquation: SearchBarTokenEquation = {
@@ -245,12 +276,15 @@ export default function SearchField({
 
   function handleBackspaceKeyDown() {
     if (inputValue === "" && tokenEquations.length > 0) {
-      const updatedTokens = [...tokenEquations];
-      const lastEquation = updatedTokens[updatedTokens.length - 1];
+      const lastEquation = tokenEquations[tokenEquations.length - 1];
+      let updatedTokens: SearchBarTokenEquation[];
       if (lastEquation.items.length > 1) {
-        lastEquation.items = lastEquation.items.slice(0, -1);
+        updatedTokens = [
+          ...tokenEquations.slice(0, -1),
+          { ...lastEquation, items: lastEquation.items.slice(0, -1) },
+        ];
       } else {
-        updatedTokens.pop();
+        updatedTokens = tokenEquations.slice(0, -1);
       }
       handleEquationsVerification(updatedTokens, setTokenEquations);
       setFocusedTokenIndex(null);
@@ -258,6 +292,19 @@ export default function SearchField({
     setTimeout(() => {
       inputRef.current?.focus();
     }, 0);
+  }
+
+  /** Submit the current input value as a new token. */
+  function handleSubmit() {
+    const trimmed = inputValue.trim();
+    if (trimmed) {
+      const { nature, type } = getTokenMetadata(
+        trimmed,
+        suggestions,
+        previousToken,
+      );
+      handleTokenCreation(trimmed, nature, type);
+    }
   }
 
   const handleDateAccepted = (newValue: string | null) => {
@@ -294,72 +341,92 @@ export default function SearchField({
         setInputValue(value);
       }}
       sx={{
-        marginTop: "2px",
-        minWidth: "180px",
+        minWidth: "120px",
         flexGrow: 1,
       }}
+      loading={suggestionsLoading}
       disableClearable={true}
       options={suggestions.items}
       value={inputValue}
       onHighlightChange={(_e, option) => {
         optionSelectedRef.current = option !== null;
       }}
-      loading={suggestionsLoading}
-      renderInput={(params) => (
-        <TextField
-          {...params}
-          data-testid="search-field"
-          variant="standard"
-          placeholder={placeholder}
-          inputRef={inputRef}
-          slotProps={{
-            input: {
-              ...params.InputProps,
-              disableUnderline: true,
-            },
-          }}
-          onKeyDown={(e: React.KeyboardEvent<HTMLDivElement>) => {
-            if (e.key === "Enter" && inputValue && inputValue.trim()) {
-              if (optionSelectedRef.current) {
-                optionSelectedRef.current = false;
-                return;
-              }
-              const { nature, type } = getTokenMetadata(
-                inputValue.trim(),
-                suggestions,
-                previousToken,
-              );
-              // Always create token on Enter press, regardless of operator type
-              handleTokenCreation(inputValue.trim(), nature, type);
-            }
-            if (e.key === "Backspace") {
-              handleBackspaceKeyDown();
-            }
+      onKeyDown={(e: React.KeyboardEvent<HTMLDivElement>) => {
+        if (e.key === "Enter" && inputValue.trim()) {
+          if (optionSelectedRef.current) {
+            optionSelectedRef.current = false;
+            return;
+          }
+          handleSubmit();
+        }
+        if (e.key === "Backspace") {
+          handleBackspaceKeyDown();
+        }
+        if (e.key === "ArrowLeft" || e.key === "ArrowRight") {
+          handleArrowKeyDown(e);
+        }
+        if (e.key === "Tab") {
+          e.preventDefault();
+          setInputValue((prev) => {
+            const options = suggestions.items.filter((val) => {
+              return val.toLowerCase().startsWith(prev.toLowerCase());
+            });
+            return options[0] || prev;
+          });
+        }
+        if (e.key === "Escape") {
+          setFocusedTokenIndex(null);
+          setInputValue("");
+        }
+      }}
+      renderInput={(params) => {
+        // Separate the wrapper ref (used by Autocomplete for popup positioning)
+        // from the rest of InputProps (className, adornments, event handlers).
+        const { ref: wrapperRef, ...restWrapperProps } = params.InputProps;
+        // Separate the input element ref (used by Autocomplete for focus tracking)
+        // from the rest of inputProps (id, aria-*, etc.).
+        const { ref: inputElRef, ...restInputProps } = params.inputProps;
 
-            if (e.key === "ArrowLeft" || e.key === "ArrowRight") {
-              handleArrowKeyDown(e);
+        return (
+          <InputBase
+            ref={wrapperRef}
+            {...restWrapperProps}
+            id={params.id}
+            disabled={params.disabled}
+            fullWidth={params.fullWidth}
+            placeholder={placeholder}
+            data-testid="search-field"
+            inputRef={mergeRefs(inputElRef, inputRef)}
+            endAdornment={
+              inputValue.trim() ? (
+                <InputAdornment position="end">
+                  <Tooltip title="Enter">
+                    <IconButton
+                      size="small"
+                      aria-label="confirm input"
+                      onMouseDown={(e) => {
+                        // Prevent the input from losing focus
+                        e.preventDefault();
+                      }}
+                      onClick={handleSubmit}
+                    >
+                      <KeyboardReturnIcon fontSize="small" />
+                    </IconButton>
+                  </Tooltip>
+                </InputAdornment>
+              ) : null
             }
-
-            if (e.key === "Tab") {
-              e.preventDefault();
-              setInputValue((prev) => {
-                const options = suggestions.items.filter((val) => {
-                  return val.toLowerCase().startsWith(prev.toLowerCase());
-                });
-                return options[0] || prev;
-              });
-            }
-            if (e.key === "Escape") {
-              setFocusedTokenIndex(null);
-              setInputValue("");
-            }
-          }}
-        />
-      )}
+            inputProps={{
+              ...restInputProps,
+              style: {
+                width: `min(max(${inputValue.length}ch + 50px, 150px), 800px)`,
+              },
+            }}
+          />
+        );
+      }}
       onChange={(_e, value: string | null) => {
         if (value && value !== "") {
-          optionSelectedRef.current = true;
-
           // Check if previous token is "in" or "not in" operator
           if (
             previousToken &&

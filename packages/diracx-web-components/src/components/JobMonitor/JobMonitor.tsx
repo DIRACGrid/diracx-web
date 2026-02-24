@@ -172,11 +172,12 @@ export default function JobMonitor() {
           sx={{
             display: "inline-block",
             borderRadius: "10px",
-            padding: "3px 10px",
+            padding: "1px 8px",
+            fontSize: "0.75rem",
             backgroundColor:
               theme.palette.mode === "light"
-                ? lighten(statusColors[status] ?? defaultColor, 0.1)
-                : darken(statusColors[status] ?? defaultColor, 0.3),
+                ? darken(statusColors[status] ?? defaultColor, 0.1)
+                : lighten(statusColors[status] ?? defaultColor, 0.3),
             color: "white",
             fontWeight: "bold",
           }}
@@ -317,7 +318,7 @@ export default function JobMonitor() {
         display: "flex",
         flexDirection: "column",
         flexGrow: 1,
-        overflow: "hidden",
+        overflow: "auto",
       }}
     >
       <Box
