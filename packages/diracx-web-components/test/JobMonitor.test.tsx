@@ -63,10 +63,10 @@ describe("JobDataTable", () => {
       </VirtuosoMockContext.Provider>,
     );
 
-    // Verify table headers
+    // Verify table headers exist (some column names also appear in the pie chart toggle)
     expect(getByText("ID")).toBeInTheDocument();
-    expect(getByText("Status")).toBeInTheDocument();
-    expect(getByText("Name")).toBeInTheDocument();
+    expect(screen.getAllByText("Status").length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText("Name").length).toBeGreaterThanOrEqual(1);
 
     // Verify job data is displayed
     await waitFor(() => {

@@ -30,7 +30,6 @@ import {
 } from "./defaultFunctions";
 
 import SearchField from "./SearchField";
-import { PlotTypeSelector } from "./PlotTypeSelector";
 
 export interface CreateSuggestionsParams {
   previousToken?: SearchBarToken;
@@ -39,7 +38,7 @@ export interface CreateSuggestionsParams {
   equationIndex?: number;
 }
 
-export interface SearchBarProps<T extends string> {
+export interface SearchBarProps {
   /** The filters to be applied to the search */
   filters: Filter[];
   /** The function to set the filters */
@@ -72,11 +71,6 @@ export interface SearchBarProps<T extends string> {
   allowKeyWordSearch?: boolean;
   /** Whether createSuggestions uses the currentInput parameter (default is false) */
   usesCurrentInput?: boolean;
-  plotTypeSelectorProps?: {
-    plotType: T;
-    setPlotType: React.Dispatch<React.SetStateAction<T>>;
-    buttonList?: { plotName: T; icon: React.ReactNode }[];
-  };
 }
 
 /**
@@ -86,7 +80,7 @@ export interface SearchBarProps<T extends string> {
  * @param props - The properties for the SearchBar component.
  * @returns The rendered SearchBar component.
  */
-export function SearchBar<T extends string>({
+export function SearchBar({
   filters,
   setFilters,
   createSuggestions,
@@ -95,8 +89,7 @@ export function SearchBar<T extends string>({
   refreshFunction = convertAndApplyFilters,
   allowKeyWordSearch = true,
   usesCurrentInput = false,
-  plotTypeSelectorProps,
-}: SearchBarProps<T>) {
+}: SearchBarProps) {
   const [inputValue, setInputValue] = useState("");
   const [anchorEl, setAnchorEl] = useState<null | Element>(null);
   const [clickedTokenIndex, setClickedTokenIndex] =
@@ -487,14 +480,6 @@ export function SearchBar<T extends string>({
           )}
         </Box>
       </Box>
-      {/* Plot type selector if provided */}
-      {plotTypeSelectorProps && (
-        <PlotTypeSelector
-          plotType={plotTypeSelectorProps.plotType}
-          setPlotType={plotTypeSelectorProps.setPlotType}
-          buttonList={plotTypeSelectorProps.buttonList}
-        />
-      )}
     </Box>
   );
 }

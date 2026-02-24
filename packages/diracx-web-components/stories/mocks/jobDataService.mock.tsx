@@ -145,6 +145,75 @@ export function rescheduleJobs(
   });
 }
 
+// Mock implementation of useJobSummary
+export function useJobSummary(
+  _diracxUrl: string | null,
+  _accessToken: string | undefined,
+  _grouping: string,
+  _searchBody: any,
+) {
+  return {
+    data: [
+      {
+        Status: "Running",
+        MinorStatus: "None",
+        ApplicationStatus: "Accepted",
+        Site: "SiteA",
+        JobName: "Job 1",
+        JobType: "TypeA",
+        JobGroup: "GroupA",
+        Owner: "UserA",
+        OwnerGroup: "GroupA",
+        VO: "VOA",
+        UserPriority: 100,
+        RescheduleCounter: 0,
+        count: 10,
+      },
+      {
+        Status: "Completed",
+        MinorStatus: "None",
+        ApplicationStatus: "Finished",
+        Site: "SiteB",
+        JobName: "Job 2",
+        JobType: "TypeB",
+        JobGroup: "GroupB",
+        Owner: "UserB",
+        OwnerGroup: "GroupB",
+        VO: "VOB",
+        UserPriority: 200,
+        RescheduleCounter: 1,
+        count: 5,
+      },
+      {
+        Status: "Failed",
+        MinorStatus: "Error",
+        ApplicationStatus: "Failed",
+        Site: "SiteC",
+        JobName: "Job 3",
+        JobType: "TypeC",
+        JobGroup: "GroupC",
+        Owner: "UserC",
+        OwnerGroup: "GroupC",
+        VO: "VOC",
+        UserPriority: 300,
+        RescheduleCounter: 2,
+        count: 2,
+      },
+    ],
+    isLoading: false,
+    error: null,
+  };
+}
+
+// Mock implementation of getSearchJobUrl
+export function getSearchJobUrl(
+  _diracxUrl: string | null,
+  _page: number,
+  _rowsPerPage: number,
+) {
+  return "http://mock/api/jobs/search?page=1&per_page=25";
+}
+
 // Mock implementation of getJobSummary
 export async function getJobSummary(
   _diracxUrl: string | null,

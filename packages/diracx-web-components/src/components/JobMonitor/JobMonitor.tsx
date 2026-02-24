@@ -15,9 +15,7 @@ import {
   brown,
 } from "@mui/material/colors";
 
-import { lighten, darken, useTheme, Box } from "@mui/material";
-
-import { TableChart, DonutSmall } from "@mui/icons-material";
+import { lighten, darken, useTheme, Box, Paper } from "@mui/material";
 
 import {
   createColumnHelper,
@@ -31,16 +29,11 @@ import {
 import { mutate } from "swr";
 import { useApplicationId } from "../../hooks/application";
 import { Filter } from "../../types/Filter";
-import {
-  Job,
-  SearchBody,
-  CategoryType,
-  JobMonitorChartType,
-} from "../../types";
+import { Job, SearchBody, CategoryType } from "../../types";
 import { useDiracxUrl } from "../../hooks";
 import { JobDataTable } from "./JobDataTable";
 import { JobSearchBar } from "./JobSearchBar";
-import { JobSunburst } from "./JobSunburst";
+import { JobPieChart } from "./JobPieChart";
 import { getSearchJobUrl } from "./jobDataService";
 
 /**
@@ -111,8 +104,6 @@ export default function JobMonitor() {
         },
   );
 
-  const [chartType, setChartType] = useState(JobMonitorChartType.TABLE);
-
   // Save the state of the app in local storage
   useEffect(() => {
     const state = {
@@ -177,7 +168,7 @@ export default function JobMonitor() {
             backgroundColor:
               theme.palette.mode === "light"
                 ? darken(statusColors[status] ?? defaultColor, 0.1)
-                : lighten(statusColors[status] ?? defaultColor, 0.3),
+                : lighten(statusColors[status] ?? defaultColor, 0.1),
             color: "white",
             fontWeight: "bold",
           }}
@@ -318,64 +309,72 @@ export default function JobMonitor() {
         display: "flex",
         flexDirection: "column",
         flexGrow: 1,
-        overflow: "auto",
+        overflow: "hidden",
       }}
     >
+      <JobSearchBar
+        filters={filters}
+        setFilters={setFilters}
+        searchBody={searchBody}
+        handleApplyFilters={handleApplyFilters}
+        columns={columns}
+        mutateJobs={mutateJobs}
+      />
+
       <Box
         sx={{
           display: "flex",
-          flexDirection: "row",
+          flexDirection: { xs: "column", md: "row" },
+          flexGrow: 1,
+          overflow: "hidden",
         }}
       >
-        <JobSearchBar
-          filters={filters}
-          setFilters={setFilters}
-          searchBody={searchBody}
-          handleApplyFilters={handleApplyFilters}
-          columns={columns}
-          plotTypeSelectorProps={{
-            plotType: chartType,
-            setPlotType: setChartType,
-            buttonList: [
-              {
-                plotName: JobMonitorChartType.TABLE,
-                icon: <TableChart fontSize="large" />,
-              },
-              {
-                plotName: JobMonitorChartType.SUNBURST,
-                icon: <DonutSmall fontSize="large" />,
-              },
-            ],
+        {/* Table section */}
+        <Box
+          sx={{
+            flexGrow: 1,
+            minWidth: 0,
+            overflow: "auto",
+            display: "flex",
+            flexDirection: "column",
           }}
-          mutateJobs={mutateJobs}
-        />
-      </Box>
+        >
+          <JobDataTable
+            searchBody={searchBody}
+            setSearchBody={setSearchBody}
+            columns={columns}
+            pagination={pagination}
+            setPagination={setPagination}
+            columnVisibility={columnVisibility}
+            setColumnVisibility={setColumnVisibility}
+            columnPinning={columnPinning}
+            setColumnPinning={setColumnPinning}
+            rowSelection={rowSelection}
+            setRowSelection={setRowSelection}
+            statusColors={statusColors}
+            mutateJobs={mutateJobs}
+          />
+        </Box>
 
-      {chartType === JobMonitorChartType.TABLE && (
-        <JobDataTable
-          searchBody={searchBody}
-          setSearchBody={setSearchBody}
-          columns={columns}
-          pagination={pagination}
-          setPagination={setPagination}
-          columnVisibility={columnVisibility}
-          setColumnVisibility={setColumnVisibility}
-          columnPinning={columnPinning}
-          setColumnPinning={setColumnPinning}
-          rowSelection={rowSelection}
-          setRowSelection={setRowSelection}
-          statusColors={statusColors}
-          mutateJobs={mutateJobs}
-        />
-      )}
-      {chartType === JobMonitorChartType.SUNBURST && (
-        <JobSunburst
-          searchBody={searchBody}
-          setFilters={setFilters}
-          statusColors={statusColors}
-          columns={columns}
-        />
-      )}
+        {/* Pie chart card */}
+        <Paper
+          elevation={2}
+          sx={{
+            width: { md: 340 },
+            flexShrink: 0,
+            alignSelf: "flex-start",
+            m: 1,
+            borderRadius: 2,
+          }}
+        >
+          <JobPieChart
+            searchBody={searchBody}
+            setFilters={setFilters}
+            statusColors={statusColors}
+            columns={columns}
+          />
+        </Paper>
+      </Box>
     </Box>
   );
 }

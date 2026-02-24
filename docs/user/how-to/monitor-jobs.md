@@ -31,8 +31,6 @@ The search bar allows you to filter jobs based on various criteria. The filters 
 
 ## Use the table
 
-By default, the jobs are displayed in a table. If you are viewing them in another chart, you can click the table button next to the search bar to switch back to the table view.
-
 The table displays the jobs that match the criteria specified in the search bar. Each row represents a job, and the columns show various attributes of the job, such as its ID, status, type, and submission date.
 
 === "Table Management"
@@ -64,4 +62,12 @@ The table displays the jobs that match the criteria specified in the search bar.
 
 ## Use the Pie Chart
 
-You can change the visualization to use a pie chart with the button next to the search bar. The pie chart provides a hierarchical view of the jobs based on their attributes. The `Columns to plot` component lets you choose your criteria for visualizing the jobs. The chart can display two levels, and you can then click on a section of the chart to zoom into that category and see more details.
+A pie chart is displayed alongside the table, showing the distribution of jobs grouped by a selected attribute. The total number of jobs is shown in the center of the donut chart.
+
+=== "Group by attribute"
+
+    Use the toggle buttons above the chart to switch between different grouping attributes (e.g., Status, Site, Minor Status). Only attributes that are not quasi-unique (like Job ID or dates) are available for grouping.
+
+=== "Filter by clicking"
+
+    Click on a slice of the pie chart to add a filter to the search bar. Both the table and the pie chart will update to reflect the new filter.
