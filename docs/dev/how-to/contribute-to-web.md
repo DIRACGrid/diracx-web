@@ -1,6 +1,6 @@
 # Contributing to DiracX-Web
 
-*Requirements: [Setup Environment](setup_web_environment.md)*
+*Requirements: [Setup Environment](setup-web-environment.md)*
 
 === "Documentation"
 
@@ -29,7 +29,7 @@
     If you create an export function or component in `diracx-web-components`, you must add it to the `index.ts` file and run `npm run build` inside `packages/diracx-web-components` to ensure the pre-commit hook passes.
 
 !!! warning
-    Don't forget to update the `packages/extensions` code if you integrate breaking changes in the `diracx-web-components` library. See [Managing the extension](manage_web_extension.md) for further details.
+    Don't forget to update the `packages/extensions` code if you integrate breaking changes in the `diracx-web-components` library. See [Managing the extension](manage-web-extension.md) for further details.
 
 !!! note "Pre-commit Hooks"
     `Husky` is configured to run as a pre-commit script, executing tasks such as linting staged files to maintain code consistency with the codebase.

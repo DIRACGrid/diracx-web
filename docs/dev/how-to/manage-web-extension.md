@@ -83,3 +83,12 @@ npm run --prefix packages/extensions test
 
 !!! tip
     Like `diracx-web`, `gubbins-web` does automatically reflect changes made in `diracx-web-components`. This means that while running `gubbins` using `diracx-charts/run_demo.sh`, any modifications to `diracx-web-components` will also be applied to `gubbins`.
+
+## Deploying an extension as a standalone
+
+By default, the `gubbins` extension is part of a monorepo and uses a local version of `diracx-web-components`. This setup is not representative of a standalone extension configuration.
+
+To deploy gubbins as a standalone package:
+
+- **Isolate the `packages/extensions` directory:** Copy the content of `packages/extensions` to a new repository or directory outside the monorepo.
+- **Update Configuration:** Adjust relevant variables to align with a standalone setup. Review the gubbins-test GitHub Action workflow for required changes.
