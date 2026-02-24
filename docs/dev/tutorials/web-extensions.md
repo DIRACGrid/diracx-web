@@ -121,13 +121,13 @@ You can either create a new repository or start from this one to build your Dira
    The output is set to `export` to have a static application.
    Images are left unoptimized because it's not well-supported with a static export.
 
-5. **Add the nginx config** located in the [`config/nginx`](config/nginx/) directory.
+5. **Add the nginx config** located in the [`config/nginx`](https://github.com/DIRACGrid/diracx-web/tree/main/packages/extensions/config/nginx) directory.
    This adjustment ensures that Nginx can correctly handle requests for .html files and fall back appropriately, preventing the `404: Not Found` errors encountered when accessing routes like `/auth`. (see [#57](https://github.com/DIRACGrid/diracx-web/pull/57))
 
 6. **Organize your pages** in the `src/app` app directory.
    The `<DiracXWebProviders>` context is needed by most of the components of `diracx-web-components`, so you should include it in the layouts of your application. Use `<OIDCSecure>` to require authentication on a route. You can also override some default values of certain contexts like `<ApplicationProvider>` for the application list.
    Finally, some components have some personalization options (i.e. the logo URL for the dashboard), check the [Storybook documentation](https://diracgrid.github.io/diracx-web/) to see the props of each component.
-   Check [the app directory](src/app/) in this example to have a reference.
+   Check [the app directory](https://github.com/DIRACGrid/diracx-web/tree/main/packages/extensions/src/app) in this example to have a reference.
 
 ### Architecture
 
@@ -177,12 +177,12 @@ Having a directory dedicated to your extension components will help you keep you
 
 To add new apps to your extension, you can create new components in your extension directory.
 
-[`testApp`](src/gubbins/components/TestApp/testApp.tsx) provides an example of a basic app component and the [Storybook documentation](https://diracgrid.github.io/diracx-web/) showcases all the components you can use from the library in an interactive interface.
+[`testApp`](https://github.com/DIRACGrid/diracx-web/blob/main/packages/extensions/src/gubbins/components/TestApp/testApp.tsx) provides an example of a basic app component and the [Storybook documentation](https://diracgrid.github.io/diracx-web/) showcases all the components you can use from the library in an interactive interface.
 
 It is then pretty easy to add them to DiracX Web by extending the `applicationList` (the list of apps available in DiracX-Web) from `diracx-web-components/components`.
 
 Context providers are used to manage and share global state across the application. You can use the `ApplicationProvider` from `diracx-web-components/contexts` to pass the list of applications to the components that need it.
-It is used in this example in the [(Dashboard) directory's layout.tsx](<src/app/(dashboard)/layout.tsx>) file.
+It is used in this example in the [(Dashboard) directory's layout.tsx](https://github.com/DIRACGrid/diracx-web/blob/main/packages/extensions/src/app/(dashboard)/layout.tsx) file.
 
 If you need more info on Contexts, you can check the [React documentation](https://reactjs.org/docs/context.html).
 
@@ -205,7 +205,7 @@ const newApplicationList = [...applicationList, newApp];
 <ApplicationProvider appList={newApplicationList}>...</ApplicationProvider>;
 ```
 
-In this example, the new App list is defined in a [separate file](src/gubbins/applicationList.ts)
+In this example, the new App list is defined in a [separate file](https://github.com/DIRACGrid/diracx-web/blob/main/packages/extensions/src/gubbins/applicationList.ts)
 
 Feel free to explore and adjust the code to fit your requirements.
 

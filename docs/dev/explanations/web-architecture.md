@@ -36,7 +36,7 @@ Built with [tsup](https://tsup.egoist.dev/) for fast TypeScript compilation. Out
 
 The vanilla DiracX web interface:
 
-- **Framework**: [Next.js 15](https://nextjs.org/) with App Router
+- **Framework**: [Next.js](https://nextjs.org/) with App Router
 - **Output**: Static export (`output: "export"`)
 - **Authentication**: [@axa-fr/react-oidc](https://github.com/AxaFrance/oidc-client)
 - **Testing**: [Cypress](https://www.cypress.io/) for end-to-end tests
@@ -77,7 +77,6 @@ DiracX Web uses [Next.js folder-based routing](https://nextjs.org/docs/app/build
 
 - **Application state**: Managed via React Context (`ApplicationProvider`).
 - **Session storage**: Each application instance writes its state to `<appId>_State` for share/import functionality.
-- **URL encoding**: Dashboard layout is encoded in the URL for sharing.
 
 ## Design system
 
