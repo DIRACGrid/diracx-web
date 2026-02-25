@@ -1,22 +1,9 @@
 /// <reference types="cypress" />
+/// <reference path="support/index.d.ts" />
 
 describe("DashboardDrawer", { retries: { runMode: 5, openMode: 3 } }, () => {
   beforeEach(() => {
-    cy.session("login", () => {
-      // Visit the page where the DashboardDrawer is rendered
-      cy.visit("/");
-
-      //login
-      cy.get('[data-testid="login-form-button"]').click();
-      cy.get("#login").type("admin@example.com");
-      cy.get("#password").type("password");
-
-      // Find the login button and click on it
-      cy.get("button").click();
-      // Grant access
-      cy.get(":nth-child(1) > form > .dex-btn").click();
-      cy.url().should("include", "/auth");
-    });
+    cy.login();
     cy.window().then((win) => {
       win.sessionStorage.setItem(
         "savedDashboard",

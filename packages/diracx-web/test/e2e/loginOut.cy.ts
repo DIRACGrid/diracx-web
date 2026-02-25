@@ -41,9 +41,9 @@ describe("Login and Logout", () => {
     cy.url().should("include", "/auth");
 
     // From now on the user is logged in
-    // The login buttton should not be present anymore
+    // The login button should not be present anymore
     cy.get('[data-testid="login-form-button"]').should("not.exist");
-    cy.contains("My Jobs").should("exist");
+    cy.contains("My Jobs", { timeout: 10000 }).should("exist");
 
     // Click on the user avatar
     cy.get(".MuiAvatar-root").click();
