@@ -5,7 +5,7 @@ describe("Owner Monitor", () => {
     cy.session("login", () => {
       cy.visit("/auth");
       //login
-      cy.get('[data-testid="button-login"]').click();
+      cy.get('[data-testid="login-form-button"]').click();
       cy.get("#login").type("admin@example.com");
       cy.get("#password").type("password");
 
@@ -54,7 +54,7 @@ describe("Owner Monitor", () => {
   /** Column interactions */
   it("should hide/show columns", () => {
     // Click on the visibility icon
-    cy.get('[data-testid="VisibilityIcon"] > path').click();
+    cy.get('[data-testid="column-visibility-button"]').click();
     cy.get('[data-testid="column-visibility-popover"]').should("be.visible");
 
     // Hide the "Owner Name" column

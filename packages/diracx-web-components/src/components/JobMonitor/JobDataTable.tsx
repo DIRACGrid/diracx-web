@@ -367,18 +367,30 @@ export function JobDataTable({
     () => (
       <>
         <Tooltip title="Reschedule">
-          <IconButton onClick={() => handleReschedule()}>
+          <IconButton
+            aria-label="Reschedule selected jobs"
+            data-testid="reschedule-jobs-button"
+            onClick={() => handleReschedule()}
+          >
             <Replay />
           </IconButton>
         </Tooltip>
         <Tooltip title="Kill">
-          <IconButton onClick={() => handleKill()}>
+          <IconButton
+            aria-label="Kill selected jobs"
+            data-testid="kill-jobs-button"
+            onClick={() => handleKill()}
+          >
             <Clear />
           </IconButton>
         </Tooltip>
         <Tooltip title="Delete">
-          <IconButton onClick={() => handleDelete()}>
-            <Delete data-testid="delete-jobs-button" />
+          <IconButton
+            aria-label="Delete selected jobs"
+            data-testid="delete-jobs-button"
+            onClick={() => handleDelete()}
+          >
+            <Delete />
           </IconButton>
         </Tooltip>
       </>

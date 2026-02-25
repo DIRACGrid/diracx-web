@@ -138,7 +138,10 @@ function DataTableToolbar<T extends Record<string, unknown>>({
       {numSelected > 0 ? (
         <Stack direction="row">
           <Tooltip title={`Get ID${numSelected > 1 ? "s" : ""}`}>
-            <IconButton onClick={handleCopyIDs}>
+            <IconButton
+              aria-label={`Get ID${numSelected > 1 ? "s" : ""}`}
+              onClick={handleCopyIDs}
+            >
               <FormatListBulleted />
             </IconButton>
           </Tooltip>
@@ -154,7 +157,11 @@ function DataTableToolbar<T extends Record<string, unknown>>({
         <Box>
           <Toolbar>
             <Tooltip title="Hide/Show columns">
-              <IconButton onClick={handleVisibilityClick}>
+              <IconButton
+                aria-label="Hide/Show columns"
+                data-testid="column-visibility-button"
+                onClick={handleVisibilityClick}
+              >
                 <Visibility />
               </IconButton>
             </Tooltip>

@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 
-import { Box, Menu, MenuItem, IconButton } from "@mui/material";
+import { Box, Menu, MenuItem, IconButton, Tooltip } from "@mui/material";
 
 import DeleteIcon from "@mui/icons-material/Delete";
 import RefreshIcon from "@mui/icons-material/Refresh";
@@ -404,6 +404,8 @@ export function SearchBar({
           },
           alignItems: "center",
         }}
+        role="search"
+        aria-label="Search filters"
         data-testid="search-bar"
       >
         <Box
@@ -459,24 +461,36 @@ export function SearchBar({
           </Menu>
         </Box>
         <Box sx={{ marginLeft: "auto", display: "flex", alignItems: "center" }}>
-          <IconButton
-            onClick={() => refreshFunction(tokenEquations, setFilters)}
-            disabled={
-              !tokenEquations.every((eq) => eq.status === EquationStatus.VALID)
-            }
-          >
-            <RefreshIcon />
-          </IconButton>
+          <Tooltip title="Refresh search">
+            <span>
+              <IconButton
+                aria-label="Refresh search"
+                data-testid="refresh-search-button"
+                onClick={() => refreshFunction(tokenEquations, setFilters)}
+                disabled={
+                  !tokenEquations.every(
+                    (eq) => eq.status === EquationStatus.VALID,
+                  )
+                }
+              >
+                <RefreshIcon />
+              </IconButton>
+            </span>
+          </Tooltip>
 
           {tokenEquations.length !== 0 && (
-            <IconButton
-              onClick={() => {
-                setInputValue("");
-                clearFunction(setFilters, setTokenEquations);
-              }}
-            >
-              <DeleteIcon />
-            </IconButton>
+            <Tooltip title="Clear all filters">
+              <IconButton
+                aria-label="Clear all filters"
+                data-testid="clear-filters-button"
+                onClick={() => {
+                  setInputValue("");
+                  clearFunction(setFilters, setTokenEquations);
+                }}
+              >
+                <DeleteIcon />
+              </IconButton>
+            </Tooltip>
           )}
         </Box>
       </Box>

@@ -5,7 +5,7 @@ describe("Job Monitor", () => {
     cy.session("login", () => {
       cy.visit("/");
       //login
-      cy.get('[data-testid="button-login"]').click();
+      cy.get('[data-testid="login-form-button"]').click();
       cy.get("#login").type("admin@example.com");
       cy.get("#password").type("password");
 
@@ -89,7 +89,7 @@ describe("Job Monitor", () => {
       }
 
       // refresh the jobs
-      cy.get('[data-testid="RefreshIcon"]').click();
+      cy.get('[data-testid="refresh-search-button"]').click();
     });
   });
 
@@ -254,7 +254,7 @@ describe("Job Monitor", () => {
     cy.get("[data-index=1]").click({ force: true });
     cy.get("[data-index=2]").click({ force: true });
 
-    cy.get('[data-testid="ClearIcon"] > path').click();
+    cy.get('[data-testid="kill-jobs-button"]').first().click();
 
     // Make sure the job status is "Killed"
     cy.get("[data-index=0]").find("td").eq(2).should("contain", "Killed");
@@ -270,7 +270,7 @@ describe("Job Monitor", () => {
     cy.get("@jobItem2").click({ force: true });
     cy.get("@jobItem3").click({ force: true });
 
-    cy.get('[data-testid="delete-jobs-button"] > path').click();
+    cy.get('[data-testid="delete-jobs-button"]').first().click();
 
     // Make sure the jobs disappeared from the table
     cy.get("table").should("be.visible");
@@ -299,7 +299,7 @@ describe("Job Monitor", () => {
   //   cy.get("@jobItem2").click({ force: true });
   //   cy.get("@jobItem3").click({ force: true });
 
-  //   cy.get('[data-testid="ClearIcon"] > path').click();
+  //   cy.get('[data-testid="kill-jobs-button"] > path').click();
 
   //   // Then, select the jobs to reschedule
   //   cy.get("@jobItem1").click({ force: true });
@@ -333,7 +333,7 @@ describe("Job Monitor", () => {
     cy.wait(1000); // Wait for the table to load
 
     // Click on the visibility icon
-    cy.get('[data-testid="VisibilityIcon"] > path').click();
+    cy.get('[data-testid="column-visibility-button"]').click();
     cy.get('[data-testid="column-visibility-popover"]').should("be.visible");
 
     // Hide the "Status" column and Show the "VO" column
@@ -466,7 +466,7 @@ describe("Job Monitor", () => {
       .find(".MuiChip-root")
       .should("have.length", 3);
 
-    cy.get('[data-testid="DeleteIcon"]').click();
+    cy.get('[data-testid="clear-filters-button"]').click();
 
     cy.get('[data-testid="search-bar"]')
       .find(".MuiChip-root")

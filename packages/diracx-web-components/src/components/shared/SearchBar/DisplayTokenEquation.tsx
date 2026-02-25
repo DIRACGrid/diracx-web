@@ -52,7 +52,11 @@ export function DisplayTokenEquation({
           : "default";
 
   return (
-    <Box sx={{ display: "flex", alignItems: "center" }}>
+    <Box
+      sx={{ display: "flex", alignItems: "center" }}
+      role="group"
+      aria-label={`Filter equation ${equationIndex + 1}`}
+    >
       {tokens.map((token, tokenIndex) => {
         if (
           equationIndex === focusedTokenIndex?.equationIndex &&
@@ -71,6 +75,7 @@ export function DisplayTokenEquation({
             key={tokenIndex}
             label={chipLabel}
             color={chipColor}
+            aria-label={`${token.nature}: ${chipLabel}`}
             onClick={(e) => handleClick(e, tokenIndex)}
             onDelete={isLast ? handleDelete : undefined}
             id={`tokenid:equation-${equationIndex}-token-${tokenIndex}`}

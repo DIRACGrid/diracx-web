@@ -141,7 +141,11 @@ export function ExportButton() {
   return (
     <>
       <Tooltip title="Export application state">
-        <IconButton onClick={handleClick} data-testid="export-button">
+        <IconButton
+          aria-label="Export application state"
+          onClick={handleClick}
+          data-testid="export-button"
+        >
           <OutputIcon />
         </IconButton>
       </Tooltip>

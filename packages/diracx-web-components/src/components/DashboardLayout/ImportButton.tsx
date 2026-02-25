@@ -243,6 +243,7 @@ export function ImportButton() {
     <>
       <Tooltip title="Import application state">
         <IconButton
+          aria-label="Import application state"
           onClick={() => setDialogOpen(true)}
           data-testid="import-button"
         >

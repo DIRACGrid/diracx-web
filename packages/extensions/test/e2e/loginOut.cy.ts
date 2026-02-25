@@ -16,7 +16,7 @@ describe("Login and Logout", () => {
     cy.url().should("include", "/auth");
 
     // Continue with the default parameters
-    cy.get('[data-testid="button-login"]').click();
+    cy.get('[data-testid="login-form-button"]').click();
 
     // Extract name from baseUrl (remove http:// and port number)
     const domain = Cypress.config()
@@ -42,7 +42,7 @@ describe("Login and Logout", () => {
 
     // From now on the user is logged in
     // The login buttton should not be present anymore
-    cy.get('[data-testid="button-login"]').should("not.exist");
+    cy.get('[data-testid="login-form-button"]').should("not.exist");
 
     cy.visit("/");
     cy.contains("Owners").should("exist");
@@ -64,7 +64,7 @@ describe("Login and Logout", () => {
 
     // The user is logged out
     // The login button should be present
-    cy.get('[data-testid="button-login"]').should("exist");
+    cy.get('[data-testid="login-form-button"]').should("exist");
 
     // The user tries to access the dashboard page without being connected
     // The user is redirected to the /auth page

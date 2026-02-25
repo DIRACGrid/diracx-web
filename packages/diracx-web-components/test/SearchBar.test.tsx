@@ -120,7 +120,7 @@ describe("SearchBar", () => {
 
     // Check if delete button is present
     await waitFor(() => {
-      const deleteButton = screen.getByTestId("DeleteIcon");
+      const deleteButton = screen.getByTestId("clear-filters-button");
       expect(deleteButton).toBeInTheDocument();
     });
   });
@@ -135,7 +135,7 @@ describe("SearchBar", () => {
       expect(screen.getByText("Running | Completed")).toBeInTheDocument();
 
       // Click delete button
-      const deleteButton = screen.getByTestId("DeleteIcon");
+      const deleteButton = screen.getByTestId("clear-filters-button");
       user.click(deleteButton);
     });
 

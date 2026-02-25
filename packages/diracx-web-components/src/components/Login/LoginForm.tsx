@@ -160,7 +160,7 @@ export function LoginForm({
             variant="h3"
             gutterBottom
             sx={{ textAlign: "center" }}
-            data-testid="h3-vo-name"
+            data-testid="vo-name"
           >
             {selectedVO}
           </Typography>
@@ -173,7 +173,7 @@ export function LoginForm({
                 {...params}
                 label="Select a Virtual Organization"
                 variant="outlined"
-                data-testid="autocomplete-vo-select"
+                data-testid="vo-select"
               />
             )}
             value={selectedVO}
@@ -198,7 +198,7 @@ export function LoginForm({
                 }
                 label="Select a Group"
                 onChange={handleGroupChange}
-                data-testid="select-group"
+                data-testid="group-select"
               >
                 {Object.keys(
                   metadata.virtual_organizations[selectedVO].groups,
@@ -220,7 +220,7 @@ export function LoginForm({
                   flexGrow: 1,
                 }}
                 onClick={handleConfigurationChanges}
-                data-testid="button-login"
+                data-testid="login-form-button"
               >
                 Login via your Identity Provider
               </Button>
