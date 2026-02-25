@@ -15,28 +15,28 @@ describe("LoginForm", () => {
     render(<SingleVO />);
 
     // now immediately rendered
-    expect(screen.getByTestId("h3-vo-name")).toBeInTheDocument();
-    expect(screen.queryByTestId("autocomplete-vo-select")).toBeNull();
-    expect(screen.getByTestId("select-group")).toBeInTheDocument();
-    expect(screen.getByTestId("button-login")).toBeInTheDocument();
+    expect(screen.getByTestId("vo-name")).toBeInTheDocument();
+    expect(screen.queryByTestId("vo-select")).toBeNull();
+    expect(screen.getByTestId("group-select")).toBeInTheDocument();
+    expect(screen.getByTestId("login-form-button")).toBeInTheDocument();
   });
 
   it("works for the MultiVO story", () => {
     render(<MultiVO />);
 
     const input = screen
-      .getByTestId("autocomplete-vo-select")
+      .getByTestId("vo-select")
       .querySelector("input") as HTMLInputElement;
 
     // before selection
-    expect(screen.queryByTestId("button-login")).toBeNull();
+    expect(screen.queryByTestId("login-form-button")).toBeNull();
 
     // pick “LHCp”
     fireEvent.change(input, { target: { value: "LHC" } });
     fireEvent.click(screen.getByText("LHCp"));
 
-    expect(screen.getByTestId("select-group")).toBeInTheDocument();
-    expect(screen.getByTestId("button-login")).toBeInTheDocument();
+    expect(screen.getByTestId("group-select")).toBeInTheDocument();
+    expect(screen.getByTestId("login-form-button")).toBeInTheDocument();
   });
 
   it("works for the Error story", () => {
@@ -45,13 +45,13 @@ describe("LoginForm", () => {
     expect(
       screen.getByText("An error occurred while fetching metadata."),
     ).toBeInTheDocument();
-    expect(screen.queryByTestId("h3-vo-name")).toBeNull();
+    expect(screen.queryByTestId("vo-name")).toBeNull();
   });
 
   it("works for the Loading story", () => {
     render(<Loading />);
 
     expect(screen.getByText("Loading...")).toBeInTheDocument();
-    expect(screen.queryByTestId("h3-vo-name")).toBeNull();
+    expect(screen.queryByTestId("vo-name")).toBeNull();
   });
 });

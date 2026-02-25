@@ -7,7 +7,7 @@ describe("DashboardDrawer", { retries: { runMode: 5, openMode: 3 } }, () => {
       cy.visit("/");
 
       //login
-      cy.get('[data-testid="button-login"]').click();
+      cy.get('[data-testid="login-form-button"]').click();
       cy.get("#login").type("admin@example.com");
       cy.get("#password").type("password");
 
