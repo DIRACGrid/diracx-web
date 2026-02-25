@@ -1,5 +1,29 @@
 # Changelog
 
+## [0.1.0-a11](https://github.com/DIRACGrid/diracx-web/compare/v0.1.0-a10...v0.1.0-a11) (2026-02-25)
+
+
+### Features
+
+* add aria-label to make app more accessible ([496184d](https://github.com/DIRACGrid/diracx-web/commit/496184dc3f3ba66bd0049a3bcce379466c06cfb5))
+* avoid re fetching the jobs when switching from an app to another ([9cb7bf6](https://github.com/DIRACGrid/diracx-web/commit/9cb7bf6dff379666c1cbc109e8281c1aae402333))
+* move from sunburst to pie chart ([0b9d5d2](https://github.com/DIRACGrid/diracx-web/commit/0b9d5d265a80d46e84b1100152d46441da099974))
+
+
+### Bug Fixes
+
+* adapt search bar to review comments ([e433439](https://github.com/DIRACGrid/diracx-web/commit/e433439f8379517606d4d7e5b06d35fb0636b088))
+* **deps:** update dependency @atlaskit/pragmatic-drag-and-drop-react-drop-indicator to v3 ([876a3c5](https://github.com/DIRACGrid/diracx-web/commit/876a3c51f450e3af70edacc25515d5fe208eb100))
+* **deps:** update dependency @types/node to v24 ([055109d](https://github.com/DIRACGrid/diracx-web/commit/055109d279fa0b51b4e930148fcd525a6d8ff77b))
+* **deps:** update material-ui monorepo ([6b12dca](https://github.com/DIRACGrid/diracx-web/commit/6b12dca8775c68c2e0743abbaf772fd6883b5cc2))
+* **deps:** update react monorepo ([cb03f7f](https://github.com/DIRACGrid/diracx-web/commit/cb03f7f5204d92af7267b3b63ef4fa33ad805d48))
+* make job history more compact ([62e48a4](https://github.com/DIRACGrid/diracx-web/commit/62e48a48e7b7c42344f20203e0e7846df35279d0))
+* make ui more compact overall ([49ed4fa](https://github.com/DIRACGrid/diracx-web/commit/49ed4fa8cf5e78faa6887c72c7bbf535d0cf4c68))
+* **oidc:** revoke only refresh token ([7eb3fd4](https://github.com/DIRACGrid/diracx-web/commit/7eb3fd432960374a3a8ce80696726a20eba8f0c7))
+* **oidc:** revoke only refresh token ([209c4ec](https://github.com/DIRACGrid/diracx-web/commit/209c4ec7915324aba6ec5987849d5781dec86266))
+* **searchbar:** datetime issues and ux for numerical values ([2708235](https://github.com/DIRACGrid/diracx-web/commit/2708235383fdec5f10b01905c682874534345673))
+* update when columns change and feat: rightClick on the sunburst ([cdab963](https://github.com/DIRACGrid/diracx-web/commit/cdab96348fe00dc43cab29e611ba5491db6f8dd9))
+
 ## [0.1.0-a10](https://github.com/DIRACGrid/diracx-web/compare/v0.1.0-a9...v0.1.0-a10) (2025-08-25)
 
 
