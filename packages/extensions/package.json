@@ -15,14 +15,14 @@
     "postinstall": "node ../../node_modules/@axa-fr/react-oidc/bin/copy-service-worker-files.mjs public"
   },
   "dependencies": {
-    "@axa-fr/react-oidc": ">=7.24.0 <7.26.0",
+    "@axa-fr/react-oidc": ">=7.24.0 <7.27.0",
     "@dirac-grid/diracx-web-components": "0.1.0-a10",
     "@mui/icons-material": "^7.0.0",
     "@mui/material": "^7.0.0",
     "@mui/utils": "^7.0.0",
     "@mui/x-date-pickers": "^8.0.0",
     "@tanstack/react-table": "^8.20.5",
-    "autoprefixer": "10.4.24",
+    "autoprefixer": "10.4.27",
     "next": "16.1.6",
     "postcss": "8.5.6",
     "react": "^19.0.0",
