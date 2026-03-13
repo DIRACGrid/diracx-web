@@ -45,6 +45,7 @@ import { SearchBody } from "../../types";
 export interface MenuItem {
   label: string;
   onClick: (id: string | null) => void;
+  dataTestId?: string;
 }
 
 /**
@@ -655,6 +656,7 @@ export function DataTable<T extends Record<string, unknown>>({
           {menuItems.map((menuItem, index: number) => (
             <MenuItem
               key={index}
+              data-testid={menuItem.dataTestId}
               onClick={() => {
                 handleCloseContextMenu();
                 menuItem.onClick(contextMenu.id);
