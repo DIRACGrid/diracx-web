@@ -1,5 +1,41 @@
 # Changelog
 
+## [0.1.0-a11](https://github.com/DIRACGrid/diracx-web/compare/v0.1.0-a10...v0.1.0-a11) (2026-03-18)
+
+
+### Features
+
+* add aria-label to make app more accessible ([496184d](https://github.com/DIRACGrid/diracx-web/commit/496184dc3f3ba66bd0049a3bcce379466c06cfb5))
+* add input/output sandbox download support ([27a6b8d](https://github.com/DIRACGrid/diracx-web/commit/27a6b8d1920cc638dcafd2874624c6a6f933ef36))
+* avoid re fetching the jobs when switching from an app to another ([9cb7bf6](https://github.com/DIRACGrid/diracx-web/commit/9cb7bf6dff379666c1cbc109e8281c1aae402333))
+* move from sunburst to pie chart ([0b9d5d2](https://github.com/DIRACGrid/diracx-web/commit/0b9d5d265a80d46e84b1100152d46441da099974))
+
+
+### Bug Fixes
+
+* adjust e2e tests ([8d814de](https://github.com/DIRACGrid/diracx-web/commit/8d814de9a07a1d52c37c8cfc368150fd9682eaa8))
+* **deps:** update dependency @types/node to v24 ([055109d](https://github.com/DIRACGrid/diracx-web/commit/055109d279fa0b51b4e930148fcd525a6d8ff77b))
+* **deps:** update dependency @types/node to v24.11.0 ([1010bc0](https://github.com/DIRACGrid/diracx-web/commit/1010bc0d16c07940fa09119610086f9855334e2b))
+* **deps:** update dependency @types/node to v24.12.0 ([c25ea9e](https://github.com/DIRACGrid/diracx-web/commit/c25ea9eaae308cc1b4051bfa3cb3312fea8e40b5))
+* **deps:** update dependency next to v15.5.10 [security] ([5b93bca](https://github.com/DIRACGrid/diracx-web/commit/5b93bcae99dd0a2d044a00c0880bac113c3ccc06))
+* **deps:** update dependency next to v16.1.7 [security] ([ac25a3d](https://github.com/DIRACGrid/diracx-web/commit/ac25a3dc817b6d64a1b1f3b545007bcadc4dd7d6))
+* **deps:** update dependency postcss to v8.5.8 ([36c25c3](https://github.com/DIRACGrid/diracx-web/commit/36c25c3f47164d9230a09cc0c71519b5e65d78e1))
+* **deps:** update material-ui monorepo ([6b12dca](https://github.com/DIRACGrid/diracx-web/commit/6b12dca8775c68c2e0743abbaf772fd6883b5cc2))
+* **deps:** update nextjs monorepo to v16 ([c2cbdb3](https://github.com/DIRACGrid/diracx-web/commit/c2cbdb3f9323fca95a4d77b617e1fb5d29a61992))
+* **deps:** update npm dependencies (non-major) ([c7dec96](https://github.com/DIRACGrid/diracx-web/commit/c7dec965a18b56d534eefa4d64baa4bb08c953fe))
+* **deps:** update npm dependencies (non-major) ([61643c0](https://github.com/DIRACGrid/diracx-web/commit/61643c0e297137cd64eac7d32b641e8e39efe01e))
+* **deps:** update react monorepo ([cb03f7f](https://github.com/DIRACGrid/diracx-web/commit/cb03f7f5204d92af7267b3b63ef4fa33ad805d48))
+* issue [#412](https://github.com/DIRACGrid/diracx-web/issues/412) ([5b6b1b2](https://github.com/DIRACGrid/diracx-web/commit/5b6b1b2fad260094d2848042a85dd0dc4257d0e3))
+* issue [#412](https://github.com/DIRACGrid/diracx-web/issues/412) ([ccce03c](https://github.com/DIRACGrid/diracx-web/commit/ccce03c5a1db2b4e71458d0a3103e2d21e0b06d5))
+* make ui more compact overall ([49ed4fa](https://github.com/DIRACGrid/diracx-web/commit/49ed4fa8cf5e78faa6887c72c7bbf535d0cf4c68))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @dirac-grid/diracx-web-components bumped from ^0.1.0-a10 to ^0.1.0-a11
+
 ## [0.1.0-a10](https://github.com/DIRACGrid/diracx-web/compare/v0.1.0-a9...v0.1.0-a10) (2025-08-25)
 
 
