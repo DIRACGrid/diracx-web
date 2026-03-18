@@ -10,7 +10,8 @@ import {
   useTheme,
   TextField,
 } from "@mui/material";
-import { DragIndicator, SvgIconComponent } from "@mui/icons-material";
+import DragIndicator from "@mui/icons-material/DragIndicator";
+import type { SvgIconComponent } from "@mui/icons-material";
 import { combine } from "@atlaskit/pragmatic-drag-and-drop/combine";
 import {
   draggable,
@@ -25,7 +26,10 @@ import {
 import { setCustomNativeDragPreview } from "@atlaskit/pragmatic-drag-and-drop/element/set-custom-native-drag-preview";
 import EggIcon from "@mui/icons-material/Egg";
 import { ThemeProvider } from "../../contexts/ThemeProvider";
-import { ApplicationsContext } from "../../contexts/ApplicationsProvider";
+import {
+  AppListContext,
+  DashboardContext,
+} from "../../contexts/ApplicationsProvider";
 import { DashboardGroup, DashboardItem } from "../../types";
 
 interface DrawerItemProps {
@@ -70,7 +74,8 @@ export default function DrawerItem({
   // Represents the closest edge to the mouse cursor
   const [closestEdge, setClosestEdge] = useState<Edge | null>(null);
 
-  const [, , appList, appId, setCurrentAppId] = use(ApplicationsContext);
+  const { appList } = use(AppListContext);
+  const { currentAppId: appId, setCurrentAppId } = use(DashboardContext);
   const { icon } = appList.find((app) => app.name === item.type) || {
     icon: EggIcon,
   };
@@ -165,7 +170,7 @@ export default function DrawerItem({
 
   // Handle renaming of the item
   const handleItemRename = () => {
-    if (renameValue.trim() === "") return;
+    if (renameValue.trim() === "" || renameValue === item.title) return;
     setUserDashboard((groups) =>
       groups.map((group) => {
         if (group.title === groupTitle) {

@@ -49,9 +49,10 @@ describe("LoginForm", () => {
   });
 
   it("works for the Loading story", () => {
-    render(<Loading />);
+    const { container } = render(<Loading />);
 
-    expect(screen.getByText("Loading...")).toBeInTheDocument();
+    // Skeletons are rendered instead of plain text
+    expect(container.querySelector(".MuiSkeleton-root")).toBeInTheDocument();
     expect(screen.queryByTestId("vo-name")).toBeNull();
   });
 });

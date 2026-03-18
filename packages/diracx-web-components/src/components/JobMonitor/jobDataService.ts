@@ -4,7 +4,7 @@ import useSWR from "swr";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 
-import { fetcher } from "../../hooks/utils";
+import { fetcher } from "../../services/client";
 import type { JobSummary } from "../../types";
 import {
   Filter,
@@ -23,70 +23,40 @@ dayjs.extend(utc);
  * @param searchBody The search body to be processed
  * @returns The processed search body with adjusted filters
  */
-function processSearchBody(searchBody: SearchBody) {
-  searchBody.search = searchBody.search?.map((filter: Filter) => {
-    if (filter.operator == "last") {
-      const valueStr = filter.value as string;
-      const match = valueStr.match(/^(\d+)\s*(minute|hour|day|month|year)s?$/i);
+function processSearchBody(searchBody: SearchBody): SearchBody {
+  return {
+    ...searchBody,
+    search: searchBody.search?.map((filter: Filter) => {
+      if (filter.operator == "last") {
+        const valueStr = filter.value as string;
+        const match = valueStr.match(
+          /^(\d+)\s*(minute|hour|day|month|year)s?$/i,
+        );
 
-      if (match) {
-        const amount = parseInt(match[1], 10);
-        const unit = match[2].toLowerCase() as TimeUnit;
+        if (match) {
+          const amount = parseInt(match[1], 10);
+          const unit = match[2].toLowerCase() as TimeUnit;
 
-        return {
-          parameter: filter.parameter,
-          operator: "gt",
-          value: dayjs().subtract(amount, unit).toISOString(),
-          values: filter.values,
-        };
-      } else {
-        return {
-          parameter: filter.parameter,
-          operator: "gt",
-          value: dayjs()
-            .subtract(1, filter.value as TimeUnit)
-            .toISOString(),
-          values: filter.values,
-        };
+          return {
+            parameter: filter.parameter,
+            operator: "gt",
+            value: dayjs().subtract(amount, unit).toISOString(),
+            values: filter.values,
+          };
+        } else {
+          return {
+            parameter: filter.parameter,
+            operator: "gt",
+            value: dayjs()
+              .subtract(1, filter.value as TimeUnit)
+              .toISOString(),
+            values: filter.values,
+          };
+        }
       }
-    }
-    return filter;
-  });
-}
-
-/**
- * Deletes jobs with the specified IDs.
- *
- * @param diracxUrl - The base URL of the DiracX API.
- * @param selectedIds - An array of job IDs to delete.
- * @param accessToken - The authentication token.
- * @param accessTokenPayload - Information about the user.
- */
-export function deleteJobs(
-  diracxUrl: string | null,
-  selectedIds: readonly number[],
-  accessToken: string,
-  accessTokenPayload: Record<string, number | string>,
-) {
-  if (!diracxUrl) {
-    throw new Error("Invalid URL generated for deleting jobs.");
-  }
-
-  const deleteUrl = `${diracxUrl}/api/jobs/status`;
-
-  const currentDate = dayjs().utc().toISOString();
-
-  const body = selectedIds.reduce((acc: StatusBody, jobId) => {
-    acc[jobId] = {
-      [currentDate]: {
-        Status: "Deleted",
-        MinorStatus: "Marked for deletion",
-        Source: `User: ${accessTokenPayload["preferred_username"]}`,
-      },
-    };
-    return acc;
-  }, {});
-  return fetcher([deleteUrl, accessToken, "PATCH", body]);
+      return filter;
+    }),
+  };
 }
 
 type JobBulkResponse = {
@@ -109,13 +79,69 @@ type StatusBody = {
 };
 
 /**
- * Kills the specified jobs.
+ * Updates the status of jobs with the specified IDs.
  *
  * @param diracxUrl - The base URL of the DiracX API.
- * @param selectedIds - An array of job IDs to be killed.
+ * @param selectedIds - An array of job IDs to update.
  * @param accessToken - The authentication token.
  * @param accessTokenPayload - Information about the user.
+ * @param status - The new status to set (e.g. "Deleted", "Killed").
+ * @param minorStatus - The minor status message.
  * @returns A Promise that resolves to an object containing the response headers and data.
+ */
+function updateJobStatus(
+  diracxUrl: string | null,
+  selectedIds: readonly number[],
+  accessToken: string,
+  accessTokenPayload: Record<string, number | string>,
+  status: string,
+  minorStatus: string,
+): Promise<{ headers: Headers; data: JobBulkResponse }> {
+  if (!diracxUrl) {
+    throw new Error(`Invalid URL generated for setting jobs to ${status}.`);
+  }
+
+  const currentDate = dayjs().utc().toISOString();
+
+  const body = selectedIds.reduce((acc: StatusBody, jobId) => {
+    acc[jobId] = {
+      [currentDate]: {
+        Status: status,
+        MinorStatus: minorStatus,
+        Source: `User: ${accessTokenPayload["preferred_username"]}`,
+      },
+    };
+    return acc;
+  }, {});
+  return fetcher({
+    url: `${diracxUrl}/api/jobs/status`,
+    accessToken,
+    method: "PATCH",
+    body,
+  });
+}
+
+/**
+ * Deletes jobs with the specified IDs.
+ */
+export function deleteJobs(
+  diracxUrl: string | null,
+  selectedIds: readonly number[],
+  accessToken: string,
+  accessTokenPayload: Record<string, number | string>,
+) {
+  return updateJobStatus(
+    diracxUrl,
+    selectedIds,
+    accessToken,
+    accessTokenPayload,
+    "Deleted",
+    "Marked for deletion",
+  );
+}
+
+/**
+ * Kills the specified jobs.
  */
 export function killJobs(
   diracxUrl: string | null,
@@ -123,47 +149,14 @@ export function killJobs(
   accessToken: string,
   accessTokenPayload: Record<string, number | string>,
 ): Promise<{ headers: Headers; data: JobBulkResponse }> {
-  if (!diracxUrl) {
-    throw new Error("Invalid URL generated for killing jobs.");
-  }
-  const killUrl = `${diracxUrl}/api/jobs/status`;
-  const currentDate = dayjs().utc().toISOString();
-
-  const body = selectedIds.reduce((acc: StatusBody, jobId) => {
-    acc[jobId] = {
-      [currentDate]: {
-        Status: "Killed",
-        MinorStatus: "Marked for termination",
-        Source: `User: ${accessTokenPayload["preferred_username"]}`,
-      },
-    };
-    return acc;
-  }, {});
-  return fetcher([killUrl, accessToken, "PATCH", body]);
-}
-
-/**
- * Reschedules the specified jobs.
- *
- * @param diracxUrl - The base URL of the DiracX API.
- * @param selectedIds - An array of job IDs to be rescheduled.
- * @param token - The authentication token.
- * @returns A Promise that resolves to an object containing the response headers and data.
- */
-export function rescheduleJobs(
-  diracxUrl: string | null,
-  selectedIds: readonly number[],
-  accessToken: string,
-): Promise<{ headers: Headers; data: JobBulkResponse }> {
-  if (!diracxUrl) {
-    throw new Error("Invalid URL generated for rescheduling jobs.");
-  }
-  const body = {
-    job_ids: selectedIds,
-  };
-
-  const rescheduleUrl = `${diracxUrl}/api/jobs/reschedule`;
-  return fetcher([rescheduleUrl, accessToken, "POST", body]);
+  return updateJobStatus(
+    diracxUrl,
+    selectedIds,
+    accessToken,
+    accessTokenPayload,
+    "Killed",
+    "Marked for termination",
+  );
 }
 
 /**
@@ -171,7 +164,7 @@ export function rescheduleJobs(
  *
  * @param diracxUrl - The base URL of the DiracX API.
  * @param jobId - The ID of the job.
- * @param token - The authentication token.
+ * @param accessToken - The authentication token.
  * @returns A Promise that resolves to an object containing the headers and data of the job history.
  */
 export async function getJobHistory(
@@ -182,7 +175,6 @@ export async function getJobHistory(
   if (!diracxUrl) {
     throw new Error("Invalid URL generated for fetching job history.");
   }
-  const historyUrl = `${diracxUrl}/api/jobs/search`;
   const body = {
     parameters: ["LoggingInfo"],
     search: [
@@ -193,16 +185,21 @@ export async function getJobHistory(
       },
     ],
   };
-  // Expect the response to be an array of objects with JobID and LoggingInfo
   const { data } = await fetcher<
     Array<{ JobID: number; LoggingInfo: JobHistory[] }>
-  >([historyUrl, accessToken, "POST", body]);
+  >({
+    url: `${diracxUrl}/api/jobs/search`,
+    accessToken,
+    method: "POST",
+    body,
+  });
 
   return { data: data[0].LoggingInfo };
 }
 
 /**
  * Retrieves the sandbox information for a given job ID and sandbox type.
+ * @param diracxUrl - The base URL of the DiracX API.
  * @param jobId - The ID of the job.
  * @param sbType - The type of the sandbox (input or output).
  * @param accessToken - The authentication token.
@@ -214,12 +211,15 @@ export function getJobSandbox(
   sbType: "input" | "output",
   accessToken: string,
 ): Promise<{ headers: Headers; data: JobSandboxPFNResponse }> {
-  const url = `${diracxUrl}/api/jobs/${jobId}/sandbox/${sbType}`;
-  return fetcher([url, accessToken]);
+  return fetcher({
+    url: `${diracxUrl}/api/jobs/${jobId}/sandbox/${sbType}`,
+    accessToken,
+  });
 }
 
 /**
  * Retrieves the sandbox URL for a given PFN.
+ * @param diracxUrl - The base URL of the DiracX API.
  * @param pfn - The PFN of the job.
  * @param accessToken - The authentication token.
  * @returns A Promise that resolves to an object containing the headers and data of the sandbox URL.
@@ -229,8 +229,16 @@ export function getJobSandboxUrl(
   pfn: string,
   accessToken: string,
 ): Promise<{ headers: Headers; data: SandboxUrlResponse }> {
-  const url = `${diracxUrl}/api/jobs/sandbox?pfn=${encodeURIComponent(pfn)}`;
-  return fetcher([url, accessToken]);
+  // Validate PFN format: must start with / or a known protocol
+  if (!/^(\/|https?:\/\/|s3:\/\/|srm:\/\/)/.test(pfn)) {
+    throw new Error(
+      `Invalid PFN format: "${pfn}". Must start with / or a known protocol (http, https, s3, srm).`,
+    );
+  }
+  return fetcher({
+    url: `${diracxUrl}/api/jobs/sandbox?pfn=${encodeURIComponent(pfn)}`,
+    accessToken,
+  });
 }
 
 /**
@@ -252,20 +260,18 @@ export async function getJobSummary(
     throw new Error("Invalid URL generated for fetching job summary.");
   }
 
-  if (searchBody) processSearchBody(searchBody);
+  const processed = searchBody ? processSearchBody(searchBody) : searchBody;
 
-  const summaryUrl = `${diracxUrl}/api/jobs/summary`;
   const body = {
     grouping: grouping,
-    search: searchBody?.search || [],
+    search: processed?.search || [],
   };
-  // Expect the response to be an array of objects with all the grouping fields
-  const { data } = await fetcher<Array<JobSummary>>([
-    summaryUrl,
+  const { data } = await fetcher<Array<JobSummary>>({
+    url: `${diracxUrl}/api/jobs/summary`,
     accessToken,
-    "POST",
+    method: "POST",
     body,
-  ]);
+  });
 
   return { data };
 }
@@ -299,14 +305,19 @@ export function useJobSummary(
   } = useSWR(
     swrKey,
     async ([url, _grouping, _searchBody]) => {
-      processSearchBody(_searchBody);
+      const processed = processSearchBody(_searchBody);
 
       const body = {
         grouping: [_grouping],
-        search: _searchBody.search || [],
+        search: processed.search || [],
       };
 
-      return await fetcher<JobSummary[]>([url, accessToken!, "POST", body]);
+      return await fetcher<JobSummary[]>({
+        url,
+        accessToken: accessToken!,
+        method: "POST",
+        body,
+      });
     },
     {
       revalidateOnMount: true,
@@ -357,14 +368,19 @@ export function useJobs(
   } = useSWR(
     swrKey,
     async ([url, _searchBody]) => {
-      processSearchBody(_searchBody);
+      const processed = processSearchBody(_searchBody);
 
       const body = {
-        search: _searchBody.search || [],
-        sort: _searchBody.sort || [],
+        search: processed.search || [],
+        sort: processed.sort || [],
       };
 
-      return await fetcher<Job[]>([url, accessToken, "POST", body]);
+      return await fetcher<Job[]>({
+        url,
+        accessToken,
+        method: "POST",
+        body,
+      });
     },
     {
       revalidateOnMount: true,
@@ -393,14 +409,49 @@ export function useJobs(
   };
 }
 
+/** Maximum number of IDs that can be fetched in a single request */
+const MAX_IDS_PER_PAGE = 10000;
+
 /**
- * Generates the URL for searching jobs.
+ * Fetches all job IDs matching the current search filters.
+ * Uses the `parameters` field to request only JobID, with per_page=10000.
  *
  * @param diracxUrl - The base URL of the DiracX API.
- * @param page - The page number for pagination.
- * @param rowsPerPage - The number of rows per page.
- * @returns The URL for the job search API endpoint.
+ * @param accessToken - The access token for authentication.
+ * @param searchBody - The search body for filtering jobs.
+ * @returns An array of job IDs.
  */
+export async function fetchMatchingJobIds(
+  diracxUrl: string | null,
+  accessToken: string,
+  searchBody: SearchBody,
+): Promise<number[]> {
+  if (!diracxUrl) {
+    throw new Error("Invalid URL for fetching job IDs.");
+  }
+
+  const body = {
+    parameters: ["JobID"],
+    search: searchBody.search || [],
+    sort: searchBody.sort || [],
+  };
+
+  // Process 'last' operator before sending
+  const processedBody = processSearchBody({
+    ...body,
+    search: [...(body.search || [])],
+  } as SearchBody);
+
+  const result = await fetcher<{ JobID: number }[]>({
+    url: `${diracxUrl}/api/jobs/search?page=1&per_page=${MAX_IDS_PER_PAGE}`,
+    accessToken,
+    method: "POST",
+    body: processedBody,
+  });
+
+  return (result.data as { JobID: number }[]).map((item) => item.JobID);
+}
+
 export function getSearchJobUrl(
   diracxUrl: string | null,
   page: number,

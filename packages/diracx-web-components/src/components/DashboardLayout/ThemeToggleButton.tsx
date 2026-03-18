@@ -1,7 +1,8 @@
 "use client";
 
 import { IconButton } from "@mui/material";
-import { DarkMode, LightMode } from "@mui/icons-material";
+import DarkMode from "@mui/icons-material/DarkMode";
+import LightMode from "@mui/icons-material/LightMode";
 import { useTheme } from "../../hooks/theme";
 
 /**

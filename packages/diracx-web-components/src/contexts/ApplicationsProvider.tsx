@@ -1,21 +1,34 @@
 "use client";
 
-import React, { createContext, useEffect, useState } from "react";
+import React, { createContext, useEffect, useMemo, useState } from "react";
 import { applicationList } from "../components/applicationList";
 import { defaultDashboard } from "../components/defaultDashboard";
 import { DashboardGroup } from "../types/DashboardGroup";
 import ApplicationMetadata from "../types/ApplicationMetadata";
 
-// Create a context for the UserDashboard state
-export const ApplicationsContext = createContext<
-  [
-    DashboardGroup[],
-    React.Dispatch<React.SetStateAction<DashboardGroup[]>>,
-    ApplicationMetadata[],
-    string, // Id of the current application
-    React.Dispatch<React.SetStateAction<string>>,
-  ]
->([[], () => {}, [], "", () => {}]);
+// Stable context for app list (rarely changes)
+export interface AppListContextType {
+  appList: ApplicationMetadata[];
+}
+
+export const AppListContext = createContext<AppListContextType>({
+  appList: [],
+});
+
+// Dashboard context (changes on drag-drop, add/remove, app switch)
+export interface DashboardContextType {
+  userDashboard: DashboardGroup[];
+  setUserDashboard: React.Dispatch<React.SetStateAction<DashboardGroup[]>>;
+  currentAppId: string;
+  setCurrentAppId: React.Dispatch<React.SetStateAction<string>>;
+}
+
+export const DashboardContext = createContext<DashboardContextType>({
+  userDashboard: [],
+  setUserDashboard: () => {},
+  currentAppId: "",
+  setCurrentAppId: () => {},
+});
 
 interface ApplicationsProviderProps {
   children: React.ReactNode;
@@ -37,9 +50,16 @@ export const ApplicationsProvider = ({
   defaultUserDashboard = defaultDashboard,
 }: ApplicationsProviderProps) => {
   const loadedDashboard = sessionStorage.getItem("savedDashboard");
-  const parsedDashboard: DashboardGroup[] | null = loadedDashboard
-    ? JSON.parse(loadedDashboard)
-    : null;
+  let parsedDashboard: DashboardGroup[] | null = null;
+  if (loadedDashboard) {
+    try {
+      parsedDashboard = JSON.parse(loadedDashboard);
+    } catch {
+      console.warn(
+        'Failed to parse dashboard state from sessionStorage ("savedDashboard"). Using defaults.',
+      );
+    }
+  }
 
   const [userDashboard, setUserDashboard] = useState(
     parsedDashboard ? parsedDashboard : defaultUserDashboard,
@@ -54,19 +74,24 @@ export const ApplicationsProvider = ({
     sessionStorage.setItem("savedDashboard", JSON.stringify(userDashboard));
   }, [userDashboard]);
 
+  const appListValue = useMemo(
+    (): AppListContextType => ({ appList }),
+    [appList],
+  );
+
+  const dashboardValue = useMemo(
+    (): DashboardContextType => ({
+      userDashboard,
+      setUserDashboard,
+      currentAppId,
+      setCurrentAppId,
+    }),
+    [userDashboard, currentAppId],
+  );
+
   return (
-    <ApplicationsContext
-      value={[
-        userDashboard,
-        (group) => {
-          setUserDashboard(group);
-        },
-        appList,
-        currentAppId,
-        setCurrentAppId,
-      ]}
-    >
-      {children}
-    </ApplicationsContext>
+    <AppListContext value={appListValue}>
+      <DashboardContext value={dashboardValue}>{children}</DashboardContext>
+    </AppListContext>
   );
 };
