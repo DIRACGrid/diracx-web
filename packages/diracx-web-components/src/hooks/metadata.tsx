@@ -1,7 +1,8 @@
 "use client";
 
-import useSWRImmutable, { SWRResponse } from "swr";
-import { fetcher } from "./utils";
+import useSWRImmutable from "swr/immutable";
+import type { SWRResponse } from "swr";
+import { fetcher } from "../services/client";
 
 /**
  * Metadata returned by the /.well-known/dirac-metadata endpoint
@@ -36,7 +37,7 @@ export function useMetadata(diracxUrl: string | null) {
     error,
   }: SWRResponse<{ headers: Headers; data: Metadata }, Error> = useSWRImmutable(
     url ? [url] : null,
-    (args) => fetcher<Metadata>(args),
+    ([fetchUrl]) => fetcher<Metadata>({ url: fetchUrl }),
   );
 
   const metadata = data?.data;

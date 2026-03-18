@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, createContext } from "react";
+import React, { useState, createContext, useMemo } from "react";
 import { OidcConfiguration } from "@axa-fr/react-oidc";
 import { OIDCProvider } from "../components/OIDC/OIDCProvider";
 
@@ -34,13 +34,13 @@ export const OIDCConfigurationProvider = ({
     null,
   );
 
+  const contextValue = useMemo(
+    () => ({ configuration, setConfiguration }),
+    [configuration],
+  );
+
   return (
-    <OIDCConfigurationContext
-      value={{
-        configuration,
-        setConfiguration,
-      }}
-    >
+    <OIDCConfigurationContext value={contextValue}>
       <OIDCProvider>{children}</OIDCProvider>
     </OIDCConfigurationContext>
   );

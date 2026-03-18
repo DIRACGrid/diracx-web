@@ -23,18 +23,14 @@ describe("DataTable", () => {
     expect(screen.getByText("Email")).toBeInTheDocument();
   });
 
-  it("renders Edit menu item if menu is opened", () => {
+  it("renders Edit menu item when the row context menu is opened", () => {
     render(<Default />);
-    const moreButtons = screen.queryAllByRole("button");
-    const menuButton = moreButtons.find((btn) =>
-      /menu|action|more/i.test(
-        btn.textContent || btn.getAttribute("aria-label") || "",
-      ),
-    );
-    if (menuButton) {
-      fireEvent.click(menuButton);
-      expect(screen.getByText("Edit")).toBeInTheDocument();
-    }
+    // The row actions menu opens on right-click (context menu) on a row.
+    // getByText throws if the row is missing, so the assertion below can
+    // never pass vacuously.
+    const rowCell = screen.getByText("John Doe");
+    fireEvent.contextMenu(rowCell);
+    expect(screen.getByText("Edit")).toBeInTheDocument();
   });
 
   it("hide footer when hideFooter prop is true", () => {

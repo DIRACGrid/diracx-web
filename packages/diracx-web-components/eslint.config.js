@@ -5,6 +5,7 @@ import _import from "eslint-plugin-import";
 import typescriptEslint from "@typescript-eslint/eslint-plugin";
 import react from "eslint-plugin-react";
 import reactHooks from "eslint-plugin-react-hooks";
+import jsxA11y from "eslint-plugin-jsx-a11y";
 import tsParser from "@typescript-eslint/parser";
 import js from "@eslint/js";
 import { FlatCompat } from "@eslint/eslintrc";
@@ -30,6 +31,7 @@ export default [
       "prettier",
     ),
   ),
+  jsxA11y.flatConfigs.recommended,
   {
     plugins: {
       import: fixupPluginRules(_import),
@@ -77,6 +79,19 @@ export default [
           varsIgnorePattern: "^_",
           caughtErrorsIgnorePattern: "^_",
           ignoreRestSiblings: true,
+        },
+      ],
+      "@typescript-eslint/no-restricted-imports": [
+        "error",
+        {
+          paths: [
+            {
+              name: "@mui/icons-material",
+              message:
+                "Import icons individually: import Icon from '@mui/icons-material/Icon'",
+              allowTypeImports: true,
+            },
+          ],
         },
       ],
       "no-restricted-properties": [

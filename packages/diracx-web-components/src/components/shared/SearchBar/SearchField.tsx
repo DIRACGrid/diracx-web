@@ -24,9 +24,10 @@ import {
   handleEquationsVerification,
   getTokenMetadata,
   convertListToString,
+  nextEquationId,
 } from "./Utils";
 
-import { MyDateTimePicker } from "./DatePicker";
+import { MyDateTimePicker, DATE_TIME_PICKER_FORMAT } from "./DatePicker";
 
 /** Merge multiple React refs into a single callback ref. */
 function mergeRefs<T>(
@@ -122,19 +123,32 @@ export default function SearchField({
       : label.trim();
 
     if (focusedTokenIndex) {
-      // If a token is focused, update the focused token
-      const updatedTokens = [...tokenEquations];
+      // If a token is focused, update the focused token.
+      // Rebuild the equation and token objects immutably — the previous
+      // objects are still referenced by the reducer state.
       const equationIndex = focusedTokenIndex.equationIndex;
       const tokenIndex = focusedTokenIndex.tokenIndex;
 
-      if (updatedTokens[equationIndex]) {
-        updatedTokens[equationIndex].items[tokenIndex] = {
-          label: formatedLabel,
-          type: type,
-          nature: nature,
-          suggestions:
-            nature === SearchBarTokenNature.CATEGORY ? undefined : suggestions,
-        };
+      if (tokenEquations[equationIndex]) {
+        const updatedTokens = tokenEquations.map((equation, eqIdx) => {
+          if (eqIdx !== equationIndex) return equation;
+          return {
+            ...equation,
+            items: equation.items.map((item, itemIdx) =>
+              itemIdx !== tokenIndex
+                ? item
+                : {
+                    label: formatedLabel,
+                    type: type,
+                    nature: nature,
+                    suggestions:
+                      nature === SearchBarTokenNature.CATEGORY
+                        ? undefined
+                        : suggestions,
+                  },
+            ),
+          };
+        });
         handleEquationsVerification(updatedTokens, setTokenEquations);
       }
       setFocusedTokenIndex(null);
@@ -165,6 +179,7 @@ export default function SearchField({
       } else {
         // We are creating a new equation
         const newLastEquation: SearchBarTokenEquation = {
+          id: nextEquationId(),
           status:
             nature === SearchBarTokenNature.CUSTOM
               ? EquationStatus.VALID
@@ -202,7 +217,8 @@ export default function SearchField({
 
     const isAtLeftEdge = input.selectionStart === 0;
     const isAtRightEdge = isDatePicker
-      ? input.selectionEnd === 19 // Assuming that the date picker input has a fixed width of 19 characters
+      ? // The date picker input has a fixed width: the length of its display format
+        input.selectionEnd === DATE_TIME_PICKER_FORMAT.length
       : input.selectionEnd === inputValue.length;
 
     let newFocusedTokenIndex: EquationAndTokenIndex | null = null;
@@ -438,10 +454,10 @@ export default function SearchField({
             if (inputValue && inputValue.trim() === "") {
               setInputValue(value);
             } else {
-              // Additional value selection - append with separator
-              setInputValue((prev) => {
-                return inputRef.current?.value + " | " + prev;
-              });
+              // Additional value selection - append with separator.
+              // Use the selected option (controlled value) rather than
+              // reading the live DOM, which may be undefined.
+              setInputValue((prev) => `${value} | ${prev}`);
             }
             return;
           }

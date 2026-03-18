@@ -10,7 +10,8 @@ import {
   useTheme,
   TextField,
 } from "@mui/material";
-import { DragIndicator, SvgIconComponent } from "@mui/icons-material";
+import DragIndicator from "@mui/icons-material/DragIndicator";
+import type { SvgIconComponent } from "@mui/icons-material";
 import { combine } from "@atlaskit/pragmatic-drag-and-drop/combine";
 import {
   draggable,
@@ -25,7 +26,10 @@ import {
 import { setCustomNativeDragPreview } from "@atlaskit/pragmatic-drag-and-drop/element/set-custom-native-drag-preview";
 import EggIcon from "@mui/icons-material/Egg";
 import { ThemeProvider } from "../../contexts/ThemeProvider";
-import { ApplicationsContext } from "../../contexts/ApplicationsProvider";
+import {
+  AppListContext,
+  CurrentAppContext,
+} from "../../contexts/ApplicationsProvider";
 import { DashboardGroup, DashboardItem } from "../../types";
 
 interface DrawerItemProps {
@@ -70,7 +74,8 @@ export default function DrawerItem({
   // Represents the closest edge to the mouse cursor
   const [closestEdge, setClosestEdge] = useState<Edge | null>(null);
 
-  const [, , appList, appId, setCurrentAppId] = use(ApplicationsContext);
+  const { appList } = use(AppListContext);
+  const { currentAppId: appId, setCurrentAppId } = use(CurrentAppContext);
   const { icon } = appList.find((app) => app.name === item.type) || {
     icon: EggIcon,
   };
@@ -165,20 +170,28 @@ export default function DrawerItem({
 
   // Handle renaming of the item
   const handleItemRename = () => {
-    if (renameValue.trim() === "") return;
-    setUserDashboard((groups) =>
-      groups.map((group) => {
-        if (group.title === groupTitle) {
+    if (renameValue.trim() === "" || renameValue === item.title) return;
+    setUserDashboard((groups) => {
+      const group = groups.find((g) => g.title === groupTitle);
+      const count =
+        group?.items.reduce(
+          (sum, i) =>
+            i.id !== item.id && i.title.startsWith(renameValue) ? sum + 1 : sum,
+          0,
+        ) ?? 0;
+      const newTitle = count > 0 ? `${renameValue} (${count})` : renameValue;
+      return groups.map((g) => {
+        if (g.title === groupTitle) {
           return {
-            ...group,
-            items: group.items.map((i) =>
-              i.id === item.id ? { ...item, title: renameValue } : i,
+            ...g,
+            items: g.items.map((i) =>
+              i.id === item.id ? { ...item, title: newTitle } : i,
             ),
           };
         }
-        return group;
-      }),
-    );
+        return g;
+      });
+    });
     setRenamingItemId(null);
     setRenameValue("");
   };
@@ -208,6 +221,10 @@ export default function DrawerItem({
                 setRenamingItemId(null);
               }
             }}
+            // The rename field only appears in direct response to a user
+            // action (context-menu "Rename"), so moving focus into it is
+            // the expected behavior, not a focus steal.
+            // eslint-disable-next-line jsx-a11y/no-autofocus
             autoFocus
             size="small"
           />

@@ -25,6 +25,8 @@ export default (phase) => {
           path.join(componentsSrc, "hooks");
         config.resolve.alias["@dirac-grid/diracx-web-components/types"] =
           path.join(componentsSrc, "types");
+        config.resolve.alias["@dirac-grid/diracx-web-components/services"] =
+          path.join(componentsSrc, "services");
         config.resolve.alias["@dirac-grid/diracx-web-components"] =
           componentsSrc;
         return config;

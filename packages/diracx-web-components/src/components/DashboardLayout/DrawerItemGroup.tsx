@@ -6,8 +6,8 @@ import {
   AccordionSummary,
   TextField,
 } from "@mui/material";
-import { ExpandMore } from "@mui/icons-material";
-import React, { useEffect, useRef, useState } from "react";
+import ExpandMore from "@mui/icons-material/ExpandMore";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { dropTargetForElements } from "@atlaskit/pragmatic-drag-and-drop/element/adapter";
 import { DashboardGroup } from "../../types/DashboardGroup";
 import DrawerItem from "./DrawerItem";
@@ -59,16 +59,26 @@ export default function DrawerItemGroup({
   // State to track whether the user is hovering over the item during a drag operation
   const [hovered, setHovered] = useState(false);
 
-  // Handles expansion of the accordion group
-  const handleChange =
-    (title: string) => (_: React.ChangeEvent<unknown>, isExpanded: boolean) => {
-      // Set the extended state of the accordion group.
+  // Sets the extended state of an accordion group; shared by the accordion
+  // onChange handler and the drag-and-drop drop handler.
+  // setUserDashboard is a state setter, so this callback identity is stable.
+  const setGroupExpanded = useCallback(
+    (groupTitle: string, isExpanded: boolean) => {
       setUserDashboard((groups) =>
         groups.map((group) =>
-          group.title === title ? { ...group, extended: isExpanded } : group,
+          group.title === groupTitle
+            ? { ...group, extended: isExpanded }
+            : group,
         ),
       );
-    };
+    },
+    [setUserDashboard],
+  );
+
+  // Handles expansion of the accordion group
+  const handleChange =
+    (title: string) => (_: React.ChangeEvent<unknown>, isExpanded: boolean) =>
+      setGroupExpanded(title, isExpanded);
 
   useEffect(() => {
     if (!dropRef.current) return;
@@ -81,16 +91,16 @@ export default function DrawerItemGroup({
       onDragStart: () => setHovered(true),
       onDrop: () => {
         setHovered(false);
-        handleChange(title)({} as React.ChangeEvent<unknown>, true);
+        setGroupExpanded(title, true);
       },
       onDragEnter: () => setHovered(true),
       onDragLeave: () => setHovered(false),
     });
-  });
+  }, [title, setGroupExpanded]);
 
   // Handle renaming of the group
   const handleGroupRename = () => {
-    if (renameValue.trim() === "") return;
+    if (renameValue.trim() === "" || renameValue === title) return;
     setUserDashboard((groups) => {
       const count = groups.reduce(
         (sum, group) => (group.title.startsWith(renameValue) ? sum + 1 : sum),
@@ -130,6 +140,10 @@ export default function DrawerItemGroup({
                 setRenamingGroupId(null);
               }
             }}
+            // The rename field only appears in direct response to a user
+            // action (context-menu "Rename"), so moving focus into it is
+            // the expected behavior, not a focus steal.
+            // eslint-disable-next-line jsx-a11y/no-autofocus
             autoFocus
             size="small"
           />

@@ -12,6 +12,19 @@ import {
 
 import { CreateSuggestionsParams } from "./SearchBar";
 
+/** Module-level counter backing {@link nextEquationId}. */
+let equationIdCounter = 0;
+
+/**
+ * Returns a unique, stable identifier for a newly created token equation.
+ * Used as a React key so that deleting/reordering equations does not
+ * mis-attach component state.
+ */
+export function nextEquationId(): string {
+  equationIdCounter += 1;
+  return `equation-${equationIdCounter}`;
+}
+
 /**
  * @param tokenEquations The list of token equations to be verified.
  * @param setTokenEquations A function to update the state of token equations.
@@ -47,133 +60,144 @@ export function handleEquationsVerification(
  * @param tokenEquation The equation to be verified.
  * @returns The equation with its status updated based on its validity.
  */
+type EquationValidator = (items: SearchBarToken[]) => EquationStatus;
+
+const validators: Record<string, EquationValidator> = {
+  [CategoryType.STRING]: (items) => {
+    const freeTextOps = Operators.getFreeTextOperators().map((op) =>
+      op.getDisplay(),
+    );
+    if (freeTextOps.includes(items[1].label as string))
+      return EquationStatus.VALID;
+    if (
+      items[1].type === CategoryType.STRING &&
+      items[2].type === CategoryType.STRING
+    )
+      return EquationStatus.VALID;
+    return EquationStatus.INVALID;
+  },
+
+  [CategoryType.NUMBER]: (items) => {
+    if (
+      items[1].type !== CategoryType.NUMBER ||
+      items[2].type !== CategoryType.NUMBER
+    )
+      return EquationStatus.INVALID;
+    const label = items[2].label;
+    const values = typeof label === "string" ? [label] : label;
+    return values.every((v) => !isNaN(Number(v)))
+      ? EquationStatus.VALID
+      : EquationStatus.INVALID;
+  },
+
+  [CategoryType.BOOLEAN]: (items) => {
+    if (items[1].type !== CategoryType.BOOLEAN) return EquationStatus.INVALID;
+    return items[2].label === "true" || items[2].label === "false"
+      ? EquationStatus.VALID
+      : EquationStatus.INVALID;
+  },
+
+  [CategoryType.DATE]: (items) => {
+    if (items[1].type !== CategoryType.DATE) return EquationStatus.INVALID;
+
+    if (
+      (items[1].label === Operators.GREATER_THAN.getDisplay() ||
+        items[1].label === Operators.LESS_THAN.getDisplay()) &&
+      /\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/.test(items[2].label as string)
+    ) {
+      return EquationStatus.VALID;
+    }
+
+    if (
+      items[1].label === Operators.LAST.getDisplay() &&
+      typeof items[2].label === "string"
+    ) {
+      return validateLastDuration(items[2].label);
+    }
+
+    return EquationStatus.INVALID;
+  },
+};
+
+/**
+ * Upper bound (in years) accepted for a "last N <unit>" duration.
+ * Durations at or above this are rejected as nonsensical. The value is a
+ * sanity cap, not a calendar year (it predates any date arithmetic);
+ * preserved from the previous hardcoded literal.
+ */
+const MAX_LAST_DURATION_YEARS = 2025;
+
+function validateLastDuration(label: string): EquationStatus {
+  const pattern =
+    /^(minute|hour|day|week|month|year)$|^(\d+)\s+(minutes|hours|days|weeks|months|years)$/;
+  const match = label.match(pattern);
+  if (!match) return EquationStatus.INVALID;
+
+  if (match[1]) return EquationStatus.VALID;
+
+  const yearsEquivalent = convertToYears(parseInt(match[2], 10), match[3]);
+  return yearsEquivalent < MAX_LAST_DURATION_YEARS
+    ? EquationStatus.VALID
+    : EquationStatus.INVALID;
+}
+
+function convertToYears(quantity: number, unit: string): number {
+  const conversions: Record<string, number> = {
+    minutes: 1 / (60 * 24 * 365),
+    hours: 1 / (24 * 365),
+    days: 1 / 365,
+    weeks: 1 / 52,
+    months: 1 / 12,
+    years: 1,
+  };
+  return quantity * (conversions[unit] ?? 0);
+}
+
 function handleEquationVerification(
   inputEquation: SearchBarTokenEquation,
 ): SearchBarTokenEquation {
-  const tokenEquation = {
+  const equation = {
     ...inputEquation,
     items: [...inputEquation.items],
   };
-  const freeTextOperators = Operators.getFreeTextOperators().map((operator) =>
-    operator.getDisplay(),
-  );
 
   // Sometimes, an equation can be a single token, e.g., a keyword
-  if (tokenEquation.items.length === 1) {
-    tokenEquation.status =
-      tokenEquation.items[0].nature === SearchBarTokenNature.CUSTOM
+  if (equation.items.length === 1) {
+    equation.status =
+      equation.items[0].nature === SearchBarTokenNature.CUSTOM
         ? EquationStatus.VALID
         : EquationStatus.INVALID;
-    return tokenEquation;
+    return equation;
   }
 
-  if (tokenEquation.items.length !== 3) {
-    tokenEquation.status = EquationStatus.INVALID;
-    return tokenEquation;
+  if (equation.items.length !== 3) {
+    equation.status = EquationStatus.INVALID;
+    return equation;
   }
 
   // Check the structure of the equation
   if (
-    tokenEquation.items[0].nature !== SearchBarTokenNature.CATEGORY ||
-    tokenEquation.items[1].nature !== SearchBarTokenNature.OPERATOR ||
-    tokenEquation.items[2].nature !== SearchBarTokenNature.VALUE
+    equation.items[0].nature !== SearchBarTokenNature.CATEGORY ||
+    equation.items[1].nature !== SearchBarTokenNature.OPERATOR ||
+    equation.items[2].nature !== SearchBarTokenNature.VALUE
   ) {
-    tokenEquation.status = EquationStatus.INVALID;
-    return tokenEquation;
+    equation.status = EquationStatus.INVALID;
+    return equation;
   }
 
-  // When the equation are build from the storage, the types are not set yet
-  if (tokenEquation.items[2].type === CategoryType.UNKNOWN) {
-    tokenEquation.status = EquationStatus.VALID;
-    return tokenEquation;
+  // When the equations are built from storage, the types are not set yet
+  if (equation.items[2].type === CategoryType.UNKNOWN) {
+    equation.status = EquationStatus.VALID;
+    return equation;
   }
 
-  // For a normal equation, we check is consistency based on the type of the first token
-  switch (tokenEquation.items[0].type) {
-    case CategoryType.STRING:
-      if (
-        freeTextOperators.includes(tokenEquation.items[1].label as string) ||
-        (tokenEquation.items[1].type === CategoryType.STRING &&
-          tokenEquation.items[2].type === CategoryType.STRING)
-      )
-        tokenEquation.status = EquationStatus.VALID;
-      else tokenEquation.status = EquationStatus.INVALID;
-      break;
+  // Delegate to type-specific validator
+  const validator = validators[equation.items[0].type];
+  equation.status = validator
+    ? validator(equation.items)
+    : EquationStatus.INVALID;
 
-    case CategoryType.NUMBER:
-      if (
-        tokenEquation.items[1].type === CategoryType.NUMBER &&
-        tokenEquation.items[2].type === CategoryType.NUMBER &&
-        (typeof tokenEquation.items[2].label === "string"
-          ? !isNaN(Number(tokenEquation.items[2].label))
-          : tokenEquation.items[2].label.every((item) => !isNaN(Number(item))))
-      )
-        tokenEquation.status = EquationStatus.VALID;
-      else tokenEquation.status = EquationStatus.INVALID;
-      break;
-
-    case CategoryType.BOOLEAN:
-      if (
-        tokenEquation.items[1].type === CategoryType.BOOLEAN &&
-        (tokenEquation.items[2].label === "true" ||
-          tokenEquation.items[2].label === "false")
-      )
-        tokenEquation.status = EquationStatus.VALID;
-      else tokenEquation.status = EquationStatus.INVALID;
-      break;
-
-    case CategoryType.DATE:
-      if (
-        tokenEquation.items[1].type === CategoryType.DATE &&
-        (tokenEquation.items[1].label === Operators.GREATER_THAN.getDisplay() ||
-          tokenEquation.items[1].label === Operators.LESS_THAN.getDisplay()) &&
-        /\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/.test(
-          tokenEquation.items[2].label as string,
-        )
-      )
-        tokenEquation.status = EquationStatus.VALID;
-      else if (
-        tokenEquation.items[1].label === Operators.LAST.getDisplay() &&
-        typeof tokenEquation.items[2].label == "string"
-      ) {
-        const pattern =
-          /^(minute|hour|day|week|month|year)$|^(\d+)\s+(minutes|hours|days|weeks|months|years)$/;
-
-        const match = tokenEquation.items[2].label.match(pattern);
-        if (!match) {
-          tokenEquation.status = EquationStatus.INVALID;
-          return tokenEquation;
-        }
-
-        if (match[1]) tokenEquation.status = EquationStatus.VALID;
-        else {
-          const quantity = parseInt(match[2], 10);
-          const unit = match[3];
-          const years = (() => {
-            switch (unit) {
-              case "minutes":
-                return quantity / (60 * 24 * 365);
-              case "hours":
-                return quantity / (24 * 365);
-              case "days":
-                return quantity / 365;
-              case "weeks":
-                return quantity / 52;
-              case "months":
-                return quantity / 12;
-              case "years":
-                return quantity;
-              default:
-                return 0;
-            }
-          })();
-          tokenEquation.status =
-            years < 2025 ? EquationStatus.VALID : EquationStatus.INVALID;
-        }
-      }
-  }
-
-  return tokenEquation;
+  return equation;
 }
 
 /**
@@ -204,6 +228,9 @@ export function getPreviousEquationAndToken(
     // else
     const previousEquation =
       tokenEquations[focusedTokenIndex.equationIndex - 1] || undefined;
+    if (!previousEquation) {
+      return { previousEquation: undefined, previousToken: undefined };
+    }
     const previousToken =
       previousEquation.items[previousEquation.items.length - 1] || undefined;
     return { previousEquation, previousToken };
@@ -239,6 +266,42 @@ export function getTokenMetadata(
   // If the value is in the suggestions list, return its metadata
   // If there is no suggestions for this category, then we allow every input
   // If the last token is an free text operator
+
+  // Operators form a static vocabulary: classify them without relying on the
+  // suggestions state, which is updated by a debounced async effect and may
+  // still hold the previous token's suggestion list when the user types
+  // quickly (e.g. "={enter}" right after completing a category token).
+  if (lastToken?.nature === SearchBarTokenNature.CATEGORY) {
+    const operatorsForType =
+      {
+        [CategoryType.STRING]: Operators.getStringOperators(),
+        [CategoryType.NUMBER]: Operators.getNumberOperators(),
+        [CategoryType.BOOLEAN]: Operators.getBooleanOperators(),
+        [CategoryType.DATE]: Operators.getDateOperators(),
+      }[String(lastToken.type)] ?? Operators.getDefaultOperators();
+    if (operatorsForType.map((op) => op.getDisplay()).includes(value)) {
+      return {
+        nature: SearchBarTokenNature.OPERATOR,
+        type: lastToken.type ?? CategoryType.CUSTOM,
+      };
+    }
+  }
+
+  // Same rationale for the value slot: if the suggestions in state still
+  // belong to the operator slot (their nature says OPERATOR), they cannot
+  // validate a value — accept the input as a value instead of dropping it
+  // as CUSTOM. Loaded value-slot suggestions always carry the VALUE nature,
+  // so the strict "value must come from the list" behavior is preserved
+  // once the debounced suggestions effect has caught up.
+  if (
+    lastToken?.nature === SearchBarTokenNature.OPERATOR &&
+    suggestions.nature.includes(SearchBarTokenNature.OPERATOR)
+  ) {
+    return {
+      nature: SearchBarTokenNature.VALUE,
+      type: lastToken.type ?? CategoryType.CUSTOM,
+    };
+  }
 
   const index = suggestions.items.indexOf(value);
   const isFreeTextOperator = Operators.getFreeTextOperators()
@@ -315,6 +378,7 @@ export async function convertFilterToTokenEquation(
   }: CreateSuggestionsParams) => Promise<SearchBarSuggestions>,
 ): Promise<SearchBarTokenEquation> {
   const newEquation: SearchBarTokenEquation = {
+    id: nextEquationId(),
     items: [
       {
         label: filter.parameter,
@@ -359,15 +423,12 @@ export async function convertFilterToTokenEquation(
       )
     ] || CategoryType.UNKNOWN;
 
-  // For the value
-  const suggestions_values = await createSuggestions({
-    previousToken: newEquation.items[1],
-    previousEquation: newEquation,
-    equationIndex: filterIndex,
-  });
-
   newEquation.items[1].suggestions = suggestions_operators;
-  newEquation.items[2].suggestions = suggestions_values;
+  // Value suggestions are deliberately NOT fetched here: for backends they
+  // require an expensive group-by query per filter, and they are only needed
+  // once the user focuses/clicks the value token — at which point
+  // useSearchSuggestions fetches fresh ones. Token display does not use them.
+  newEquation.items[2].suggestions = { items: [], nature: [], type: [] };
 
   return newEquation;
 }

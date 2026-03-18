@@ -1,0 +1,33 @@
+name: PR title
+
+# PRs are squash-merged and the PR title becomes the commit message on main,
+# which release-please parses for versioning. Individual commits inside a PR
+# are free-form; the PR title is what must follow the conventional-commit
+# format. Runs on `edited` so fixing the title re-triggers the check.
+
+on:
+  pull_request:
+    types: [opened, edited, synchronize, reopened]
+    branches-ignore:
+      - release-please-**
+
+jobs:
+  lint-pr-title:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 'lts/*'
+          cache: 'npm'
+
+      # Root-only install: commitlint and its config live in the root
+      # devDependencies; the workspaces are not needed for this check.
+      - name: Install commitlint
+        run: npm ci --workspaces=false --ignore-scripts
+
+      - name: Validate PR title with commitlint
+        env:
+          PR_TITLE: ${{ github.event.pull_request.title }}
+        run: printf '%s\n' "$PR_TITLE" | npx commitlint --verbose

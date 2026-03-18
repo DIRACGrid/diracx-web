@@ -8,11 +8,10 @@ import {
   lighten,
   darken,
   alpha,
-  PaletteMode,
   useMediaQuery,
 } from "@mui/material";
 import { cyan, grey, lightGreen } from "@mui/material/colors";
-import { createContext, useMemo, useState } from "react";
+import { createContext, useCallback, useMemo, useState } from "react";
 
 declare module "@mui/material/styles" {
   interface Palette {
@@ -29,13 +28,21 @@ declare module "@mui/material/styles" {
   }
 }
 
+/** The two supported theme modes */
+export type ThemeMode = "light" | "dark";
+
+/** Type guard narrowing an arbitrary stored string to a valid theme mode */
+function isThemeMode(value: string | null): value is ThemeMode {
+  return value === "light" || value === "dark";
+}
+
 /**
  * Theme context type
  * @property theme - the current theme mode
  * @property toggleTheme - function to toggle the theme mode
  */
 type ThemeContextType = {
-  theme: string;
+  theme: ThemeMode;
   toggleTheme: () => void;
 };
 
@@ -58,49 +65,45 @@ export const ThemeContext = createContext<ThemeContextType | undefined>(
  */
 export const ThemeProvider = ({ children }: ThemeProviderProps) => {
   const prefersDarkMode = useMediaQuery("(prefers-color-scheme: dark)");
-  const [theme, setTheme] = useState<string | null>(null);
+  const [theme, setTheme] = useState<ThemeMode | null>(null);
   const [prevPrefersDark, setPrevPrefersDark] = useState(prefersDarkMode);
 
-  // Initialize theme from sessionStorage or system preference
+  // Initialize theme from sessionStorage or system preference.
+  // Render is kept pure: storage is only written from the toggle handler,
+  // where it records an explicit user choice.
   if (theme === null) {
     const storedTheme =
       typeof sessionStorage !== "undefined"
         ? sessionStorage.getItem("theme")
         : null;
-    if (storedTheme) {
-      setTheme(storedTheme);
-    } else {
-      const defaultTheme = prefersDarkMode ? "dark" : "light";
-      setTheme(defaultTheme);
-      if (typeof sessionStorage !== "undefined") {
-        sessionStorage.setItem("theme", defaultTheme);
-      }
-    }
+    setTheme(
+      isThemeMode(storedTheme)
+        ? storedTheme
+        : prefersDarkMode
+          ? "dark"
+          : "light",
+    );
   }
 
-  // Update theme when system preference changes
+  // Follow system preference changes unless the user made an explicit choice
   if (prevPrefersDark !== prefersDarkMode) {
     setPrevPrefersDark(prefersDarkMode);
     const storedTheme =
       typeof sessionStorage !== "undefined"
         ? sessionStorage.getItem("theme")
         : null;
-    if (!storedTheme) {
-      const defaultTheme = prefersDarkMode ? "dark" : "light";
-      setTheme(defaultTheme);
-      if (typeof sessionStorage !== "undefined") {
-        sessionStorage.setItem("theme", defaultTheme);
-      }
+    if (!isThemeMode(storedTheme)) {
+      setTheme(prefersDarkMode ? "dark" : "light");
     }
   }
 
-  const toggleTheme = () => {
+  const toggleTheme = useCallback(() => {
     setTheme((prevTheme) => {
-      const newTheme = prevTheme === "light" ? "dark" : "light";
+      const newTheme: ThemeMode = prevTheme === "light" ? "dark" : "light";
       sessionStorage.setItem("theme", newTheme);
       return newTheme;
     });
-  };
+  }, []);
 
   const muiTheme = useMemo(() => {
     if (theme === null) return createTheme();
@@ -130,10 +133,20 @@ export const ThemeProvider = ({ children }: ThemeProviderProps) => {
         ? lighten(tableRowFirstColor, 0.2)
         : darken(tableRowSecondColor, 0.8);
 
+    // Outlined-input border/label colors for the current palette mode.
+    // Light mode keeps the historical grey[200] derivatives; dark mode
+    // mirrors them from grey[800] so borders stay subtle on dark surfaces.
+    const inputBorder = theme === "light" ? grey[200] : grey[800];
+    const inputBorderHover =
+      theme === "light" ? darken(grey[200], 0.2) : lighten(grey[800], 0.2);
+    const inputBorderFocused =
+      theme === "light" ? darken(grey[200], 0.4) : lighten(grey[800], 0.4);
+    const inputTextFocused = theme === "light" ? "black" : "white";
+
     // Create a Material-UI theme based on the current mode
     const muiTheme = createTheme({
       palette: {
-        mode: theme as PaletteMode,
+        mode: theme,
         primary: {
           main: primary,
         },
@@ -243,7 +256,7 @@ export const ThemeProvider = ({ children }: ThemeProviderProps) => {
         styleOverrides: {
           root: {
             "&.Mui-focused": {
-              color: darken(grey[200], 0.4),
+              color: inputBorderFocused,
             },
           },
         },
@@ -252,14 +265,14 @@ export const ThemeProvider = ({ children }: ThemeProviderProps) => {
         styleOverrides: {
           root: {
             "& .MuiOutlinedInput-notchedOutline": {
-              borderColor: grey[200],
+              borderColor: inputBorder,
             },
             "&:hover .MuiOutlinedInput-notchedOutline": {
-              borderColor: darken(grey[200], 0.2),
+              borderColor: inputBorderHover,
             },
             "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-              borderColor: darken(grey[200], 0.4),
-              color: "black",
+              borderColor: inputBorderFocused,
+              color: inputTextFocused,
             },
           },
         },
@@ -363,17 +376,20 @@ export const ThemeProvider = ({ children }: ThemeProviderProps) => {
         defaultProps: { size: "small" },
         styleOverrides: {
           root: {
-            "& .MuiTableRow-root:nth-of-type(odd)": {
+            // Use data-attribute selectors instead of nth-of-type so that
+            // virtualized tables (where DOM order ≠ data order) get stable
+            // alternating row colors.
+            "& .MuiTableRow-root[data-row-parity='odd'] td": {
               backgroundColor: muiTheme.palette.tableRow.odd,
-              "&:hover": {
-                backgroundColor: darken(muiTheme.palette.tableRow.odd, 0.1),
-              },
             },
-            "& .MuiTableRow-root:nth-of-type(even)": {
+            "& .MuiTableRow-root[data-row-parity='odd']:hover td": {
+              backgroundColor: darken(muiTheme.palette.tableRow.odd, 0.1),
+            },
+            "& .MuiTableRow-root[data-row-parity='even'] td": {
               backgroundColor: muiTheme.palette.tableRow.even,
-              "&:hover": {
-                backgroundColor: darken(muiTheme.palette.tableRow.even, 0.1),
-              },
+            },
+            "& .MuiTableRow-root[data-row-parity='even']:hover td": {
+              backgroundColor: darken(muiTheme.palette.tableRow.even, 0.1),
             },
           },
         },
@@ -383,12 +399,17 @@ export const ThemeProvider = ({ children }: ThemeProviderProps) => {
     return muiTheme;
   }, [theme]);
 
-  if (theme === null) {
+  const themeContextValue = useMemo<ThemeContextType | null>(
+    () => (theme === null ? null : { theme, toggleTheme }),
+    [theme, toggleTheme],
+  );
+
+  if (themeContextValue === null) {
     return <div>Loading Theme...</div>;
   }
 
   return (
-    <ThemeContext value={{ theme: theme, toggleTheme }}>
+    <ThemeContext value={themeContextValue}>
       <MUIThemeProvider theme={muiTheme}>
         <CssBaseline />
         {children}

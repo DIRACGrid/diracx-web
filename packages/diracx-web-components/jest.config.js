@@ -10,6 +10,16 @@ const config = {
   // The test environment that will be used for testing
   testEnvironment: "jest-environment-jsdom",
 
+  // Coverage is only collected when jest runs with --coverage
+  // (see the test:coverage script). Stories, mocks and build output are
+  // excluded; no thresholds are enforced yet.
+  collectCoverageFrom: [
+    "src/**/*.{ts,tsx}",
+    "!src/**/*.d.ts",
+    "!src/**/*.stories.{ts,tsx}",
+  ],
+  coveragePathIgnorePatterns: ["/node_modules/", "/dist/", "/stories/"],
+
   moduleNameMapper: {
     "^@axa-fr/react-oidc$": "<rootDir>/stories/mocks/react-oidc.mock.tsx",
     "^../../hooks/metadata$": "<rootDir>/stories/mocks/metadata.mock.tsx",

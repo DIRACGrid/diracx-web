@@ -1,6 +1,0 @@
-{
-  "private": true,
-  "main": "../dist/hooks/index.cjs",
-  "module": "../dist/hooks/index.js",
-  "types": "../dist/hooks/index.d.ts"
-}
