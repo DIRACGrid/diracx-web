@@ -1,10 +1,8 @@
 "use client";
 import React, { useMemo, useState, useEffect, useCallback } from "react";
 import { useOidcAccessToken } from "@axa-fr/react-oidc";
-import {
-  fetcher,
-  useOIDCContext,
-} from "@dirac-grid/diracx-web-components/hooks";
+import { useOIDCContext } from "@dirac-grid/diracx-web-components/hooks";
+import { fetcher } from "@dirac-grid/diracx-web-components/services";
 import { Alert, Box, Button, Snackbar, TextField } from "@mui/material";
 import {
   createColumnHelper,
@@ -37,10 +35,10 @@ export default function OwnerMonitor() {
   const fetchOwners = useCallback(async () => {
     try {
       setIsLoading(true);
-      const response = await fetcher<string[]>([
-        "/api/lollygag/get_owners",
+      const response = await fetcher<string[]>({
+        url: "/api/lollygag/get_owners",
         accessToken,
-      ]);
+      });
 
       // Transform names into objects with id and name
       const transformedData = response.data.map((name, index) => ({
@@ -59,11 +57,11 @@ export default function OwnerMonitor() {
   const handleAddOwner = async () => {
     if (!ownerName) return setError("Owner name cannot be empty.");
     try {
-      await fetcher([
-        `/api/lollygag/insert_owner/${ownerName}`,
+      await fetcher({
+        url: `/api/lollygag/insert_owner/${ownerName}`,
         accessToken,
-        "POST",
-      ]);
+        method: "POST",
+      });
       setSuccess(`Owner "${ownerName}" added successfully.`);
       setOwnerName("");
       fetchOwners(); // Refresh the owners list

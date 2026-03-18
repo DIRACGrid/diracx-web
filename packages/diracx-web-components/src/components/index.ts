@@ -2,16 +2,22 @@
 export { applicationList } from "./applicationList";
 
 // Dashboard Layout
-export * from "./DashboardLayout";
+export { Dashboard } from "./DashboardLayout";
 
 // Job Monitor
-export * from "./JobMonitor";
+export { JobMonitor } from "./JobMonitor";
 
 // Login
-export * from "./Login";
+export { LoginForm } from "./Login";
 
 // OIDC
-export * from "./OIDC";
+export { OIDCProvider } from "./OIDC";
+export { OIDCSecure } from "./OIDC";
 
 // Shared components
-export * from "./shared";
+export { DataTable } from "./shared";
+export { ErrorBox } from "./shared";
+export { ApplicationSelector } from "./shared";
+export { SearchBar } from "./shared";
+export { PieChart } from "./shared";
+export type { PieChartItem } from "./shared";

@@ -1,6 +1,11 @@
-export * from "./metadata";
-export * from "./oidcConfiguration";
-export * from "./searchParamsUtils";
-export * from "./theme";
-export * from "./utils";
-export * from "./application";
+export { type Metadata, useMetadata } from "./metadata";
+export { useOIDCContext } from "./oidcConfiguration";
+export { useSearchParamsUtils } from "./searchParamsUtils";
+export { useTheme } from "./theme";
+export { useDiracxUrl } from "./utils";
+export {
+  useAppList,
+  useDashboard,
+  useApplicationId,
+  useCurrentApplication,
+} from "./application";

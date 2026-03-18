@@ -156,27 +156,6 @@ export function killJobs(
   });
 }
 
-// Mock implementation of rescheduleJobs
-export function rescheduleJobs(
-  _diracxUrl: string | null,
-  selectedIds: readonly number[],
-  _accessToken: string,
-): Promise<{ headers: Headers; data: any }> {
-  return Promise.resolve({
-    headers: new Headers(),
-    data: {
-      success: selectedIds.reduce(
-        (acc, id) => {
-          acc[id] = {};
-          return acc;
-        },
-        {} as Record<number, {}>,
-      ),
-      failed: {},
-    },
-  });
-}
-
 // Mock implementation of useJobSummary
 export function useJobSummary(
   _diracxUrl: string | null,

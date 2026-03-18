@@ -1,56 +1,50 @@
 "use client";
 
 import { use, useMemo } from "react";
-import { ApplicationsContext } from "../contexts/ApplicationsProvider";
+import {
+  AppListContext,
+  DashboardContext,
+} from "../contexts/ApplicationsProvider";
+
+/**
+ * Custom hook to access the app list from the context
+ * @returns the app list context value
+ */
+export function useAppList() {
+  return use(AppListContext);
+}
+
+/**
+ * Custom hook to access the dashboard state from the context
+ * @returns the dashboard context value
+ */
+export function useDashboard() {
+  return use(DashboardContext);
+}
 
 /**
  * Custom hook to access the application id from the context
  * @returns the application id
  */
 export function useApplicationId() {
-  const [, , , appId] = use(ApplicationsContext);
-  return appId;
+  const { currentAppId } = use(DashboardContext);
+  return currentAppId;
 }
 
 /**
- * Custom hook to access the application title based on the application id
- * @returns the application title
+ * Custom hook to find the current application (by ID) in the dashboard.
+ * @returns the current dashboard item, or null if not found
  */
-export function useApplicationTitle() {
-  const [userDashboard, , , appId] = use(ApplicationsContext);
+export function useCurrentApplication() {
+  const { userDashboard, currentAppId: appId } = use(DashboardContext);
 
   return useMemo(() => {
     if (!userDashboard || !appId) return null;
 
-    const app = userDashboard.reduce(
-      (acc, group) => {
-        if (acc) return acc;
-        return group.items.find((app) => app.id === appId);
-      },
-      undefined as { title: string } | undefined,
-    );
-    return app?.title;
-  }, [userDashboard, appId]);
-}
-
-/**
- * Custom hook to access the application title based on the application id
- * @returns the application type
- */
-export function useApplicationType() {
-  const [userDashboard] = use(ApplicationsContext);
-  const appId = useApplicationId();
-
-  return useMemo(() => {
-    if (!userDashboard || !appId) return null;
-
-    const app = userDashboard.reduce(
-      (acc, group) => {
-        if (acc) return acc;
-        return group.items.find((app) => app.id === appId);
-      },
-      undefined as { type: string } | undefined,
-    );
-    return app?.type;
+    for (const group of userDashboard) {
+      const item = group.items.find((app) => app.id === appId);
+      if (item) return item;
+    }
+    return null;
   }, [userDashboard, appId]);
 }

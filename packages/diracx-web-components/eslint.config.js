@@ -79,6 +79,19 @@ export default [
           ignoreRestSiblings: true,
         },
       ],
+      "@typescript-eslint/no-restricted-imports": [
+        "error",
+        {
+          paths: [
+            {
+              name: "@mui/icons-material",
+              message:
+                "Import icons individually: import Icon from '@mui/icons-material/Icon'",
+              allowTypeImports: true,
+            },
+          ],
+        },
+      ],
       "no-restricted-properties": [
         "error",
         {

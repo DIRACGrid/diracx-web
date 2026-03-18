@@ -67,38 +67,4 @@ describe("Job Monitor - Row Actions", () => {
     cy.get("@jobItem2").find("td").eq(2).should("contain", "Deleted");
     cy.get("@jobItem3").find("td").eq(2).should("contain", "Deleted");
   });
-
-  // ### FIXME: The reschedule functionality is not working as expected ###
-  // The test below would be decommented once the reschedule functionality is fixed in diracx
-
-  // it("should reschedule jobs", () => {
-  //   cy.get("[data-testid=search-field]").type("Reschedule Counter{enter}!={enter}3{enter}");
-
-  //   // Create aliases for the job items
-  //   cy.get("table tbody [data-index=0]").as("jobItem1");
-  //   cy.get("table tbody [data-index=1]").as("jobItem2");
-  //   cy.get("table tbody [data-index=2]").as("jobItem3");
-
-  //   // First, kill the jobs to ensure they can be rescheduled
-  //   cy.get("@jobItem1").click({ force: true });
-  //   cy.get("@jobItem2").click({ force: true });
-  //   cy.get("@jobItem3").click({ force: true });
-
-  //   cy.get('[data-testid="kill-jobs-button"] > path').click();
-
-  //   // Then, select the jobs to reschedule
-  //   cy.get("@jobItem1").click({ force: true });
-  //   cy.get("@jobItem2").click({ force: true });
-  //   cy.get("@jobItem3").click({ force: true });
-
-  //   cy.get('[data-testid="ReplayIcon"] > path').click({ force: true });
-  //   cy.get('[aria-label="Reschedule"]').click({ force: true });
-  //   cy.get('[data-testid="ReplayIcon"] > path').click({ force: true });
-  //   cy.get('[aria-label="Reschedule"]').click({ force: true });
-
-  //   // Make sure the job status is "Received"
-  //   cy.get("table tbody [data-index=0]").find("td").eq(2).should("contain", "Received");
-  //   cy.get("table tbody [data-index=1]").find("td").eq(2).should("contain", "Received");
-  //   cy.get("table tbody [data-index=2]").find("td").eq(2).should("contain", "Received");
-  // });
 });

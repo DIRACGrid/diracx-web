@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useMemo } from "react";
 
 export interface NavigationContextType {
   getPath: () => string;
@@ -27,9 +27,10 @@ export const NavigationProvider = ({
   setPath,
   getSearchParams,
 }: NavigationProviderProps) => {
-  return (
-    <NavigationContext value={{ getPath, setPath, getSearchParams }}>
-      {children}
-    </NavigationContext>
+  const contextValue = useMemo(
+    () => ({ getPath, setPath, getSearchParams }),
+    [getPath, setPath, getSearchParams],
   );
+
+  return <NavigationContext value={contextValue}>{children}</NavigationContext>;
 };

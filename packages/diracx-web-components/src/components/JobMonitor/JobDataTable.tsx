@@ -1,76 +1,60 @@
 "use client";
 
-import { useCallback, useMemo, useState } from "react";
+import React, { useCallback, useMemo, useState, Suspense } from "react";
 import Box from "@mui/material/Box";
 import {
   Alert,
   AlertColor,
-  IconButton,
-  Tooltip,
   Backdrop,
   CircularProgress,
   Snackbar,
 } from "@mui/material";
 import { useOidcAccessToken } from "@axa-fr/react-oidc";
-import { Delete, Clear, Replay } from "@mui/icons-material";
-import {
-  useReactTable,
-  getCoreRowModel,
-  ColumnDef,
-  ColumnPinningState,
-  RowSelectionState,
-  VisibilityState,
-  PaginationState,
-} from "@tanstack/react-table";
+import Delete from "@mui/icons-material/Delete";
+import Clear from "@mui/icons-material/Clear";
+import { useReactTable, getCoreRowModel } from "@tanstack/react-table";
 import { useOIDCContext } from "../../hooks/oidcConfiguration";
-import { DataTable, MenuItem } from "../shared/DataTable";
+import { DataTable, ContextMenuItem } from "../shared/DataTable";
+import type { ToolbarAction } from "../shared/DataTable/SplitActionButton";
 import { Job, JobHistory, SearchBody } from "../../types";
 import { useDiracxUrl } from "../../hooks/utils";
-import { JobHistoryDialog } from "./JobHistoryDialog";
+import { useJobMonitorContext } from "./JobMonitorContext";
 
 import {
   deleteJobs,
+  fetchMatchingJobIds,
   getJobHistory,
   getJobSandbox,
   getJobSandboxUrl,
   killJobs,
-  rescheduleJobs,
   useJobs,
 } from "./jobDataService";
 
-/**
- * Job Data Table props
- * @property {number} searchBody - the search body to send along with the request
- * @property {function} setSearchBody - the function to call when the search body changes
- */
+const LazyJobHistoryDialog = React.lazy(() =>
+  import("./JobHistoryDialog").then((m) => ({ default: m.JobHistoryDialog })),
+);
+
 interface JobDataTableProps {
   /** The search body to send along with the request */
   searchBody: SearchBody;
   /** The function to call when the search body changes */
   setSearchBody: React.Dispatch<React.SetStateAction<SearchBody>>;
-  /** Columns */
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  columns: ColumnDef<Job, any>[];
-  /** Pagination */
-  pagination: PaginationState;
   /** Set pagination */
-  setPagination: React.Dispatch<React.SetStateAction<PaginationState>>;
-  /** Row selection */
-  rowSelection: RowSelectionState;
+  setPagination: React.Dispatch<
+    React.SetStateAction<import("@tanstack/react-table").PaginationState>
+  >;
   /** Set row selection */
-  setRowSelection: React.Dispatch<React.SetStateAction<RowSelectionState>>;
-  /** Column Visibility */
-  columnVisibility: VisibilityState;
+  setRowSelection: React.Dispatch<
+    React.SetStateAction<import("@tanstack/react-table").RowSelectionState>
+  >;
   /** Set column visibility */
-  setColumnVisibility: React.Dispatch<React.SetStateAction<VisibilityState>>;
-  /** Column Pinning */
-  columnPinning: ColumnPinningState;
+  setColumnVisibility: React.Dispatch<
+    React.SetStateAction<import("@tanstack/react-table").VisibilityState>
+  >;
   /** Set column pinning */
-  setColumnPinning: React.Dispatch<React.SetStateAction<ColumnPinningState>>;
-  /** Status Colors */
-  statusColors: Record<string, string>;
-  /** Mutate Jobs */
-  mutateJobs: () => void;
+  setColumnPinning: React.Dispatch<
+    React.SetStateAction<import("@tanstack/react-table").ColumnPinningState>
+  >;
 }
 
 /**
@@ -79,18 +63,14 @@ interface JobDataTableProps {
 export function JobDataTable({
   searchBody,
   setSearchBody,
-  columns,
-  pagination,
   setPagination,
-  rowSelection,
   setRowSelection,
-  columnVisibility,
   setColumnVisibility,
-  columnPinning,
   setColumnPinning,
-  statusColors,
-  mutateJobs,
 }: JobDataTableProps) {
+  const { state, columns, statusColors, mutateJobs } = useJobMonitorContext();
+  const { pagination, rowSelection, columnVisibility, columnPinning } = state;
+
   // Authentication
   const { configuration } = useOIDCContext();
   const { accessToken, accessTokenPayload } = useOidcAccessToken(
@@ -148,170 +128,95 @@ export function JobDataTable({
   );
 
   /**
-   * Handle the deletion of the selected jobs
+   * Handle the deletion of jobs by IDs (called by SplitActionButton)
    */
-  const handleDelete = useCallback(async () => {
-    setBackdropOpen(true);
-    try {
-      const selectedIds = Object.keys(rowSelection).map(Number);
-      await deleteJobs(diracxUrl, selectedIds, accessToken, accessTokenPayload);
-      setBackdropOpen(false);
-      // Refresh the data
-      mutateJobs();
-      clearSelected();
-      setSnackbarInfo({
-        open: true,
-        message: "Deleted successfully",
-        severity: "success",
-      });
-    } catch (error: unknown) {
-      let errorMessage = "An unknown error occurred";
-
-      if (error instanceof Error) {
-        errorMessage = error.message;
-      }
-      setSnackbarInfo({
-        open: true,
-        message: "Delete failed: " + errorMessage,
-        severity: "error",
-      });
-    } finally {
-      setBackdropOpen(false);
-    }
-  }, [
-    accessToken,
-    accessTokenPayload,
-    diracxUrl,
-    rowSelection,
-    clearSelected,
-    mutateJobs,
-  ]);
-
-  /**
-   * Handle the killing of the selected jobs
-   */
-  const handleKill = useCallback(async () => {
-    setBackdropOpen(true);
-    try {
-      const selectedIds = Object.keys(rowSelection).map(Number);
-      const { data } = await killJobs(
-        diracxUrl,
-        selectedIds,
-        accessToken,
-        accessTokenPayload,
-      );
-
-      const failedJobs = Object.entries(data.failed).map(
-        ([jobId, error]) => `Job ${jobId}: ${error.detail}`,
-      );
-      const areSucceedJobs = Object.keys(data.success).length > 0;
-
-      setBackdropOpen(false);
-
-      // Refresh the data
-      mutateJobs();
-
-      clearSelected();
-      // Handle Snackbar Messaging
-      if (areSucceedJobs && failedJobs.length > 0) {
+  const handleDelete = useCallback(
+    async (ids: (number | string)[]) => {
+      setBackdropOpen(true);
+      try {
+        await deleteJobs(
+          diracxUrl,
+          ids.map(Number),
+          accessToken,
+          accessTokenPayload,
+        );
+        mutateJobs();
+        clearSelected();
         setSnackbarInfo({
           open: true,
-          message: `Kill operation summary. Failed: ${failedJobs.join("; ")}, Success for the rest`,
-          severity: "warning",
-        });
-      } else if (areSucceedJobs) {
-        setSnackbarInfo({
-          open: true,
-          message: `Kill operation summary. Success for all selected jobs.`,
+          message: "Deleted successfully",
           severity: "success",
         });
-      } else {
+      } catch (error: unknown) {
+        const errorMessage =
+          error instanceof Error ? error.message : "An unknown error occurred";
         setSnackbarInfo({
           open: true,
-          message: `Kill operation summary. Failure for all selected jobs.`,
+          message: "Delete failed: " + errorMessage,
           severity: "error",
         });
+      } finally {
+        setBackdropOpen(false);
       }
-    } catch (error: unknown) {
-      let errorMessage = "An unknown error occurred";
-
-      if (error instanceof Error) {
-        errorMessage = error.message;
-      }
-      setSnackbarInfo({
-        open: true,
-        message: "Kill operation failed: " + errorMessage,
-        severity: "error",
-      });
-    } finally {
-      setBackdropOpen(false);
-    }
-  }, [
-    accessToken,
-    accessTokenPayload,
-    diracxUrl,
-    rowSelection,
-    clearSelected,
-    mutateJobs,
-  ]);
+    },
+    [accessToken, accessTokenPayload, diracxUrl, clearSelected, mutateJobs],
+  );
 
   /**
-   * Handle the rescheduling of the selected jobs
+   * Handle the killing of jobs by IDs (called by SplitActionButton)
    */
-  const handleReschedule = useCallback(async () => {
-    setBackdropOpen(true);
-    try {
-      const selectedIds = Object.keys(rowSelection).map(Number);
-      const { data } = await rescheduleJobs(
-        diracxUrl,
-        selectedIds,
-        accessToken,
-      );
+  const handleKill = useCallback(
+    async (ids: (number | string)[]) => {
+      setBackdropOpen(true);
+      try {
+        const { data } = await killJobs(
+          diracxUrl,
+          ids.map(Number),
+          accessToken,
+          accessTokenPayload,
+        );
 
-      const failedJobs = Object.entries(data.failed).map(
-        ([jobId, error]) => `Job ${jobId}: ${error.detail}`,
-      );
-      const areSucceedJobs = Object.keys(data.success).length > 0;
+        const failedJobs = Object.entries(data.failed).map(
+          ([jobId, error]) => `Job ${jobId}: ${error.detail}`,
+        );
+        const areSucceedJobs = Object.keys(data.success).length > 0;
 
-      setBackdropOpen(false);
-      // Refresh the data
-      mutateJobs();
-      clearSelected();
-      // Handle Snackbar Messaging
-      if (areSucceedJobs && failedJobs.length > 0) {
+        mutateJobs();
+        clearSelected();
+
+        if (areSucceedJobs && failedJobs.length > 0) {
+          setSnackbarInfo({
+            open: true,
+            message: `Kill: Failed: ${failedJobs.join("; ")}, Success for the rest`,
+            severity: "warning",
+          });
+        } else if (areSucceedJobs) {
+          setSnackbarInfo({
+            open: true,
+            message: "Kill: Success for all jobs.",
+            severity: "success",
+          });
+        } else {
+          setSnackbarInfo({
+            open: true,
+            message: "Kill: Failure for all jobs.",
+            severity: "error",
+          });
+        }
+      } catch (error: unknown) {
+        const errorMessage =
+          error instanceof Error ? error.message : "An unknown error occurred";
         setSnackbarInfo({
           open: true,
-          message: `Reschedule operation summary. Failed: ${failedJobs.join("; ")}, Success for the rest`,
-          severity: "warning",
-        });
-      } else if (areSucceedJobs) {
-        setSnackbarInfo({
-          open: true,
-          message: `Reschedule operation summary. Success for all selected jobs.`,
-          severity: "success",
-        });
-      } else {
-        setSnackbarInfo({
-          open: true,
-          message: `Reschedule operation summary. Failure for all selected jobs.`,
+          message: "Kill failed: " + errorMessage,
           severity: "error",
         });
+      } finally {
+        setBackdropOpen(false);
       }
-    } catch (error: unknown) {
-      let errorMessage = "An unknown error occurred";
-
-      if (error instanceof Error) {
-        errorMessage = error.message;
-      }
-      setSnackbarInfo({
-        open: true,
-        message: "Reschedule operation failed: " + errorMessage,
-        severity: "error",
-      });
-    } finally {
-      setBackdropOpen(false);
-    }
-  }, [accessToken, diracxUrl, rowSelection, clearSelected, mutateJobs]);
+    },
+    [accessToken, accessTokenPayload, diracxUrl, clearSelected, mutateJobs],
+  );
 
   /**
    * Handle the history of the selected job
@@ -408,45 +313,34 @@ export function JobDataTable({
   /**
    * The toolbar components for the data grid
    */
-  const toolbarComponents = useMemo(
-    () => (
-      <>
-        <Tooltip title="Reschedule">
-          <IconButton
-            aria-label="Reschedule selected jobs"
-            data-testid="reschedule-jobs-button"
-            onClick={() => handleReschedule()}
-          >
-            <Replay />
-          </IconButton>
-        </Tooltip>
-        <Tooltip title="Kill">
-          <IconButton
-            aria-label="Kill selected jobs"
-            data-testid="kill-jobs-button"
-            onClick={() => handleKill()}
-          >
-            <Clear />
-          </IconButton>
-        </Tooltip>
-        <Tooltip title="Delete">
-          <IconButton
-            aria-label="Delete selected jobs"
-            data-testid="delete-jobs-button"
-            onClick={() => handleDelete()}
-          >
-            <Delete />
-          </IconButton>
-        </Tooltip>
-      </>
-    ),
-    [handleReschedule, handleKill, handleDelete],
+  const actions: ToolbarAction[] = useMemo(
+    () => [
+      {
+        label: "Kill",
+        icon: <Clear fontSize="small" />,
+        onClick: handleKill,
+        requiresConfirmation: true,
+        confirmationMessage: (count: number) =>
+          `Are you sure you want to kill ${count.toLocaleString()} jobs?`,
+        "data-testid": "kill-jobs-button",
+      },
+      {
+        label: "Delete",
+        icon: <Delete fontSize="small" />,
+        onClick: handleDelete,
+        requiresConfirmation: true,
+        confirmationMessage: (count: number) =>
+          `Are you sure you want to delete ${count.toLocaleString()} jobs?`,
+        "data-testid": "delete-jobs-button",
+      },
+    ],
+    [handleKill, handleDelete],
   );
 
   /**
    * The menu items
    */
-  const menuItems: MenuItem[] = useMemo(
+  const menuItems: ContextMenuItem[] = useMemo(
     () => [
       {
         label: "Get history",
@@ -465,6 +359,11 @@ export function JobDataTable({
       },
     ],
     [handleHistory, handleSandboxDownload],
+  );
+
+  const fetchMatchingIds = useCallback(
+    () => fetchMatchingJobIds(diracxUrl, accessToken, searchBody),
+    [diracxUrl, accessToken, searchBody],
   );
 
   /**
@@ -511,8 +410,9 @@ export function JobDataTable({
         setSearchBody={setSearchBody}
         error={dataError}
         isLoading={isLoading}
-        toolbarComponents={toolbarComponents}
+        actions={actions}
         menuItems={menuItems}
+        fetchMatchingIds={fetchMatchingIds}
       />
       <Snackbar
         open={snackbarInfo.open}
@@ -523,6 +423,7 @@ export function JobDataTable({
           onClose={() => setSnackbarInfo((old) => ({ ...old, open: false }))}
           severity={snackbarInfo.severity as AlertColor}
           sx={{ width: "100%" }}
+          role="alert"
         >
           {snackbarInfo.message}
         </Alert>
@@ -533,13 +434,15 @@ export function JobDataTable({
       >
         <CircularProgress color="inherit" />
       </Backdrop>
-      <JobHistoryDialog
-        open={isHistoryDialogOpen}
-        onClose={handleHistoryClose}
-        historyData={jobHistoryData}
-        jobId={selectedJobId ?? 0}
-        statusColors={statusColors}
-      />
+      <Suspense fallback={null}>
+        <LazyJobHistoryDialog
+          open={isHistoryDialogOpen}
+          onClose={handleHistoryClose}
+          historyData={jobHistoryData}
+          jobId={selectedJobId ?? 0}
+          statusColors={statusColors}
+        />
+      </Suspense>
     </Box>
   );
 }
