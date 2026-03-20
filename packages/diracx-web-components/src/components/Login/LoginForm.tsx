@@ -10,10 +10,10 @@ import {
   Select,
   MenuItem,
   Button,
-  Stack,
   Autocomplete,
   TextField,
   SelectChangeEvent,
+  Skeleton,
 } from "@mui/material";
 
 import Image from "next/image";
@@ -117,7 +117,37 @@ export function LoginForm({
   };
 
   if (isLoading) {
-    return <div>Loading...</div>;
+    return (
+      <Box
+        sx={{
+          ml: { xs: "5%", md: "30%" },
+          mr: { xs: "5%", md: "30%" },
+          pt: "10%",
+        }}
+      >
+        <Box sx={{ display: "flex", justifyContent: "center", pb: "10%" }}>
+          <Skeleton
+            variant="circular"
+            animation="pulse"
+            width={150}
+            height={150}
+          />
+        </Box>
+        <Skeleton
+          variant="rectangular"
+          animation="pulse"
+          height={56}
+          sx={{ mb: 4 }}
+        />
+        <Skeleton
+          variant="rectangular"
+          animation="pulse"
+          height={56}
+          sx={{ mb: 4 }}
+        />
+        <Skeleton variant="rectangular" animation="pulse" height={42} />
+      </Box>
+    );
   }
   if (error) {
     return <div>An error occurred while fetching metadata.</div>;
@@ -209,25 +239,14 @@ export function LoginForm({
                 ))}
               </Select>
             </FormControl>
-            <Stack
-              direction={{ xs: "column", sm: "row" }}
-              spacing={2}
+            <Button
+              variant="contained"
               sx={{ mt: 5, width: "100%" }}
+              onClick={handleConfigurationChanges}
+              data-testid="login-form-button"
             >
-              <Button
-                variant="contained"
-                sx={{
-                  flexGrow: 1,
-                }}
-                onClick={handleConfigurationChanges}
-                data-testid="login-form-button"
-              >
-                Login via your Identity Provider
-              </Button>
-              <Button variant="outlined" onClick={() => {}}>
-                Advanced Options
-              </Button>
-            </Stack>
+              Login via your Identity Provider
+            </Button>
             <Typography
               sx={{ paddingTop: "5%", color: "gray", textAlign: "center" }}
             >

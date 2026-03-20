@@ -24,7 +24,7 @@ import SaveIcon from "@mui/icons-material/Save";
 
 import { DashboardGroup } from "../../types/DashboardGroup";
 
-import { ApplicationsContext } from "../../contexts";
+import { DashboardContext } from "../../contexts";
 
 interface ExportDialogProps {
   open: boolean;
@@ -96,7 +96,7 @@ export function ExportButton() {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedApps, setSelectedApps] = useState<string[]>([]);
   const [selectedState, setSelectedState] = useState("");
-  const [groups, ,] = use(ApplicationsContext);
+  const { userDashboard: groups } = use(DashboardContext);
 
   // Function to handle the click event on the share button
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {

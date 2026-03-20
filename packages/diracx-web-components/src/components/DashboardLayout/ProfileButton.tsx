@@ -1,14 +1,11 @@
 "use client";
 
 import { useOidc, useOidcAccessToken } from "@axa-fr/react-oidc";
-import {
-  Info,
-  Logout,
-  CorporateFare,
-  Groups,
-  Person,
-  ExpandMore,
-} from "@mui/icons-material";
+import Logout from "@mui/icons-material/Logout";
+import CorporateFare from "@mui/icons-material/CorporateFare";
+import Groups from "@mui/icons-material/Groups";
+import Person from "@mui/icons-material/Person";
+import ExpandMore from "@mui/icons-material/ExpandMore";
 import {
   Accordion,
   AccordionDetails,
@@ -181,16 +178,6 @@ export function ProfileButton() {
           </Stack>
         </MenuItem>
         <Divider />
-        <MenuItem
-          onClick={() => {
-            handleClose();
-          }}
-        >
-          <ListItemIcon>
-            <Info fontSize="small" />
-          </ListItemIcon>
-          About
-        </MenuItem>
         <MenuItem
           onClick={() => {
             handleClose();

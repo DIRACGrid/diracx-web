@@ -1,7 +1,7 @@
 "use client";
 import { use, useMemo, useEffect } from "react";
 import { Typography } from "@mui/material";
-import { ApplicationsContext } from "../../contexts";
+import { AppListContext, DashboardContext } from "../../contexts";
 
 /**
  * ApplicationSelector component renders the currently selected application
@@ -9,8 +9,9 @@ import { ApplicationsContext } from "../../contexts";
  * If no application is selected, it defaults to the first available application.
  */
 export function ApplicationSelector() {
-  const [userDashboard, , applicationList, currentAppId, setCurrentAppId] =
-    use(ApplicationsContext);
+  const { appList: applicationList } = use(AppListContext);
+  const { userDashboard, currentAppId, setCurrentAppId } =
+    use(DashboardContext);
 
   const group = userDashboard.find((group) =>
     group.items.some((item) => item.id === currentAppId),

@@ -12,7 +12,7 @@ import {
 } from "@mui/material";
 import InputIcon from "@mui/icons-material/Input";
 import React, { useState, use } from "react";
-import { ApplicationsContext } from "../../contexts";
+import { AppListContext, DashboardContext } from "../../contexts";
 import {
   ApplicationMetadata,
   DashboardGroup,
@@ -186,7 +186,8 @@ export function ImportButton() {
   const [correctStates, setCorrectStates] = useState<
     { oldSettings: ApplicationSettings; newState: ApplicationState }[]
   >([]);
-  const [userDashboard, setUserDashboard, appList] = use(ApplicationsContext);
+  const { appList } = use(AppListContext);
+  const { userDashboard, setUserDashboard } = use(DashboardContext);
 
   const handleImport = (
     importedStates: ApplicationSettings | ApplicationSettings[],
