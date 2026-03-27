@@ -1,11 +1,22 @@
 "use client";
 
-import { useEffect } from "react";
-import { ColumnDef } from "@tanstack/react-table";
+import { memo, useCallback, useEffect, useRef, useState } from "react";
 import { useOidcAccessToken } from "@axa-fr/react-oidc";
+import {
+  Alert,
+  Box,
+  IconButton,
+  Popover,
+  Typography,
+  Tooltip,
+} from "@mui/material";
+import HelpOutline from "@mui/icons-material/HelpOutline";
 import { useOIDCContext } from "../../hooks/oidcConfiguration";
 import { useDiracxUrl } from "../../hooks/utils";
-import { SearchBar } from "../shared/SearchBar/SearchBar";
+import {
+  SearchBar,
+  CreateSuggestionsParams,
+} from "../shared/SearchBar/SearchBar";
 import {
   Filter,
   JobSummary,
@@ -13,13 +24,13 @@ import {
   SearchBarToken,
   SearchBarTokenEquation,
   SearchBody,
-  Job,
   Operators,
   SearchBarTokenNature,
   CategoryType,
 } from "../../types";
 import { getJobSummary } from "./jobDataService";
-import { fromHumanReadableText } from "./JobMonitor";
+import { fromHumanReadableText } from "./jobColumns";
+import { JobColumnDef, useJobMonitorContext } from "./JobMonitorContext";
 
 interface JobSearchBarProps {
   /** The filters */
@@ -30,38 +41,47 @@ interface JobSearchBarProps {
   searchBody: SearchBody;
   /** The function to apply the filters */
   handleApplyFilters: () => void;
-  /** The columns to display in the job monitor */
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  columns: ColumnDef<Job, any>[];
-  /** Function to mutate the job data */
-  mutateJobs: () => void;
 }
 
-export function JobSearchBar({
+export const JobSearchBar = memo(function JobSearchBar({
   filters,
   searchBody,
   setFilters,
   handleApplyFilters,
-  columns,
-  mutateJobs,
 }: JobSearchBarProps) {
+  const { columns, mutateJobs } = useJobMonitorContext();
+
   // Authentication
   const { configuration } = useOIDCContext();
   const { accessToken } = useOidcAccessToken(configuration?.scope);
 
   const diracxUrl = useDiracxUrl();
 
+  const [helpAnchorEl, setHelpAnchorEl] = useState<HTMLElement | null>(null);
+  const [suggestionError, setSuggestionError] = useState(false);
+
+  // Debounce filter application to avoid redundant API calls on rapid changes
+  const applyTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   useEffect(() => {
-    handleApplyFilters();
+    if (applyTimerRef.current) clearTimeout(applyTimerRef.current);
+    applyTimerRef.current = setTimeout(() => {
+      handleApplyFilters();
+    }, 300);
+    return () => {
+      if (applyTimerRef.current) clearTimeout(applyTimerRef.current);
+    };
   }, [filters, handleApplyFilters]);
 
-  return (
-    <SearchBar
-      filters={filters}
-      setFilters={setFilters}
-      refreshFunction={mutateJobs}
-      createSuggestions={({ previousToken, previousEquation, equationIndex }) =>
-        createSuggestions({
+  const createSuggestionsCallback = useCallback(
+    async ({
+      previousToken,
+      previousEquation,
+      equationIndex,
+    }: CreateSuggestionsParams) => {
+      // Clear error on new suggestion fetch attempt
+      setSuggestionError(false);
+      try {
+        return await createSuggestions({
           diracxUrl,
           accessToken,
           previousToken,
@@ -69,25 +89,82 @@ export function JobSearchBar({
           columns,
           searchBody,
           searchBodyIndex: equationIndex,
-        })
+        });
+      } catch {
+        setSuggestionError(true);
+        return { items: [], nature: [], type: [] };
       }
-      allowKeyWordSearch={false} // Disable keyword search for job monitor
-    />
+    },
+    [diracxUrl, accessToken, columns, searchBody],
   );
-}
+
+  return (
+    <Box
+      sx={{
+        display: "flex",
+        alignItems: "flex-start",
+        minWidth: 0,
+        maxWidth: "100%",
+      }}
+    >
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          flexGrow: 1,
+          minWidth: 0,
+        }}
+      >
+        <SearchBar
+          filters={filters}
+          setFilters={setFilters}
+          refreshFunction={mutateJobs}
+          createSuggestions={createSuggestionsCallback}
+          allowKeyWordSearch={false}
+        />
+        {suggestionError && (
+          <Alert severity="warning" sx={{ mt: 0.5, py: 0, fontSize: "0.8rem" }}>
+            Could not load suggestions
+          </Alert>
+        )}
+      </Box>
+      <Tooltip title="Filter help">
+        <IconButton
+          size="small"
+          sx={{ mt: 0.75, ml: 0.5 }}
+          onClick={(e) => setHelpAnchorEl(e.currentTarget)}
+          aria-label="Filter syntax help"
+        >
+          <HelpOutline fontSize="small" />
+        </IconButton>
+      </Tooltip>
+      <Popover
+        open={Boolean(helpAnchorEl)}
+        anchorEl={helpAnchorEl}
+        onClose={() => setHelpAnchorEl(null)}
+        anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
+      >
+        <Box sx={{ p: 2, maxWidth: 300 }}>
+          <Typography variant="subtitle2" gutterBottom>
+            Filter syntax
+          </Typography>
+          <Typography variant="body2" component="ul" sx={{ pl: 2, m: 0 }}>
+            <li>Click a suggestion or type to add a filter</li>
+            <li>
+              Example: <strong>Status = Running</strong>
+            </li>
+            <li>Multiple filters are combined with AND logic</li>
+            <li>Click a token to change its value</li>
+            <li>Use the clear button to remove all filters</li>
+          </Typography>
+        </Box>
+      </Popover>
+    </Box>
+  );
+});
 
 /**
  * Creates suggestions for the search bar based on the current tokens
- * If necessary, it fetches job summaries from the server to get personalized suggestions
- *
- * @param diracxUrl The URL of the DiracX server.
- * @param accessToken The access token for authentication, which can be undefined if not authenticated.
- * @param previousToken The previous token, which can be undefined if no token is focused.
- * @param previousEquation The previous equation, which can be undefined if no equation is focused.
- * @param columns The columns to be used for suggestions, which are used to determine the categories and types.
- * @param searchBody The search body to be sent along with the request (optional).
- * @param searchBodyIndex The index of the search body, which is used to determine the current search context (optional).
- * @returns A list of suggestions based on the current tokens and data.
  */
 async function createSuggestions({
   diracxUrl,
@@ -102,15 +179,13 @@ async function createSuggestions({
   accessToken: string | undefined;
   previousToken: SearchBarToken | undefined;
   previousEquation: SearchBarTokenEquation | undefined;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  columns: ColumnDef<Job, any>[];
+  columns: JobColumnDef[];
   searchBody?: SearchBody;
   searchBodyIndex?: number;
 }): Promise<SearchBarSuggestions> {
   let data: JobSummary[] = [];
 
   const search = [...(searchBody?.search || [])];
-  /** The search body index is used to determine the current search context */
   const newSearchBody = {
     ...searchBody,
     search: search.slice(0, searchBodyIndex),
@@ -118,19 +193,13 @@ async function createSuggestions({
 
   const fetchJobSummary = async (category: string) => {
     if (diracxUrl && accessToken) {
-      try {
-        const result = await getJobSummary(
-          diracxUrl,
-          [category],
-          accessToken,
-          newSearchBody,
-        );
-        data = result.data || [];
-      } catch {
-        // If the fetch fails, leave data empty — the search bar
-        // will still work, just without personalized value suggestions.
-        data = [];
-      }
+      const result = await getJobSummary(
+        diracxUrl,
+        [category],
+        accessToken,
+        newSearchBody,
+      );
+      data = result.data || [];
     }
   };
 
@@ -153,7 +222,6 @@ async function createSuggestions({
     };
   }
 
-  // Here, we need personalized suggestions based on the previous token
   if (previousToken.nature === SearchBarTokenNature.OPERATOR) {
     if (previousToken.label === Operators.LAST.getDisplay()) {
       return {
@@ -170,11 +238,6 @@ async function createSuggestions({
     );
 
     if (!hideSuggestion) {
-      // Load the suggestions for the selected category
-
-      /**
-       * The internal name of the category is used to fetch the job summary
-       */
       const category = fromHumanReadableText(
         String(previousEquation.items[0].label),
         columns,

@@ -4,14 +4,11 @@ import { useState } from "react";
 import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
 import IconButton from "@mui/material/IconButton";
-import { Menu } from "@mui/icons-material";
+import Menu from "@mui/icons-material/Menu";
 import Toolbar from "@mui/material/Toolbar";
 import Stack from "@mui/material/Stack";
 import { Typography, useMediaQuery, useTheme } from "@mui/material";
-import {
-  useApplicationTitle,
-  useApplicationType,
-} from "../../hooks/application";
+import { useCurrentApplication } from "../../hooks/application";
 import { ProfileButton } from "./ProfileButton";
 import { ThemeToggleButton } from "./ThemeToggleButton";
 import DashboardDrawer from "./DashboardDrawer";
@@ -42,8 +39,9 @@ export default function Dashboard({
   logoURL,
   documentationURL,
 }: DashboardProps) {
-  const appTitle = useApplicationTitle();
-  const appType = useApplicationType();
+  const currentApp = useCurrentApplication();
+  const appTitle = currentApp?.title ?? null;
+  const appType = currentApp?.type ?? null;
 
   /** Theme and media query */
   const theme = useTheme();
@@ -92,7 +90,6 @@ export default function Dashboard({
             }}
           >
             <Typography
-              color="text.primary"
               variant={isMobile ? "h6" : "h4"}
               fontWeight={"bold"}
               width={"fit-content"}
@@ -101,6 +98,9 @@ export default function Dashboard({
                 whiteSpace: "nowrap",
                 textOverflow: "ellipsis",
                 paddingLeft: 2,
+                background: `linear-gradient(90deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
               }}
             >
               {appTitle}
@@ -154,7 +154,8 @@ export default function Dashboard({
           flexGrow: 1,
           display: "flex",
           flexDirection: "column",
-          width: { sm: `${drawerWidth}px` },
+          width: { sm: `calc(100% - ${drawerWidth}px)` },
+          minWidth: 0,
         }}
       >
         <Toolbar />

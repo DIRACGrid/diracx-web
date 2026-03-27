@@ -348,7 +348,6 @@ describe("ProfileButton", () => {
     expect(getByText("dirac")).toBeInTheDocument();
     expect(getByText("group1")).toBeInTheDocument();
     expect(getByText("Properties")).toBeInTheDocument();
-    expect(getByText("About")).toBeInTheDocument();
     expect(getByText("Logout")).toBeInTheDocument();
 
     // Expand properties

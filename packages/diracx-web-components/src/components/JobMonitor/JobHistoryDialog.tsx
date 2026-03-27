@@ -13,7 +13,9 @@ import {
   Typography,
   useTheme,
 } from "@mui/material";
-import { Close, ExpandMore, ExpandLess } from "@mui/icons-material";
+import Close from "@mui/icons-material/Close";
+import ExpandMore from "@mui/icons-material/ExpandMore";
+import ExpandLess from "@mui/icons-material/ExpandLess";
 import { JobHistory } from "../../types/JobHistory";
 
 interface JobHistoryDialogProps {

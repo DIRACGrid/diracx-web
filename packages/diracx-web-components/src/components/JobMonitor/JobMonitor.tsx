@@ -1,40 +1,67 @@
 "use client";
-import { useCallback, useEffect, useMemo, useState } from "react";
-import {
-  blue,
-  orange,
-  grey,
-  green,
-  red,
-  lightBlue,
-  purple,
-  teal,
-  blueGrey,
-  lime,
-  amber,
-  brown,
-} from "@mui/material/colors";
+import React, {
+  useCallback,
+  useMemo,
+  useReducer,
+  useRef,
+  useEffect,
+  Suspense,
+} from "react";
 
-import { lighten, darken, useTheme, Box, Paper } from "@mui/material";
-
-import {
-  createColumnHelper,
-  ColumnPinningState,
-  RowSelectionState,
-  VisibilityState,
-  PaginationState,
-  ColumnDef,
-} from "@tanstack/react-table";
+import { Box, Paper, Skeleton } from "@mui/material";
 
 import { mutate } from "swr";
 import { useApplicationId } from "../../hooks/application";
 import { Filter } from "../../types/Filter";
-import { Job, SearchBody, CategoryType } from "../../types";
+import { SearchBody } from "../../types";
 import { useDiracxUrl } from "../../hooks";
 import { JobDataTable } from "./JobDataTable";
 import { JobSearchBar } from "./JobSearchBar";
-import { JobPieChart } from "./JobPieChart";
+const LazyJobPieChart = React.lazy(() =>
+  import("./JobPieChart").then((m) => ({ default: m.JobPieChart })),
+);
 import { getSearchJobUrl } from "./jobDataService";
+import { JobMonitorContext, jobMonitorReducer } from "./JobMonitorContext";
+import { jobColumns, statusColors, fromHumanReadableText } from "./jobColumns";
+import {
+  loadInitialState,
+  useJobMonitorPersistence,
+} from "./useJobMonitorPersistence";
+
+// Static sx props extracted to avoid new object references on every render
+const rootSx = {
+  display: "flex",
+  flexDirection: "column",
+  flexGrow: 1,
+  overflow: "hidden",
+  maxWidth: "100%",
+} as const;
+
+const contentSx = {
+  display: "flex",
+  flexDirection: { xs: "column", md: "row" },
+  flexGrow: 1,
+  overflow: "hidden",
+  minWidth: 0,
+} as const;
+
+const tableSx = {
+  flexGrow: 1,
+  minWidth: 0,
+  overflow: "auto",
+  display: "flex",
+  flexDirection: "column",
+} as const;
+
+const pieChartPaperSx = {
+  width: { md: 340 },
+  flexShrink: 0,
+  alignSelf: { xs: "stretch", md: "flex-start" },
+  m: 1,
+  borderRadius: 2,
+  boxSizing: "border-box",
+  overflow: "hidden",
+} as const;
 
 /**
  * Build the Job Monitor application
@@ -43,402 +70,146 @@ import { getSearchJobUrl } from "./jobDataService";
  */
 export default function JobMonitor() {
   const appId = useApplicationId();
-  const theme = useTheme();
   const diracxUrl = useDiracxUrl();
 
-  // Load the initial state from local storage
-  const initialState = sessionStorage.getItem(`${appId}_State`);
-
-  const parsedInitialState =
-    typeof initialState === "string" ? JSON.parse(initialState) : null;
-
-  // State for filters
-  const [filters, setFilters] = useState<Filter[]>(
-    parsedInitialState ? parsedInitialState.filters : [],
-  );
-
-  // State for search body
-  const [searchBody, setSearchBody] = useState<SearchBody>({
-    search: parsedInitialState
-      ? parsedInitialState.filters.map((filter: Filter) => ({
-          parameter: filter.parameter,
-          operator: filter.operator,
-          value: filter.value,
-          values: filter.values,
-        }))
-      : [], // Default to an empty array if no filters are present
-    sort: [{ parameter: "JobID", direction: "desc" }],
-  });
-
-  // States for table settings
-  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>(
-    parsedInitialState
-      ? parsedInitialState.columnVisibility
-      : {
-          JobGroup: false,
-          JobType: false,
-          Owner: false,
-          OwnerGroup: false,
-          VO: false,
-          StartExecTime: false,
-          EndExecTime: false,
-          UserPriority: false,
-        },
-  );
-  const [columnPinning, setColumnPinning] = useState<ColumnPinningState>(
-    parsedInitialState
-      ? parsedInitialState.columnPinning
-      : {
-          left: ["JobID"], // Pin JobID column by default
-        },
-  );
-  const [rowSelection, setRowSelection] = useState<RowSelectionState>(
-    parsedInitialState ? parsedInitialState.rowSelection : {},
-  );
-  const [pagination, setPagination] = useState<PaginationState>(
-    parsedInitialState
-      ? parsedInitialState.pagination
-      : {
-          pageIndex: 0,
-          pageSize: 25,
-        },
-  );
-
-  // Save the state of the app in local storage
-  useEffect(() => {
-    const state = {
-      filters: [...filters],
-      columnVisibility: { ...columnVisibility },
-      columnPinning: {
-        left: [...(columnPinning.left || [])],
-        right: [...(columnPinning.right || [])],
-      },
-      rowSelection: { ...rowSelection },
-      pagination: {
-        pageIndex: pagination.pageIndex,
-        pageSize: pagination.pageSize,
-      },
-    };
-
-    sessionStorage.setItem(`${appId}_State`, JSON.stringify(state));
-  }, [
+  const [state, dispatch] = useReducer(
+    jobMonitorReducer,
     appId,
-    filters,
-    columnVisibility,
-    columnPinning,
-    rowSelection,
-    pagination,
-  ]);
-
-  // Status colors
-  const statusColors: Record<string, string> = useMemo(
-    () => ({
-      Submitting: purple[500],
-      Received: blueGrey[500],
-      Checking: teal[500],
-      Staging: lightBlue[500],
-      Waiting: amber[600],
-      Matched: blue[300],
-      Running: blue[900],
-      Rescheduled: lime[700],
-      Completing: orange[500],
-      Completed: green[300],
-      Done: green[500],
-      Failed: red[500],
-      Stalled: amber[900],
-      Killed: red[900],
-      Deleted: grey[500],
-    }),
-    [],
+    loadInitialState,
   );
 
-  /**
-   * Renders the status cell with colors
-   */
-  const renderStatusCell = useCallback(
-    (status: string) => {
-      const defaultColor = brown[500];
-      return (
-        <Box
-          sx={{
-            display: "inline-block",
-            borderRadius: "10px",
-            padding: "1px 8px",
-            fontSize: "0.75rem",
-            backgroundColor:
-              theme.palette.mode === "light"
-                ? darken(statusColors[status] ?? defaultColor, 0.1)
-                : lighten(statusColors[status] ?? defaultColor, 0.1),
-            color: "white",
-            fontWeight: "bold",
-          }}
-        >
-          {status}
-        </Box>
-      );
-    },
-    [theme, statusColors],
-  );
+  useJobMonitorPersistence(appId, state);
 
-  const columnHelper = useMemo(() => createColumnHelper<Job>(), []);
-
-  /**
-   * The head cells for the data grid (desktop version)
-   */
-  const columns = useMemo(
-    () => [
-      columnHelper.accessor("JobID", {
-        id: "JobID",
-        header: "ID",
-        meta: { type: CategoryType.NUMBER, isQuasiUnique: true },
-      }),
-      columnHelper.accessor("Status", {
-        id: "Status",
-        header: "Status",
-        cell: (info) => renderStatusCell(info.getValue()),
-        meta: {
-          type: CategoryType.STRING,
-          values: Object.keys(statusColors).sort(),
-          isQuasiUnique: false,
-        },
-      }),
-      columnHelper.accessor("MinorStatus", {
-        id: "MinorStatus",
-        header: "Minor Status",
-      }),
-      columnHelper.accessor("ApplicationStatus", {
-        id: "ApplicationStatus",
-        header: "Application Status",
-      }),
-      columnHelper.accessor("Site", {
-        id: "Site",
-        header: "Site",
-      }),
-      columnHelper.accessor("JobName", {
-        id: "JobName",
-        header: "Name",
-      }),
-      columnHelper.accessor("JobGroup", {
-        id: "JobGroup",
-        header: "Job Group",
-      }),
-      columnHelper.accessor("JobType", {
-        id: "JobType",
-        header: "Type",
-      }),
-      columnHelper.accessor("LastUpdateTime", {
-        id: "LastUpdateTime",
-        header: "Last Update Time",
-        meta: { type: CategoryType.DATE, isQuasiUnique: true },
-      }),
-      columnHelper.accessor("HeartBeatTime", {
-        id: "HeartBeatTime",
-        header: "Last Sign of Life",
-        meta: { type: CategoryType.DATE, isQuasiUnique: true },
-      }),
-      columnHelper.accessor("SubmissionTime", {
-        id: "SubmissionTime",
-        header: "Submission Time",
-        meta: { type: CategoryType.DATE, isQuasiUnique: true },
-      }),
-      columnHelper.accessor("Owner", {
-        id: "Owner",
-        header: "Owner",
-      }),
-      columnHelper.accessor("OwnerGroup", {
-        id: "OwnerGroup",
-        header: "Owner Group",
-      }),
-      columnHelper.accessor("VO", {
-        id: "VO",
-        header: "VO",
-      }),
-      columnHelper.accessor("StartExecTime", {
-        id: "StartExecTime",
-        header: "Start Execution Time",
-        meta: { type: CategoryType.DATE, isQuasiUnique: true },
-      }),
-      columnHelper.accessor("EndExecTime", {
-        id: "EndExecTime",
-        header: "End Execution Time",
-        meta: { type: CategoryType.DATE, isQuasiUnique: true },
-      }),
-      columnHelper.accessor("UserPriority", {
-        id: "UserPriority",
-        header: "User Priority",
-        meta: { type: CategoryType.NUMBER },
-      }),
-      columnHelper.accessor("RescheduleCounter", {
-        id: "RescheduleCounter",
-        header: "Reschedule Counter",
-        meta: { type: CategoryType.NUMBER },
-      }),
-    ],
-    [columnHelper, renderStatusCell, statusColors],
-  );
+  const { filters, searchBody, pagination } = state;
 
   // Handle the application of filters
   const handleApplyFilters = useCallback(() => {
-    setSearchBody((prev) => ({
-      ...prev,
-      search: filters.map(({ parameter, operator, value, values }) => ({
-        parameter: fromHumanReadableText(parameter, columns),
-        operator,
-        value,
-        values,
-      })),
-    }));
-    setPagination((prev) => ({
-      ...prev,
-      pageIndex: 0, // Reset to the first page when applying filters
-    }));
-  }, [filters, columns, setSearchBody, setPagination]);
+    dispatch({
+      type: "APPLY_FILTERS",
+      columns: jobColumns,
+      fromHumanReadableText,
+    });
+  }, []);
 
-  const mutateJobs = useMemo(() => {
-    return () => {
-      mutate([
-        getSearchJobUrl(diracxUrl, pagination.pageIndex, pagination.pageSize),
-        searchBody,
-      ]);
-    };
-  }, [diracxUrl, pagination.pageIndex, pagination.pageSize, searchBody]);
+  // Store current values in refs so the callback identity stays stable
+  const searchBodyRef = useRef(searchBody);
+  const paginationRef = useRef(pagination);
+  useEffect(() => {
+    searchBodyRef.current = searchBody;
+  }, [searchBody]);
+  useEffect(() => {
+    paginationRef.current = pagination;
+  }, [pagination]);
+
+  const mutateJobs = useCallback(() => {
+    const p = paginationRef.current;
+    // Revalidate the job table data
+    mutate([
+      getSearchJobUrl(diracxUrl, p.pageIndex, p.pageSize),
+      searchBodyRef.current,
+    ]);
+    // Revalidate all job summary entries (pie chart) regardless of grouping
+    mutate(
+      (key) =>
+        Array.isArray(key) &&
+        typeof key[0] === "string" &&
+        key[0].includes("/api/jobs/summary"),
+    );
+  }, [diracxUrl]);
+
+  // Dispatcher-based setters for children that need React.Dispatch-compatible callbacks
+  const setFilters = useCallback(
+    (payload: Filter[] | ((prev: Filter[]) => Filter[])) =>
+      dispatch({ type: "SET_FILTERS", payload }),
+    [],
+  );
+  const setSearchBody = useCallback(
+    (payload: SearchBody | ((prev: SearchBody) => SearchBody)) =>
+      dispatch({ type: "SET_SEARCH_BODY", payload }),
+    [],
+  );
+  const setColumnVisibility = useCallback(
+    (
+      payload:
+        | import("@tanstack/react-table").VisibilityState
+        | ((
+            prev: import("@tanstack/react-table").VisibilityState,
+          ) => import("@tanstack/react-table").VisibilityState),
+    ) => dispatch({ type: "SET_COLUMN_VISIBILITY", payload }),
+    [],
+  );
+  const setColumnPinning = useCallback(
+    (
+      payload:
+        | import("@tanstack/react-table").ColumnPinningState
+        | ((
+            prev: import("@tanstack/react-table").ColumnPinningState,
+          ) => import("@tanstack/react-table").ColumnPinningState),
+    ) => dispatch({ type: "SET_COLUMN_PINNING", payload }),
+    [],
+  );
+  const setRowSelection = useCallback(
+    (
+      payload:
+        | import("@tanstack/react-table").RowSelectionState
+        | ((
+            prev: import("@tanstack/react-table").RowSelectionState,
+          ) => import("@tanstack/react-table").RowSelectionState),
+    ) => dispatch({ type: "SET_ROW_SELECTION", payload }),
+    [],
+  );
+  const setPagination = useCallback(
+    (
+      payload:
+        | import("@tanstack/react-table").PaginationState
+        | ((
+            prev: import("@tanstack/react-table").PaginationState,
+          ) => import("@tanstack/react-table").PaginationState),
+    ) => dispatch({ type: "SET_PAGINATION", payload }),
+    [],
+  );
+
+  const contextValue = useMemo(
+    () => ({ state, dispatch, columns: jobColumns, statusColors, mutateJobs }),
+    [state, dispatch, mutateJobs],
+  );
 
   return (
-    <Box
-      sx={{
-        display: "flex",
-        flexDirection: "column",
-        flexGrow: 1,
-        overflow: "hidden",
-      }}
-    >
-      <JobSearchBar
-        filters={filters}
-        setFilters={setFilters}
-        searchBody={searchBody}
-        handleApplyFilters={handleApplyFilters}
-        columns={columns}
-        mutateJobs={mutateJobs}
-      />
+    <JobMonitorContext value={contextValue}>
+      <Box sx={rootSx}>
+        <JobSearchBar
+          filters={filters}
+          setFilters={setFilters}
+          searchBody={searchBody}
+          handleApplyFilters={handleApplyFilters}
+        />
 
-      <Box
-        sx={{
-          display: "flex",
-          flexDirection: { xs: "column", md: "row" },
-          flexGrow: 1,
-          overflow: "hidden",
-        }}
-      >
-        {/* Table section */}
-        <Box
-          sx={{
-            flexGrow: 1,
-            minWidth: 0,
-            overflow: "auto",
-            display: "flex",
-            flexDirection: "column",
-          }}
-        >
-          <JobDataTable
-            searchBody={searchBody}
-            setSearchBody={setSearchBody}
-            columns={columns}
-            pagination={pagination}
-            setPagination={setPagination}
-            columnVisibility={columnVisibility}
-            setColumnVisibility={setColumnVisibility}
-            columnPinning={columnPinning}
-            setColumnPinning={setColumnPinning}
-            rowSelection={rowSelection}
-            setRowSelection={setRowSelection}
-            statusColors={statusColors}
-            mutateJobs={mutateJobs}
-          />
+        <Box sx={contentSx}>
+          {/* Table section */}
+          <Box sx={tableSx}>
+            <JobDataTable
+              searchBody={searchBody}
+              setSearchBody={setSearchBody}
+              setPagination={setPagination}
+              setRowSelection={setRowSelection}
+              setColumnVisibility={setColumnVisibility}
+              setColumnPinning={setColumnPinning}
+            />
+          </Box>
+
+          {/* Pie chart card */}
+          <Paper elevation={2} sx={pieChartPaperSx}>
+            <Suspense
+              fallback={<Skeleton variant="rectangular" height={200} />}
+            >
+              <LazyJobPieChart
+                searchBody={searchBody}
+                setFilters={setFilters}
+              />
+            </Suspense>
+          </Paper>
         </Box>
-
-        {/* Pie chart card */}
-        <Paper
-          elevation={2}
-          sx={{
-            width: { md: 340 },
-            flexShrink: 0,
-            alignSelf: "flex-start",
-            m: 1,
-            borderRadius: 2,
-          }}
-        >
-          <JobPieChart
-            searchBody={searchBody}
-            setFilters={setFilters}
-            statusColors={statusColors}
-            columns={columns}
-          />
-        </Paper>
       </Box>
-    </Box>
+    </JobMonitorContext>
   );
-}
-
-/**
- * This function validates and converts the state of the application
- * It ensure that the state is in the correct format
- * even if the structure changed between versions
- *
- * @param state - The state of the application
- * @returns The parsed state of the application and a boolean indicating if the state was converted
- * @throws Error if the state is not valid
- */
-export function validateAndConvertState(state: string): [string, boolean] {
-  // The previous structure did not have the filters field, so we add it if it is missing
-  let parsed;
-  let isValid = true;
-  try {
-    parsed = JSON.parse(state);
-    isValid =
-      typeof parsed === "object" &&
-      typeof parsed.columnVisibility === "object" &&
-      typeof parsed.columnPinning === "object" &&
-      typeof parsed.rowSelection === "object" &&
-      typeof parsed.pagination === "object" &&
-      "pageIndex" in parsed.pagination &&
-      "pageSize" in parsed.pagination &&
-      typeof parsed.filters === "object"; // New field
-
-    if (isValid) return [state, false];
-  } catch (e) {
-    // Convert the state to the new version
-    isValid = false;
-    if (e instanceof SyntaxError) {
-      // The state is not a valid JSON
-      throw new Error("The state is not a valid JSON");
-    }
-  }
-
-  const newState = {
-    filters: [], // Create an empty filters array
-    columnVisibility: parsed.columnVisibility,
-    columnPinning: parsed.columnPinning,
-    rowSelection: parsed.rowSelection,
-    pagination: parsed.pagination,
-  };
-
-  return [JSON.stringify(newState), true];
-}
-
-/**
- * Converts a human-readable job attribute name to its internal name.
- * @param name - The human-readable name of the job attribute
- * @param columns - The array of column definitions
- * @returns The corresponding internal name of the job attribute
- */
-export function fromHumanReadableText(
-  name: string,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  columns: ColumnDef<Job, any>[],
-): string {
-  const index = columns.findIndex((column) => column.header === name);
-  if (index !== -1) {
-    return columns[index].id || name; // Return the id if it exists, otherwise
-  }
-  return name;
 }

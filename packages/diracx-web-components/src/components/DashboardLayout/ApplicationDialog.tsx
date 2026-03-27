@@ -11,8 +11,8 @@ import {
   Icon,
   IconButton,
 } from "@mui/material";
-import { Close } from "@mui/icons-material";
-import { ApplicationsContext } from "../../contexts/ApplicationsProvider";
+import Close from "@mui/icons-material/Close";
+import { AppListContext } from "../../contexts/ApplicationsProvider";
 
 interface AppDialogProps {
   /** Determines whether the dialog is open or not. */
@@ -34,7 +34,7 @@ export default function AppDialog({
   setAppDialogOpen,
   handleCreateApp,
 }: AppDialogProps) {
-  const applicationList = use(ApplicationsContext)[2];
+  const { appList: applicationList } = use(AppListContext);
   return (
     <Dialog
       open={appDialogOpen}

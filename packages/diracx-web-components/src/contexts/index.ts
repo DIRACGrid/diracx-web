@@ -1,10 +1,17 @@
 export {
-  ApplicationsContext,
   ApplicationsProvider,
+  AppListContext,
+  DashboardContext,
+  type AppListContextType,
+  type DashboardContextType,
 } from "./ApplicationsProvider";
 export {
   OIDCConfigurationContext,
   OIDCConfigurationProvider,
 } from "./OIDCConfigurationProvider";
 export { DiracXWebProviders } from "./DiracXWebProviders";
-export * from "./NavigationProvider";
+export {
+  type NavigationContextType,
+  NavigationContext,
+  NavigationProvider,
+} from "./NavigationProvider";
