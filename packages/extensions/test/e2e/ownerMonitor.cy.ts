@@ -1,22 +1,11 @@
 /// <reference types="cypress" />
+/// <reference path="support/index.d.ts" />
 
 describe("Owner Monitor", () => {
   beforeEach(() => {
-    cy.session("login", () => {
-      cy.visit("/auth");
-      //login
-      cy.get('[data-testid="login-form-button"]').click();
-      cy.get("#login").type("admin@example.com");
-      cy.get("#password").type("password");
+    cy.login();
 
-      // Find the login button and click on it
-      cy.get("button").click();
-      // Grant access
-      cy.get(":nth-child(1) > form > .dex-btn").click();
-      cy.url().should("include", "/auth");
-    });
-
-    // Visit the page where the Job Monitor is rendered
+    // Visit the page where the Owner Monitor is rendered
     cy.window().then((win) => {
       win.sessionStorage.setItem(
         "savedDashboard",
@@ -24,7 +13,7 @@ describe("Owner Monitor", () => {
       );
     });
 
-    cy.visit("/");
+    cy.visitApp();
   });
 
   it("should render the drawer", () => {

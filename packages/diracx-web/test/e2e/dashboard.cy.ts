@@ -11,7 +11,7 @@ describe("DashboardDrawer", { retries: { runMode: 5, openMode: 3 } }, () => {
       );
     });
 
-    cy.visit("/");
+    cy.visitApp();
   });
 
   it("should render the drawer", () => {
