@@ -54,7 +54,13 @@ jobs:
     - name: Publish to NPM
       env:
         NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
-      run: npm --workspace packages/diracx-web-components publish
+      run: |
+        TAG_NAME="${{ needs.release-please.outputs.tag_name }}"
+        if [[ "$TAG_NAME" == *-* ]]; then
+          npm --workspace packages/diracx-web-components publish --tag latest
+        else
+          npm --workspace packages/diracx-web-components publish
+        fi
 
   # Storybook is built and deployed to GitHub Pages
   # -----------------------------------------------
@@ -196,10 +202,17 @@ jobs:
           cd diracx-charts
           pre-commit run --all-files || true
 
+      - name: Install pixi
+        uses: prefix-dev/setup-pixi@v0.8.1
+
       - name: Commit and push changes
         if: success()
         run: |
           cd diracx-charts
+
+          # Update the diagram to reflect the updated version number
+          pixi run generate-diagram
+
           git add -A
 
           if ! git diff --cached --quiet; then
