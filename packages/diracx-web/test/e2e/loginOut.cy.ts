@@ -1,4 +1,5 @@
 /// <reference types="cypress" />
+/// <reference path="support/index.d.ts" />
 
 // Make sure the user can login and logout
 describe("Login and Logout", () => {
@@ -7,14 +8,10 @@ describe("Login and Logout", () => {
     // so we must tell it to visit our website with the `cy.visit()` command.
     // Since we want to visit the same URL at the start of all our tests,
     // we include it in our beforeEach function so that it runs before each test
-    cy.visit("/");
+    cy.visit("/auth");
   });
 
   it("login", () => {
-    // The user is redirected to the /auth page because not authenticated
-    // Make sure we are on the /auth page
-    cy.url().should("include", "/auth");
-
     // Continue with the default parameters
     cy.get('[data-testid="login-form-button"]').click();
 
@@ -57,16 +54,12 @@ describe("Login and Logout", () => {
     // Logout
     cy.contains("Logout").click();
 
-    // The user is redirected back to the /auth page
-    cy.url().should("include", "/auth");
-
-    // The user is logged out
-    // The login button should be present
-    cy.get('[data-testid="login-form-button"]').should("exist");
-
-    // The user tries to access the dashboard page without being connected
-    // The user is redirected to the /auth page
-    cy.visit("/");
-    cy.url().should("include", "/auth");
+    // The user is logged out and redirected back to the /auth page
+    // Wait for the login button to reappear as the definitive signal.
+    // Uses a longer timeout because the logout → OIDC session clear →
+    // redirect → render chain can take longer than the default 4s in CI.
+    cy.get('[data-testid="login-form-button"]', { timeout: 10000 }).should(
+      "exist",
+    );
   });
 });

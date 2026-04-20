@@ -151,3 +151,60 @@ jobs:
           push: true
           tags: ghcr.io/diracgrid/diracx-web/static:${{ needs.release-please.outputs.tag_name }}
           platforms: linux/amd64,linux/arm64
+
+  # Helm charts are updated in diracx-charts
+  # -----------------------------------------
+
+  update-charts:
+    name: Update Helm charts
+    needs:
+      - release-please
+      - build-deploy-diracx-web-release-image
+    runs-on: ubuntu-latest
+    if: ${{ needs.release-please.outputs.release_created == 'true' }}
+    steps:
+      - name: Checkout diracx-web (for update script)
+        uses: actions/checkout@v6
+        with:
+          path: diracx-web
+          sparse-checkout: .github/workflows
+
+      - name: Checkout diracx-charts
+        uses: actions/checkout@v6
+        with:
+          repository: DIRACGrid/diracx-charts
+          token: ${{ secrets.CHARTS_UPDATE_TOKEN }}
+          path: diracx-charts
+
+      - name: Configure Git
+        run: |
+          cd diracx-charts
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Update chart versions
+        run: |
+          python diracx-web/.github/workflows/update_chart_version.py \
+            --charts-dir diracx-charts \
+            --web-version "${{ needs.release-please.outputs.tag_name }}"
+
+      - name: Install pre-commit
+        run: pip install pre-commit
+
+      - name: Run pre-commit to update README
+        run: |
+          cd diracx-charts
+          pre-commit run --all-files || true
+
+      - name: Commit and push changes
+        if: success()
+        run: |
+          cd diracx-charts
+          git add -A
+
+          if ! git diff --cached --quiet; then
+            git commit -m "chore: bump diracx-web to ${{ needs.release-please.outputs.tag_name }}"
+            git push origin master
+          else
+            echo "No changes to commit"
+          fi

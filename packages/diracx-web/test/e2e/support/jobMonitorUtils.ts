@@ -1,6 +1,6 @@
 /**
  * Set up the dashboard with two Job Monitor apps via sessionStorage.
- * Call this after cy.login() and before cy.visit("/").
+ * Call this after cy.login() and before cy.visitApp().
  */
 export function setupJobMonitorDashboard() {
   cy.window().then((win) => {
@@ -150,8 +150,6 @@ export function addJobWithOutputSandbox() {
  * If not, add jobs and refresh. Call after the table is visible.
  */
 export function ensureMinimumJobs(minNumberOfJobs: number) {
-  cy.contains("Loading OIDC Configuration").should("not.exist");
-  cy.contains("Loading").should("not.exist");
   cy.get('[data-testid="loading-skeleton"]').should("not.exist");
 
   cy.get("body").then(($body) => {

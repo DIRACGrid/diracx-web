@@ -5,7 +5,7 @@ describe("Export and import app state", () => {
   beforeEach(() => {
     cy.login();
 
-    cy.visit("/");
+    cy.visitApp();
 
     // Open 2 Job Monitor apps
     cy.get('[data-testid="add-application-button"]').click();

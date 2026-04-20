@@ -9,9 +9,8 @@ import {
 describe("Job Monitor - Filters", () => {
   beforeEach(() => {
     cy.login();
-
-    cy.visit("/");
     setupJobMonitorDashboard();
+    cy.visitApp();
 
     cy.contains("Job Monitor").click();
 

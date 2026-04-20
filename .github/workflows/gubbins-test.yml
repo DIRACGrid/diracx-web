@@ -54,101 +54,41 @@ jobs:
   prepare-gubbins-backend:
     runs-on: ubuntu-latest
     if: ${{ github.event_name != 'push' || github.repository == 'DIRACGrid/diracx-web' }}
-    defaults:
-      run:
-        # We need extglob for REFERENCE_BRANCH substitution
-        shell: bash -l -O extglob {0}
     steps:
       - name: Clone source
         run: |
           cd ..
           git clone https://github.com/DIRACGrid/diracx.git
 
-      # Prepare the gubbins extension
-      - name: Where the magic happens (Move extensions to a temporary directory)
-        run: |
-          # We have to copy the code to another directory
-          # and make it a git repository by itself because otherwise the
-          # root in the pyproject to do not make sense once mounted
-          # in the containers.
-          cp -r ../diracx/extensions/gubbins /tmp/
-          sed -i 's@../..@.@g' /tmp/gubbins/pyproject.toml
-          sed -i 's@../../@@g' /tmp/gubbins/gubbins-*/pyproject.toml
-
-      - name: Upload artifact
-        uses: actions/upload-artifact@v7
-        with:
-          name: gubbins
-          path: /tmp/gubbins
-          include-hidden-files: true
-
-      # Prepare the gubbins image
-      # - Build the gubbins wheels
-      - uses: actions/setup-python@v6
-        with:
-          python-version: '3.14'
-      - name: Installing dependencies
-        run: |
-          cd ../diracx
-          python -m pip install \
-              build \
-              python-dateutil \
-              pytz \
-              readme_renderer[md] \
-              requests \
-              setuptools_scm
-      - name: Build distributions
-        run: |
-          cd ../diracx
-          for pkg_dir in $PWD/diracx-*; do
-            echo "Building $pkg_dir"
-            python -m build --outdir $PWD/dist $pkg_dir
-          done
-          # Also build the diracx metapackage
-          python -m build --outdir $PWD/dist .
-          # And build the gubbins package
-          for pkg_dir in $PWD/extensions/gubbins/gubbins-*; do
-            # Skip the testing package
-            if [[ "${pkg_dir}" =~ .*testing.* ]];
-            then
-              echo "Do not build ${pkg_dir}";
-              continue;
-            fi
-            echo "Building $pkg_dir"
-            python -m build --outdir $PWD/dist $pkg_dir
-          done
-      - name: "Find wheels"
-        id: find_wheel
-        run: |
-          cd ../diracx/dist
-          # We need to copy them there to be able to access them in the RUN --mount
-          cp diracx*.whl gubbins*.whl ../extensions/containers/services/
-          for wheel_fn in *.whl; do
-            pkg_name=$(basename "${wheel_fn}" | cut -d '-' -f 1)
-            echo "${pkg_name}-wheel-name=$(ls "${pkg_name}"-*.whl)" >> $GITHUB_OUTPUT
-          done
-
-      # - Build the gubbins image using the wheels
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v4
+      # Build gubbins container images using pixi
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v4
 
-      - name: Build and export service
+      - name: Build gubbins services image
         uses: docker/build-push-action@v7
         with:
-          context: ../diracx/extensions/containers/services
-          tags: gubbins/services:dev
-          outputs: type=docker,dest=/tmp/gubbins_services_image.tar
+          context: ../diracx
+          file: ../diracx/containers/Dockerfile
           build-args: |
-            EXTRA_PACKAGES_TO_INSTALL=git+https://github.com/DIRACGrid/DIRAC.git@integration
-            EXTENSION_CUSTOM_SOURCES_TO_INSTALL=/bindmount/gubbins_db*.whl,/bindmount/gubbins_routers*.whl,/bindmount/gubbins_client*.whl
+            PIXI_ENV=gubbins-container-services
+          tags: ghcr.io/gubbins/services:dev
+          outputs: type=docker,dest=/tmp/gubbins_services_image.tar
 
-      - name: Upload artifact
+      - name: Build gubbins client image
+        uses: docker/build-push-action@v7
+        with:
+          context: ../diracx
+          file: ../diracx/containers/Dockerfile
+          build-args: |
+            PIXI_ENV=gubbins-container-client
+          tags: ghcr.io/gubbins/client:dev
+          outputs: type=docker,dest=/tmp/gubbins_client_image.tar
+
+      - name: Upload gubbins images
         uses: actions/upload-artifact@v7
         with:
-          name: gubbins-services-img
-          path: /tmp/gubbins_services_image.tar
+          name: gubbins-images
+          path: /tmp/gubbins_*_image.tar
 
   prepare-gubbins-frontend-as-a-standalone:
     runs-on: ubuntu-latest
@@ -226,7 +166,7 @@ jobs:
       # WARNING: In your CI/CD pipeline, you should remove the following steps  #
       # ------------------------------------------------------------------------#
       - name: Download gubbins-web
-        uses: actions/download-artifact@v8
+        uses: actions/download-artifact@v7
         with:
           name: gubbins-web
           path: /tmp/gubbins-web
@@ -258,43 +198,57 @@ jobs:
     # ========================================================================#
     # WARNING: In your CI/CD pipeline, you should remove the following steps  #
     # ------------------------------------------------------------------------#
-    - name: Download gubbins
-      uses: actions/download-artifact@v8
-      with:
-        name: gubbins
-        path: /tmp/gubbins
-
-    - name: Create a new git repository
-      run: |
-        git init /tmp/gubbins/
-
-    - name: Clone diracx source 
+    - name: Clone diracx source
       run: |
         cd ..
         git clone https://github.com/DIRACGrid/diracx.git
 
-    - name: Download gubbins:services image
-      uses: actions/download-artifact@v8
+    - name: Download gubbins images
+      uses: actions/download-artifact@v7
       with:
-        name: gubbins-services-img
+        name: gubbins-images
         path: /tmp/
 
-    - name: Load docker image
-      run: docker load --input /tmp/gubbins_services_image.tar
+    - name: Load gubbins images
+      run: |
+        docker load --input /tmp/gubbins_services_image.tar
+        rm -f /tmp/gubbins_services_image.tar
+        docker load --input /tmp/gubbins_client_image.tar
+        rm -f /tmp/gubbins_client_image.tar
 
     - name: Download gubbins-web
-      uses: actions/download-artifact@v8
+      uses: actions/download-artifact@v7
       with:
         name: gubbins-web
         path: /tmp/gubbins-web
     # ------------------------------------------------------------------------#
     # ========================================================================#
-  
+
     # Runs the demo with the extension source code
-    - name: Start demo 
+    - name: Start demo
       run: |
         cd ..
-        diracx-charts/run_demo.sh --exit-when-done --set-value developer.autoReload=false --ci-values ./diracx/extensions/gubbins_values.yaml --load-docker-image "gubbins/services:dev" diracx/ /tmp/gubbins/ /tmp/gubbins-web/
+
+        # Download helm/kubectl/kind first
+        diracx-charts/run_demo.sh --only-download-deps
+
+        # Copy gubbins-charts to a temporary location and build dependencies
+        cp -r ./diracx/extensions/gubbins-charts /tmp/
+        diracx-charts/.demo/helm dependency build /tmp/gubbins-charts
+        # Replace the downloaded subchart with the locally-cloned one to
+        # ensure we have the pixi-compatible ConfigMap entrypoint
+        rm -f /tmp/gubbins-charts/charts/diracx-*.tgz
+        diracx-charts/.demo/helm package diracx-charts/diracx -d /tmp/gubbins-charts/charts/
+
+        diracx-charts/run_demo.sh \
+          --exit-when-done \
+          --set-value diracx.developer.autoReload=false \
+          --extension-chart-path /tmp/gubbins-charts \
+          --ci-values ./diracx/extensions/gubbins_values.yaml \
+          --load-docker-image "ghcr.io/gubbins/services:dev" \
+          --load-docker-image "ghcr.io/gubbins/client:dev" \
+          --prune-loaded-images \
+          /tmp/gubbins-web/
     
     - name: Debugging information
       run: |

@@ -9,13 +9,11 @@ import {
 describe("Job Monitor - Sandbox Download", () => {
   beforeEach(() => {
     cy.login();
-    cy.visit("/");
     setupJobMonitorDashboard();
+    cy.visitApp();
     cy.contains("Job Monitor").click();
 
     // Wait for the table to be ready
-    cy.contains("Loading OIDC Configuration").should("not.exist");
-    cy.contains("Loading").should("not.exist");
     cy.get('[data-testid="loading-skeleton"]').should("not.exist");
   });
 
