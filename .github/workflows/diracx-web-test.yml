@@ -57,7 +57,7 @@ jobs:
       run: echo "DIRACX_URL=https://$(ifconfig | grep 'inet ' | awk '{ print $2 }' | grep -v '^127' | head -n 1 | cut -d '/' -f 1).nip.io:8000" >> $GITHUB_ENV
 
     - name: Start Cypress
-      uses: cypress-io/github-action@v6
+      uses: cypress-io/github-action@783cb3f07983868532cabaedaa1e6c00ff4786a8 # v7.1.9
       with:
         browser: chrome
         config: baseUrl=${{ env.DIRACX_URL }}
