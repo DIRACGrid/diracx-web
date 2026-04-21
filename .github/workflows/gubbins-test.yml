@@ -166,7 +166,7 @@ jobs:
       # WARNING: In your CI/CD pipeline, you should remove the following steps  #
       # ------------------------------------------------------------------------#
       - name: Download gubbins-web
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8
         with:
           name: gubbins-web
           path: /tmp/gubbins-web
@@ -204,7 +204,7 @@ jobs:
         git clone https://github.com/DIRACGrid/diracx.git
 
     - name: Download gubbins images
-      uses: actions/download-artifact@v7
+      uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8
       with:
         name: gubbins-images
         path: /tmp/
@@ -217,7 +217,7 @@ jobs:
         rm -f /tmp/gubbins_client_image.tar
 
     - name: Download gubbins-web
-      uses: actions/download-artifact@v7
+      uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8
       with:
         name: gubbins-web
         path: /tmp/gubbins-web
@@ -279,7 +279,7 @@ jobs:
 
     # Run e2e tests with Cypress
     - name: Start Cypress
-      uses: cypress-io/github-action@v6
+      uses: cypress-io/github-action@783cb3f07983868532cabaedaa1e6c00ff4786a8 # v7.1.9
       with:
         browser: chrome
         config: baseUrl=${{ env.DIRACX_URL }}
