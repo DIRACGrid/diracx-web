@@ -6,7 +6,7 @@ import {
   AccordionSummary,
   TextField,
 } from "@mui/material";
-import { ExpandMore } from "@mui/icons-material";
+import ExpandMore from "@mui/icons-material/ExpandMore";
 import React, { useEffect, useRef, useState } from "react";
 import { dropTargetForElements } from "@atlaskit/pragmatic-drag-and-drop/element/adapter";
 import { DashboardGroup } from "../../types/DashboardGroup";
@@ -90,7 +90,7 @@ export default function DrawerItemGroup({
 
   // Handle renaming of the group
   const handleGroupRename = () => {
-    if (renameValue.trim() === "") return;
+    if (renameValue.trim() === "" || renameValue === title) return;
     setUserDashboard((groups) => {
       const count = groups.reduce(
         (sum, group) => (group.title.startsWith(renameValue) ? sum + 1 : sum),

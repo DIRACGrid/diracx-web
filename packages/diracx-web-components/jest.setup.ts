@@ -20,4 +20,21 @@ if (typeof globalThis.PointerEvent === "undefined") {
   };
 }
 
+// Mock layout measurements for @tanstack/react-virtual (jsdom has no layout engine).
+// Only override offsetHeight/offsetWidth — these are the properties the virtualizer
+// uses to determine container size. We do NOT override getBoundingClientRect globally
+// because MUI Popover relies on the native implementation.
+Object.defineProperty(HTMLElement.prototype, "offsetHeight", {
+  configurable: true,
+  get() {
+    return 600;
+  },
+});
+Object.defineProperty(HTMLElement.prototype, "offsetWidth", {
+  configurable: true,
+  get() {
+    return 800;
+  },
+});
+
 jest.mock("@axa-fr/react-oidc");

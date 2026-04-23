@@ -32,13 +32,13 @@
     "@mui/x-charts": "^8.0.0",
     "@mui/x-date-pickers": "^8.0.0",
     "@tanstack/react-table": "^8.20.5",
+    "@tanstack/react-virtual": "^3.13.23",
     "@types/node": "^24.0.0",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
     "dayjs": "^1.11.13",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "react-virtuoso": "^4.12.3",
     "swr": "^2.2.5"
   },
   "devDependencies": {
@@ -99,6 +99,10 @@
     "./types": {
       "import": "./dist/types/index.js",
       "types": "./dist/types/index.d.ts"
+    },
+    "./services": {
+      "import": "./dist/services/index.js",
+      "types": "./dist/services/index.d.ts"
     }
   },
   "files": [

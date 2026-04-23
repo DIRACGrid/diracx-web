@@ -46,7 +46,7 @@ describe("Job Monitor - Pagination", () => {
       });
 
     // Scroll and get the last visible row value (e.g. 31)
-    cy.get('[data-testid="virtuoso-scroller"]')
+    cy.get('[data-testid="table-scroller"]')
       .wait(100)
       .scrollTo("bottom", { ensureScrollable: false });
 
@@ -144,7 +144,7 @@ describe("Job Monitor - Pagination", () => {
       });
 
     // Scroll and get the last visible row value
-    cy.get('[data-testid="virtuoso-scroller"]')
+    cy.get('[data-testid="table-scroller"]')
       .wait(100)
       .scrollTo("bottom", { ensureScrollable: false });
 

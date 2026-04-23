@@ -12,7 +12,7 @@ import {
   useMediaQuery,
 } from "@mui/material";
 import { cyan, grey, lightGreen } from "@mui/material/colors";
-import { createContext, useMemo, useState } from "react";
+import { createContext, useCallback, useMemo, useState } from "react";
 
 declare module "@mui/material/styles" {
   interface Palette {
@@ -94,13 +94,13 @@ export const ThemeProvider = ({ children }: ThemeProviderProps) => {
     }
   }
 
-  const toggleTheme = () => {
+  const toggleTheme = useCallback(() => {
     setTheme((prevTheme) => {
       const newTheme = prevTheme === "light" ? "dark" : "light";
       sessionStorage.setItem("theme", newTheme);
       return newTheme;
     });
-  };
+  }, []);
 
   const muiTheme = useMemo(() => {
     if (theme === null) return createTheme();
@@ -363,17 +363,20 @@ export const ThemeProvider = ({ children }: ThemeProviderProps) => {
         defaultProps: { size: "small" },
         styleOverrides: {
           root: {
-            "& .MuiTableRow-root:nth-of-type(odd)": {
+            // Use data-attribute selectors instead of nth-of-type so that
+            // virtualized tables (where DOM order ≠ data order) get stable
+            // alternating row colors.
+            "& .MuiTableRow-root[data-row-parity='odd'] td": {
               backgroundColor: muiTheme.palette.tableRow.odd,
-              "&:hover": {
-                backgroundColor: darken(muiTheme.palette.tableRow.odd, 0.1),
-              },
             },
-            "& .MuiTableRow-root:nth-of-type(even)": {
+            "& .MuiTableRow-root[data-row-parity='odd']:hover td": {
+              backgroundColor: darken(muiTheme.palette.tableRow.odd, 0.1),
+            },
+            "& .MuiTableRow-root[data-row-parity='even'] td": {
               backgroundColor: muiTheme.palette.tableRow.even,
-              "&:hover": {
-                backgroundColor: darken(muiTheme.palette.tableRow.even, 0.1),
-              },
+            },
+            "& .MuiTableRow-root[data-row-parity='even']:hover td": {
+              backgroundColor: darken(muiTheme.palette.tableRow.even, 0.1),
             },
           },
         },
@@ -383,12 +386,17 @@ export const ThemeProvider = ({ children }: ThemeProviderProps) => {
     return muiTheme;
   }, [theme]);
 
+  const themeContextValue = useMemo(
+    () => ({ theme: theme!, toggleTheme }),
+    [theme, toggleTheme],
+  );
+
   if (theme === null) {
     return <div>Loading Theme...</div>;
   }
 
   return (
-    <ThemeContext value={{ theme: theme, toggleTheme }}>
+    <ThemeContext value={themeContextValue}>
       <MUIThemeProvider theme={muiTheme}>
         <CssBaseline />
         {children}
