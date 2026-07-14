@@ -7,7 +7,13 @@ import IconButton from "@mui/material/IconButton";
 import Menu from "@mui/icons-material/Menu";
 import Toolbar from "@mui/material/Toolbar";
 import Stack from "@mui/material/Stack";
-import { Typography, useMediaQuery, useTheme } from "@mui/material";
+import {
+  Typography,
+  darken,
+  lighten,
+  useMediaQuery,
+  useTheme,
+} from "@mui/material";
 import { useCurrentApplication } from "../../hooks/application";
 import { ProfileButton } from "./ProfileButton";
 import { ThemeToggleButton } from "./ThemeToggleButton";
@@ -46,6 +52,19 @@ export default function Dashboard({
   /** Theme and media query */
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+
+  // Endpoints for the app title gradient, derived per palette mode. The
+  // palette mains are tuned for surfaces rather than text and are far too
+  // light to read against the light-mode app bar (~2:1), so darken them
+  // there and lighten them on dark; both modes then clear WCAG AA (4.5:1).
+  const titleGradientStart =
+    theme.palette.mode === "light"
+      ? darken(theme.palette.primary.main, 0.4)
+      : lighten(theme.palette.primary.main, 0.2);
+  const titleGradientEnd =
+    theme.palette.mode === "light"
+      ? darken(theme.palette.secondary.main, 0.4)
+      : lighten(theme.palette.secondary.main, 0.2);
 
   /** State management for mobile drawer */
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -90,7 +109,6 @@ export default function Dashboard({
             }}
           >
             <Typography
-              color="text.primary"
               variant={isMobile ? "h6" : "h4"}
               fontWeight={"bold"}
               width={"fit-content"}
@@ -99,6 +117,17 @@ export default function Dashboard({
                 whiteSpace: "nowrap",
                 textOverflow: "ellipsis",
                 paddingLeft: 2,
+                // Fallback color first: the gradient relies on a transparent
+                // text fill, which would hide the title outright wherever
+                // background-clip: text is unsupported.
+                color: "text.primary",
+                "@supports ((background-clip: text) or (-webkit-background-clip: text))":
+                  {
+                    background: `linear-gradient(90deg, ${titleGradientStart}, ${titleGradientEnd})`,
+                    backgroundClip: "text",
+                    WebkitBackgroundClip: "text",
+                    WebkitTextFillColor: "transparent",
+                  },
               }}
             >
               {appTitle}
