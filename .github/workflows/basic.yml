@@ -36,10 +36,11 @@ jobs:
       - name: Check typescript type validity
         run: npm run ts-lint
 
+      # Individual PR commits are NOT linted: PRs are squash-merged and the
+      # PR title becomes the commit message, so the title is what must follow
+      # the conventional-commit format (enforced by pr-title.yml). This
+      # push-time check remains as a backstop for the squashed commits landing
+      # on main and for direct pushes.
       - name: Validate current commit (last commit) with commitlint
         if: github.event_name == 'push'
         run: npx commitlint --last --verbose
-
-      - name: Validate PR commits with commitlint
-        if: github.event_name == 'pull_request'
-        run: npx commitlint --from ${{ github.event.pull_request.head.sha }}~${{ github.event.pull_request.commits }} --to ${{ github.event.pull_request.head.sha }} --verbose
