@@ -57,10 +57,13 @@ export async function fetcher<T>(
 export function useDiracxUrl() {
   const [diracxUrl] = useState<string | null>(() => {
     if (typeof window === "undefined") return null;
-    return (
-      process.env.NEXT_PUBLIC_DIRACX_URL ||
-      `${window.location.protocol}//${window.location.host}`
-    );
+    // `process` only exists under Next.js (or another bundler that injects
+    // it); guard the access so plain browser bundles don't throw.
+    const envUrl =
+      typeof process !== "undefined" && process.env
+        ? process.env.NEXT_PUBLIC_DIRACX_URL
+        : undefined;
+    return envUrl || `${window.location.protocol}//${window.location.host}`;
   });
 
   return diracxUrl;

@@ -2,6 +2,9 @@
   "name": "diracx-web-root",
   "version": "0.1.0-a11",
   "private": true,
+  "engines": {
+    "node": ">=22"
+  },
   "workspaces": [
     "packages/diracx-web-components",
     "packages/diracx-web",
