@@ -58,9 +58,13 @@ describe("Export and import app state", () => {
 
     cy.contains("Copy").click();
 
+    // Note: the exported state deliberately excludes `rowSelection`
+    // (transient UI state) since the persistence-format change; older
+    // exports that still contain it remain importable (see the fixture
+    // in "should import the non-empty state" below).
     cy.get("@writeTextStub").should(
       "have.been.calledOnceWithExactly",
-      '[{\"appType\":\"Job Monitor\",\"appName\":\"Job Monitor \",\"state\":\"{\\"filters\\":[],\\"columnVisibility\\":{\\"JobGroup\\":false,\\"JobType\\":false,\\"Owner\\":false,\\"OwnerGroup\\":false,\\"VO\\":false,\\"StartExecTime\\":false,\\"EndExecTime\\":false,\\"UserPriority\\":false},\\"columnPinning\\":{\\"left\\":[\\"JobID\\"],\\"right\\":[]},\\"rowSelection\\":{},\\"pagination\\":{\\"pageIndex\\":0,\\"pageSize\\":25}}\"}]',
+      '[{\"appType\":\"Job Monitor\",\"appName\":\"Job Monitor \",\"state\":\"{\\"filters\\":[],\\"columnVisibility\\":{\\"JobGroup\\":false,\\"JobType\\":false,\\"Owner\\":false,\\"OwnerGroup\\":false,\\"VO\\":false,\\"StartExecTime\\":false,\\"EndExecTime\\":false,\\"UserPriority\\":false},\\"columnPinning\\":{\\"left\\":[\\"JobID\\"]},\\"pagination\\":{\\"pageIndex\\":0,\\"pageSize\\":25}}\"}]',
     );
   });
 

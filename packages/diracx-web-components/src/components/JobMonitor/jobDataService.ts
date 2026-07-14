@@ -4,7 +4,8 @@ import useSWR from "swr";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 
-import { fetcher } from "../../hooks/utils";
+import { fetcher } from "../../services/client";
+import { MAX_BULK_RESULTS } from "../shared/DataTable/SplitActionButton";
 import type { JobSummary } from "../../types";
 import {
   Filter,
@@ -23,70 +24,40 @@ dayjs.extend(utc);
  * @param searchBody The search body to be processed
  * @returns The processed search body with adjusted filters
  */
-function processSearchBody(searchBody: SearchBody) {
-  searchBody.search = searchBody.search?.map((filter: Filter) => {
-    if (filter.operator == "last") {
-      const valueStr = filter.value as string;
-      const match = valueStr.match(/^(\d+)\s*(minute|hour|day|month|year)s?$/i);
+function processSearchBody(searchBody: SearchBody): SearchBody {
+  return {
+    ...searchBody,
+    search: searchBody.search?.map((filter: Filter) => {
+      if (filter.operator == "last") {
+        const valueStr = filter.value as string;
+        const match = valueStr.match(
+          /^(\d+)\s*(minute|hour|day|month|year)s?$/i,
+        );
 
-      if (match) {
-        const amount = parseInt(match[1], 10);
-        const unit = match[2].toLowerCase() as TimeUnit;
+        if (match) {
+          const amount = parseInt(match[1], 10);
+          const unit = match[2].toLowerCase() as TimeUnit;
 
-        return {
-          parameter: filter.parameter,
-          operator: "gt",
-          value: dayjs().subtract(amount, unit).toISOString(),
-          values: filter.values,
-        };
-      } else {
-        return {
-          parameter: filter.parameter,
-          operator: "gt",
-          value: dayjs()
-            .subtract(1, filter.value as TimeUnit)
-            .toISOString(),
-          values: filter.values,
-        };
+          return {
+            parameter: filter.parameter,
+            operator: "gt",
+            value: dayjs().subtract(amount, unit).toISOString(),
+            values: filter.values,
+          };
+        } else {
+          return {
+            parameter: filter.parameter,
+            operator: "gt",
+            value: dayjs()
+              .subtract(1, filter.value as TimeUnit)
+              .toISOString(),
+            values: filter.values,
+          };
+        }
       }
-    }
-    return filter;
-  });
-}
-
-/**
- * Deletes jobs with the specified IDs.
- *
- * @param diracxUrl - The base URL of the DiracX API.
- * @param selectedIds - An array of job IDs to delete.
- * @param accessToken - The authentication token.
- * @param accessTokenPayload - Information about the user.
- */
-export function deleteJobs(
-  diracxUrl: string | null,
-  selectedIds: readonly number[],
-  accessToken: string,
-  accessTokenPayload: Record<string, number | string>,
-) {
-  if (!diracxUrl) {
-    throw new Error("Invalid URL generated for deleting jobs.");
-  }
-
-  const deleteUrl = `${diracxUrl}/api/jobs/status`;
-
-  const currentDate = dayjs().utc().toISOString();
-
-  const body = selectedIds.reduce((acc: StatusBody, jobId) => {
-    acc[jobId] = {
-      [currentDate]: {
-        Status: "Deleted",
-        MinorStatus: "Marked for deletion",
-        Source: `User: ${accessTokenPayload["preferred_username"]}`,
-      },
-    };
-    return acc;
-  }, {});
-  return fetcher([deleteUrl, accessToken, "PATCH", body]);
+      return filter;
+    }),
+  };
 }
 
 type JobBulkResponse = {
@@ -109,13 +80,69 @@ type StatusBody = {
 };
 
 /**
- * Kills the specified jobs.
+ * Updates the status of jobs with the specified IDs.
  *
  * @param diracxUrl - The base URL of the DiracX API.
- * @param selectedIds - An array of job IDs to be killed.
+ * @param selectedIds - An array of job IDs to update.
  * @param accessToken - The authentication token.
  * @param accessTokenPayload - Information about the user.
+ * @param status - The new status to set (e.g. "Deleted", "Killed").
+ * @param minorStatus - The minor status message.
  * @returns A Promise that resolves to an object containing the response headers and data.
+ */
+function updateJobStatus(
+  diracxUrl: string | null,
+  selectedIds: readonly number[],
+  accessToken: string,
+  accessTokenPayload: Record<string, number | string>,
+  status: string,
+  minorStatus: string,
+): Promise<{ headers: Headers; data: JobBulkResponse }> {
+  if (!diracxUrl) {
+    throw new Error(`Invalid URL generated for setting jobs to ${status}.`);
+  }
+
+  const currentDate = dayjs().utc().toISOString();
+
+  const body = selectedIds.reduce((acc: StatusBody, jobId) => {
+    acc[jobId] = {
+      [currentDate]: {
+        Status: status,
+        MinorStatus: minorStatus,
+        Source: `User: ${accessTokenPayload["preferred_username"]}`,
+      },
+    };
+    return acc;
+  }, {});
+  return fetcher({
+    url: `${diracxUrl}/api/jobs/status`,
+    accessToken,
+    method: "PATCH",
+    body,
+  });
+}
+
+/**
+ * Deletes jobs with the specified IDs.
+ */
+export function deleteJobs(
+  diracxUrl: string | null,
+  selectedIds: readonly number[],
+  accessToken: string,
+  accessTokenPayload: Record<string, number | string>,
+) {
+  return updateJobStatus(
+    diracxUrl,
+    selectedIds,
+    accessToken,
+    accessTokenPayload,
+    "Deleted",
+    "Marked for deletion",
+  );
+}
+
+/**
+ * Kills the specified jobs.
  */
 export function killJobs(
   diracxUrl: string | null,
@@ -123,47 +150,14 @@ export function killJobs(
   accessToken: string,
   accessTokenPayload: Record<string, number | string>,
 ): Promise<{ headers: Headers; data: JobBulkResponse }> {
-  if (!diracxUrl) {
-    throw new Error("Invalid URL generated for killing jobs.");
-  }
-  const killUrl = `${diracxUrl}/api/jobs/status`;
-  const currentDate = dayjs().utc().toISOString();
-
-  const body = selectedIds.reduce((acc: StatusBody, jobId) => {
-    acc[jobId] = {
-      [currentDate]: {
-        Status: "Killed",
-        MinorStatus: "Marked for termination",
-        Source: `User: ${accessTokenPayload["preferred_username"]}`,
-      },
-    };
-    return acc;
-  }, {});
-  return fetcher([killUrl, accessToken, "PATCH", body]);
-}
-
-/**
- * Reschedules the specified jobs.
- *
- * @param diracxUrl - The base URL of the DiracX API.
- * @param selectedIds - An array of job IDs to be rescheduled.
- * @param token - The authentication token.
- * @returns A Promise that resolves to an object containing the response headers and data.
- */
-export function rescheduleJobs(
-  diracxUrl: string | null,
-  selectedIds: readonly number[],
-  accessToken: string,
-): Promise<{ headers: Headers; data: JobBulkResponse }> {
-  if (!diracxUrl) {
-    throw new Error("Invalid URL generated for rescheduling jobs.");
-  }
-  const body = {
-    job_ids: selectedIds,
-  };
-
-  const rescheduleUrl = `${diracxUrl}/api/jobs/reschedule`;
-  return fetcher([rescheduleUrl, accessToken, "POST", body]);
+  return updateJobStatus(
+    diracxUrl,
+    selectedIds,
+    accessToken,
+    accessTokenPayload,
+    "Killed",
+    "Marked for termination",
+  );
 }
 
 /**
@@ -171,7 +165,7 @@ export function rescheduleJobs(
  *
  * @param diracxUrl - The base URL of the DiracX API.
  * @param jobId - The ID of the job.
- * @param token - The authentication token.
+ * @param accessToken - The authentication token.
  * @returns A Promise that resolves to an object containing the headers and data of the job history.
  */
 export async function getJobHistory(
@@ -182,7 +176,6 @@ export async function getJobHistory(
   if (!diracxUrl) {
     throw new Error("Invalid URL generated for fetching job history.");
   }
-  const historyUrl = `${diracxUrl}/api/jobs/search`;
   const body = {
     parameters: ["LoggingInfo"],
     search: [
@@ -193,16 +186,25 @@ export async function getJobHistory(
       },
     ],
   };
-  // Expect the response to be an array of objects with JobID and LoggingInfo
   const { data } = await fetcher<
     Array<{ JobID: number; LoggingInfo: JobHistory[] }>
-  >([historyUrl, accessToken, "POST", body]);
+  >({
+    url: `${diracxUrl}/api/jobs/search`,
+    accessToken,
+    method: "POST",
+    body,
+  });
+
+  if (!Array.isArray(data) || data.length === 0 || !data[0]?.LoggingInfo) {
+    throw new Error("No history found for this job");
+  }
 
   return { data: data[0].LoggingInfo };
 }
 
 /**
  * Retrieves the sandbox information for a given job ID and sandbox type.
+ * @param diracxUrl - The base URL of the DiracX API.
  * @param jobId - The ID of the job.
  * @param sbType - The type of the sandbox (input or output).
  * @param accessToken - The authentication token.
@@ -214,12 +216,15 @@ export function getJobSandbox(
   sbType: "input" | "output",
   accessToken: string,
 ): Promise<{ headers: Headers; data: JobSandboxPFNResponse }> {
-  const url = `${diracxUrl}/api/jobs/${jobId}/sandbox/${sbType}`;
-  return fetcher([url, accessToken]);
+  return fetcher({
+    url: `${diracxUrl}/api/jobs/${jobId}/sandbox/${sbType}`,
+    accessToken,
+  });
 }
 
 /**
  * Retrieves the sandbox URL for a given PFN.
+ * @param diracxUrl - The base URL of the DiracX API.
  * @param pfn - The PFN of the job.
  * @param accessToken - The authentication token.
  * @returns A Promise that resolves to an object containing the headers and data of the sandbox URL.
@@ -229,8 +234,16 @@ export function getJobSandboxUrl(
   pfn: string,
   accessToken: string,
 ): Promise<{ headers: Headers; data: SandboxUrlResponse }> {
-  const url = `${diracxUrl}/api/jobs/sandbox?pfn=${encodeURIComponent(pfn)}`;
-  return fetcher([url, accessToken]);
+  // Validate PFN format: must start with / or a known protocol
+  if (!/^(\/|https?:\/\/|s3:\/\/|srm:\/\/)/.test(pfn)) {
+    throw new Error(
+      `Invalid PFN format: "${pfn}". Must start with / or a known protocol (http, https, s3, srm).`,
+    );
+  }
+  return fetcher({
+    url: `${diracxUrl}/api/jobs/sandbox?pfn=${encodeURIComponent(pfn)}`,
+    accessToken,
+  });
 }
 
 /**
@@ -240,6 +253,7 @@ export function getJobSandboxUrl(
  * @param grouping - An array of strings representing the grouping fields.
  * @param accessToken - The authentication token.
  * @param searchBody - The search body to be sent along with the request (optional).
+ * @param signal - Optional signal to abort the request.
  * @returns A Promise that resolves to an object containing the job summary data.
  */
 export async function getJobSummary(
@@ -247,25 +261,25 @@ export async function getJobSummary(
   grouping: string[],
   accessToken: string,
   searchBody?: SearchBody,
+  signal?: AbortSignal,
 ): Promise<{ data: JobSummary[] }> {
   if (!diracxUrl) {
     throw new Error("Invalid URL generated for fetching job summary.");
   }
 
-  if (searchBody) processSearchBody(searchBody);
+  const processed = searchBody ? processSearchBody(searchBody) : searchBody;
 
-  const summaryUrl = `${diracxUrl}/api/jobs/summary`;
   const body = {
     grouping: grouping,
-    search: searchBody?.search || [],
+    search: processed?.search || [],
   };
-  // Expect the response to be an array of objects with all the grouping fields
-  const { data } = await fetcher<Array<JobSummary>>([
-    summaryUrl,
+  const { data } = await fetcher<Array<JobSummary>>({
+    url: `${diracxUrl}/api/jobs/summary`,
     accessToken,
-    "POST",
+    method: "POST",
     body,
-  ]);
+    signal,
+  });
 
   return { data };
 }
@@ -299,27 +313,47 @@ export function useJobSummary(
   } = useSWR(
     swrKey,
     async ([url, _grouping, _searchBody]) => {
-      processSearchBody(_searchBody);
+      const processed = processSearchBody(_searchBody);
 
       const body = {
         grouping: [_grouping],
-        search: _searchBody.search || [],
+        search: processed.search || [],
       };
 
-      return await fetcher<JobSummary[]>([url, accessToken!, "POST", body]);
+      const result = await fetcher<JobSummary[]>({
+        url,
+        accessToken: accessToken!,
+        method: "POST",
+        body,
+      });
+      // Tag the rows with the grouping that produced them: with
+      // keepPreviousData, consumers receive the PREVIOUS grouping's rows
+      // while a new grouping is loading, and must label them by this value
+      // rather than by the currently requested grouping.
+      return { rows: result.data, grouping: _grouping };
     },
     {
       revalidateOnMount: true,
       revalidateOnFocus: false,
       revalidateOnReconnect: false,
-      revalidateIfStale: false,
-      dedupingInterval: 60000,
+      // Same freshness rationale as useJobs: cached groupings must revalidate
+      // when the user switches back to them.
+      revalidateIfStale: true,
+      dedupingInterval: 5000,
       shouldRetryOnError: false,
+      // Keep showing the previous summary while a new key is loading,
+      // instead of unmounting the chart into a skeleton.
+      keepPreviousData: true,
     },
   );
 
   return {
-    data: (swrData?.data as JobSummary[] | undefined) ?? null,
+    data: swrData?.rows ?? null,
+    /**
+     * The grouping column that produced `data`. Lags behind the requested
+     * grouping while a new one is loading (keepPreviousData).
+     */
+    dataGrouping: swrData?.grouping ?? null,
     isLoading,
     error: swrError,
   };
@@ -333,6 +367,8 @@ export function useJobSummary(
  * @param searchBody - The search body for filtering jobs.
  * @param page - The page number for pagination.
  * @param rowsPerPage - The number of rows per page.
+ * @param visibleColumns - Column IDs to request from the API (`parameters`
+ *   projection). When omitted, all columns are returned by the backend.
  * @returns The response from the API call.
  */
 export function useJobs(
@@ -341,13 +377,18 @@ export function useJobs(
   searchBody: SearchBody,
   page: number,
   rowsPerPage: number,
+  visibleColumns?: string[],
 ) {
   /** The url to fetch jobs */
   const urlGetJobs = getSearchJobUrl(diracxUrl, page, rowsPerPage);
 
-  /** The key used to revalidate the SWR cache */
-  const swrKey: [string, SearchBody] | null = urlGetJobs
-    ? [urlGetJobs, searchBody]
+  /**
+   * The key used to revalidate the SWR cache.
+   * The visible columns are part of the key so that toggling column
+   * visibility naturally refetches with the new projection.
+   */
+  const swrKey: [string, SearchBody, string[] | null] | null = urlGetJobs
+    ? [urlGetJobs, searchBody, visibleColumns ?? null]
     : null;
 
   const {
@@ -356,23 +397,39 @@ export function useJobs(
     isLoading,
   } = useSWR(
     swrKey,
-    async ([url, _searchBody]) => {
-      processSearchBody(_searchBody);
+    async ([url, _searchBody, _visibleColumns]) => {
+      const processed = processSearchBody(_searchBody);
 
       const body = {
-        search: _searchBody.search || [],
-        sort: _searchBody.sort || [],
+        ...(_visibleColumns && _visibleColumns.length > 0
+          ? { parameters: _visibleColumns }
+          : {}),
+        search: processed.search || [],
+        sort: processed.sort || [],
       };
 
-      return await fetcher<Job[]>([url, accessToken, "POST", body]);
+      return await fetcher<Job[]>({
+        url,
+        accessToken,
+        method: "POST",
+        body,
+      });
     },
     {
       revalidateOnMount: true,
       revalidateOnFocus: false,
       revalidateOnReconnect: false,
-      revalidateIfStale: false,
-      dedupingInterval: 60000,
+      // Revalidate cached entries when the key changes back to one seen
+      // earlier (e.g. toggling rows-per-page): otherwise the table serves
+      // pre-refresh data from the cache and never refetches it.
+      revalidateIfStale: true,
+      // Deduping only guards against render-storm duplicates; a long window
+      // here acts as an accidental freshness policy and pins stale pages.
+      dedupingInterval: 5000,
       shouldRetryOnError: false,
+      // Keep showing the previous page's rows while a new key (page/sort/
+      // filter/column change) is loading, instead of unmounting the table.
+      keepPreviousData: true,
     },
   );
 
@@ -394,13 +451,47 @@ export function useJobs(
 }
 
 /**
- * Generates the URL for searching jobs.
+ * Fetches all job IDs matching the current search filters.
+ * Uses the `parameters` field to request only JobID, with
+ * per_page=MAX_BULK_RESULTS (the same limit that gates bulk actions in the
+ * toolbar, so no matching ID is silently truncated).
  *
  * @param diracxUrl - The base URL of the DiracX API.
- * @param page - The page number for pagination.
- * @param rowsPerPage - The number of rows per page.
- * @returns The URL for the job search API endpoint.
+ * @param accessToken - The access token for authentication.
+ * @param searchBody - The search body for filtering jobs.
+ * @returns An array of job IDs.
  */
+export async function fetchMatchingJobIds(
+  diracxUrl: string | null,
+  accessToken: string,
+  searchBody: SearchBody,
+): Promise<number[]> {
+  if (!diracxUrl) {
+    throw new Error("Invalid URL for fetching job IDs.");
+  }
+
+  const body = {
+    parameters: ["JobID"],
+    search: searchBody.search || [],
+    sort: searchBody.sort || [],
+  };
+
+  // Process 'last' operator before sending
+  const processedBody = processSearchBody({
+    ...body,
+    search: [...(body.search || [])],
+  } as SearchBody);
+
+  const result = await fetcher<{ JobID: number }[]>({
+    url: `${diracxUrl}/api/jobs/search?page=1&per_page=${MAX_BULK_RESULTS}`,
+    accessToken,
+    method: "POST",
+    body: processedBody,
+  });
+
+  return (result.data as { JobID: number }[]).map((item) => item.JobID);
+}
+
 export function getSearchJobUrl(
   diracxUrl: string | null,
   page: number,

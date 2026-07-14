@@ -9,6 +9,13 @@ import React, { KeyboardEvent, useState } from "react";
 import "dayjs/locale/en-gb"; // Import the locale for dayjs
 import { TextField, TextFieldProps } from "@mui/material";
 
+/**
+ * Display format of the date-time picker input (en-gb locale, 24h clock with
+ * seconds). Passed explicitly to the picker so that consumers (e.g.
+ * SearchField caret handling) can rely on its exact length.
+ */
+export const DATE_TIME_PICKER_FORMAT = "DD/MM/YYYY HH:mm:ss";
+
 interface CustomDateTimePickerProps extends Omit<
   DateTimePickerProps,
   "value" | "onChange"
@@ -65,11 +72,14 @@ export function MyDateTimePicker({
 
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale={"en-gb"}>
-      <div onClick={(e) => e.stopPropagation()}>
+      {/* Non-interactive wrapper: the click handler only stops propagation
+          so clicks inside the picker don't refocus the search input. */}
+      <div role="presentation" onClick={(e) => e.stopPropagation()}>
         <DateTimePicker
           enableAccessibleFieldDOMStructure={false}
           value={dateValue}
           onChange={(val) => setDateValue(val)}
+          format={DATE_TIME_PICKER_FORMAT}
           views={["year", "month", "day", "hours", "minutes", "seconds"]}
           onAccept={(val, _ctx) =>
             onDateAccepted(val ? val.toISOString() : null)

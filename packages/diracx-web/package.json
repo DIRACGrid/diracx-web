@@ -7,6 +7,7 @@
     "dev": "export NEXT_PUBLIC_DIRACX_URL=$DIRACX_URL; next dev --webpack",
     "build": "next build",
     "test": "cypress open --config baseUrl=$DIRACX_URL",
+    "test:headless": "cypress run --config baseUrl=$DIRACX_URL",
     "start": "next start",
     "lint": "eslint ./src",
     "lint-staged": "lint-staged",

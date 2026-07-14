@@ -1,10 +1,29 @@
+import { useState } from "react";
 import { render, screen, waitFor } from "@testing-library/react";
 import { composeStories } from "@storybook/react";
 import userEvent from "@testing-library/user-event";
 import * as stories from "../stories/SearchBar.stories";
+import { SearchBar } from "../src/components/shared/SearchBar/SearchBar";
+import type {
+  Filter,
+  SearchBarSuggestions,
+  SearchBarToken,
+  SearchBarTokenEquation,
+} from "../src/types";
 
 // Compose the stories to get actual Storybook behavior (decorators, args, etc)
 const { Default, WithPrefilledTokens } = composeStories(stories);
+
+const emptySuggestions: SearchBarSuggestions = {
+  items: [],
+  type: [],
+  nature: [],
+};
+
+const noopSuggestions = async (_: {
+  previousToken?: SearchBarToken;
+  previousEquation?: SearchBarTokenEquation;
+}) => emptySuggestions;
 
 describe("SearchBar", () => {
   it("renders the component", async () => {
@@ -51,8 +70,12 @@ describe("SearchBar", () => {
 
     const searchInput = screen.getByPlaceholderText("Enter a category");
 
-    // Type and select a category
+    // Type a category
     await user.type(searchInput, "Status");
+
+    // Wait for the (debounced) category suggestions to load before submitting,
+    // otherwise the input is classified as a keyword instead of a category
+    await screen.findByRole("option", { name: "Status" });
     await user.keyboard("{Enter}");
 
     // Check if token is created
@@ -72,12 +95,15 @@ describe("SearchBar", () => {
 
     const searchInput = screen.getByPlaceholderText("Enter a category");
 
-    // Create a category token (Status)
+    // Create a category token (Status), waiting for the (debounced)
+    // suggestions so the input is recognized as a category
     await user.type(searchInput, "Status");
+    await screen.findByRole("option", { name: "Status" });
     await user.keyboard("{Enter}");
 
     // Focus operator input
-    const operatorInput = screen.getByPlaceholderText("Enter an operator");
+    const operatorInput =
+      await screen.findByPlaceholderText("Enter an operator");
     await user.click(operatorInput);
 
     // Open the autocomplete popup
@@ -98,11 +124,11 @@ describe("SearchBar", () => {
     const user = userEvent.setup();
     render(<WithPrefilledTokens />);
 
-    // Find and click on an existing token
-    await waitFor(() => {
-      const tokenButton = screen.getByText("12345");
-      user.click(tokenButton);
-    });
+    // Wait for the token to render, then click it (the click must be awaited
+    // outside waitFor: an un-awaited click inside waitFor can fire multiple
+    // times and its effects race the assertion)
+    const tokenButton = await screen.findByText("12345");
+    await user.click(tokenButton);
 
     // Check if menu appears
     await waitFor(
@@ -133,11 +159,10 @@ describe("SearchBar", () => {
     await waitFor(() => {
       expect(screen.getByText("12345")).toBeInTheDocument();
       expect(screen.getByText("Running | Completed")).toBeInTheDocument();
-
-      // Click delete button
-      const deleteButton = screen.getByTestId("clear-filters-button");
-      user.click(deleteButton);
     });
+
+    // Click delete button (awaited, outside waitFor)
+    await user.click(screen.getByTestId("clear-filters-button"));
 
     // Check if tokens are removed
     await waitFor(() => {
@@ -159,5 +184,41 @@ describe("SearchBar", () => {
 
     // Check if input is focused
     expect(searchInput).toHaveFocus();
+  });
+
+  it("clears token equations when the filters prop becomes empty", async () => {
+    const initialFilters: Filter[] = [
+      { operator: "eq", parameter: "JobID", value: "12345" },
+    ];
+
+    function Harness() {
+      const [filters, setFilters] = useState<Filter[]>(initialFilters);
+      return (
+        <>
+          <SearchBar
+            filters={filters}
+            setFilters={setFilters}
+            createSuggestions={noopSuggestions}
+          />
+          <button onClick={() => setFilters([])}>external-clear</button>
+        </>
+      );
+    }
+
+    const user = userEvent.setup();
+    render(<Harness />);
+
+    // The prefilled token should render once useFilterSync converts the filter.
+    await waitFor(() => {
+      expect(screen.getByText("12345")).toBeInTheDocument();
+    });
+
+    // External caller empties the filters prop (not via the SearchBar clear button).
+    await user.click(screen.getByText("external-clear"));
+
+    // Token equations should be cleared rather than left stale.
+    await waitFor(() => {
+      expect(screen.queryByText("12345")).not.toBeInTheDocument();
+    });
   });
 });

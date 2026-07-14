@@ -29,7 +29,7 @@ describe("Owner Monitor", () => {
     // Click the Add Owner button
     cy.contains("button", "Add Owner").click();
 
-    cy.get('[data-testid="virtuoso-scroller"]')
+    cy.get('[data-testid="table-scroller"]')
       .wait(100) // Wait for rendering
       .scrollTo("bottom", { ensureScrollable: false });
 

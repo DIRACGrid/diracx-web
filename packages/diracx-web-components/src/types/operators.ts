@@ -1,5 +1,5 @@
 export class Operators {
-  static readonly EGUALS = new Operators("=", "eq");
+  static readonly EQUALS = new Operators("=", "eq");
   static readonly NOT_EQUALS = new Operators("!=", "neq");
   static readonly GREATER_THAN = new Operators(">", "gt");
   static readonly LESS_THAN = new Operators("<", "lt");
@@ -45,7 +45,7 @@ export class Operators {
 
   static getAll(): Operators[] {
     return [
-      Operators.EGUALS,
+      Operators.EQUALS,
       Operators.NOT_EQUALS,
       Operators.GREATER_THAN,
       Operators.LESS_THAN,
@@ -68,7 +68,7 @@ export class Operators {
 
   static getStringOperators(): Operators[] {
     return [
-      Operators.EGUALS,
+      Operators.EQUALS,
       Operators.NOT_EQUALS,
       Operators.IN,
       Operators.NOT_IN,
@@ -80,7 +80,7 @@ export class Operators {
 
   static getNumberOperators(): Operators[] {
     return [
-      Operators.EGUALS,
+      Operators.EQUALS,
       Operators.NOT_EQUALS,
       Operators.GREATER_THAN,
       Operators.LESS_THAN,
@@ -92,7 +92,7 @@ export class Operators {
   }
 
   static getBooleanOperators(): Operators[] {
-    return [Operators.EGUALS, Operators.NOT_EQUALS];
+    return [Operators.EQUALS, Operators.NOT_EQUALS];
   }
 
   static getDateOperators(): Operators[] {
@@ -101,7 +101,7 @@ export class Operators {
 
   static getDefaultOperators(): Operators[] {
     return [
-      Operators.EGUALS,
+      Operators.EQUALS,
       Operators.NOT_EQUALS,
       Operators.GREATER_THAN,
       Operators.LESS_THAN,
