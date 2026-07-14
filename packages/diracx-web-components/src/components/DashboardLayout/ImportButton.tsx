@@ -12,10 +12,10 @@ import {
 } from "@mui/material";
 import InputIcon from "@mui/icons-material/Input";
 import React, { useState, use } from "react";
-import { ApplicationsContext } from "../../contexts";
+import { AppListContext, DashboardContext } from "../../contexts";
 import {
-  ApplicationMetadata,
   DashboardGroup,
+  DashboardItem,
   ApplicationSettings,
 } from "../../types";
 import { ApplicationState } from "../../types/ApplicationMetadata";
@@ -186,7 +186,8 @@ export function ImportButton() {
   const [correctStates, setCorrectStates] = useState<
     { oldSettings: ApplicationSettings; newState: ApplicationState }[]
   >([]);
-  const [userDashboard, setUserDashboard, appList] = use(ApplicationsContext);
+  const { appList } = use(AppListContext);
+  const { userDashboard, setUserDashboard } = use(DashboardContext);
 
   const handleImport = (
     importedStates: ApplicationSettings | ApplicationSettings[],
@@ -204,39 +205,50 @@ export function ImportButton() {
       title = `Imported Applications ${parseInt(title.split(" ")[2]) + 1}`;
     }
 
-    const newGroup = {
-      title: title,
-      extended: true,
-      items: [],
-    };
-
-    // Create a group only if there are valid states to import
-    if (states.some((state) => state.state !== "null"))
-      userDashboard.push(newGroup);
+    // Build the new group and any outdated-state notices locally, then
+    // commit them with immutable state updates.
+    const newItems: DashboardItem[] = [];
+    const newCorrectStates: {
+      oldSettings: ApplicationSettings;
+      newState: ApplicationState;
+    }[] = [];
 
     states.forEach((state) => {
-      if (state.state !== "null") {
-        const applicationMetadata = appList.find(
-          (app) => app.name === state.appType,
-        );
-        const appId = handleAppCreation(
-          state.appType,
-          state.appName,
-          applicationMetadata,
-          userDashboard,
-          setUserDashboard,
-        );
-        const [appState, haveChangedState] =
-          applicationMetadata?.validateAndConvertState
-            ? applicationMetadata.validateAndConvertState(state.state)
-            : [state.state, false];
-        if (haveChangedState)
-          correctStates.push({ oldSettings: state, newState: appState });
-        sessionStorage.setItem(`${appId}_State`, appState);
-      } else {
+      if (state.state === "null") {
         console.warn(`No state to import for app type: ${state.appType}`);
+        return;
       }
+      const applicationMetadata = appList.find(
+        (app) => app.name === state.appType,
+      );
+      const newApp = createApp(
+        state.appType,
+        state.appName,
+        newItems,
+        userDashboard,
+      );
+      newItems.push(newApp);
+      const [appState, haveChangedState] =
+        applicationMetadata?.validateAndConvertState
+          ? applicationMetadata.validateAndConvertState(state.state)
+          : [state.state, false];
+      if (haveChangedState)
+        newCorrectStates.push({ oldSettings: state, newState: appState });
+      sessionStorage.setItem(`${newApp.id}_State`, appState);
     });
+
+    // Create a group only if there are valid states to import
+    if (newItems.length > 0) {
+      const newGroup: DashboardGroup = {
+        title: title,
+        extended: true,
+        items: newItems,
+      };
+      setUserDashboard((prev) => [...prev, newGroup]);
+    }
+    if (newCorrectStates.length > 0) {
+      setCorrectStates((prev) => [...prev, ...newCorrectStates]);
+    }
   };
 
   return (
@@ -267,25 +279,23 @@ export function ImportButton() {
 }
 
 /**
- * Handles the creation of a new app in the dashboard drawer.
+ * Builds a new dashboard app entry without mutating any existing state.
  *
  * @param appType - The type of the app to be created.
  * @param appTitle - The title of the app to be created.
- * @param appList - The list of applications with their metadata.
- * @param userDashboard - The current state of the user's dashboard.
- * @param setUserDashboard - The function to update the user's dashboard state.
- * @returns The ID of the newly created app.
+ * @param groupItems - The items already added to the group being built
+ * (used for title deduplication and ID uniqueness).
+ * @param userDashboard - The current state of the user's dashboard (read-only,
+ * used for ID uniqueness).
+ * @returns The newly created app entry.
  */
-function handleAppCreation(
+function createApp(
   appType: string,
   appTitle: string,
-  applicationMetadata: ApplicationMetadata | undefined,
+  groupItems: DashboardItem[],
   userDashboard: DashboardGroup[],
-  setUserDashboard: React.Dispatch<React.SetStateAction<DashboardGroup[]>>,
-): string {
-  const group = userDashboard[userDashboard.length - 1];
-
-  const count = group.items.filter((item) =>
+): DashboardItem {
+  const count = groupItems.filter((item) =>
     item.title.startsWith(appTitle),
   ).length;
 
@@ -293,22 +303,19 @@ function handleAppCreation(
 
   let appId = `${appType} 0`;
   while (
-    userDashboard.some((group) => group.items.some((app) => app.id === appId))
+    userDashboard.some((group) =>
+      group.items.some((app) => app.id === appId),
+    ) ||
+    groupItems.some((app) => app.id === appId)
   ) {
     const match = appId.match(/(\d+)$/);
     const num = match ? parseInt(match[1], 10) + 1 : 0;
     appId = `${appType} ${num}`;
   }
 
-  const newApp = {
+  return {
     title: title,
     id: appId,
     type: appType,
   };
-  group.items.push(newApp);
-  setUserDashboard((userDashboard) =>
-    userDashboard.map((g) => (g.title === group.title ? group : g)),
-  );
-
-  return appId;
 }
