@@ -18,7 +18,6 @@ import {
 } from "@mui/material";
 import { MenuBook, Add } from "@mui/icons-material";
 import React, { use, useEffect, useState } from "react";
-import Image from "next/image";
 import { monitorForElements } from "@atlaskit/pragmatic-drag-and-drop/element/adapter";
 import { extractClosestEdge } from "@atlaskit/pragmatic-drag-and-drop-hitbox/closest-edge";
 import { ApplicationsContext } from "../../contexts/ApplicationsProvider";
@@ -413,11 +412,17 @@ export default function DashboardDrawer({
               backgroundColor: theme.palette.background.default,
             }}
           >
-            <Image
+            <img
               src={logoURL}
               alt="DIRAC logo"
-              fill
-              style={{ objectFit: "contain" }}
+              style={{
+                position: "absolute",
+                top: 0,
+                left: 0,
+                width: "100%",
+                height: "100%",
+                objectFit: "contain",
+              }}
             />
           </Toolbar>
           {/* Map over user app instances and render them as list items in the drawer. */}

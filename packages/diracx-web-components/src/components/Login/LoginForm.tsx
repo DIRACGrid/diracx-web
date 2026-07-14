@@ -16,8 +16,6 @@ import {
   SelectChangeEvent,
 } from "@mui/material";
 
-import Image from "next/image";
-
 import { useOidc } from "@axa-fr/react-oidc";
 import { useMetadata, Metadata } from "../../hooks/metadata";
 import { useOIDCContext } from "../../hooks/oidcConfiguration";
@@ -153,7 +151,7 @@ export function LoginForm({
             paddingBottom: "10%",
           }}
         >
-          <Image src={logoURL} alt="DIRAC logo" width={150} height={150} />
+          <img src={logoURL} alt="DIRAC logo" width={150} height={150} />
         </Box>
         {singleVO ? (
           <Typography

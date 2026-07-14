@@ -2,7 +2,7 @@
 
 import type { ApplicationMetadata, DashboardGroup } from "../types";
 
-import { OIDCSecure } from "../components";
+import { OIDCSecure } from "../components/OIDC/OIDCSecure";
 import { ThemeProvider } from "./ThemeProvider";
 import {
   OIDCConfigurationProvider,
