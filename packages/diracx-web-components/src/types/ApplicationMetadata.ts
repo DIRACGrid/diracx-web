@@ -1,6 +1,6 @@
 "use client";
 
-import { SvgIconComponent } from "@mui/icons-material";
+import type { SvgIconComponent } from "@mui/icons-material";
 import { ElementType } from "react";
 
 export default interface ApplicationMetadata {

@@ -1,7 +1,11 @@
 import { useState } from "react";
 import type { Meta, StoryObj } from "@storybook/nextjs";
 import { Box } from "@mui/material";
-import { ApplicationsContext } from "../src/contexts/ApplicationsProvider";
+import {
+  AppListContext,
+  CurrentAppContext,
+  DashboardContext,
+} from "../src/contexts/ApplicationsProvider";
 import { NavigationProvider } from "../src/contexts/NavigationProvider";
 import { applicationList } from "../src/components/applicationList";
 import { DashboardGroup } from "../src/types/DashboardGroup";
@@ -47,21 +51,17 @@ const meta = {
             return url;
           }}
         >
-          <ApplicationsContext.Provider
-            value={[
-              userDashboard,
-              setUserDashboard,
-              applicationList,
-              currentAppId,
-              setCurrentAppId,
-            ]}
-          >
-            <ThemeProvider>
-              <Box sx={{ height: "50vh" }}>
-                <Story />
-              </Box>
-            </ThemeProvider>
-          </ApplicationsContext.Provider>
+          <AppListContext value={{ appList: applicationList }}>
+            <DashboardContext value={{ userDashboard, setUserDashboard }}>
+              <CurrentAppContext value={{ currentAppId, setCurrentAppId }}>
+                <ThemeProvider>
+                  <Box sx={{ height: "50vh" }}>
+                    <Story />
+                  </Box>
+                </ThemeProvider>
+              </CurrentAppContext>
+            </DashboardContext>
+          </AppListContext>
         </NavigationProvider>
       );
     },

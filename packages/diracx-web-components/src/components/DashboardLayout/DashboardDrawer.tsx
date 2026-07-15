@@ -1,29 +1,26 @@
 "use client";
 
 import {
-  Box,
-  Button,
   Drawer,
   List,
   ListItem,
   ListItemButton,
   ListItemIcon,
   ListItemText,
-  Menu,
-  MenuItem,
-  Popover,
-  TextField,
   Toolbar,
   useTheme,
 } from "@mui/material";
-import { MenuBook, Add } from "@mui/icons-material";
-import React, { use, useEffect, useState } from "react";
-import { monitorForElements } from "@atlaskit/pragmatic-drag-and-drop/element/adapter";
-import { extractClosestEdge } from "@atlaskit/pragmatic-drag-and-drop-hitbox/closest-edge";
-import { ApplicationsContext } from "../../contexts/ApplicationsProvider";
-import { DashboardGroup } from "../../types";
+import MenuBook from "@mui/icons-material/MenuBook";
+import Add from "@mui/icons-material/Add";
+import React, { use, useRef, useState } from "react";
+import {
+  CurrentAppContext,
+  DashboardContext,
+} from "../../contexts/ApplicationsProvider";
 import DrawerItemGroup from "./DrawerItemGroup";
 import AppDialog from "./ApplicationDialog";
+import DrawerContextMenu from "./DrawerContextMenu";
+import useDashboardDragDrop from "./useDashboardDragDrop";
 
 interface DashboardDrawerProps {
   /** The variant of the drawer. Usually temporary if on mobile and permanent otherwise. */
@@ -55,12 +52,7 @@ export default function DashboardDrawer({
   logoURL = "/DIRAC-logo.png",
   documentationURL,
 }: DashboardDrawerProps) {
-  // Determine the container for the Drawer based on whether the window object exists.
-  const container =
-    window !== undefined ? () => window.document.body : undefined;
-  // Check if the drawer is in "temporary" mode.
   const isTemporary = variant === "temporary";
-  // Whether the modal for Application Creation is open
   const [appDialogOpen, setAppDialogOpen] = useState(false);
 
   const [contextMenu, setContextMenu] = useState<{
@@ -69,155 +61,27 @@ export default function DashboardDrawer({
   } | null>(null);
 
   const [contextState, setContextState] = useState<{
-    type: string | null;
+    type: "group" | "item" | null;
     id: string | null;
   }>({ type: null, id: null });
 
-  const [popAnchorEl, setPopAnchorEl] = useState<HTMLElement | null>(null);
   const [renamingItemId, setRenamingItemId] = useState<string | null>(null);
   const [renamingGroupId, setRenamingGroupId] = useState<string | null>(null);
   const [renameValue, setRenameValue] = useState("");
 
-  // Define the applications that are accessible to users.
-  // Each application has an associated icon and path.
-  const [userDashboard, setUserDashboard, , , setCurrentAppId] =
-    use(ApplicationsContext);
+  const { userDashboard, setUserDashboard } = use(DashboardContext);
+  const { setCurrentAppId } = use(CurrentAppContext);
 
   const theme = useTheme();
 
-  useEffect(() => {
-    // Handle changes to app instances when drag and drop occurs.
-    return monitorForElements({
-      onDrop({ source, location }) {
-        const target = location.current.dropTargets[0];
-        if (!target) {
-          return;
-        }
-        const sourceData = source.data;
-        const targetData = target.data;
+  // Set up drag and drop
+  useDashboardDragDrop(setUserDashboard);
 
-        if (location.current.dropTargets.length == 2) {
-          // If the target is an item
-          const groupTitle = targetData.title;
-          const closestEdgeOfTarget = extractClosestEdge(targetData);
-          const targetIndex = targetData.index as number;
-          const sourceGroup = userDashboard.find(
-            (group) => group.title == sourceData.title,
-          );
-          const targetGroup = userDashboard.find(
-            (group) => group.title == groupTitle,
-          );
-          const sourceIndex = sourceData.index as number;
-          const destinationIndex = (
-            closestEdgeOfTarget === "top" ? targetIndex : targetIndex + 1
-          ) as number;
-
-          reorderSections(
-            sourceGroup,
-            targetGroup,
-            sourceIndex,
-            destinationIndex,
-          );
-        } else {
-          // If the target is a group
-          const groupTitle = targetData.title;
-          const sourceGroup = userDashboard.find(
-            (group) => group.title == sourceData.title,
-          );
-          const targetGroup = userDashboard.find(
-            (group) => group.title == groupTitle,
-          );
-          const sourceIndex = sourceData.index as number;
-
-          reorderSections(sourceGroup, targetGroup, sourceIndex);
-        }
-      },
-    });
-
-    /**
-     * Reorders app instances within a group or between different groups.
-     *
-     * @param sourceGroup - The source group from which the app instance is being moved.
-     * @param destinationGroup - The destination group where the app instance is being moved to.
-     * @param sourceIndex - The index of the app instance within the source group.
-     * @param destinationIndex - The index where the app instance should be placed in the destination group.
-     *                           If null, the app instance will be placed at the end of the destination group.
-     */
-    function reorderSections(
-      sourceGroup: DashboardGroup | undefined,
-      destinationGroup: DashboardGroup | undefined,
-      sourceIndex: number,
-      destinationIndex: number | null = null,
-    ) {
-      if (sourceGroup && destinationGroup) {
-        if (
-          sourceGroup.title === destinationGroup.title &&
-          destinationIndex &&
-          sourceIndex < destinationIndex
-        ) {
-          destinationIndex -= 1; // Corrects the index within the same group if needed
-        }
-        if (
-          sourceGroup.title === destinationGroup.title &&
-          (destinationIndex == null || sourceIndex === destinationIndex)
-        ) {
-          return; // Nothing to do
-        }
-
-        if (sourceGroup.title === destinationGroup.title) {
-          const sourceItems = [...sourceGroup.items];
-
-          const [removed] = sourceItems.splice(sourceIndex, 1);
-
-          if (destinationIndex === null) {
-            destinationIndex = sourceItems.length;
-          }
-          sourceItems.splice(destinationIndex, 0, removed);
-
-          setUserDashboard((groups) =>
-            groups.map((group) =>
-              group.title === sourceGroup.title
-                ? { ...group, items: sourceItems }
-                : group,
-            ),
-          );
-        } else {
-          const sourceItems = [...sourceGroup.items];
-
-          const [removed] = sourceItems.splice(sourceIndex, 1);
-
-          const destinationItems = [...destinationGroup.items];
-
-          if (destinationIndex === null) {
-            destinationIndex = destinationItems.length;
-          }
-          destinationItems.splice(destinationIndex, 0, removed);
-
-          setUserDashboard((groups) =>
-            groups.map((group) =>
-              group.title === sourceGroup.title
-                ? { ...group, items: sourceItems }
-                : group.title === destinationGroup.title
-                  ? { ...group, items: destinationItems }
-                  : group,
-            ),
-          );
-        }
-      }
-    }
-  }, [setUserDashboard, userDashboard]);
-
-  /**
-   * Handles the creation of a new app in the dashboard drawer.
-   *
-   * @param appType - The type of the app to be created.
-   */
   const handleAppCreation = (appType: string) => {
     const group =
       userDashboard.length > 0
         ? userDashboard[userDashboard.length - 1]
         : {
-            // Create a new group if none exists
             title: `Group 1`,
             extended: false,
             items: [],
@@ -249,18 +113,19 @@ export default function DashboardDrawer({
       id: appId,
       type: appType,
     };
-    group.items.push(newApp);
+    // Build a new group object instead of mutating the one held in state
+    const updatedGroup = { ...group, items: [...group.items, newApp] };
     if (empty) {
-      setUserDashboard((userDashboard) => [...userDashboard, group]);
+      setUserDashboard((userDashboard) => [...userDashboard, updatedGroup]);
     } else {
       setUserDashboard((userDashboard) =>
-        userDashboard.map((g) => (g.title === group.title ? group : g)),
+        userDashboard.map((g) => (g.title === group.title ? updatedGroup : g)),
       );
     }
     setCurrentAppId(newApp.id);
   };
 
-  let isContextStateStable = true;
+  const isContextStateStable = useRef(true);
 
   const handleContextMenu =
     (type: "group" | "item" | null = null, id: string | null = null) =>
@@ -274,16 +139,16 @@ export default function DashboardDrawer({
         mouseX: event.clientX + 2,
         mouseY: event.clientY - 6,
       });
-      if (isContextStateStable) {
+      if (isContextStateStable.current) {
         setContextState({ type, id });
-        isContextStateStable = false;
+        isContextStateStable.current = false;
       }
     };
 
   const handleCloseContextMenu = () => {
     setContextMenu(null);
     setContextState({ type: null, id: null });
-    isContextStateStable = true;
+    isContextStateStable.current = true;
   };
 
   const handleNewGroup = () => {
@@ -332,58 +197,22 @@ export default function DashboardDrawer({
   const handleRenameClick = () => {
     if (contextState.type === "group") {
       setRenamingGroupId(contextState.id);
+      setRenameValue(contextState.id ?? "");
     } else if (contextState.type === "item") {
       setRenamingItemId(contextState.id);
+      const currentTitle = userDashboard
+        .flatMap((group) => group.items)
+        .find((item) => item.id === contextState.id)?.title;
+      setRenameValue(currentTitle ?? "");
     }
-    setRenameValue("");
     handleCloseContextMenu();
   };
 
-  const popClose = () => {
-    setRenameValue("");
-    setPopAnchorEl(null);
-  };
-
-  const handleRename = () => {
-    if (contextState.type === "group") {
-      //check if the name is already taken
-      if (userDashboard.some((group) => group.title === renameValue)) {
-        return;
-      }
-      //rename the group
-      setUserDashboard((userDashboard) =>
-        userDashboard.map((group) => {
-          if (group.title === contextState.id) {
-            return { ...group, title: renameValue };
-          }
-          return group;
-        }),
-      );
-    } else if (contextState.type === "item") {
-      setUserDashboard((userDashboard) =>
-        userDashboard.map((group) => {
-          const newItems = group.items.map((item) => {
-            if (item.id === contextState.id) {
-              return { ...item, title: renameValue };
-            }
-            return item;
-          });
-          return { ...group, items: newItems };
-        }),
-      );
-    }
-
-    popClose();
-    handleCloseContextMenu();
-  };
-
-  // Use provided documentationURL or fallback to default
   const docURL = documentationURL || "https://diracx.io";
 
   return (
     <>
       <Drawer
-        container={isTemporary ? container : undefined}
         variant={variant}
         open={isTemporary ? mobileOpen : true}
         onClose={handleDrawerToggle}
@@ -403,7 +232,6 @@ export default function DashboardDrawer({
         <div
           style={{ display: "flex", flexDirection: "column", height: "100%" }}
         >
-          {/* Display the logo in the toolbar section of the drawer. */}
           <Toolbar
             sx={{
               position: "sticky",
@@ -425,11 +253,12 @@ export default function DashboardDrawer({
               }}
             />
           </Toolbar>
-          {/* Map over user app instances and render them as list items in the drawer. */}
           <List>
-            {userDashboard.map((group, index) => (
+            {userDashboard.map((group) => (
               <ListItem
-                key={index}
+                // Group titles are kept unique by the creation/rename dedup
+                // logic, so they are a stable identity across drag-reorders
+                key={group.title}
                 disablePadding
                 onContextMenu={handleContextMenu("group", group.title)}
               >
@@ -448,7 +277,6 @@ export default function DashboardDrawer({
             ))}
           </List>
 
-          {/* Render a link to documentation and a button to add applications, positioned at the bottom of the drawer. */}
           <List
             sx={{
               mt: "auto",
@@ -475,59 +303,14 @@ export default function DashboardDrawer({
             </ListItem>
           </List>
         </div>
-        <Menu
-          open={contextMenu !== null}
+        <DrawerContextMenu
+          contextMenu={contextMenu}
+          contextType={contextState.type}
           onClose={handleCloseContextMenu}
-          anchorReference="anchorPosition"
-          anchorPosition={
-            contextMenu !== null
-              ? { top: contextMenu.mouseY, left: contextMenu.mouseX }
-              : undefined
-          }
-          data-testid="context-menu"
-        >
-          {contextState.type && (
-            <MenuItem onClick={handleRenameClick}>Rename</MenuItem>
-          )}
-          {contextState.type && (
-            <MenuItem onClick={handleDelete}>Delete</MenuItem>
-          )}
-          {contextState.type === null && (
-            <MenuItem onClick={handleNewGroup}>New Group</MenuItem>
-          )}
-        </Menu>
-        <Popover
-          open={Boolean(popAnchorEl)}
-          anchorEl={popAnchorEl}
-          onClose={popClose}
-          anchorOrigin={{
-            vertical: "center",
-            horizontal: "right",
-          }}
-          transformOrigin={{
-            vertical: "center",
-            horizontal: "left",
-          }}
-        >
-          <form
-            onSubmit={(e) => {
-              e.preventDefault();
-              handleRename();
-            }}
-          >
-            <Box sx={{ p: 2, display: "flex" }}>
-              <TextField
-                autoFocus
-                label="New Name"
-                value={renameValue}
-                onChange={(e) => setRenameValue(e.target.value)}
-              />
-              <Button variant="outlined" type="submit">
-                Rename
-              </Button>
-            </Box>
-          </form>
-        </Popover>
+          onRename={handleRenameClick}
+          onDelete={handleDelete}
+          onNewGroup={handleNewGroup}
+        />
       </Drawer>
       <AppDialog
         appDialogOpen={appDialogOpen}
