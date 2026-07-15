@@ -75,7 +75,7 @@ export default function DashboardDrawer({
   const theme = useTheme();
 
   // Set up drag and drop
-  useDashboardDragDrop(userDashboard, setUserDashboard);
+  useDashboardDragDrop(setUserDashboard);
 
   const handleAppCreation = (appType: string) => {
     const group =
