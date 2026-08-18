@@ -149,6 +149,7 @@ export default function DrawerItemGroup({
             // The rename field only appears in direct response to a user
             // action (context-menu "Rename"), so moving focus into it is
             // the expected behavior, not a focus steal.
+            // eslint-disable-next-line jsx-a11y/no-autofocus
             autoFocus
             size="small"
           />

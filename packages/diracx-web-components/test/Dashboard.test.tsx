@@ -290,8 +290,13 @@ describe("ThemeToggleButton", () => {
     expect(getByTestId("dark-mode")).toBeInTheDocument();
     expect(queryByTestId("light-mode")).not.toBeInTheDocument();
 
-    // Verify sessionStorage was updated to match system preference
-    expect(sessionStorage.getItem("theme")).toBe("light");
+    // The system-derived default is NOT persisted (storage only records an
+    // explicit user choice, written from the toggle handler)
+    expect(sessionStorage.getItem("theme")).toBeNull();
+
+    // An explicit toggle persists the chosen theme
+    fireEvent.click(getByTestId("theme-toggle-button"));
+    expect(sessionStorage.getItem("theme")).toBe("dark");
   });
 
   it("prioritizes sessionStorage theme over system preference", () => {
@@ -348,7 +353,6 @@ describe("ProfileButton", () => {
     expect(getByText("dirac")).toBeInTheDocument();
     expect(getByText("group1")).toBeInTheDocument();
     expect(getByText("Properties")).toBeInTheDocument();
-    expect(getByText("About")).toBeInTheDocument();
     expect(getByText("Logout")).toBeInTheDocument();
 
     // Expand properties

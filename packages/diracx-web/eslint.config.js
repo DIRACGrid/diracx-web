@@ -40,7 +40,9 @@ export default [
       "react/destructuring-assignment": ["error", "always"],
 
       // Coding style rules
-      "comma-dangle": ["error", "always-multiline"],
+      // Formatting (commas, semicolons, indentation) is owned by Prettier;
+      // re-enabling the corresponding ESLint rules after extending
+      // eslint-config-prettier reintroduces the exact conflicts it prevents.
       "no-unreachable": ["error"],
       "prefer-const": ["error"],
       "no-unused-vars": [
@@ -53,10 +55,6 @@ export default [
         },
       ],
       "@typescript-eslint/no-explicit-any": ["error"],
-      semi: ["error", "always"],
-
-      // Identation rules
-      indent: ["error", 2],
 
       "no-restricted-properties": [
         "error",
