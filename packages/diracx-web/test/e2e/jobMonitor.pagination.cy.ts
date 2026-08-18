@@ -36,7 +36,7 @@ describe("Job Monitor - Pagination", () => {
     let lastValue: number;
 
     // Get the first visible row value (e.g. 55)
-    cy.get("table tbody tr")
+    cy.get("table tbody tr[data-index]")
       .first()
       .find("td")
       .eq(1)
@@ -46,11 +46,11 @@ describe("Job Monitor - Pagination", () => {
       });
 
     // Scroll and get the last visible row value (e.g. 31)
-    cy.get('[data-testid="virtuoso-scroller"]')
+    cy.get('[data-testid="table-scroller"]')
       .wait(100)
       .scrollTo("bottom", { ensureScrollable: false });
 
-    cy.get("table tbody tr")
+    cy.get("table tbody tr[data-index]")
       .last()
       .find("td")
       .eq(1)
@@ -66,7 +66,7 @@ describe("Job Monitor - Pagination", () => {
     let firstValueNextPage: number;
 
     // Get the first visible row value (e.g. 55)
-    cy.get("table tbody tr")
+    cy.get("table tbody tr[data-index]")
       .first()
       .find("td")
       .eq(1)
@@ -93,7 +93,7 @@ describe("Job Monitor - Pagination", () => {
       }
     });
 
-    cy.get("table tbody tr")
+    cy.get("table tbody tr[data-index]")
       .last()
       .find("td")
       .eq(1)
@@ -134,7 +134,7 @@ describe("Job Monitor - Pagination", () => {
     let lastValue: number;
 
     // Get the first visible row value (e.g. 55)
-    cy.get("table tbody tr")
+    cy.get("table tbody tr[data-index]")
       .first()
       .find("td")
       .eq(1)
@@ -144,11 +144,11 @@ describe("Job Monitor - Pagination", () => {
       });
 
     // Scroll and get the last visible row value
-    cy.get('[data-testid="virtuoso-scroller"]')
+    cy.get('[data-testid="table-scroller"]')
       .wait(100)
       .scrollTo("bottom", { ensureScrollable: false });
 
-    cy.get("table tbody tr")
+    cy.get("table tbody tr[data-index]")
       .last()
       .find("td")
       .eq(1)

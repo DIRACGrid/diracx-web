@@ -3,54 +3,6 @@
 import { useState } from "react";
 
 /**
- * Fetcher function for useSWR
- * @param args - URL, access token, body and method
- * @returns a promise
- */
-export async function fetcher<T>(
-  args: [string, string?, string?, unknown?],
-): Promise<{ headers: Headers; data: T }> {
-  const [url, accessToken, method = "GET", body] = args;
-  const headers = {
-    "Content-Type": "application/json",
-    ...(accessToken && { Authorization: "Bearer " + accessToken }),
-  };
-
-  const response = await fetch(url, {
-    method: method,
-    headers: headers,
-    body: body ? JSON.stringify(body) : undefined,
-  });
-
-  if (!response.ok) {
-    // Try to parse a more specific error message
-    let errorMessage = `HTTP ${response.status}`;
-    try {
-      const errorJson = await response.json();
-      if (errorJson?.detail) {
-        errorMessage += `: ${errorJson.detail}`;
-      } else {
-        errorMessage += `: ${JSON.stringify(errorJson)}`;
-      }
-    } catch {
-      // fallback if the server doesn't return JSON
-      const text = await response.text();
-      errorMessage += `: ${text}`;
-    }
-    throw new Error(errorMessage);
-  }
-
-  if (response.status === 204) {
-    // No content response, return empty data
-    return { headers: response.headers, data: {} as T };
-  }
-
-  const data = (await response.json()) as T;
-
-  return { headers: response.headers, data };
-}
-
-/**
  * Custom hook to get the diracx installation URL
  * @returns the diracx installation URL
  */

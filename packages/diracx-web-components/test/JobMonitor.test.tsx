@@ -6,7 +6,6 @@ import {
   waitFor,
 } from "@testing-library/react";
 import { composeStories } from "@storybook/react";
-import { VirtuosoMockContext } from "react-virtuoso";
 import * as stories from "../stories/JobMonitor.stories";
 
 // Compose Storybook stories (includes all decorators/args)
@@ -55,13 +54,7 @@ describe("JobMonitor", () => {
 
 describe("JobDataTable", () => {
   it("displays job data with correct columns", async () => {
-    const { getByText } = render(
-      <VirtuosoMockContext.Provider
-        value={{ viewportHeight: 300, itemHeight: 100 }}
-      >
-        <Default />
-      </VirtuosoMockContext.Provider>,
-    );
+    const { getByText } = render(<Default />);
 
     // Verify table headers exist (some column names also appear in the pie chart toggle)
     expect(getByText("ID")).toBeInTheDocument();
@@ -76,13 +69,7 @@ describe("JobDataTable", () => {
   });
 
   it("displays the snackbar: no input sandbox", async () => {
-    const { getByText, getByTestId } = render(
-      <VirtuosoMockContext.Provider
-        value={{ viewportHeight: 300, itemHeight: 100 }}
-      >
-        <Default />
-      </VirtuosoMockContext.Provider>,
-    );
+    const { getByText, getByTestId } = render(<Default />);
 
     await act(async () => {
       fireEvent.contextMenu(getByText("Job 1"));
@@ -102,13 +89,7 @@ describe("JobDataTable", () => {
   });
 
   it("displays the snackbar: no output sandbox", async () => {
-    const { getByText, getByTestId } = render(
-      <VirtuosoMockContext.Provider
-        value={{ viewportHeight: 300, itemHeight: 100 }}
-      >
-        <Default />
-      </VirtuosoMockContext.Provider>,
-    );
+    const { getByText, getByTestId } = render(<Default />);
 
     await act(async () => {
       fireEvent.contextMenu(getByText("Job 1"));
@@ -130,13 +111,7 @@ describe("JobDataTable", () => {
 
 describe("JobHistoryDialog", () => {
   it("renders the dialog with correct data", async () => {
-    const { getByText, getByTestId } = render(
-      <VirtuosoMockContext.Provider
-        value={{ viewportHeight: 300, itemHeight: 100 }}
-      >
-        <Default />
-      </VirtuosoMockContext.Provider>,
-    );
+    const { getByText, getByTestId } = render(<Default />);
 
     await act(async () => {
       fireEvent.contextMenu(getByText("Job 1"));

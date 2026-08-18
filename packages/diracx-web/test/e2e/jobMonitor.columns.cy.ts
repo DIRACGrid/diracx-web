@@ -84,7 +84,7 @@ describe("Job Monitor - Columns", () => {
     let firstValueAgain: number;
 
     // Get the first visible row value (e.g. 55)
-    cy.get("table tbody tr")
+    cy.get("table tbody tr[data-index]")
       .first()
       .find("td")
       .eq(1)
@@ -95,26 +95,38 @@ describe("Job Monitor - Columns", () => {
 
     cy.get('[data-testid="sort-JobID"]').click();
 
-    cy.get("table tbody tr")
+    // The table keeps the previous (descending) rows on screen while the
+    // re-sorted page revalidates (SWR keepPreviousData), so a plain read can
+    // still see the stale top row. Retry with `.should()` until the ascending
+    // top row (smaller than the descending top) has actually loaded, then
+    // capture it for the round-trip assertion below.
+    cy.get("table tbody tr[data-index]")
       .first()
       .find("td")
       .eq(1)
+      .should(($td) => {
+        expect(parseInt($td.text().trim(), 10)).to.be.lessThan(firstValue);
+      })
       .invoke("text")
       .then((text) => {
         firstValueSorted = parseInt(text.trim(), 10);
-        expect(firstValue).to.be.greaterThan(firstValueSorted);
       });
 
     cy.get('[data-testid="sort-JobID"]').click();
 
-    cy.get("table tbody tr")
+    // Toggle back to descending: retry until the original top row returns.
+    cy.get("table tbody tr[data-index]")
       .first()
       .find("td")
       .eq(1)
+      .should(($td) => {
+        expect(parseInt($td.text().trim(), 10)).to.be.greaterThan(
+          firstValueSorted,
+        );
+      })
       .invoke("text")
       .then((text) => {
         firstValueAgain = parseInt(text.trim(), 10);
-        expect(firstValueAgain).to.be.greaterThan(firstValueSorted);
         expect(firstValue).to.be.equal(firstValueAgain);
       });
   });

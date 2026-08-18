@@ -35,8 +35,8 @@
     "@mui/x-charts": "^8.0.0",
     "@mui/x-date-pickers": "^8.0.0",
     "@tanstack/react-table": "^8.20.5",
-    "dayjs": "^1.11.13",
-    "react-virtuoso": "^4.12.3"
+    "@tanstack/react-virtual": "^3.13.23",
+    "dayjs": "^1.11.13"
   },
   "peerDependencies": {
     "@axa-fr/react-oidc": ">=7.24.0 <7.27.0",
