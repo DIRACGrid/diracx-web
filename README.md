@@ -15,9 +15,9 @@
 ## Get Started
 
 
-- **New user?** Learn how to use the application effectively in the [:book: User Guide](https://diracx.diracgrid.org/en/latest/user/web/)
-- **Developing a DiracX-Web extension?** Go straight to the [:page_facing_up: Extension README](https://diracx.diracgrid.org/en/latest/developer/manage_extension/)
-- **Managing the repository?** Discover tips and tricks in the [:book: Ops Guide](https://diracx.diracgrid.org/en/latest/dev/setup_environment/)
+- **New user?** Learn how to use the application effectively in the [:book: User Guide](https://diracx.diracgrid.org/en/latest/user/how-to/)
+- **Developing a DiracX-Web extension?** Go straight to the [:page_facing_up: Extension README](https://diracx.diracgrid.org/en/latest/dev/how-to/manage-web-extension/)
+- **Managing the repository?** Discover tips and tricks in the [:book: Ops Guide](https://diracx.diracgrid.org/en/latest/dev/how-to/setup-web-environment/)
 
 - **Interested in contributing?** Read the [:star: Contributing Document](docs/dev/how-to/contribute-to-web.md)
 
