@@ -1,5 +1,23 @@
 # Changelog
 
+## [0.1.0-a12](https://github.com/DIRACGrid/diracx-web/compare/v0.1.0-a11...v0.1.0-a12) (2026-09-01)
+
+
+### ⚠ BREAKING CHANGES
+
+* **jobmonitor:** the tuple-based fetcher export is gone from @dirac-grid/diracx-web-components/hooks; use the object-based fetcher from @dirac-grid/diracx-web-components/services instead. Operators.EGUALS is renamed Operators.EQUALS, and the DataTable API changed with the module split.
+
+### Code Refactoring
+
+* **jobmonitor:** virtualized DataTable split, SearchBar decomposition, context split, SWR tuning ([#498](https://github.com/DIRACGrid/diracx-web/issues/498)) ([0395577](https://github.com/DIRACGrid/diracx-web/commit/03955777f66377dd8222a449cc28d626f717be1f))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @dirac-grid/diracx-web-components bumped from ^0.1.0-a11 to ^0.1.0-a12
+
 ## [0.1.0-a11](https://github.com/DIRACGrid/diracx-web/compare/v0.1.0-a10...v0.1.0-a11) (2026-04-20)
 
 
