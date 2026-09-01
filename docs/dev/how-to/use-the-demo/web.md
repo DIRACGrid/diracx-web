@@ -28,4 +28,4 @@ The dashboard provides access to all available DiracX Web applications:
 
 Use the left sidebar to switch between applications. You can add new application instances and organize them into groups.
 
-For more details on using specific features, see the [User Guide](../../../user/how-to/index.md).
+For more details on using specific features, see the [User Guide](../../../user/how-to/web-interface/index.md).

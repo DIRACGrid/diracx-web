@@ -15,7 +15,7 @@
 ## Get Started
 
 
-- **New user?** Learn how to use the application effectively in the [:book: User Guide](https://diracx.diracgrid.org/en/latest/user/how-to/)
+- **New user?** Learn how to use the application effectively in the [:book: User Guide](https://diracx.diracgrid.org/en/latest/user/how-to/web-interface/)
 - **Developing a DiracX-Web extension?** Go straight to the [:page_facing_up: Extension README](https://diracx.diracgrid.org/en/latest/dev/how-to/manage-web-extension/)
 - **Managing the repository?** Discover tips and tricks in the [:book: Ops Guide](https://diracx.diracgrid.org/en/latest/dev/how-to/setup-web-environment/)
 
