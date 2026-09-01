@@ -1,6 +1,6 @@
 {
   "name": "diracx-web-root",
-  "version": "0.1.0-a11",
+  "version": "0.1.0-a12",
   "private": true,
   "engines": {
     "node": ">=22"
