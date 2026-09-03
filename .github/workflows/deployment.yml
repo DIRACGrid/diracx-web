@@ -20,7 +20,7 @@ jobs:
       release_created: ${{ steps.release.outputs.release_created }}
       tag_name: ${{ steps.release.outputs.tag_name }}
     steps:
-      - uses: googleapis/release-please-action@v4
+      - uses: googleapis/release-please-action@45996ed1f6d02564a971a2fa1b5860e934307cf7 # v5
         id: release
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
@@ -39,9 +39,9 @@ jobs:
       contents: read
       packages: write
     steps:
-    - uses: actions/checkout@v6
+    - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
 
-    - uses: actions/setup-node@v6
+    - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
       with:
         node-version: 'lts/*'
         registry-url: 'https://registry.npmjs.org'
@@ -72,9 +72,9 @@ jobs:
       pages: write
     if: ${{  github.event_name != 'push' || github.repository == 'DIRACGrid/diracx-web' }}
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
  
-      - uses: actions/setup-node@v6
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
         with:
           node-version: 'lts/*'
           cache: 'npm'
@@ -83,7 +83,7 @@ jobs:
         run: npm ci && npm --prefix packages/diracx-web-components run build-doc
 
       - name: Upload artifact
-        uses: actions/upload-pages-artifact@v4
+        uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5
         with: 
           path: packages/diracx-web-components/storybook-static
 
@@ -97,7 +97,7 @@ jobs:
     steps:    
       - id: deploy
         name: Deploy to GitHub Pages
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@cd2ce8fcbc39b97be8ca5fce6e763baed58fa128 # v5
         with:
           token: ${{ github.token }}
 
@@ -108,7 +108,7 @@ jobs:
     runs-on: ubuntu-latest
     if: ${{ github.event_name != 'push' || github.repository == 'DIRACGrid/diracx-web' }}
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v4
@@ -135,7 +135,7 @@ jobs:
     if: ${{ github.event_name == 'push' && github.repository == 'DIRACGrid/diracx-web' }}
     needs: release-please
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v4
@@ -170,13 +170,13 @@ jobs:
     if: ${{ needs.release-please.outputs.release_created == 'true' }}
     steps:
       - name: Checkout diracx-web (for update script)
-        uses: actions/checkout@v6
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           path: diracx-web
           sparse-checkout: .github/workflows
 
       - name: Checkout diracx-charts
-        uses: actions/checkout@v6
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           repository: DIRACGrid/diracx-charts
           token: ${{ secrets.CHARTS_UPDATE_TOKEN }}
