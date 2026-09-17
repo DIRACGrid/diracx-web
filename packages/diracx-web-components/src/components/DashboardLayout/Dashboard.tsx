@@ -43,7 +43,7 @@ export default function Dashboard({
   children,
   drawerWidth = 240,
   logoURL,
-  documentationURL,
+  documentationURL = "https://diracx.diracgrid.org",
 }: DashboardProps) {
   const currentApp = useCurrentApplication();
   const appTitle = currentApp?.title ?? null;

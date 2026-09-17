@@ -23,7 +23,7 @@ const meta = {
     children: { control: false },
     drawerWidth: { control: { type: "range", min: 200, max: 500, step: 10 } },
     logoURL: { control: { disable: true } },
-    documentationURL: { control: { disable: true } },
+    documentationURL: { control: "text" },
   },
   decorators: [
     (Story) => {
@@ -76,6 +76,7 @@ type Story = StoryObj<typeof meta>;
 export const Default: Story = {
   args: {
     children: <div></div>,
+    documentationURL: "https://diracx.diracgrid.org",
     logoURL: process.env.STORYBOOK_DEV
       ? undefined
       : // we need to add "/diracx-web" at the start of the url in production
