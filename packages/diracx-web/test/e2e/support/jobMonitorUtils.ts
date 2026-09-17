@@ -35,7 +35,7 @@ export function addJobs(numberOfJobs: number) {
         },
         body: ['Arguments = "jobDescription.xml -o LogLevel=INFO'],
       }).then((response) => {
-        expect(response.status).to.eq(200);
+        expect(response.status).to.eq(201);
       });
     });
   });
