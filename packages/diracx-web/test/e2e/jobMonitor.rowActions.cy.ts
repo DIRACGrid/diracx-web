@@ -4,6 +4,7 @@
 import {
   setupJobMonitorDashboard,
   ensureMinimumJobs,
+  forceJobsStatus,
 } from "./support/jobMonitorUtils";
 
 describe("Job Monitor - Row Actions", () => {
@@ -29,6 +30,22 @@ describe("Job Monitor - Row Actions", () => {
   });
 
   it("should kill jobs", () => {
+    // "Done" jobs cannot be killed: move the first three jobs back to "Running"
+    const jobIds: number[] = [];
+    [0, 1, 2].forEach((index) => {
+      cy.get(`table tbody [data-index=${index}]`)
+        .find("td")
+        .eq(1)
+        .invoke("text")
+        .then((text) => jobIds.push(Number(text.trim())));
+    });
+    cy.then(() => forceJobsStatus(jobIds, "Running"));
+    cy.get('[data-testid="refresh-search-button"]').click();
+    cy.get("table tbody [data-index=2]")
+      .find("td")
+      .eq(2)
+      .should("contain", "Running");
+
     cy.get("table tbody [data-index=0]").click({ force: true });
     cy.get("table tbody [data-index=1]").click({ force: true });
     cy.get("table tbody [data-index=2]").click({ force: true });
