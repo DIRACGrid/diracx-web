@@ -42,6 +42,107 @@ export function addJobs(numberOfJobs: number) {
 }
 
 /**
+ * Statuses of jobs the demo's dummy job executor has not processed yet.
+ */
+const PENDING_EXECUTION_STATUSES = ["Received", "Waiting", "Matched"];
+
+/**
+ * Wait until the demo's dummy job executor is done with the given jobs.
+ *
+ * The executor records the final "Done" status a few seconds in the future,
+ * and DiracX ignores status updates older than a job's latest record: also
+ * wait for every record to be in the past.
+ */
+function waitForJobsExecuted(
+  accessToken: string,
+  jobIds: number[],
+  attempts = 30,
+) {
+  cy.request({
+    method: "POST",
+    url: "/api/jobs/search",
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+    },
+    body: {
+      parameters: ["JobID", "Status", "LoggingInfo"],
+      search: [{ parameter: "JobID", operator: "in", values: jobIds }],
+    },
+  }).then((response) => {
+    const jobs: { Status: string; LoggingInfo: { StatusTime: string }[] }[] =
+      response.body;
+    const executed =
+      jobs.length === jobIds.length &&
+      jobs.every(
+        (job) =>
+          !PENDING_EXECUTION_STATUSES.includes(job.Status) &&
+          job.LoggingInfo.every(
+            (record) => Date.parse(record.StatusTime) < Date.now(),
+          ),
+      );
+
+    if (executed) {
+      return;
+    }
+    if (attempts <= 1) {
+      throw new Error(`Jobs ${jobIds.join(", ")} were not executed in time`);
+    }
+    cy.wait(1000);
+    waitForJobsExecuted(accessToken, jobIds, attempts - 1);
+  });
+}
+
+/**
+ * Force jobs into the given status, bypassing the job state machine.
+ *
+ * The demo's dummy job executor moves every submitted job to "Done", a final
+ * state: use this to put jobs back into a state the tests can act on.
+ */
+export function forceJobsStatus(jobIds: number[], status: string) {
+  cy.window().then((win) => {
+    const sessionData = win.sessionStorage.getItem(
+      "oidc.vo:diracAdmin group:admin",
+    );
+
+    if (!sessionData) {
+      throw new Error("Access token not found in session storage");
+    }
+
+    const accessToken = JSON.parse(sessionData).tokens.accessToken;
+
+    // Otherwise the executor could override the forced status, or DiracX
+    // could ignore it
+    waitForJobsExecuted(accessToken, jobIds);
+
+    cy.then(() => {
+      const now = new Date().toISOString();
+
+      cy.request({
+        method: "PATCH",
+        url: "/api/jobs/status?force=true",
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+        body: Object.fromEntries(
+          jobIds.map((jobId) => [
+            jobId,
+            {
+              [now]: {
+                Status: status,
+                MinorStatus: "Cypress",
+                Source: "Cypress",
+              },
+            },
+          ]),
+        ),
+      }).then((response) => {
+        expect(response.status).to.eq(200);
+      });
+    });
+  });
+}
+
+/**
  * Create a sandbox, upload it, submit a job, and assign the sandbox as output.
  * Returns a Cypress chainable that yields the job ID.
  *
