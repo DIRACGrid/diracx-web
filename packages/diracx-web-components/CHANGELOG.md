@@ -1,5 +1,24 @@
 # Changelog
 
+## [0.1.0-a12](https://github.com/DIRACGrid/diracx-web/compare/v0.1.0-a11...v0.1.0-a12) (2026-09-23)
+
+
+### ⚠ BREAKING CHANGES
+
+* **jobmonitor:** the tuple-based fetcher export is gone from @dirac-grid/diracx-web-components/hooks; use the object-based fetcher from @dirac-grid/diracx-web-components/services instead. Operators.EGUALS is renamed Operators.EQUALS, and the DataTable API changed with the module split.
+* **packaging:** react, react-dom, @mui/material, @mui/icons-material, @emotion/react, @emotion/styled, @axa-fr/react-oidc and swr are now peerDependencies and must be installed by the consuming application. Deep imports that relied on the removed per-directory package.json stubs must use the documented subpath exports instead.
+
+### Bug Fixes
+
+* default documentation URL to diracx.diracgrid.org ([b3eac9c](https://github.com/DIRACGrid/diracx-web/commit/b3eac9c1f347ad44dc6317ff0ad35e9c8a287b52))
+* default documentation URL to diracx.diracgrid.org ([13bf04f](https://github.com/DIRACGrid/diracx-web/commit/13bf04f6a546ff5aafc6e86096513bee4577d148))
+* **packaging:** make the component library consumable outside the monorepo ([#496](https://github.com/DIRACGrid/diracx-web/issues/496)) ([6cd3e80](https://github.com/DIRACGrid/diracx-web/commit/6cd3e80c98950a1d0f4ec8d8efa10c9ff523b08e))
+
+
+### Code Refactoring
+
+* **jobmonitor:** virtualized DataTable split, SearchBar decomposition, context split, SWR tuning ([#498](https://github.com/DIRACGrid/diracx-web/issues/498)) ([0395577](https://github.com/DIRACGrid/diracx-web/commit/03955777f66377dd8222a449cc28d626f717be1f))
+
 ## [0.1.0-a11](https://github.com/DIRACGrid/diracx-web/compare/v0.1.0-a10...v0.1.0-a11) (2026-04-20)
 
 
