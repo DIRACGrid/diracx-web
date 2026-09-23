@@ -34,7 +34,7 @@ interface DashboardDrawerProps {
   /** The URL for the logo image. */
   logoURL?: string;
   /** The URL for the documentation link. */
-  documentationURL?: string;
+  documentationURL: string;
 }
 
 /**
@@ -208,8 +208,6 @@ export default function DashboardDrawer({
     handleCloseContextMenu();
   };
 
-  const docURL = documentationURL || "https://diracx.io";
-
   return (
     <>
       <Drawer
@@ -296,7 +294,7 @@ export default function DashboardDrawer({
               </ListItemButton>
             </ListItem>
             <ListItem key={"Documentation"}>
-              <ListItemButton target="_blank" href={docURL}>
+              <ListItemButton target="_blank" href={documentationURL}>
                 <ListItemIcon>{<MenuBook />}</ListItemIcon>
                 <ListItemText primary={"Documentation"} />
               </ListItemButton>
