@@ -1,3 +1,4 @@
+// TEMPORARY, see hooks/utils.tsx's useDiracxUrl in diracx-web-components.
 // Mirrors the same augmentation in diracx-web-components/src/global.d.ts.
 // TypeScript doesn't pick up ambient global declarations transitively from
 // a dependency's source, so it's declared here too.
