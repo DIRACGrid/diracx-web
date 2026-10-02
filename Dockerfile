@@ -1,7 +1,7 @@
 # Minimize the size and complexity of the final Docker image by separating the
 # build stage and the runtime stage into two different steps
 
-# Stage 1: Build the Next.js application
+# Stage 1: Build the application
 FROM --platform=$BUILDPLATFORM node:24-alpine AS build
 WORKDIR /app
 
@@ -13,8 +13,8 @@ COPY packages/diracx-web-components/package*.json ./packages/diracx-web-componen
 RUN npm ci && npm cache clean --force
 # Copy the application to the working directory
 COPY . .
-# Build the static export with telemetry disabled (https://nextjs.org/telemetry)
-RUN NEXT_TELEMETRY_DISABLED=1 npm run build
+# Build the static export
+RUN npm run build
 
 # Stage 2: Copy the website from the previous container to a Nginx container
 FROM nginxinc/nginx-unprivileged:1.29-alpine
