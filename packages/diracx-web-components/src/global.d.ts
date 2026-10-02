@@ -15,3 +15,13 @@ declare module "@tanstack/react-table" {
     isQuasiUnique?: boolean; // Some columns are quasi-unique, meaning they can have multiple values but are not fully unique
   }
 }
+
+declare global {
+  interface Window {
+    // Set by the consuming app's entry point (e.g. diracx-web's main.tsx)
+    // to pass through a bundler-specific env var (Vite's import.meta.env,
+    // which this package's own es6-targeted build strips), since this
+    // package itself can't read it directly.
+    __DIRACX_URL__?: string;
+  }
+}
