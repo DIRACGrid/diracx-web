@@ -1,8 +1,49 @@
+import path from "node:path";
+import { fileURLToPath } from "node:url";
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 
-export default defineConfig({
+const componentsSrc = fileURLToPath(
+  new URL("../diracx-web-components/src", import.meta.url),
+);
+
+export default defineConfig(({ command }) => ({
   plugins: [react()],
+  resolve: {
+    // diracx-web-components' package.json "exports" map only points at its
+    // built dist/, which the in-cluster dev-mode deployment never builds
+    // (diracx-charts' developer-mode init container only runs `npm ci`, no
+    // build step). Next.js never hit this because transpilePackages
+    // transpiled the package's source directly, bypassing dist/ entirely;
+    // Vite has no equivalent, so alias each subpath to source in dev mode.
+    // Each subpath needs its own entry (a bare-package alias wouldn't match
+    // these more specific specifiers).
+    ...(command === "serve" && {
+      alias: {
+        "@dirac-grid/diracx-web-components/components": path.join(
+          componentsSrc,
+          "components",
+        ),
+        "@dirac-grid/diracx-web-components/contexts": path.join(
+          componentsSrc,
+          "contexts",
+        ),
+        "@dirac-grid/diracx-web-components/hooks": path.join(
+          componentsSrc,
+          "hooks",
+        ),
+        "@dirac-grid/diracx-web-components/types": path.join(
+          componentsSrc,
+          "types",
+        ),
+        "@dirac-grid/diracx-web-components/services": path.join(
+          componentsSrc,
+          "services",
+        ),
+        "@dirac-grid/diracx-web-components": componentsSrc,
+      },
+    }),
+  },
   server: {
     // In-cluster dev mode (diracx-charts' developer.enabled mount) sets
     // PORT=8080 to match the pod's declared containerPort/Service/probes,
@@ -24,4 +65,4 @@ export default defineConfig({
     // check to match Next's prior behavior.
     allowedHosts: true,
   },
-});
+}));
