@@ -102,7 +102,7 @@ describe("searchBarReducer", () => {
       equations: [sampleEquation],
     });
 
-    const updater = jest.fn((prev: SearchBarTokenEquation[]) =>
+    const updater = vi.fn((prev: SearchBarTokenEquation[]) =>
       prev.map((eq) => ({ ...eq, status: EquationStatus.INVALID })),
     );
     const next = searchBarReducer(withEquations, {

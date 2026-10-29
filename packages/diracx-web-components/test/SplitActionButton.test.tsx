@@ -10,7 +10,7 @@ function makeAction(overrides: Partial<ToolbarAction> = {}): ToolbarAction {
   return {
     label: "Delete",
     icon: <DeleteIcon />,
-    onClick: jest.fn(),
+    onClick: vi.fn(),
     "data-testid": "delete-action",
     ...overrides,
   };
@@ -18,7 +18,7 @@ function makeAction(overrides: Partial<ToolbarAction> = {}): ToolbarAction {
 
 describe("SplitActionButton", () => {
   it("calls onClick with selected ids when some rows are selected", async () => {
-    const onClick = jest.fn();
+    const onClick = vi.fn();
     const user = userEvent.setup();
     render(
       <SplitActionButton
@@ -34,8 +34,8 @@ describe("SplitActionButton", () => {
   });
 
   it("acts on all matching rows when nothing is selected and no confirmation is required", async () => {
-    const onClick = jest.fn();
-    const fetchMatchingIds = jest.fn().mockResolvedValue([10, 20, 30]);
+    const onClick = vi.fn();
+    const fetchMatchingIds = vi.fn().mockResolvedValue([10, 20, 30]);
     const user = userEvent.setup();
     render(
       <SplitActionButton
@@ -56,8 +56,8 @@ describe("SplitActionButton", () => {
   });
 
   it("shows a confirmation dialog for destructive all-matching actions", async () => {
-    const onClick = jest.fn();
-    const fetchMatchingIds = jest.fn().mockResolvedValue([1, 2]);
+    const onClick = vi.fn();
+    const fetchMatchingIds = vi.fn().mockResolvedValue([1, 2]);
     const user = userEvent.setup();
     render(
       <SplitActionButton
@@ -82,8 +82,8 @@ describe("SplitActionButton", () => {
   });
 
   it("cancels the confirmation dialog without calling onClick", async () => {
-    const onClick = jest.fn();
-    const fetchMatchingIds = jest.fn().mockResolvedValue([1]);
+    const onClick = vi.fn();
+    const fetchMatchingIds = vi.fn().mockResolvedValue([1]);
     const user = userEvent.setup();
     render(
       <SplitActionButton
@@ -112,8 +112,8 @@ describe("SplitActionButton", () => {
   });
 
   it("executes the action after confirming", async () => {
-    const onClick = jest.fn();
-    const fetchMatchingIds = jest.fn().mockResolvedValue([7, 8]);
+    const onClick = vi.fn();
+    const fetchMatchingIds = vi.fn().mockResolvedValue([7, 8]);
     const user = userEvent.setup();
     render(
       <SplitActionButton
@@ -154,7 +154,7 @@ describe("SplitActionButton", () => {
         numSelected={0}
         selectedIds={[]}
         totalRows={20000}
-        fetchMatchingIds={jest.fn()}
+        fetchMatchingIds={vi.fn()}
       />,
     );
 

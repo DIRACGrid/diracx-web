@@ -1,4 +1,5 @@
 import { render, fireEvent, waitFor } from "@testing-library/react";
+import type { Mock } from "vitest";
 import { composeStories } from "@storybook/react";
 import { useOidc, useOidcAccessToken } from "@axa-fr/react-oidc";
 import { useMediaQuery } from "@mui/material";
@@ -7,14 +8,14 @@ import * as stories from "../stories/Dashboard.stories";
 // Compose your Storybook stories (this will include all decorators/args)
 const { Default } = composeStories(stories);
 
-jest.mock("@mui/material", () => ({
-  ...jest.requireActual("@mui/material"),
-  useMediaQuery: jest.fn(),
+vi.mock("@mui/material", async () => ({
+  ...(await vi.importActual("@mui/material")),
+  useMediaQuery: vi.fn(),
 }));
 
 describe("Dashboard", () => {
   it("renders in desktop mode", () => {
-    (useMediaQuery as jest.Mock).mockReturnValue(false); // desktop
+    (useMediaQuery as Mock).mockReturnValue(false); // desktop
 
     const { getByTestId } = render(<Default />);
 
@@ -26,7 +27,7 @@ describe("Dashboard", () => {
   });
 
   it("renders in mobile mode and opens drawer after toggle", () => {
-    (useMediaQuery as jest.Mock).mockReturnValue(true); // mobile
+    (useMediaQuery as Mock).mockReturnValue(true); // mobile
 
     const { getByTestId } = render(<Default />);
     const toggleButton = getByTestId("drawer-toggle-button");
@@ -44,14 +45,14 @@ describe("Dashboard", () => {
 
 describe("DashboardDrawer", () => {
   it("renders the app title from the context", () => {
-    (useMediaQuery as jest.Mock).mockReturnValue(false); // desktop
+    (useMediaQuery as Mock).mockReturnValue(false); // desktop
 
     const { getByRole } = render(<Default />);
     expect(getByRole("heading", { name: /App Name/i })).toBeInTheDocument();
   });
 
   it("shows the context menu when right-clicking on an app item", () => {
-    (useMediaQuery as jest.Mock).mockReturnValue(false); // desktop
+    (useMediaQuery as Mock).mockReturnValue(false); // desktop
 
     const { getByRole, getByTestId } = render(<Default />);
     fireEvent.contextMenu(getByRole("button", { name: /App Name/i }));
@@ -61,7 +62,7 @@ describe("DashboardDrawer", () => {
 
 describe("ApplicationDialog", () => {
   it("renders the Default story with the dialog open", () => {
-    (useMediaQuery as jest.Mock).mockReturnValue(false); // desktop
+    (useMediaQuery as Mock).mockReturnValue(false); // desktop
 
     const { getByTestId, getByRole, getByText } = render(<Default />);
 
@@ -224,7 +225,7 @@ describe("ExportButton", () => {
     // Mock clipboard
     Object.assign(navigator, {
       clipboard: {
-        writeText: jest.fn().mockResolvedValue(undefined),
+        writeText: vi.fn().mockResolvedValue(undefined),
       },
     });
 
@@ -282,7 +283,7 @@ describe("ThemeToggleButton", () => {
 
   it("uses system light mode preference when no theme in sessionStorage", () => {
     // Simulate system preference = light mode
-    (useMediaQuery as jest.Mock).mockReturnValue(false);
+    (useMediaQuery as Mock).mockReturnValue(false);
 
     const { getByTestId, queryByTestId } = render(<Default />);
 
@@ -301,7 +302,7 @@ describe("ThemeToggleButton", () => {
 
   it("prioritizes sessionStorage theme over system preference", () => {
     // System prefers light mode
-    (useMediaQuery as jest.Mock).mockReturnValue(false);
+    (useMediaQuery as Mock).mockReturnValue(false);
 
     // But sessionStorage has dark theme
     sessionStorage.setItem("theme", "dark");
@@ -315,23 +316,23 @@ describe("ThemeToggleButton", () => {
 
 describe("ProfileButton", () => {
   beforeEach(() => {
-    jest.resetAllMocks();
+    vi.resetAllMocks();
   });
 
   it('renders "Login" button when not authenticated', () => {
-    (useOidc as jest.Mock).mockReturnValue({ isAuthenticated: false });
-    (useOidcAccessToken as jest.Mock).mockReturnValue({});
+    (useOidc as Mock).mockReturnValue({ isAuthenticated: false });
+    (useOidcAccessToken as Mock).mockReturnValue({});
 
     const { getByTestId } = render(<Default />);
     expect(getByTestId("login-button")).toBeInTheDocument();
   });
 
   it("renders user avatar with initial and opens menu when authenticated", () => {
-    (useOidc as jest.Mock).mockReturnValue({
+    (useOidc as Mock).mockReturnValue({
       isAuthenticated: true,
-      logout: jest.fn(),
+      logout: vi.fn(),
     });
-    (useOidcAccessToken as jest.Mock).mockReturnValue({
+    (useOidcAccessToken as Mock).mockReturnValue({
       accessToken: "mockAccessToken",
       accessTokenPayload: {
         preferred_username: "Maria",

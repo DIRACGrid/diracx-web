@@ -1,9 +1,9 @@
 import structuredClonePonyfill from "@ungap/structured-clone";
-import "@testing-library/jest-dom";
+import "@testing-library/jest-dom/vitest";
 
 // Polyfill structuredClone for jsdom (used by @mui/x-charts).
-// jest-environment-jsdom does not expose Node's native structuredClone, and
-// Node's v8-serialize trick creates values from the wrong realm (instanceof
+// Vitest's jsdom environment does not expose Node's native structuredClone,
+// and Node's v8-serialize trick creates values from the wrong realm (instanceof
 // breaks). @ungap/structured-clone implements the structured-clone algorithm
 // in the current realm (unlike JSON round-tripping, it preserves Dates,
 // Maps, Sets, …).
@@ -74,4 +74,4 @@ export function restoreRealLayoutMeasurements() {
   }
 }
 
-jest.mock("@axa-fr/react-oidc");
+vi.mock("@axa-fr/react-oidc");
