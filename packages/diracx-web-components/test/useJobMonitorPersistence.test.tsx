@@ -1,4 +1,5 @@
 import { renderHook, act } from "@testing-library/react";
+import type { MockInstance } from "vitest";
 import {
   useJobMonitorPersistence,
   loadInitialState,
@@ -28,17 +29,17 @@ function makeState(overrides: Partial<JobMonitorState> = {}): JobMonitorState {
 }
 
 describe("useJobMonitorPersistence", () => {
-  let setItemSpy: jest.SpyInstance;
+  let setItemSpy: MockInstance;
 
   beforeEach(() => {
-    jest.useFakeTimers();
+    vi.useFakeTimers();
     window.sessionStorage.clear();
-    setItemSpy = jest.spyOn(Storage.prototype, "setItem");
+    setItemSpy = vi.spyOn(Storage.prototype, "setItem");
   });
 
   afterEach(() => {
     setItemSpy.mockRestore();
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   it("persists the state after the 500ms debounce, not before", () => {
@@ -46,12 +47,12 @@ describe("useJobMonitorPersistence", () => {
     renderHook(() => useJobMonitorPersistence(APP_ID, state));
 
     act(() => {
-      jest.advanceTimersByTime(499);
+      vi.advanceTimersByTime(499);
     });
     expect(setItemSpy).not.toHaveBeenCalled();
 
     act(() => {
-      jest.advanceTimersByTime(1);
+      vi.advanceTimersByTime(1);
     });
     expect(setItemSpy).toHaveBeenCalledTimes(1);
 
@@ -72,19 +73,19 @@ describe("useJobMonitorPersistence", () => {
     );
 
     act(() => {
-      jest.advanceTimersByTime(300);
+      vi.advanceTimersByTime(300);
     });
     const updated = makeState({ pagination: { pageIndex: 5, pageSize: 50 } });
     rerender({ state: updated });
 
     // The first timer was reset: 300 + 300 > 500 but no write yet
     act(() => {
-      jest.advanceTimersByTime(300);
+      vi.advanceTimersByTime(300);
     });
     expect(setItemSpy).not.toHaveBeenCalled();
 
     act(() => {
-      jest.advanceTimersByTime(200);
+      vi.advanceTimersByTime(200);
     });
     expect(setItemSpy).toHaveBeenCalledTimes(1);
     const persisted = JSON.parse(setItemSpy.mock.calls[0][1]);
@@ -96,7 +97,7 @@ describe("useJobMonitorPersistence", () => {
     renderHook(() => useJobMonitorPersistence(APP_ID, state));
 
     act(() => {
-      jest.advanceTimersByTime(500);
+      vi.advanceTimersByTime(500);
     });
 
     const persisted = JSON.parse(setItemSpy.mock.calls[0][1]);
@@ -186,7 +187,7 @@ describe("loadInitialState", () => {
   });
 
   it("falls back to defaults and warns on corrupt JSON", () => {
-    const warnSpy = jest.spyOn(console, "warn").mockImplementation(() => {});
+    const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
     window.sessionStorage.setItem(STORAGE_KEY, "{not valid json");
 
     const state = loadInitialState(APP_ID);

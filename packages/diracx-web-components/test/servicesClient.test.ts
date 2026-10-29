@@ -37,16 +37,14 @@ function mockResponse(init: {
 }
 
 function mockFetch(response: Response) {
-  global.fetch = jest
-    .fn()
-    .mockResolvedValue(response) as unknown as typeof fetch;
+  global.fetch = vi.fn().mockResolvedValue(response) as unknown as typeof fetch;
 }
 
 describe("services/client fetcher", () => {
   const originalFetch = global.fetch;
   afterEach(() => {
     global.fetch = originalFetch;
-    jest.restoreAllMocks();
+    vi.restoreAllMocks();
   });
 
   it("parses JSON success responses", async () => {
@@ -90,9 +88,7 @@ describe("services/client fetcher", () => {
   });
 
   it("sends the bearer token and JSON body when provided", async () => {
-    const fetchMock = jest
-      .fn()
-      .mockResolvedValue(mockResponse({ jsonBody: {} }));
+    const fetchMock = vi.fn().mockResolvedValue(mockResponse({ jsonBody: {} }));
     global.fetch = fetchMock as unknown as typeof fetch;
     await fetcher({
       url: "/api",

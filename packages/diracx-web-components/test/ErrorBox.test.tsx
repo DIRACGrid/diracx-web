@@ -18,7 +18,7 @@ describe("ErrorBox", () => {
   });
 
   it("renders reset button if reset prop is provided and calls it on click", () => {
-    const resetMock = jest.fn();
+    const resetMock = vi.fn();
     render(<Default reset={resetMock} />);
     const button = screen.getByRole("button");
     expect(button).toBeInTheDocument();

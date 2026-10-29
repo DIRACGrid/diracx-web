@@ -1,15 +1,15 @@
 import React from "react";
 
-const jestFn =
-  // Storybook runs in the browser – `jest` is not defined there
+const mockFn =
+  // Storybook runs in the browser – `vi` is not defined there
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  typeof jest !== "undefined" ? jest.fn : (fn: any) => fn;
+  typeof vi !== "undefined" ? vi.fn : (fn: any) => fn;
 
 const noop = () => {};
 
 /* ---------- API surface --------------------------------- */
-export const useOidc = jestFn(() => ({ login: noop, isAuthenticated: false }));
-export const useOidcAccessToken = jestFn(() => ({
+export const useOidc = mockFn(() => ({ login: noop, isAuthenticated: false }));
+export const useOidcAccessToken = mockFn(() => ({
   accessToken: "123456789",
   accessTokenPayload: {
     preferred_username: "John Doe",
