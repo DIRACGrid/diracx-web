@@ -3,7 +3,7 @@ import { PieChart } from "../src/components/shared/PieChart";
 
 describe("PieChart legend click", () => {
   it("fires onItemClick with the item id", () => {
-    const onItemClick = jest.fn();
+    const onItemClick = vi.fn();
     render(
       <PieChart
         data={[
