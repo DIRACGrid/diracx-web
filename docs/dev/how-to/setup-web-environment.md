@@ -17,7 +17,7 @@ flowchart TD
  subgraph lib-cmds["diracx-web-components package.json"]
         tsup:watch["tsup --watch"]
         lib:dev["dev"]
-        jest["jest"]
+        vitest["vitest run"]
         lib:test["test"]
         tsup:build["tsup"]
         lib:build["build"]
@@ -41,7 +41,7 @@ flowchart TD
         lib-out["/dist"]
   end
     lib:dev --> tsup:watch
-    lib:test --> jest
+    lib:test --> vitest
     lib:build --> tsup:build
     lib:storybook --> storybook
     diracx-web:dev -.-> nextdev
@@ -62,7 +62,7 @@ flowchart TD
     next -. needs .-> lib-out
     tsup:watch -- builds --> lib-out
     tsup:watch -. watches .-> lib-src
-    jest -- uses --> lib-src
+    vitest -- uses --> lib-src
     tsup:build -- builds --> lib-src
     storybook -- uses --> lib-src
      root:dev:::Ash
@@ -73,7 +73,7 @@ flowchart TD
      root:doc:lib:::Ash
      tsup:watch:::Rose
      lib:dev:::Ash
-     jest:::Rose
+     vitest:::Rose
      lib:test:::Ash
      tsup:build:::Rose
      lib:build:::Ash
@@ -145,7 +145,7 @@ diracx-charts/run_demo.sh ./diracx-web [./diracx]
 
 ## Testing
 
-[Jest](https://jestjs.io/) unit tests can be started with:
+[Vitest](https://vitest.dev/) unit tests can be started with:
 
 ```bash
 npm run test:diracx-web-components

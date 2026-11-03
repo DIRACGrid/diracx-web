@@ -221,9 +221,9 @@ It can be automatically deployed using CI/CD tools like GitHub Actions, GitLab C
 - **Code Quality**: Ensure your code is clean, well-documented, and follows best practices. Use tools like [ESLint](https://eslint.org/) and [Prettier](https://prettier.io/) to maintain code quality.
 
 - **Testing**:
-  - **Component Testing**: Write tests for your components to ensure they work as expected. Use [Jest](https://jestjs.io/) for unit testing and snapshot testing of your React components.
+  - **Component Testing**: Write tests for your components to ensure they work as expected. Use [Vitest](https://vitest.dev/) for unit testing and snapshot testing of your React components.
   - **Application Testing**: Use [Cypress](https://www.cypress.io/) for end-to-end testing to simulate real user interactions and ensure your application behaves correctly.
-  - **Test Coverage**: Maintain good test coverage to ensure that your critical features are well-protected during updates. Tools like Jest provide [coverage reports](https://jestjs.io/docs/code-coverage) that help you identify untested parts of your code.
+  - **Test Coverage**: Maintain good test coverage to ensure that your critical features are well-protected during updates. Tools like Vitest provide [coverage reports](https://vitest.dev/guide/coverage) that help you identify untested parts of your code.
 
 - **Accessibility**: Make your extension accessible to all users. Use semantic HTML, ARIA attributes, and test your extension with different screen sizes and assistive technologies.
 

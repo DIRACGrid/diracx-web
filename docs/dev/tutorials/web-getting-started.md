@@ -53,7 +53,7 @@ The repository is a monorepo with three main packages:
 
 ## Running tests
 
-**Unit tests** (Jest + React Testing Library):
+**Unit tests** (Vitest + React Testing Library):
 
 ```bash
 npm run test:diracx-web-components
