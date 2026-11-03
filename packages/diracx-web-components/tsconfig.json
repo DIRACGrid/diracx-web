@@ -21,8 +21,7 @@
       "react",
       "react-dom",
       "node",
-      "vitest/globals",
-      "@testing-library/jest-dom"
+      "vitest/globals"
     ]
   },
   "include": ["src/global.d.ts", "**/*.ts", "**/*.tsx", ".storybook/**/*.ts", ".storybook/**/*.tsx"],

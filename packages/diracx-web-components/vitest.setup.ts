@@ -73,5 +73,3 @@ export function restoreRealLayoutMeasurements() {
     );
   }
 }
-
-vi.mock("@axa-fr/react-oidc");
