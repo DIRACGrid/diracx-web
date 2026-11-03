@@ -1,8 +1,5 @@
-import { dirname, resolve } from "path";
-import { fileURLToPath } from "url";
 import type { StorybookConfig } from "@storybook/nextjs";
-
-const __dirname = dirname(fileURLToPath(import.meta.url));
+import { storyMockAliases } from "../stories/mocks/aliases";
 
 const config: StorybookConfig = {
   stories: ["../stories/*.mdx", "../stories/*.stories.@(js|jsx|mjs|ts|tsx)"],
@@ -31,18 +28,7 @@ const config: StorybookConfig = {
     });
     config.resolve.alias = {
       ...config.resolve.alias,
-      "@axa-fr/react-oidc": resolve(
-        __dirname,
-        "../stories/mocks/react-oidc.mock.tsx",
-      ),
-      "../../hooks/metadata": resolve(
-        __dirname,
-        "../stories/mocks/metadata.mock.tsx",
-      ),
-      "./jobDataService": resolve(
-        __dirname,
-        "../stories/mocks/jobDataService.mock.tsx",
-      ),
+      ...storyMockAliases,
     };
     return config;
   },

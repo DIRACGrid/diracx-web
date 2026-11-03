@@ -30,7 +30,7 @@ The shared component library, published to npm as `@dirac-grid/diracx-web-compon
 - **Hooks** — Custom React hooks encapsulating reusable logic
 - **Types** — TypeScript type definitions
 
-Built with [tsup](https://tsup.egoist.dev/) for fast TypeScript compilation. Outputs to `dist/` with ESM and type declarations. Documented with [Storybook](https://storybook.js.org/), published at [diracgrid.github.io/diracx-web](https://diracgrid.github.io/diracx-web/). Tested with [Jest](https://jestjs.io/) + [React Testing Library](https://testing-library.com/docs/react-testing-library/intro/).
+Built with [tsup](https://tsup.egoist.dev/) for fast TypeScript compilation. Outputs to `dist/` with ESM and type declarations. Documented with [Storybook](https://storybook.js.org/), published at [diracgrid.github.io/diracx-web](https://diracgrid.github.io/diracx-web/). Tested with [Vitest](https://vitest.dev/) + [React Testing Library](https://testing-library.com/docs/react-testing-library/intro/).
 
 ### diracx-web
 

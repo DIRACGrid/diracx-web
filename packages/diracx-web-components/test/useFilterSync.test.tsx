@@ -1,4 +1,5 @@
 import { act, renderHook, waitFor } from "@testing-library/react";
+import type { Mock } from "vitest";
 import { useFilterSync } from "../src/components/shared/SearchBar/useFilterSync";
 import {
   CategoryType,
@@ -42,17 +43,17 @@ type HookProps = Parameters<typeof useFilterSync>[0];
 function makeProps(overrides: Partial<HookProps> = {}): HookProps {
   return {
     filters: [],
-    setFilters: jest.fn(),
-    createSuggestions: jest.fn(async () => categorySuggestions),
-    localDispatch: jest.fn(),
+    setFilters: vi.fn(),
+    createSuggestions: vi.fn(async () => categorySuggestions),
+    localDispatch: vi.fn(),
     tokenEquations: [],
-    searchFunction: jest.fn(),
+    searchFunction: vi.fn(),
     ...overrides,
   };
 }
 
 /** Extract the payloads of every SET_EQUATIONS dispatch. */
-function setEquationsCalls(localDispatch: jest.Mock) {
+function setEquationsCalls(localDispatch: Mock) {
   return localDispatch.mock.calls
     .filter(([action]) => action.type === "SET_EQUATIONS")
     .map(([action]) => action.equations as SearchBarTokenEquation[]);
@@ -61,7 +62,7 @@ function setEquationsCalls(localDispatch: jest.Mock) {
 describe("useFilterSync", () => {
   describe("inbound sync (filters -> tokenEquations)", () => {
     it("converts external filters into token equations", async () => {
-      const localDispatch = jest.fn();
+      const localDispatch = vi.fn();
       const filters: Filter[] = [
         { parameter: "JobID", operator: "eq", value: "12345" },
       ];
@@ -89,7 +90,7 @@ describe("useFilterSync", () => {
       // Regression test: clearing all filters (e.g. from a pie chart or an
       // external caller) must clear the token equations instead of leaving
       // stale tokens in the search bar.
-      const localDispatch = jest.fn();
+      const localDispatch = vi.fn();
       const initialProps = makeProps({
         filters: [{ parameter: "JobID", operator: "eq", value: "12345" }],
         localDispatch,
@@ -112,7 +113,7 @@ describe("useFilterSync", () => {
     });
 
     it("does not re-dispatch when the filters are unchanged", async () => {
-      const localDispatch = jest.fn();
+      const localDispatch = vi.fn();
       const filters: Filter[] = [
         { parameter: "JobID", operator: "eq", value: "12345" },
       ];
@@ -136,16 +137,16 @@ describe("useFilterSync", () => {
 
   describe("outbound sync (tokenEquations -> filters, debounced)", () => {
     beforeEach(() => {
-      jest.useFakeTimers();
+      vi.useFakeTimers();
     });
 
     afterEach(() => {
-      jest.useRealTimers();
+      vi.useRealTimers();
     });
 
     it("calls searchFunction after the 800ms debounce when all equations are valid", () => {
-      const searchFunction = jest.fn();
-      const setFilters = jest.fn();
+      const searchFunction = vi.fn();
+      const setFilters = vi.fn();
       const props = makeProps({
         tokenEquations: [validEquation],
         searchFunction,
@@ -155,19 +156,19 @@ describe("useFilterSync", () => {
       renderHook((p: HookProps) => useFilterSync(p), { initialProps: props });
 
       act(() => {
-        jest.advanceTimersByTime(799);
+        vi.advanceTimersByTime(799);
       });
       expect(searchFunction).not.toHaveBeenCalled();
 
       act(() => {
-        jest.advanceTimersByTime(1);
+        vi.advanceTimersByTime(1);
       });
       expect(searchFunction).toHaveBeenCalledTimes(1);
       expect(searchFunction).toHaveBeenCalledWith([validEquation], setFilters);
     });
 
     it("does not search while an equation is still invalid", () => {
-      const searchFunction = jest.fn();
+      const searchFunction = vi.fn();
       const invalidEquation: SearchBarTokenEquation = {
         ...validEquation,
         status: EquationStatus.INVALID,
@@ -181,13 +182,13 @@ describe("useFilterSync", () => {
       });
 
       act(() => {
-        jest.advanceTimersByTime(2000);
+        vi.advanceTimersByTime(2000);
       });
       expect(searchFunction).not.toHaveBeenCalled();
     });
 
     it("does not search again for equations with identical content", () => {
-      const searchFunction = jest.fn();
+      const searchFunction = vi.fn();
       const props = makeProps({
         tokenEquations: [validEquation],
         searchFunction,
@@ -198,7 +199,7 @@ describe("useFilterSync", () => {
       });
 
       act(() => {
-        jest.advanceTimersByTime(800);
+        vi.advanceTimersByTime(800);
       });
       expect(searchFunction).toHaveBeenCalledTimes(1);
 
@@ -208,13 +209,13 @@ describe("useFilterSync", () => {
         tokenEquations: [{ ...validEquation, items: [...validEquation.items] }],
       });
       act(() => {
-        jest.advanceTimersByTime(2000);
+        vi.advanceTimersByTime(2000);
       });
       expect(searchFunction).toHaveBeenCalledTimes(1);
     });
 
     it("cancelPendingSearch cancels a scheduled search", () => {
-      const searchFunction = jest.fn();
+      const searchFunction = vi.fn();
       const { result } = renderHook((p: HookProps) => useFilterSync(p), {
         initialProps: makeProps({
           tokenEquations: [validEquation],
@@ -224,14 +225,14 @@ describe("useFilterSync", () => {
 
       act(() => {
         result.current.cancelPendingSearch();
-        jest.advanceTimersByTime(2000);
+        vi.advanceTimersByTime(2000);
       });
       expect(searchFunction).not.toHaveBeenCalled();
     });
 
     it("skips the inbound sync triggered by its own search", async () => {
-      const searchFunction = jest.fn();
-      const localDispatch = jest.fn();
+      const searchFunction = vi.fn();
+      const localDispatch = vi.fn();
       const props = makeProps({
         tokenEquations: [validEquation],
         searchFunction,
@@ -245,7 +246,7 @@ describe("useFilterSync", () => {
       const initialDispatches = setEquationsCalls(localDispatch).length;
 
       act(() => {
-        jest.advanceTimersByTime(800);
+        vi.advanceTimersByTime(800);
       });
       expect(searchFunction).toHaveBeenCalledTimes(1);
 
