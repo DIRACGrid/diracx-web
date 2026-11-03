@@ -188,6 +188,23 @@ jobs:
     needs: [prepare-gubbins-frontend-as-a-standalone, prepare-gubbins-backend]
     if: github.event_name != 'push' || github.repository == 'DIRACGrid/diracx-web'
     steps:
+    - name: Free disk space
+      run: |
+        echo "Before cleanup:"
+        df -h
+        # remove .NET SDKs
+        sudo rm -rf /usr/share/dotnet || true
+        # remove Android SDK
+        sudo rm -rf /usr/local/lib/android || true
+        # remove Haskell Compiler
+        sudo rm -rf /opt/ghc || true
+        sudo rm -rf /usr/local/.ghcup || true
+        sudo apt-get clean || echo "::warning::The command [sudo apt-get clean] failed to complete successfully. Proceeding..."
+        # prune docker
+        docker system prune -af || true
+        echo "After cleanup:"
+        df -h
+
     - uses: actions/checkout@v6 
       
     - name: Clone source
