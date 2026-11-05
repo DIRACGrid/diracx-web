@@ -17,7 +17,7 @@
   },
   "scripts": {
     "dev": "npm --prefix packages/diracx-web run dev",
-    "build": "npm --prefix packages/diracx-web-components run build && npm --prefix packages/diracx-web run build && mv -f packages/diracx-web/out ./out",
+    "build": "npm --prefix packages/diracx-web-components run build && npm --prefix packages/diracx-web run build && mv -f packages/diracx-web/dist ./out",
     "test:diracx-web-components": "npm --prefix packages/diracx-web-components run test",
     "build:diracx-web-components": "npm --prefix packages/diracx-web-components run build",
     "doc:diracx-web-components": "npm --prefix packages/diracx-web-components run doc",

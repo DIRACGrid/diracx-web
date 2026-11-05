@@ -13,7 +13,7 @@ Before starting, ensure you have the following installed:
 You should also have basic knowledge of:
 
 - [React](https://react.dev/)
-- [Next.js](https://nextjs.org/)
+- [Vite](https://vite.dev/)
 - [Material UI (MUI)](https://mui.com/)
 
 ## Setting up the environment
@@ -42,7 +42,7 @@ The application will be available at `http://localhost:3000`. Changes to source 
 The repository is a monorepo with three main packages:
 
 - **`packages/diracx-web-components`** — Reusable React component library published to npm
-- **`packages/diracx-web`** — Main Next.js application that consumes the components
+- **`packages/diracx-web`** — Main Vite application that consumes the components
 - **`packages/extensions`** — Example extension (`gubbins`) showing how to build custom extensions
 
 ## Making your first change
