@@ -1,3 +1,4 @@
+import { existsSync } from "node:fs";
 import path, { dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import { defineConfig } from "vite";
@@ -20,30 +21,37 @@ export default defineConfig(({ command }) => ({
       // transpiled the package's source directly, bypassing dist/ entirely;
       // Vite has no equivalent, so alias each subpath to source in dev mode.
       // Each subpath needs its own entry (a bare-package alias wouldn't
-      // match these more specific specifiers).
-      ...(command === "serve" && {
-        "@dirac-grid/diracx-web-components/components": path.join(
-          componentsSrc,
-          "components",
-        ),
-        "@dirac-grid/diracx-web-components/contexts": path.join(
-          componentsSrc,
-          "contexts",
-        ),
-        "@dirac-grid/diracx-web-components/hooks": path.join(
-          componentsSrc,
-          "hooks",
-        ),
-        "@dirac-grid/diracx-web-components/types": path.join(
-          componentsSrc,
-          "types",
-        ),
-        "@dirac-grid/diracx-web-components/services": path.join(
-          componentsSrc,
-          "services",
-        ),
-        "@dirac-grid/diracx-web-components": componentsSrc,
-      }),
+      // match these more specific specifiers). Guarded by existsSync because
+      // this config is also used standalone (e.g. the CI job that copies
+      // just this directory out of the monorepo to simulate a real
+      // extension repo): there, diracx-web-components is a real tarball
+      // dependency built via its own "prepack" script, this sibling source
+      // directory doesn't exist, and plain node_modules resolution already
+      // works correctly.
+      ...(command === "serve" &&
+        existsSync(componentsSrc) && {
+          "@dirac-grid/diracx-web-components/components": path.join(
+            componentsSrc,
+            "components",
+          ),
+          "@dirac-grid/diracx-web-components/contexts": path.join(
+            componentsSrc,
+            "contexts",
+          ),
+          "@dirac-grid/diracx-web-components/hooks": path.join(
+            componentsSrc,
+            "hooks",
+          ),
+          "@dirac-grid/diracx-web-components/types": path.join(
+            componentsSrc,
+            "types",
+          ),
+          "@dirac-grid/diracx-web-components/services": path.join(
+            componentsSrc,
+            "services",
+          ),
+          "@dirac-grid/diracx-web-components": componentsSrc,
+        }),
     },
   },
   server: {
