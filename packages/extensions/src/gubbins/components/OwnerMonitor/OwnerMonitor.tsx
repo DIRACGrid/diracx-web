@@ -1,4 +1,3 @@
-"use client";
 import React, { useMemo, useState, useEffect, useCallback } from "react";
 import { useOidcAccessToken } from "@axa-fr/react-oidc";
 import { useOIDCContext } from "@dirac-grid/diracx-web-components/hooks";
