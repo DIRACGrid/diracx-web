@@ -5,10 +5,10 @@
   "type": "module",
   "license": "GPL-3.0-only",
   "scripts": {
-    "dev": "export NEXT_PUBLIC_DIRACX_URL=$DIRACX_URL; next dev --webpack",
-    "build": "next build",
+    "dev": "export VITE_DIRACX_URL=$DIRACX_URL; vite",
+    "build": "vite build",
+    "preview": "vite preview",
     "test": "cypress open --config baseUrl=$DIRACX_URL",
-    "start": "next start",
     "lint": "eslint ./src",
     "lint-staged": "lint-staged",
     "ts-lint": "tsc -noEmit -incremental",
@@ -17,16 +17,19 @@
   "dependencies": {
     "@axa-fr/react-oidc": ">=7.24.0 <7.27.0",
     "@dirac-grid/diracx-web-components": "0.1.0-a11",
+    "@emotion/react": "^11.11.4",
+    "@emotion/styled": "^11.11.5",
+    "@fontsource/inter": "^5.3.0",
     "@mui/icons-material": "^7.0.0",
     "@mui/material": "^7.0.0",
     "@mui/utils": "^7.0.0",
     "@mui/x-date-pickers": "^8.0.0",
     "@tanstack/react-table": "^8.20.5",
     "autoprefixer": "10.4.27",
-    "next": "16.1.7",
     "postcss": "8.5.8",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "react-dom": "^19.0.0",
+    "react-error-boundary": "^6.1.6"
   },
   "devDependencies": {
     "@eslint/compat": "^2.0.0",
@@ -35,13 +38,20 @@
     "@types/node": "^24.0.0",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
+    "@typescript-eslint/eslint-plugin": "^8.31.0",
+    "@typescript-eslint/parser": "^8.31.0",
+    "@vitejs/plugin-react": "^6.1.1",
     "cypress": "^15.0.0",
     "eslint": "^9",
-    "eslint-config-next": "16.1.6",
     "eslint-config-prettier": "^10.0.1",
+    "eslint-plugin-import": "^2.29.1",
+    "eslint-plugin-react": "^7.37.1",
+    "eslint-plugin-react-hooks": "^7.0.0",
+    "eslint-plugin-react-refresh": "^0.5.7",
     "eslint-plugin-unused-imports": "^4.1.4",
     "lint-staged": "^16.0.0",
     "prettier": "^3.2.5",
-    "typescript": "^5"
+    "typescript": "^5",
+    "vite": "^8.3.2"
   }
 }
