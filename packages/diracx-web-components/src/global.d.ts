@@ -17,12 +17,12 @@ declare module "@tanstack/react-table" {
 }
 
 declare global {
-  interface Window {
-    // TEMPORARY, see hooks/utils.tsx's useDiracxUrl. Set by the consuming
-    // app's entry point (e.g. diracx-web's main.tsx) to pass through a
-    // bundler-specific env var (Vite's import.meta.env, which this
-    // package's own es6-targeted build strips), since this package itself
-    // can't read it directly.
-    __DIRACX_URL__?: string;
+  // Vite populates import.meta.env; Next.js (packages/extensions) doesn't,
+  // so it's optional here. See hooks/utils.tsx's useDiracxUrl.
+  interface ImportMetaEnv {
+    readonly VITE_DIRACX_URL?: string;
+  }
+  interface ImportMeta {
+    readonly env?: ImportMetaEnv;
   }
 }
