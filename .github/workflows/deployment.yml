@@ -35,9 +35,12 @@ jobs:
     runs-on: ubuntu-latest
     needs: release-please
     if: ${{ github.event_name == 'push' && github.repository == 'DIRACGrid/diracx-web' && needs.release-please.outputs.release_created == 'true' }}
+    # The npm trusted publisher is bound to this environment, which only main can use.
+    environment: npm
     permissions:
       contents: read
       packages: write
+      id-token: write  # OIDC token for npm trusted publishing (no NPM_TOKEN)
     steps:
     - uses: actions/checkout@v6
 
@@ -46,21 +49,21 @@ jobs:
         node-version: 'lts/*'
         registry-url: 'https://registry.npmjs.org'
 
+    # `npm stage` needs npm >= 11.15.0
+    - name: Update npm
+      run: npm install -g npm@^11.15.0
+
     - name: Install dependencies
       run: npm ci
 
-    # Release Please has already incremented versions and published tags, so we just
-    # need to publish all unpublished versions to NPM here
-    - name: Publish to NPM
-      env:
-        NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
-      run: |
-        TAG_NAME="${{ needs.release-please.outputs.tag_name }}"
-        if [[ "$TAG_NAME" == *-* ]]; then
-          npm --workspace packages/diracx-web-components publish --tag latest
-        else
-          npm --workspace packages/diracx-web-components publish
-        fi
+    # Release Please has already incremented versions and published tags. The new
+    # version is only staged here: a maintainer approves it with npm 2FA
+    # (npmjs.com or `npm stage approve <id>`) before it becomes installable.
+    # Pre-releases also go to `latest`, as before; npm requires the tag to be explicit.
+    # Run from the package directory: `npm stage` does not handle --workspace reliably.
+    - name: Stage the release on npm
+      working-directory: packages/diracx-web-components
+      run: npm stage publish --tag latest
 
   # Storybook is built and deployed to GitHub Pages
   # -----------------------------------------------
