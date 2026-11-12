@@ -37,7 +37,7 @@ jobs:
         echo "After cleanup:"
         df -h
 
-    - uses: actions/checkout@v6
+    - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
 
     - name: Clone source
       run: |
@@ -73,7 +73,7 @@ jobs:
     - name: Set DIRACX_URL
       run: echo "DIRACX_URL=https://$(ifconfig | grep 'inet ' | awk '{ print $2 }' | grep -v '^127' | head -n 1 | cut -d '/' -f 1).nip.io:8000" >> $GITHUB_ENV
 
-    - uses: actions/setup-node@v6
+    - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
       with:
         node-version-file: .nvmrc
 
@@ -86,7 +86,7 @@ jobs:
 
     - name: Upload Cypress screenshots
       if: failure()
-      uses: actions/upload-artifact@v7
+      uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
       with:
         name: cypress-screenshots
         path: packages/diracx-web/cypress/screenshots
