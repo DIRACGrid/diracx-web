@@ -15,3 +15,14 @@ declare module "@tanstack/react-table" {
     isQuasiUnique?: boolean; // Some columns are quasi-unique, meaning they can have multiple values but are not fully unique
   }
 }
+
+declare global {
+  // Vite populates import.meta.env; Next.js (packages/extensions) doesn't,
+  // so it's optional here. See hooks/utils.tsx's useDiracxUrl.
+  interface ImportMetaEnv {
+    readonly VITE_DIRACX_URL?: string;
+  }
+  interface ImportMeta {
+    readonly env?: ImportMetaEnv;
+  }
+}

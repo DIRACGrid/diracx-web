@@ -9,12 +9,14 @@ import { useState } from "react";
 export function useDiracxUrl() {
   const [diracxUrl] = useState<string | null>(() => {
     if (typeof window === "undefined") return null;
-    // `process` only exists under Next.js (or another bundler that injects
-    // it); guard the access so plain browser bundles don't throw.
+    // Vite-based consumers (diracx-web) expose VITE_DIRACX_URL via
+    // import.meta.env. Next.js-based consumers (packages/extensions) don't
+    // populate import.meta.env at all, so it's optional here; they expose
+    // the same value via process.env.NEXT_PUBLIC_DIRACX_URL instead.
     const envUrl =
-      typeof process !== "undefined" && process.env
-        ? process.env.NEXT_PUBLIC_DIRACX_URL
-        : undefined;
+      import.meta.env?.VITE_DIRACX_URL ||
+      (typeof process !== "undefined" && process.env?.NEXT_PUBLIC_DIRACX_URL) ||
+      undefined;
     return envUrl || `${window.location.protocol}//${window.location.host}`;
   });
 

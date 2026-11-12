@@ -25,11 +25,11 @@ flowchart TD
         lib:storybook["doc"]
   end
  subgraph diracx-web-cmds["diracx-web package.json"]
-        nextdev["next dev"]
+        vitedev["vite"]
         diracx-web:dev["dev"]
         cypress["cypress"]
         diracx-web:test["test"]
-        next["next build"]
+        vitebuild["vite build"]
         diracx-web:build["build"]
   end
  subgraph diracx-web["diracx-web"]
@@ -44,9 +44,9 @@ flowchart TD
     lib:test --> vitest
     lib:build --> tsup:build
     lib:storybook --> storybook
-    diracx-web:dev -.-> nextdev
+    diracx-web:dev -.-> vitedev
     diracx-web:test -.-> cypress
-    diracx-web:build -.-> next
+    diracx-web:build -.-> vitebuild
     user["Developer"] --> root-cmds
     root:test:lib -- calls --> lib:test
     root:build:lib -- calls --> lib:build
@@ -56,10 +56,10 @@ flowchart TD
     root:test -- calls --> diracx-web:test
     root:test ~~~ gubbins-cmds["**extensions[gubbins] package.json**"]
     cypress -- uses --> diracx-src
-    nextdev -- uses --> diracx-src
-    nextdev -. watches(next config) .-> lib-src
-    next -- builds --> diracx-out
-    next -. needs .-> lib-out
+    vitedev -- uses --> diracx-src
+    vitedev -. aliases(vite config) .-> lib-src
+    vitebuild -- builds --> diracx-out
+    vitebuild -. needs .-> lib-out
     tsup:watch -- builds --> lib-out
     tsup:watch -. watches .-> lib-src
     vitest -- uses --> lib-src
@@ -79,11 +79,11 @@ flowchart TD
      lib:build:::Ash
      storybook:::Rose
      lib:storybook:::Ash
-     nextdev:::Rose
+     vitedev:::Rose
      diracx-web:dev:::Ash
      cypress:::Rose
      diracx-web:test:::Ash
-     next:::Rose
+     vitebuild:::Rose
      diracx-web:build:::Ash
      diracx-src:::Peach
      diracx-out:::Peach
@@ -141,7 +141,7 @@ diracx-charts/run_demo.sh ./diracx-web [./diracx]
 ```
 
 !!! tip
-    Any change made in `diracx-web-components` is automatically reflected into the development environment. We rely on the [NextJS transpile option](https://nextjs.org/docs/app/api-reference/config/next-config-js/transpilePackages). Further details are available in the `diracx-web` NextJS configuration.
+    Any change made in `diracx-web-components` is automatically reflected into the development environment. In dev mode, Vite aliases `diracx-web-components`'s subpaths directly to its source, bypassing its built `dist/`. Further details are available in the `diracx-web` Vite configuration.
 
 ## Testing
 

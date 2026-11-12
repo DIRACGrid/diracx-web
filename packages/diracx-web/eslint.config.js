@@ -1,9 +1,14 @@
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { fixupConfigRules } from "@eslint/compat";
+import { fixupConfigRules, fixupPluginRules } from "@eslint/compat";
 import js from "@eslint/js";
 import { FlatCompat } from "@eslint/eslintrc";
-import nextCoreWebVitals from "eslint-config-next/core-web-vitals";
+import typescriptEslint from "@typescript-eslint/eslint-plugin";
+import tsParser from "@typescript-eslint/parser";
+import eslintPluginImport from "eslint-plugin-import";
+import react from "eslint-plugin-react";
+import reactHooks from "eslint-plugin-react-hooks";
+import reactRefresh from "eslint-plugin-react-refresh";
 import eslintPluginUnusedImports from "eslint-plugin-unused-imports";
 
 const __filename = fileURLToPath(import.meta.url);
@@ -16,16 +21,44 @@ const compat = new FlatCompat({
 
 // This config is only for typescript files
 export default [
-  ...nextCoreWebVitals,
+  {
+    files: ["**/*.{ts,tsx}"],
+    plugins: { "react-hooks": reactHooks },
+    rules: reactHooks.configs["recommended-latest"].rules,
+  },
+  { ...reactRefresh.configs.vite, files: ["**/*.{ts,tsx}"] },
   ...fixupConfigRules(compat.extends("prettier")),
   {
+    files: ["**/*.{ts,tsx}"],
+
     plugins: {
       "unused-imports": eslintPluginUnusedImports,
+      import: fixupPluginRules(eslintPluginImport),
+      react: fixupPluginRules(react),
+      "@typescript-eslint": fixupPluginRules(typescriptEslint),
     },
 
     languageOptions: {
       globals: {
         JSX: "readonly",
+      },
+
+      parser: tsParser,
+      ecmaVersion: 2021,
+      sourceType: "module",
+
+      parserOptions: {
+        ecmaFeatures: {
+          jsx: true,
+        },
+        project: ["./tsconfig.json"],
+        tsconfigRootDir: __dirname,
+      },
+    },
+
+    settings: {
+      react: {
+        version: "detect",
       },
     },
 
