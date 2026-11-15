@@ -9,16 +9,26 @@ on:
     branches-ignore:
       - release-please-**
 
+# A new push to the same branch/PR cancels the previous run.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
 jobs:
   basic-checks:
+    name: basic-checks
     runs-on: ubuntu-latest
     if: github.event_name != 'push' || github.repository == 'DIRACGrid/diracx-web'
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 0
+          persist-credentials: false
 
-      - uses: actions/setup-node@v6
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
         with:
           node-version: 'lts/*'
           cache: 'npm'
@@ -28,7 +38,7 @@ jobs:
       # Build the library: needed to successfully run the following checks
       - name: Build Library
         run: npm run build:diracx-web-components
-              
+
       - name: Check formatting rules
         run: npx prettier . --check
       - name: Check code-quality rules
