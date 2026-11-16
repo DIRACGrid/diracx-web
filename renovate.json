@@ -1,18 +1,11 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": [
-    "local>DIRACGrid/.github//renovate-config"
-  ],
+  "extends": ["local>DIRACGrid/.github//renovate-config"],
   "packageRules": [
     {
       "description": "Group all non-major npm dependency updates together",
-      "matchManagers": [
-        "npm"
-      ],
-      "matchUpdateTypes": [
-        "minor",
-        "patch"
-      ],
+      "matchManagers": ["npm"],
+      "matchUpdateTypes": ["minor", "patch"],
       "groupName": "npm dependencies (non-major)"
     }
   ]
