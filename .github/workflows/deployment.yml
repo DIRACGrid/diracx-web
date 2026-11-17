@@ -9,10 +9,11 @@ on:
     branches-ignore:
       - release-please-**
 
-# Don't cancel: a queued run may be a release waiting to publish.
+# One group per branch/PR: PR runs never queue behind (or replace) a main run.
+# Only superseded PR runs are cancelled; a main run may be publishing a release.
 concurrency:
-  group: ${{ github.workflow }}
-  cancel-in-progress: false
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 permissions:
   contents: read
@@ -29,7 +30,7 @@ jobs:
       release_created: ${{ steps.release.outputs.release_created }}
       tag_name: ${{ steps.release.outputs.tag_name }}
     steps:
-      - uses: googleapis/release-please-action@8b8fd2cc23b2e18957157a9d923d75aa0c6f6ad5 # v4
+      - uses: googleapis/release-please-action@5c625bfb5d1ff62eadeeb3772007f7f66fdcf071 # v4.4.1
         id: release
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
@@ -124,6 +125,9 @@ jobs:
     name: build-deploy-diracx-web-dev-image
     runs-on: ubuntu-latest
     if: ${{ github.event_name != 'push' || github.repository == 'DIRACGrid/diracx-web' }}
+    permissions:
+      contents: read
+      packages: write  # push the image to ghcr.io with the GITHUB_TOKEN
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -154,6 +158,9 @@ jobs:
     runs-on: ubuntu-latest
     if: ${{ github.event_name == 'push' && github.repository == 'DIRACGrid/diracx-web' }}
     needs: release-please
+    permissions:
+      contents: read
+      packages: write  # push the image to ghcr.io with the GITHUB_TOKEN
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
