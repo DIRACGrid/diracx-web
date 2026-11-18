@@ -11,15 +11,28 @@ on:
     branches-ignore:
       - release-please-**
 
+# A new push to the same branch/PR cancels the previous run.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
 jobs:
   # Run lint and type checks
   run-lint:
+    name: run-lint
     runs-on: ubuntu-latest
     if: github.event_name != 'push' || github.repository == 'DIRACGrid/diracx-web'
     steps:
-      - uses: actions/checkout@v6
-      
-      - uses: actions/setup-node@v6
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
         with:
           node-version: 'lts/*'
           cache: 'npm'
@@ -52,6 +65,7 @@ jobs:
   # - Update Configuration: Adjust relevant variables to align with a           #
   #   standalone setup.                                                         #
   prepare-gubbins-backend:
+    name: prepare-gubbins-backend
     runs-on: ubuntu-latest
     if: ${{ github.event_name != 'push' || github.repository == 'DIRACGrid/diracx-web' }}
     steps:
@@ -62,10 +76,10 @@ jobs:
 
       # Build gubbins container images using pixi
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v4
+        uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # v4.4.1
 
       - name: Build gubbins services image
-        uses: docker/build-push-action@v7
+        uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7.4.0
         with:
           context: ../diracx
           file: ../diracx/containers/Dockerfile
@@ -75,7 +89,7 @@ jobs:
           outputs: type=docker,dest=/tmp/gubbins_services_image.tar
 
       - name: Build gubbins client image
-        uses: docker/build-push-action@v7
+        uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7.4.0
         with:
           context: ../diracx
           file: ../diracx/containers/Dockerfile
@@ -85,18 +99,21 @@ jobs:
           outputs: type=docker,dest=/tmp/gubbins_client_image.tar
 
       - name: Upload gubbins images
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: gubbins-images
           path: /tmp/gubbins_*_image.tar
 
   prepare-gubbins-frontend-as-a-standalone:
+    name: prepare-gubbins-frontend-as-a-standalone
     runs-on: ubuntu-latest
     if: ${{ github.event_name != 'push' || github.repository == 'DIRACGrid/diracx-web' }}
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
 
-      - uses: actions/setup-node@v6
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
         with:
           node-version: 'lts/*'
           registry-url: 'https://registry.npmjs.org'
@@ -129,7 +146,7 @@ jobs:
         run: npm install
 
       - name: Upload the extensions directory
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: gubbins-web
           path: /tmp/gubbins-web
@@ -144,19 +161,24 @@ jobs:
 
   # Build the extension image
   build-gubbins-dev-image:
+    name: build-gubbins-dev-image
     runs-on: ubuntu-latest
     needs: prepare-gubbins-frontend-as-a-standalone
     if: ${{ github.event_name != 'push' || github.repository == 'DIRACGrid/diracx-web' }}
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+        with:
+          persist-credentials: false
 
       - name: Set up QEMU
-        uses: docker/setup-qemu-action@v4
+        uses: docker/setup-qemu-action@99012661954931238ded8c8b007157a8430204e1 # v4.4.0
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v4
+        uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # v4.4.1
 
       - name: Login to GitHub container registry
-        uses: docker/login-action@v4
+        uses: docker/login-action@81c6f93d4bc991e510b342a00b419b3bb4efc5c6 # v4.7.0
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
@@ -166,7 +188,7 @@ jobs:
       # WARNING: In your CI/CD pipeline, you should remove the following steps  #
       # ------------------------------------------------------------------------#
       - name: Download gubbins-web
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
           name: gubbins-web
           path: /tmp/gubbins-web
@@ -175,7 +197,7 @@ jobs:
 
       # In your extension, you have to push the image to the registry (check deployment.yml)
       - name: Build Docker image (extension example)
-        uses: docker/build-push-action@v7
+        uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7.4.0
         with:
           context: /tmp/gubbins-web
           push: false
@@ -184,6 +206,7 @@ jobs:
 
   # Run the demo with the extension source code (frontend and backend)
   run-demo:
+    name: run-demo
     runs-on: ubuntu-latest
     needs: [prepare-gubbins-frontend-as-a-standalone, prepare-gubbins-backend]
     if: github.event_name != 'push' || github.repository == 'DIRACGrid/diracx-web'
@@ -205,8 +228,10 @@ jobs:
         echo "After cleanup:"
         df -h
 
-    - uses: actions/checkout@v6 
-      
+    - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      with:
+        persist-credentials: false
+
     - name: Clone source
       run: |
         cd ..
@@ -221,7 +246,7 @@ jobs:
         git clone https://github.com/DIRACGrid/diracx.git
 
     - name: Download gubbins images
-      uses: actions/download-artifact@v7
+      uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
       with:
         name: gubbins-images
         path: /tmp/
@@ -234,7 +259,7 @@ jobs:
         rm -f /tmp/gubbins_client_image.tar
 
     - name: Download gubbins-web
-      uses: actions/download-artifact@v7
+      uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
       with:
         name: gubbins-web
         path: /tmp/gubbins-web
@@ -294,13 +319,13 @@ jobs:
     - name: Set DIRACX_URL
       run: echo "DIRACX_URL=https://$(ifconfig | grep 'inet ' | awk '{ print $2 }' | grep -v '^127' | head -n 1 | cut -d '/' -f 1).nip.io:8000" >> $GITHUB_ENV
 
-    - uses: actions/setup-node@v6
+    - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
       with:
         node-version-file: .nvmrc
 
     # Run e2e tests with Cypress
     - name: Start Cypress
-      uses: cypress-io/github-action@v6
+      uses: cypress-io/github-action@f790eee7a50d9505912f50c2095510be7de06aa7 # v6.10.9
       with:
         browser: chrome
         config: baseUrl=${{ env.DIRACX_URL }}
@@ -308,7 +333,7 @@ jobs:
     
     - name: Upload Cypress screenshots
       if: failure()  
-      uses: actions/upload-artifact@v7
+      uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
       with:
         name: cypress-screenshots
         path: /tmp/gubbins-web/cypress/screenshots
