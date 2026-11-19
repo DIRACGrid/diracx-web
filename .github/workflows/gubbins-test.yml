@@ -121,8 +121,6 @@ jobs:
           # Update the package.json to point to the correct postinstall script
           jq '.scripts.postinstall = "node ./node_modules/@axa-fr/react-oidc/bin/copy-service-worker-files.mjs public"' /tmp/gubbins-web/package.json > /tmp/gubbins-web/package.temp.json
           mv /tmp/gubbins-web/package.temp.json /tmp/gubbins-web/package.json
-          # Update the next.config.js to prevent the standalone extension from searching a local version of diracx-web-components that does not exist
-          echo 'const nextConfig = { output: "export", images: { unoptimized: true }}; export default nextConfig;' > /tmp/gubbins-web/next.config.js
 
       - name: Install extensions dependencies
         working-directory: /tmp/gubbins-web
