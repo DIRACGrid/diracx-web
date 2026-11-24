@@ -61,7 +61,7 @@ jobs:
           fi
       # Two calls: within one call the PR step cannot see the draft the release
       # step just made.
-      - uses: googleapis/release-please-action@5c625bfb5d1ff62eadeeb3772007f7f66fdcf071 # v4.4.1
+      - uses: googleapis/release-please-action@45996ed1f6d02564a971a2fa1b5860e934307cf7 # v5.0.0
         id: release
         if: steps.pending.outputs.draft != 'true'
         with:
@@ -70,7 +70,7 @@ jobs:
           config-file: release-please-config.json
           manifest-file: .release-please-manifest.json
           skip-github-pull-request: true
-      - uses: googleapis/release-please-action@5c625bfb5d1ff62eadeeb3772007f7f66fdcf071 # v4.4.1
+      - uses: googleapis/release-please-action@45996ed1f6d02564a971a2fa1b5860e934307cf7 # v5.0.0
         if: steps.pending.outputs.draft != 'true' && steps.release.outputs.releases_created != 'true'
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
@@ -96,7 +96,7 @@ jobs:
       with:
         persist-credentials: false
 
-    - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+    - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7
       with:
         node-version: 'lts/*'
         registry-url: 'https://registry.npmjs.org'
@@ -132,7 +132,7 @@ jobs:
         with:
           persist-credentials: false
 
-      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7
         with:
           node-version: 'lts/*'
           # No cache: the result is deployed to Pages on a release.
@@ -142,7 +142,7 @@ jobs:
         run: npm ci && npm --prefix packages/diracx-web-components run build-doc
 
       - name: Upload artifact
-        uses: actions/upload-pages-artifact@7b1f4a764d45c48632c6b24a0339c27f5614fb0b # v4
+        uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5
         with: 
           path: packages/diracx-web-components/storybook-static
 
@@ -157,7 +157,7 @@ jobs:
     steps:    
       - id: deploy
         name: Deploy to GitHub Pages
-        uses: actions/deploy-pages@d6db90164ac5ed86f2b6aed7e0febac5b3c0c03e # v4.0.5
+        uses: actions/deploy-pages@368f82528645a54fb793d4d04e342629a3f51346 # v5.0.1
         with:
           token: ${{ github.token }}
 
