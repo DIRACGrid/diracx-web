@@ -8,6 +8,10 @@ on:
   pull_request:
     branches-ignore:
       - release-please-**
+  # A release manager publishes the draft release made by release-please. That
+  # creates the tag and starts the npm, storybook and release image jobs.
+  release:
+    types: [published]
 
 # One group per branch/PR: PR runs never queue behind (or replace) a main run.
 # Only superseded PR runs are cancelled; a main run may be publishing a release.
@@ -22,21 +26,58 @@ jobs:
   release-please:
     name: release-please
     runs-on: ubuntu-latest
-    if: ${{ github.event_name == 'push' && github.repository == 'DIRACGrid/diracx-web' && github.ref_name == 'main' }}
+    # Also runs when the draft is published, to open the next release PR.
+    if: >-
+      github.repository == 'DIRACGrid/diracx-web'
+      && ((github.event_name == 'push' && github.ref_name == 'main') || github.event_name == 'release')
+    concurrency:
+      group: release-please
+      cancel-in-progress: false
     permissions:
-      contents: write  # release commit, tag and GitHub release
+      contents: write  # release commit and draft GitHub release
       pull-requests: write  # open and update the release PR
-    outputs:
-      release_created: ${{ steps.release.outputs.release_created }}
-      tag_name: ${{ steps.release.outputs.tag_name }}
     steps:
+      # release-please ignores draft releases (they have no tag). Until the draft
+      # is published it would build the next release PR from the whole history.
+      - name: Check for an unpublished draft release
+        id: pending
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          # Always the default branch: a release or re-run SHA can be an older commit.
+          MANIFEST_REF: ${{ github.event.repository.default_branch }}
+        run: |
+          version="$(gh api "repos/$GITHUB_REPOSITORY/contents/.release-please-manifest.json?ref=$MANIFEST_REF" \
+            --jq .content | base64 -d | jq -er '."."')"
+          if [[ ! "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+ ]]; then
+            echo "::error::Unexpected version in .release-please-manifest.json: '$version'"
+            exit 1
+          fi
+          drafts="$(gh api --paginate "repos/$GITHUB_REPOSITORY/releases?per_page=100" \
+            --jq ".[] | select(.draft and .tag_name == \"v$version\") | .id")"
+          if [[ -n "$drafts" ]]; then
+            echo "::warning::Draft release v$version is not published yet: release-please skipped"
+            echo "draft=true" >> "$GITHUB_OUTPUT"
+          fi
+      # Two calls: within one call the PR step cannot see the draft the release
+      # step just made.
       - uses: googleapis/release-please-action@5c625bfb5d1ff62eadeeb3772007f7f66fdcf071 # v4.4.1
         id: release
+        if: steps.pending.outputs.draft != 'true'
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          target-branch: ${{ github.ref_name }}
+          target-branch: ${{ github.event.repository.default_branch }}
           config-file: release-please-config.json
           manifest-file: .release-please-manifest.json
+          skip-github-pull-request: true
+      - uses: googleapis/release-please-action@5c625bfb5d1ff62eadeeb3772007f7f66fdcf071 # v4.4.1
+        if: steps.pending.outputs.draft != 'true' && steps.release.outputs.releases_created != 'true'
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          target-branch: ${{ github.event.repository.default_branch }}
+          config-file: release-please-config.json
+          manifest-file: .release-please-manifest.json
+          skip-github-release: true
 
   # Library is built and deployed to NPM
   # ------------------------------------
@@ -44,9 +85,8 @@ jobs:
   build-deploy-library-package:
     name: build-deploy-library-package
     runs-on: ubuntu-latest
-    needs: release-please
-    if: ${{ github.event_name == 'push' && github.repository == 'DIRACGrid/diracx-web' && needs.release-please.outputs.release_created == 'true' }}
-    environment: npm  # required by the npm trusted publisher; main only
+    if: ${{ github.event_name == 'release' && github.repository == 'DIRACGrid/diracx-web' }}
+    environment: npm  # required by the npm trusted publisher; main and v* tags only
     permissions:
       contents: read
       packages: write  # publish the npm package via the trusted publisher
@@ -60,6 +100,8 @@ jobs:
       with:
         node-version: 'lts/*'
         registry-url: 'https://registry.npmjs.org'
+        # No cache in a job that publishes: a pull request could have filled it.
+        package-manager-cache: false
 
     # npm stage needs npm >= 11.15.0
     - name: Update npm
@@ -93,7 +135,8 @@ jobs:
       - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
         with:
           node-version: 'lts/*'
-          cache: 'npm'
+          # No cache: the result is deployed to Pages on a release.
+          package-manager-cache: false
           
       - name: Build documentation
         run: npm ci && npm --prefix packages/diracx-web-components run build-doc
@@ -109,8 +152,8 @@ jobs:
     permissions:
       id-token: write  # OIDC authentication for the Pages deployment
       pages: write  # deploy the storybook to GitHub Pages
-    needs: [build-storybook-docs, release-please]
-    if: needs.release-please.outputs.release_created == 'true'
+    needs: build-storybook-docs
+    if: github.event_name == 'release'
     steps:    
       - id: deploy
         name: Deploy to GitHub Pages
@@ -124,7 +167,7 @@ jobs:
   build-deploy-diracx-web-dev-image:
     name: build-deploy-diracx-web-dev-image
     runs-on: ubuntu-latest
-    if: ${{ github.event_name != 'push' || github.repository == 'DIRACGrid/diracx-web' }}
+    if: ${{ github.event_name == 'pull_request' || (github.event_name == 'push' && github.repository == 'DIRACGrid/diracx-web') }}
     permissions:
       contents: read
       packages: write  # push the image to ghcr.io with the GITHUB_TOKEN
@@ -156,8 +199,7 @@ jobs:
   build-deploy-diracx-web-release-image:
     name: build-deploy-diracx-web-release-image
     runs-on: ubuntu-latest
-    if: ${{ github.event_name == 'push' && github.repository == 'DIRACGrid/diracx-web' }}
-    needs: release-please
+    if: ${{ github.event_name == 'release' && github.repository == 'DIRACGrid/diracx-web' }}
     permissions:
       contents: read
       packages: write  # push the image to ghcr.io with the GITHUB_TOKEN
@@ -179,10 +221,9 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build Docker image
-        if: ${{ needs.release-please.outputs.release_created == 'true' }}
         uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7.4.0
         with:
           context: .
           push: true
-          tags: ghcr.io/diracgrid/diracx-web/static:${{ needs.release-please.outputs.tag_name }}
+          tags: ghcr.io/diracgrid/diracx-web/static:${{ github.event.release.tag_name }}
           platforms: linux/amd64,linux/arm64
