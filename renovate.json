@@ -7,6 +7,12 @@
       "matchManagers": ["npm"],
       "matchUpdateTypes": ["minor", "patch"],
       "groupName": "npm dependencies (non-major)"
+    },
+    {
+      "description": "TypeScript major updates (e.g. the v7 Go-based compiler) change type-checking behavior across all packages: minor/patch updates flow as usual, majors require explicit approval on the dependency dashboard.",
+      "matchDepNames": ["typescript"],
+      "matchUpdateTypes": ["major"],
+      "dependencyDashboardApproval": true
     }
   ]
 }
