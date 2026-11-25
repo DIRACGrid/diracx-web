@@ -1,7 +1,15 @@
 {
   "name": "@dirac-grid/diracx-web-components",
   "version": "0.1.0-a12",
-  "repository": "https://github.com/DIRACGrid/diracx-web",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/DIRACGrid/diracx-web.git",
+    "directory": "packages/diracx-web-components"
+  },
+  "homepage": "https://diracgrid.org",
+  "bugs": {
+    "url": "https://github.com/DIRACGrid/diracx-web/issues"
+  },
   "description": "Useful components for diracx-web",
   "publishConfig": {
     "access": "public"
