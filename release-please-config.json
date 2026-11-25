@@ -14,13 +14,16 @@
       "component": "root"
     },
     "packages/extensions": {
-      "component": "extensions"
+      "component": "extensions",
+      "skip-github-release": true
     },
     "packages/diracx-web": {
-      "component": "diracx-web"
+      "component": "diracx-web",
+      "skip-github-release": true
     },
     "packages/diracx-web-components": {
-      "component": "diracx-web-components"
+      "component": "diracx-web-components",
+      "skip-github-release": true
     }
   },
   "plugins": [
