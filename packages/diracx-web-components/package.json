@@ -37,7 +37,7 @@
   ],
   "dependencies": {
     "@atlaskit/pragmatic-drag-and-drop": "^4.0.0",
-    "@atlaskit/pragmatic-drag-and-drop-hitbox": "^1.0.3",
+    "@atlaskit/pragmatic-drag-and-drop-hitbox": "^3.0.0",
     "@atlaskit/pragmatic-drag-and-drop-react-drop-indicator": "^4.0.0",
     "@mui/utils": "^7.0.0",
     "@mui/x-charts": "^8.0.0",
