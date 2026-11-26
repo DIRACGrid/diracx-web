@@ -1,6 +1,6 @@
 {
-  ".": "0.1.0-a12",
-  "packages/extensions": "0.1.0-a12",
-  "packages/diracx-web": "0.1.0-a12",
-  "packages/diracx-web-components": "0.1.0-a12"
+  ".": "0.1.0-a13",
+  "packages/extensions": "0.1.0-a13",
+  "packages/diracx-web": "0.1.0-a13",
+  "packages/diracx-web-components": "0.1.0-a13"
 }

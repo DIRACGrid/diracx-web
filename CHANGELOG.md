@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.1.0-a13](https://github.com/DIRACGrid/diracx-web/compare/v0.1.0-a12...v0.1.0-a13) (2026-11-26)
+
+
+### Bug Fixes
+
+* **deps:** update dependency @atlaskit/pragmatic-drag-and-drop to v4 ([8882e7b](https://github.com/DIRACGrid/diracx-web/commit/8882e7b821adc30299c53974c83fbd324d84b43d))
+* **deps:** update dependency @atlaskit/pragmatic-drag-and-drop to v4 ([4fd7ed9](https://github.com/DIRACGrid/diracx-web/commit/4fd7ed996cfde58f10b992af7f58966449894c9b))
+* **deps:** update dependency @atlaskit/pragmatic-drag-and-drop-react-drop-indicator to v4 ([b3b1464](https://github.com/DIRACGrid/diracx-web/commit/b3b1464293da1d6e7c517158f2608c2b877c7ce6))
+* **deps:** update dependency @atlaskit/pragmatic-drag-and-drop-react-drop-indicator to v4 ([1b07681](https://github.com/DIRACGrid/diracx-web/commit/1b076814554f5591e8d96dd91d13053ba34dea84))
+* **deps:** update dependency postcss to v8.5.23 [security] ([0e9bdc5](https://github.com/DIRACGrid/diracx-web/commit/0e9bdc53ff05b5becd3725794eb523d014e308ac))
+* **deps:** update dependency postcss to v8.5.23 [security] ([d71ece2](https://github.com/DIRACGrid/diracx-web/commit/d71ece2b583ae2709f70951220fb3d36d027ca13))
+
 ## [0.1.0-a12](https://github.com/DIRACGrid/diracx-web/compare/v0.1.0-a11...v0.1.0-a12) (2026-11-24)
 
 
