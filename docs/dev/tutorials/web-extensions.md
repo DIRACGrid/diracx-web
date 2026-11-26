@@ -2,7 +2,7 @@
 
 ![CI](https://github.com/DIRACGrid/diracx-web/actions/workflows/gubbins-test.yml/badge.svg?branch=main)
 
-This project aims to provide an example for creating a basic Next.js web extension for DiracX. It includes the necessary configuration and setup to get you started quickly.
+This project aims to provide an example for creating a basic Vite web extension for DiracX. It includes the necessary configuration and setup to get you started quickly.
 
 ## Prerequisites
 
@@ -15,7 +15,7 @@ Before starting, ensure you have the following installed:
 And ensure you have basic knowledge of:
 
 - [React](https://react.dev/)
-- [Next.js](https://nextjs.org/)
+- [Vite](https://vite.dev/)
 - [MUI](https://mui.com/)
 
 ## Getting Started
@@ -49,12 +49,12 @@ You can either create a new repository or start from this one to build your Dira
 
 3. **Remove `CHANGELOG.md`**
 
-### Method 2: Create a New Next.js Project
+### Method 2: Create a New Vite Project
 
-1. **Create a new Next.js project** using the following command:
+1. **Create a new Vite project** using the following command:
 
    ```bash
-   npx create-next-app your-extension
+   npm create vite@latest your-extension -- --template react-ts
    cd your-extension
    ```
 
@@ -102,41 +102,44 @@ You can either create a new repository or start from this one to build your Dira
 
    ```json
    "scripts": {
-     "dev": "export NEXT_PUBLIC_DIRACX_URL=$DIRACX_URL; next dev",
+     "dev": "export VITE_DIRACX_URL=$DIRACX_URL; vite",
      ...
    }
    ```
 
-   This avoids having to set 2 environment variables with the same value: NextJS can only read from variables prefixed with `NEXT_PUBLIC`.
+   This avoids having to set 2 environment variables with the same value: Vite can only expose variables prefixed with `VITE_` to client code (see the [env variables guide](https://vite.dev/guide/env-and-mode.html)).
 
-4. **Edit the Next.js config** with these options:
+4. **Configure the dev server** in `vite.config.ts`:
 
-   ```js
-      output: "export",
-      images: {
-         unoptimized: true,
-      },
+   ```ts
+   server: {
+     // Match the port expected by diracx-charts' in-cluster developer mode
+     // (or fall back to 3000 for standalone local development).
+     port: Number(process.env.PORT) || 3000,
+     // Bind all interfaces so the server is reachable from outside the
+     // container, e.g. from a kubelet readiness probe.
+     host: true,
+     // The demo generates a hostname dynamically per machine, so there is no
+     // fixed value to allowlist against Vite's DNS-rebinding protection.
+     allowedHosts: true,
+   },
    ```
 
-   The output is set to `export` to have a static application.
-   Images are left unoptimized because it's not well-supported with a static export.
+   `vite build` already produces a static `dist/` directory by default, so no extra build configuration is needed for that.
 
 5. **Add the nginx config** located in the [`config/nginx`](https://github.com/DIRACGrid/diracx-web/tree/main/packages/extensions/config/nginx) directory.
    This adjustment ensures that Nginx can correctly handle requests for .html files and fall back appropriately, preventing the `404: Not Found` errors encountered when accessing routes like `/auth`. (see [#57](https://github.com/DIRACGrid/diracx-web/pull/57))
 
-6. **Organize your pages** in the `src/app` app directory.
-   The `<DiracXWebProviders>` context is needed by most of the components of `diracx-web-components`, so you should include it in the layouts of your application. Use `<OIDCSecure>` to require authentication on a route. You can also override some default values of certain contexts like `<ApplicationProvider>` for the application list.
+6. **Write your `App.tsx`**, the single entry point rendered by `main.tsx`.
+   Wrap it in `<DiracXWebProviders>`, which most `diracx-web-components` components need, and render `<LoginForm>` or `<Dashboard>` depending on the current path (there is no file-based routing in Vite, so a small hook reading `window.location`/`history` plays that role, see `useBrowserNavigation.ts`). Use `<OIDCSecure>` to require authentication on a route. You can also override some default values of certain contexts, such as `appList`/`defaultUserDashboard` passed to `<DiracXWebProviders>`.
    Finally, some components have some personalization options (i.e. the logo URL for the dashboard), check the [Storybook documentation](https://diracgrid.github.io/diracx-web/) to see the props of each component.
-   Check [the app directory](https://github.com/DIRACGrid/diracx-web/tree/main/packages/extensions/src/app) in this example to have a reference.
+   Check [`App.tsx`](https://github.com/DIRACGrid/diracx-web/blob/main/packages/extensions/src/App.tsx) and [`useBrowserNavigation.ts`](https://github.com/DIRACGrid/diracx-web/blob/main/packages/extensions/src/useBrowserNavigation.ts) in this example to have a reference.
 
 ### Architecture
 
 We strongly recommend following the directory structure below to keep your project organized:
 
-- `/src/app`: Contains the main application logic and Next.js setup. This directory houses the core of the application built using Next.js, where each page.tsx file represents a page in the application with [folder-based routing](https://nextjs.org/docs/app/building-your-application/routing). [Next.js Official Documentation](https://nextjs.org/docs).
-  The page.tsx files contain the UI for a route and layout.tsx files handles the shared UI for a segment and its children.
-  In this example the `(Dashboard)` folder manages the main interface where users interact with the app's primary functions. Names in parentheses are ignored for the route, so it is the root URL.
-  The `auth` folder handles the authentication of users, and the route is `/auth`.
+- `/src/App.tsx`, `/src/main.tsx`: Contain the main application logic and Vite setup. [`main.tsx`](https://vite.dev/guide/#index-html-and-project-root) mounts the single `<App>` component into `index.html`. Since there is no file-based routing, `App.tsx` decides what to render (the login form or the dashboard) by checking the current path, see [`useBrowserNavigation.ts`](https://github.com/DIRACGrid/diracx-web/blob/main/packages/extensions/src/useBrowserNavigation.ts).
 
 - `/src/<your extension>`: This directory includes the source code related to your extension. You can create custom components, hooks, ... in this directory.
   - `/src/<your extension>/components`: Contains custom React components. This folder includes reusable UI components built using React. Components in React are independent, reusable pieces of UI that can manage their own state. [React Components](https://reactjs.org/docs/components-and-props.html)
@@ -177,12 +180,12 @@ Having a directory dedicated to your extension components will help you keep you
 
 To add new apps to your extension, you can create new components in your extension directory.
 
-[`testApp`](https://github.com/DIRACGrid/diracx-web/blob/main/packages/extensions/src/gubbins/components/TestApp/testApp.tsx) provides an example of a basic app component and the [Storybook documentation](https://diracgrid.github.io/diracx-web/) showcases all the components you can use from the library in an interactive interface.
+[`OwnerMonitor`](https://github.com/DIRACGrid/diracx-web/blob/main/packages/extensions/src/gubbins/components/OwnerMonitor/OwnerMonitor.tsx) provides an example of a basic app component and the [Storybook documentation](https://diracgrid.github.io/diracx-web/) showcases all the components you can use from the library in an interactive interface.
 
 It is then pretty easy to add them to DiracX Web by extending the `applicationList` (the list of apps available in DiracX-Web) from `diracx-web-components/components`.
 
 Context providers are used to manage and share global state across the application. You can use the `ApplicationProvider` from `diracx-web-components/contexts` to pass the list of applications to the components that need it.
-It is used in this example in the [(Dashboard) directory's layout.tsx](https://github.com/DIRACGrid/diracx-web/blob/main/packages/extensions/src/app/(dashboard)/layout.tsx) file.
+It is used in this example in [`App.tsx`](https://github.com/DIRACGrid/diracx-web/blob/main/packages/extensions/src/App.tsx).
 
 If you need more info on Contexts, you can check the [React documentation](https://reactjs.org/docs/context.html).
 
@@ -201,7 +204,7 @@ const newApp = {
 // Make a new list with all elements of the default list + the new application
 const newApplicationList = [...applicationList, newApp];
 
-// Use your new list by passing in the Application provider in a page's layout
+// Use your new list by passing in the Application provider in App.tsx
 <ApplicationProvider appList={newApplicationList}>...</ApplicationProvider>;
 ```
 
@@ -211,7 +214,7 @@ Feel free to explore and adjust the code to fit your requirements.
 
 ## Deployment
 
-Deployment of the extension can be done using the Dockerfile provided in the repository. The Dockerfile builds the Next.js application and serves it using a nginx server.
+Deployment of the extension can be done using the Dockerfile provided in the repository. The Dockerfile builds the Vite application and serves it using a nginx server.
 
 See [Docker's Documentation](https://docs.docker.com/get-started/) for more information on how to deploy your application using Docker.
 It can be automatically deployed using CI/CD tools like GitHub Actions, GitLab CI/CD, or Jenkins.

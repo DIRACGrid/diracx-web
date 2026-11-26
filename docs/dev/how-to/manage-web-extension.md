@@ -16,37 +16,37 @@ flowchart TD
         root:dev["dev"]
   end
  subgraph gubbins-cmds["extensions[gubbins] package.json"]
-        nextdev["next dev"]
+        vitedev["vite"]
         gubbins:dev["dev"]
         cypress["cypress"]
         gubbins:test["test"]
-        next["next build"]
+        vitebuild["vite build"]
         gubbins:build["build"]
   end
  subgraph ext["extensions[gubbins]"]
         diracx-src["/src"]
-        diracx-out["/out"]
+        diracx-out["/dist"]
   end
  subgraph lib["diracx-web-components"]
         lib-src["/src"]
         lib-out["/dist"]
   end
     user["Developer"] --> root-cmds
-    gubbins:dev -.-> nextdev
+    gubbins:dev -.-> vitedev
     gubbins:test -.-> cypress
-    gubbins:build -.-> next
+    gubbins:build -.-> vitebuild
     root:dev -- calls --> gubbins:dev
     root:dev ----x diracx-web-cmds["diracx-web package.json"]
     cypress -- uses --> diracx-src
-    nextdev -- uses --> diracx-src
-    next -- builds --> diracx-out
-    next -. needs .-> lib-out
+    vitedev -- uses --> diracx-src
+    vitebuild -- builds --> diracx-out
+    vitebuild -. needs .-> lib-out
      root:dev:::Ash
-     nextdev:::Rose
+     vitedev:::Rose
      gubbins:dev:::Ash
      cypress:::Rose
      gubbins:test:::Ash
-     next:::Rose
+     vitebuild:::Rose
      gubbins:build:::Ash
      diracx-src:::Peach
      diracx-out:::Peach
@@ -91,4 +91,4 @@ By default, the `gubbins` extension is part of a monorepo and uses a local versi
 To deploy gubbins as a standalone package:
 
 - **Isolate the `packages/extensions` directory:** Copy the content of `packages/extensions` to a new repository or directory outside the monorepo.
-- **Update Configuration:** Adjust relevant variables to align with a standalone setup. Review the gubbins-test GitHub Action workflow for required changes.
+- **Update Configuration:** Point the `@dirac-grid/diracx-web-components` dependency in `package.json` at its published version instead of the local workspace package. `vite.config.ts`'s dev-mode source alias for `diracx-web-components` only applies when a sibling `diracx-web-components/src` directory exists, so it does not need any adjustment outside the monorepo. See the `prepare-gubbins-frontend-as-a-standalone` job in the gubbins-test GitHub Action workflow for a worked example.
