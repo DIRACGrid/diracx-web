@@ -1,5 +1,20 @@
 # Changelog
 
+## [0.1.0-a13](https://github.com/DIRACGrid/diracx-web/compare/v0.1.0-a12...v0.1.0-a13) (2026-11-26)
+
+
+### Bug Fixes
+
+* **deps:** update dependency postcss to v8.5.23 [security] ([0e9bdc5](https://github.com/DIRACGrid/diracx-web/commit/0e9bdc53ff05b5becd3725794eb523d014e308ac))
+* **deps:** update dependency postcss to v8.5.23 [security] ([d71ece2](https://github.com/DIRACGrid/diracx-web/commit/d71ece2b583ae2709f70951220fb3d36d027ca13))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @dirac-grid/diracx-web-components bumped from ^0.1.0-a12 to ^0.1.0-a13
+
 ## [0.1.0-a12](https://github.com/DIRACGrid/diracx-web/compare/v0.1.0-a11...v0.1.0-a12) (2026-11-24)
 
 
