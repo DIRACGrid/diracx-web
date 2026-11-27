@@ -13,6 +13,12 @@
       "matchDepNames": ["typescript"],
       "matchUpdateTypes": ["major"],
       "dependencyDashboardApproval": true
+    },
+    {
+      "description": "Major npm updates (material-ui v9, eslint v10, next major, ...) change code behavior and APIs: keep them visible on the dependency dashboard, but require explicit approval before a PR is opened. Minor/patch updates keep flowing as usual.",
+      "matchManagers": ["npm"],
+      "matchUpdateTypes": ["major"],
+      "dependencyDashboardApproval": true
     }
   ]
 }
